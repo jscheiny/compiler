@@ -1,0 +1,97 @@
+use crate::{
+    lexer::KeywordToken,
+    parser::operator::{BinaryOperator, PrefixOperator},
+};
+
+#[derive(Debug)]
+pub enum TypeDefinitionParseNode {
+    Primitive(KeywordToken),
+    User(UserDefinedTypeParseNode),
+}
+
+#[derive(Debug)]
+pub struct UserDefinedTypeParseNode {
+    pub identifier: String,
+    pub generic_params: Vec<TypeDefinitionParseNode>,
+}
+
+#[derive(Debug)]
+pub struct StructMemberParseNode {
+    pub public: bool,
+    pub identifier: String,
+    pub type_def: TypeDefinitionParseNode,
+}
+
+#[derive(Debug)]
+pub struct MethodParseNode {
+    pub public: bool,
+    pub identifier: String,
+    pub parameters: Vec<ParameterParseNode>,
+    pub return_type: Option<TypeDefinitionParseNode>,
+    pub body: MethodBodyParseNode,
+}
+
+#[derive(Debug)]
+pub enum MethodBodyParseNode {
+    Expression(ExpressionParseNode),
+    Block(Vec<StatementParseNode>),
+}
+
+#[derive(Debug)]
+pub struct ParameterParseNode {
+    pub identifier: String,
+    pub type_def: TypeDefinitionParseNode,
+}
+
+#[derive(Debug)]
+pub struct StructDefinitionParseNode {
+    pub identifier: String,
+    pub member_list: Vec<StructMemberParseNode>,
+    pub methods: Vec<MethodParseNode>,
+}
+
+#[derive(Debug)]
+pub enum StatementParseNode {
+    Declaration(DeclarationParseNode),
+    Expression(ExpressionParseNode),
+    Block(Vec<StatementParseNode>),
+    Return(Option<ExpressionParseNode>),
+    Break(),
+    Continue(),
+    WhileLoop(WhileLoopParseNode),
+}
+
+#[derive(Debug)]
+pub struct DeclarationParseNode {
+    pub mutable: bool,
+    pub identifier: String,
+    pub type_def: Option<TypeDefinitionParseNode>,
+    pub expression: ExpressionParseNode,
+}
+
+#[derive(Debug)]
+pub struct WhileLoopParseNode {
+    pub predicate: ExpressionParseNode,
+    pub body: Vec<StatementParseNode>,
+}
+
+#[derive(Debug)]
+pub enum ExpressionParseNode {
+    PrefixOp(PrefixOpExpressionParseNode),
+    BinaryOp(BinaryOpExpressionParseNode),
+    Block(Vec<StatementParseNode>),
+    Identifier(String),
+}
+
+#[derive(Debug)]
+pub struct PrefixOpExpressionParseNode {
+    pub operator: PrefixOperator,
+    pub expression: Box<ExpressionParseNode>,
+}
+
+#[derive(Debug)]
+pub struct BinaryOpExpressionParseNode {
+    pub left: Box<ExpressionParseNode>,
+    pub operator: BinaryOperator,
+    pub right: Box<ExpressionParseNode>,
+}
