@@ -4,6 +4,16 @@ use crate::{
 };
 
 #[derive(Debug)]
+pub struct ProgramParseNode {
+    pub definitions: Vec<TopLevelDefinition>,
+}
+
+#[derive(Debug)]
+pub enum TopLevelDefinition {
+    Record(RecordDefinitionParseNode),
+}
+
+#[derive(Debug)]
 pub enum TypeDefinitionParseNode {
     Primitive(KeywordToken),
     User(UserDefinedTypeParseNode),
@@ -16,7 +26,7 @@ pub struct UserDefinedTypeParseNode {
 }
 
 #[derive(Debug)]
-pub struct StructMemberParseNode {
+pub struct RecordMemberParseNode {
     pub public: bool,
     pub identifier: String,
     pub type_def: TypeDefinitionParseNode,
@@ -44,10 +54,17 @@ pub struct ParameterParseNode {
 }
 
 #[derive(Debug)]
-pub struct StructDefinitionParseNode {
+pub struct RecordDefinitionParseNode {
+    pub record_type: RecordType,
     pub identifier: String,
-    pub member_list: Vec<StructMemberParseNode>,
+    pub member_list: Vec<RecordMemberParseNode>,
     pub methods: Vec<MethodParseNode>,
+}
+
+#[derive(Debug)]
+pub enum RecordType {
+    Structure,
+    Tuple,
 }
 
 #[derive(Debug)]

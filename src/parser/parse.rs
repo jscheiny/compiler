@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::{
     lexer::{IdentifierToken, KeywordToken, LocatedToken, Token},
-    parser::{ParserPredicate, grammar::program, parse_node::StructDefinitionParseNode},
+    parser::{ParserPredicate, ProgramParseNode, grammar::program},
 };
 
 pub struct TokenTraverser {
@@ -52,7 +52,7 @@ impl TokenTraverser {
         }
     }
 
-    fn peek(&self) -> &Token {
+    pub fn peek(&self) -> &Token {
         &self.tokens[self.index].token
     }
 
@@ -65,12 +65,8 @@ impl TokenTraverser {
     }
 }
 
-pub fn parse(tokens: Rc<Vec<LocatedToken>>) -> Result<StructDefinitionParseNode, ()> {
+pub fn parse(tokens: Rc<Vec<LocatedToken>>) -> Result<ProgramParseNode, ()> {
     let mut traverser = TokenTraverser::new(tokens);
-    let p = program(&mut traverser);
-    if !traverser.is_done() {
-        println!("ERRRRRRR");
-    }
-
-    p
+    program(&mut traverser)
 }
+

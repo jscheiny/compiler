@@ -1,26 +1,43 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken},
     parser::{
-        MethodBodyParseNode, MethodParseNode, ParameterParseNode, StructDefinitionParseNode,
-        StructMemberParseNode, TokenTraverser,
+        MethodBodyParseNode, MethodParseNode, ParameterParseNode, RecordDefinitionParseNode,
+        RecordMemberParseNode, RecordType, TokenTraverser,
         grammar::{comma_separated_list, expression, statement, type_definition},
     },
 };
 
-pub fn structure(tokens: &mut TokenTraverser) -> Result<StructDefinitionParseNode, ()> {
+pub fn structure(tokens: &mut TokenTraverser) -> Result<RecordDefinitionParseNode, ()> {
+    record(tokens, RecordType::Structure)
+}
+
+pub fn tuple(tokens: &mut TokenTraverser) -> Result<RecordDefinitionParseNode, ()> {
+    record(tokens, RecordType::Tuple)
+}
+
+fn record(
+    tokens: &mut TokenTraverser,
+    record_type: RecordType,
+) -> Result<RecordDefinitionParseNode, ()> {
+    tokens.expect(match record_type {
+        RecordType::Structure => &KeywordToken::Struct,
+        RecordType::Tuple => &KeywordToken::Tuple,
+    })?;
     let identifier = tokens.identifier().ok_or(())?;
     tokens.expect(&OperatorToken::OpenParen)?;
     let member_list = comma_separated_list(tokens, OperatorToken::CloseParen, member)?;
 
     if tokens.accept(&OperatorToken::EndStatement) {
-        Ok(StructDefinitionParseNode {
+        Ok(RecordDefinitionParseNode {
+            record_type,
             identifier,
             member_list,
             methods: vec![],
         })
     } else if tokens.accept(&OperatorToken::OpenBrace) {
         let methods = methods(tokens)?;
-        Ok(StructDefinitionParseNode {
+        Ok(RecordDefinitionParseNode {
+            record_type,
             identifier,
             member_list,
             methods,
@@ -30,10 +47,10 @@ pub fn structure(tokens: &mut TokenTraverser) -> Result<StructDefinitionParseNod
     }
 }
 
-fn member(tokens: &mut TokenTraverser) -> Result<StructMemberParseNode, ()> {
+fn member(tokens: &mut TokenTraverser) -> Result<RecordMemberParseNode, ()> {
     if tokens.accept(&KeywordToken::Pub) {
         let member = member(tokens)?;
-        return Ok(StructMemberParseNode {
+        return Ok(RecordMemberParseNode {
             public: true,
             ..member
         });
@@ -42,7 +59,7 @@ fn member(tokens: &mut TokenTraverser) -> Result<StructMemberParseNode, ()> {
     let identifier = tokens.identifier().ok_or(())?;
     tokens.expect(&OperatorToken::Type)?;
     let type_def = type_definition(tokens)?;
-    Ok(StructMemberParseNode {
+    Ok(RecordMemberParseNode {
         identifier,
         type_def,
         public: false,

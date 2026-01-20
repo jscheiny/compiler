@@ -6,8 +6,9 @@ mod type_definition;
 mod utils;
 
 use expression::*;
-pub use program::*;
 use statement::*;
 use structure::*;
 use type_definition::*;
 use utils::*;
+
+pub use program::*;
