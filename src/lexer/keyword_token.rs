@@ -8,6 +8,7 @@ use crate::{
 
 #[derive(Debug, Clone, Copy, EnumIter, PartialEq, Eq)]
 pub enum KeywordToken {
+    Interface,
     Continue,
     Return,
     Struct,
@@ -30,6 +31,7 @@ impl KeywordToken {
     pub fn to_string(&self) -> &str {
         use KeywordToken as K;
         match self {
+            K::Interface => "interface",
             K::Continue => "continue",
             K::Return => "return",
             K::Struct => "struct",

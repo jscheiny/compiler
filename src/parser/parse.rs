@@ -52,7 +52,7 @@ impl TokenTraverser {
         }
     }
 
-    pub fn peek(&self) -> &Token {
+    fn peek(&self) -> &Token {
         &self.tokens[self.index].token
     }
 
@@ -69,4 +69,3 @@ pub fn parse(tokens: Rc<Vec<LocatedToken>>) -> Result<ProgramParseNode, ()> {
     let mut traverser = TokenTraverser::new(tokens);
     program(&mut traverser)
 }
-

@@ -1,20 +1,23 @@
 use crate::{
-    lexer::{KeywordToken, Token},
+    lexer::KeywordToken,
     parser::{
-        ProgramParseNode, TokenTraverser, TopLevelDefinition, grammar::{structure, tuple},
+        ProgramParseNode, TokenTraverser, TopLevelDefinition,
+        grammar::{interface, structure, tuple},
     },
 };
 
 pub fn program(tokens: &mut TokenTraverser) -> Result<ProgramParseNode, ()> {
     let mut definitions = vec![];
     while !tokens.is_done() {
-        definitions.push(match tokens.peek() {
-            Token::Keyword(KeywordToken::Tuple) => TopLevelDefinition::Record(tuple(tokens)?),
-            Token::Keyword(KeywordToken::Struct) => {
-                TopLevelDefinition::Record(structure(tokens)?)
-            }
-            _ => panic!("Fix this"),
-        });
+        if tokens.accept(&KeywordToken::Tuple) {
+            definitions.push(TopLevelDefinition::Record(tuple(tokens)?));
+        } else if tokens.accept(&KeywordToken::Struct) {
+            definitions.push(TopLevelDefinition::Record(structure(tokens)?));
+        } else if tokens.accept(&KeywordToken::Interface) {
+            definitions.push(TopLevelDefinition::Interface(interface(tokens)?));
+        } else {
+            panic!("Fix this!");
+        }
     }
     Ok(ProgramParseNode { definitions })
 }

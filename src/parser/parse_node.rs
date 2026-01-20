@@ -11,6 +11,7 @@ pub struct ProgramParseNode {
 #[derive(Debug)]
 pub enum TopLevelDefinition {
     Record(RecordDefinitionParseNode),
+    Interface(InterfaceDefinitionParseNode),
 }
 
 #[derive(Debug)]
@@ -23,6 +24,27 @@ pub enum TypeDefinitionParseNode {
 pub struct UserDefinedTypeParseNode {
     pub identifier: String,
     pub generic_params: Vec<TypeDefinitionParseNode>,
+}
+
+#[derive(Debug)]
+pub struct InterfaceDefinitionParseNode {
+    pub identifier: String,
+    pub method_signatures: Vec<MethodSignatureParseNode>,
+}
+
+#[derive(Debug)]
+pub struct MethodSignatureParseNode {
+    pub identifier: String,
+    pub parameters: Vec<ParameterParseNode>,
+    pub return_type: TypeDefinitionParseNode,
+}
+
+#[derive(Debug)]
+pub struct RecordDefinitionParseNode {
+    pub record_type: RecordType,
+    pub identifier: String,
+    pub member_list: Vec<RecordMemberParseNode>,
+    pub methods: Vec<MethodParseNode>,
 }
 
 #[derive(Debug)]
@@ -51,14 +73,6 @@ pub enum MethodBodyParseNode {
 pub struct ParameterParseNode {
     pub identifier: String,
     pub type_def: TypeDefinitionParseNode,
-}
-
-#[derive(Debug)]
-pub struct RecordDefinitionParseNode {
-    pub record_type: RecordType,
-    pub identifier: String,
-    pub member_list: Vec<RecordMemberParseNode>,
-    pub methods: Vec<MethodParseNode>,
 }
 
 #[derive(Debug)]

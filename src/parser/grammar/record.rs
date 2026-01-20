@@ -3,7 +3,7 @@ use crate::{
     parser::{
         MethodBodyParseNode, MethodParseNode, RecordDefinitionParseNode, RecordMemberParseNode,
         RecordType, TokenTraverser,
-        grammar::{comma_separated_list, expression, parameter, statement, type_definition},
+        grammar::{comma_separated_list, expression, parameters, statement, type_definition},
     },
 };
 
@@ -19,10 +19,6 @@ fn record(
     tokens: &mut TokenTraverser,
     record_type: RecordType,
 ) -> Result<RecordDefinitionParseNode, ()> {
-    tokens.expect(match record_type {
-        RecordType::Structure => &KeywordToken::Struct,
-        RecordType::Tuple => &KeywordToken::Tuple,
-    })?;
     let identifier = tokens.identifier().ok_or(())?;
     tokens.expect(&OperatorToken::OpenParen)?;
     let member_list = comma_separated_list(tokens, OperatorToken::CloseParen, member)?;
@@ -84,8 +80,7 @@ fn method(tokens: &mut TokenTraverser) -> Result<MethodParseNode, ()> {
     }
 
     let identifier = tokens.identifier().ok_or(())?;
-    tokens.expect(&OperatorToken::OpenParen)?;
-    let parameters = comma_separated_list(tokens, OperatorToken::CloseParen, parameter)?;
+    let parameters = parameters(tokens)?;
 
     let return_type = if tokens.accept(&OperatorToken::Type) {
         Some(type_definition(tokens)?)

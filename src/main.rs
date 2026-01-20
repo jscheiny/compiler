@@ -9,7 +9,11 @@ fn main() {
     let tokens = tokenize(
         "tuple S(x: string) {}
         struct G(x: string, y:List[T]) {}
-        tuple F() {}",
+        tuple F() {}
+        interface I {
+            a(): int;
+            b(x: int): Map[T];
+        }",
     );
     for token in tokens.iter() {
         println!("{:#?}", token);
