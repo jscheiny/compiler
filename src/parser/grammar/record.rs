@@ -1,9 +1,9 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken},
     parser::{
-        MethodBodyParseNode, MethodParseNode, ParameterParseNode, RecordDefinitionParseNode,
-        RecordMemberParseNode, RecordType, TokenTraverser,
-        grammar::{comma_separated_list, expression, statement, type_definition},
+        MethodBodyParseNode, MethodParseNode, RecordDefinitionParseNode, RecordMemberParseNode,
+        RecordType, TokenTraverser,
+        grammar::{comma_separated_list, expression, parameter, statement, type_definition},
     },
 };
 
@@ -114,16 +114,5 @@ fn method(tokens: &mut TokenTraverser) -> Result<MethodParseNode, ()> {
         parameters,
         return_type,
         body: body?,
-    })
-}
-
-fn parameter(tokens: &mut TokenTraverser) -> Result<ParameterParseNode, ()> {
-    let identifier = tokens.identifier().ok_or(())?;
-    tokens.expect(&OperatorToken::Type)?;
-    let type_def = type_definition(tokens)?;
-
-    Ok(ParameterParseNode {
-        identifier,
-        type_def,
     })
 }
