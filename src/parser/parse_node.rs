@@ -91,9 +91,8 @@ pub enum RecordType {
 pub enum StatementParseNode {
     Declaration(DeclarationParseNode),
     Expression(ExpressionParseNode),
-    Block(Vec<StatementParseNode>),
     FunctionReturn(Option<ExpressionParseNode>),
-    ExpressionReturn(ExpressionParseNode),
+    BlockReturn(ExpressionParseNode),
     Break(),
     Continue(),
     WhileLoop(WhileLoopParseNode),
