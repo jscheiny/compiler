@@ -7,19 +7,16 @@ pub mod parser;
 
 fn main() {
     let tokens = tokenize(
-        "tuple S(x: string) {}
-        struct G(x: string, y:List[T]) {}
-        tuple F() {}
-        interface I {
-            a(): int;
-            b(x: int): Map[T];
-        }
-        fn f() {
+        "fn test() {
             let x = ;
-        }
-        fn g(x: int): int {}
-        fn h() -> ;
-        fn i(x: int): int ->;",
+            mut y = ;
+            return;
+            ->;
+            break;
+            continue;
+            while {}
+            {}
+        }",
     );
     for token in tokens.iter() {
         println!("{:#?}", token);
