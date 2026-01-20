@@ -2,7 +2,7 @@ use crate::{
     lexer::KeywordToken,
     parser::{
         ProgramParseNode, TokenTraverser, TopLevelDefinition,
-        grammar::{interface, structure, tuple},
+        grammar::{function, interface, structure, tuple},
     },
 };
 
@@ -15,6 +15,8 @@ pub fn program(tokens: &mut TokenTraverser) -> Result<ProgramParseNode, ()> {
             definitions.push(TopLevelDefinition::Record(structure(tokens)?));
         } else if tokens.accept(&KeywordToken::Interface) {
             definitions.push(TopLevelDefinition::Interface(interface(tokens)?));
+        } else if tokens.accept(&KeywordToken::Fn) {
+            definitions.push(TopLevelDefinition::Function(function(tokens)?));
         } else {
             panic!("Fix this!");
         }

@@ -1,9 +1,9 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken},
     parser::{
-        MethodBodyParseNode, MethodParseNode, RecordDefinitionParseNode, RecordMemberParseNode,
-        RecordType, TokenTraverser,
-        grammar::{comma_separated_list, expression, parameters, statement, type_definition},
+        MethodParseNode, RecordDefinitionParseNode, RecordMemberParseNode, RecordType,
+        TokenTraverser,
+        grammar::{comma_separated_list, function, type_definition},
     },
 };
 
@@ -79,35 +79,9 @@ fn method(tokens: &mut TokenTraverser) -> Result<MethodParseNode, ()> {
         });
     }
 
-    let identifier = tokens.identifier().ok_or(())?;
-    let parameters = parameters(tokens)?;
-
-    let return_type = if tokens.accept(&OperatorToken::Type) {
-        Some(type_definition(tokens)?)
-    } else {
-        None
-    };
-
-    let body: Result<MethodBodyParseNode, ()> = if tokens.accept(&OperatorToken::FunctionDefinition)
-    {
-        let expression = expression(tokens)?;
-        tokens.expect(&OperatorToken::EndStatement)?;
-        Ok(MethodBodyParseNode::Expression(expression))
-    } else if tokens.accept(&OperatorToken::OpenBrace) {
-        let mut statements = vec![];
-        while !tokens.accept(&OperatorToken::CloseBrace) {
-            statements.push(statement(tokens)?);
-        }
-        Ok(MethodBodyParseNode::Block(statements))
-    } else {
-        Err(())
-    };
-
+    let function = function(tokens)?;
     Ok(MethodParseNode {
         public: false,
-        identifier,
-        parameters,
-        return_type,
-        body: body?,
+        function,
     })
 }

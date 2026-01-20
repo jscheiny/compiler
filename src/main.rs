@@ -13,7 +13,13 @@ fn main() {
         interface I {
             a(): int;
             b(x: int): Map[T];
-        }",
+        }
+        fn f() {
+            let x = ;
+        }
+        fn g(x: int): int {}
+        fn h() -> ;
+        fn i(x: int): int ->;",
     );
     for token in tokens.iter() {
         println!("{:#?}", token);

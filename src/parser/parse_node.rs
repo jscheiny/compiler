@@ -12,6 +12,7 @@ pub struct ProgramParseNode {
 pub enum TopLevelDefinition {
     Record(RecordDefinitionParseNode),
     Interface(InterfaceDefinitionParseNode),
+    Function(FunctionDefintionParseNode),
 }
 
 #[derive(Debug)]
@@ -57,14 +58,19 @@ pub struct RecordMemberParseNode {
 #[derive(Debug)]
 pub struct MethodParseNode {
     pub public: bool,
-    pub identifier: String,
-    pub parameters: Vec<ParameterParseNode>,
-    pub return_type: Option<TypeDefinitionParseNode>,
-    pub body: MethodBodyParseNode,
+    pub function: FunctionDefintionParseNode,
 }
 
 #[derive(Debug)]
-pub enum MethodBodyParseNode {
+pub struct FunctionDefintionParseNode {
+    pub identifier: String,
+    pub parameters: Vec<ParameterParseNode>,
+    pub return_type: Option<TypeDefinitionParseNode>,
+    pub body: FunctionBodyParseNode,
+}
+
+#[derive(Debug)]
+pub enum FunctionBodyParseNode {
     Expression(ExpressionParseNode),
     Block(Vec<StatementParseNode>),
 }

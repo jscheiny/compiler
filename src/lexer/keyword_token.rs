@@ -24,6 +24,7 @@ pub enum KeywordToken {
     Mut,
     Pub,
     For,
+    Fn,
     If,
 }
 
@@ -47,6 +48,7 @@ impl KeywordToken {
             K::Mut => "mut",
             K::For => "for",
             K::Pub => "pub",
+            K::Fn => "fn",
             K::If => "if",
         }
     }

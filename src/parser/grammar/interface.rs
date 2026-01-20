@@ -2,7 +2,7 @@ use crate::{
     lexer::OperatorToken,
     parser::{
         InterfaceDefinitionParseNode, MethodSignatureParseNode, TokenTraverser,
-        grammar::{function::parameters, type_definition::type_definition},
+        grammar::{parameters, type_definition},
     },
 };
 
