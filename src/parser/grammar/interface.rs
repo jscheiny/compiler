@@ -7,6 +7,7 @@ use crate::{
 };
 
 pub fn interface(tokens: &mut TokenTraverser) -> Result<InterfaceDefinitionParseNode, ()> {
+    tokens.next();
     let identifier = tokens.identifier().ok_or(())?;
     tokens.expect(&OperatorToken::OpenBrace)?;
     let method_signatures = method_signatures(tokens)?;

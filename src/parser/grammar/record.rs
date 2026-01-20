@@ -19,6 +19,7 @@ fn record(
     tokens: &mut TokenTraverser,
     record_type: RecordType,
 ) -> Result<RecordDefinitionParseNode, ()> {
+    tokens.next();
     let identifier = tokens.identifier().ok_or(())?;
     tokens.expect(&OperatorToken::OpenParen)?;
     let member_list = comma_separated_list(tokens, OperatorToken::CloseParen, member)?;

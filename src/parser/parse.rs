@@ -52,11 +52,11 @@ impl TokenTraverser {
         }
     }
 
-    fn peek(&self) -> &Token {
+    pub fn peek(&self) -> &Token {
         &self.tokens[self.index].token
     }
 
-    fn next(&mut self) {
+    pub fn next(&mut self) {
         self.index += 1;
     }
 

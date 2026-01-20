@@ -1,5 +1,5 @@
 use crate::{
-    lexer::KeywordToken,
+    lexer::{KeywordToken, Token},
     parser::{
         ProgramParseNode, TokenTraverser, TopLevelDefinition,
         grammar::{function, interface, structure, tuple},
@@ -9,16 +9,25 @@ use crate::{
 pub fn program(tokens: &mut TokenTraverser) -> Result<ProgramParseNode, ()> {
     let mut definitions = vec![];
     while !tokens.is_done() {
-        if tokens.accept(&KeywordToken::Tuple) {
-            definitions.push(TopLevelDefinition::Record(tuple(tokens)?));
-        } else if tokens.accept(&KeywordToken::Struct) {
-            definitions.push(TopLevelDefinition::Record(structure(tokens)?));
-        } else if tokens.accept(&KeywordToken::Interface) {
-            definitions.push(TopLevelDefinition::Interface(interface(tokens)?));
-        } else if tokens.accept(&KeywordToken::Fn) {
-            definitions.push(TopLevelDefinition::Function(function(tokens)?));
+        if tokens.accept(&KeywordToken::Pub) {
+            todo!("Mark as public");
+        }
+
+        if let Token::Keyword(keyword) = tokens.peek() {
+            use KeywordToken as K;
+            let definition = match keyword {
+                K::Tuple => TopLevelDefinition::Record(tuple(tokens)?),
+                K::Struct => TopLevelDefinition::Record(structure(tokens)?),
+                K::Interface => TopLevelDefinition::Interface(interface(tokens)?),
+                K::Fn => {
+                    tokens.next(); // Only top level functions need the 'fn' keyword so we need to manually skip forward here
+                    TopLevelDefinition::Function(function(tokens)?)
+                }
+                _ => panic!("Fix this"),
+            };
+            definitions.push(definition);
         } else {
-            panic!("Fix this!");
+            panic!("Not good");
         }
     }
     Ok(ProgramParseNode { definitions })
