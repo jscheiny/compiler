@@ -12,7 +12,7 @@ fn main() {
             } else if predicate {
             } else if neat {
             } else {
-                x;
+                x; \"x..\\\"..\";
             }
         }",
     );

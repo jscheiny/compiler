@@ -130,6 +130,8 @@ pub enum ExpressionParseNode {
     PrefixOp(PrefixOpExpressionParseNode),
     BinaryOp(BinaryOpExpressionParseNode),
     PostfixOp(PostfixOpExpressionParseNode),
+    StringLiteral(String),
+    IntegerLiteral(i64),
     Block(Vec<StatementParseNode>),
     Identifier(String),
 }
