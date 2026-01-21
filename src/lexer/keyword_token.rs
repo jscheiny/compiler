@@ -30,26 +30,25 @@ pub enum KeywordToken {
 
 impl KeywordToken {
     pub fn to_string(&self) -> &str {
-        use KeywordToken as K;
         match self {
-            K::Interface => "interface",
-            K::Continue => "continue",
-            K::Return => "return",
-            K::Struct => "struct",
-            K::Break => "break",
-            K::Float => "float",
-            K::Tuple => "tuple",
-            K::While => "while",
-            K::Bool => "bool",
-            K::Else => "else",
-            K::Enum => "enum",
-            K::Int => "int",
-            K::Let => "let",
-            K::Mut => "mut",
-            K::For => "for",
-            K::Pub => "pub",
-            K::Fn => "fn",
-            K::If => "if",
+            Self::Interface => "interface",
+            Self::Continue => "continue",
+            Self::Return => "return",
+            Self::Struct => "struct",
+            Self::Break => "break",
+            Self::Float => "float",
+            Self::Tuple => "tuple",
+            Self::While => "while",
+            Self::Bool => "bool",
+            Self::Else => "else",
+            Self::Enum => "enum",
+            Self::Int => "int",
+            Self::Let => "let",
+            Self::Mut => "mut",
+            Self::For => "for",
+            Self::Pub => "pub",
+            Self::Fn => "fn",
+            Self::If => "if",
         }
     }
 }
