@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
@@ -6,7 +8,7 @@ use crate::{
     parser::ParserPredicate,
 };
 
-#[derive(Debug, Clone, Copy, EnumIter, PartialEq, Eq)]
+#[derive(Clone, Copy, EnumIter, PartialEq, Eq)]
 pub enum OperatorToken {
     // Two character operators
     AddAssign,
@@ -37,8 +39,6 @@ pub enum OperatorToken {
     CloseBracket,
     OpenBrace,
     CloseBrace,
-    DoubleQuote,
-    SingleQuote,
     NullShortCircuit,
     Access,
     Comma,
@@ -77,8 +77,6 @@ impl OperatorToken {
             O::CloseBracket => "]",
             O::OpenBrace => "{",
             O::CloseBrace => "}",
-            O::DoubleQuote => "\"",
-            O::SingleQuote => "'",
             O::NullShortCircuit => "?",
             O::Access => ".",
             O::Comma => ",",
@@ -108,5 +106,11 @@ impl ParserPredicate for OperatorToken {
             Token::Operator(op) => *op == *self,
             _ => false,
         }
+    }
+}
+
+impl Display for OperatorToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.as_string())
     }
 }

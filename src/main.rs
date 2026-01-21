@@ -9,13 +9,14 @@ fn main() {
     let tokens = tokenize(
         "fn test() {
             if {} {
-
+            \"abcdefg\"
+34
             } else if {} {} else if {} {}
         }",
     );
 
     for token in tokens.iter() {
-        println!("{:#?}", token);
+        println!("{}", token);
     }
     let x = parse(Rc::new(tokens)).unwrap();
     println!("{:#?}", x);

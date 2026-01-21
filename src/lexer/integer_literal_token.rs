@@ -1,6 +1,8 @@
+use std::fmt::Display;
+
 use crate::lexer::{Token, TokenParse};
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct IntegerLiteralToken(pub i64);
 
 impl TokenParse for IntegerLiteralToken {
@@ -22,5 +24,11 @@ impl TokenParse for IntegerLiteralToken {
         maybe_value
             .as_ref()
             .map(|value| (Token::IntegerLiteral(IntegerLiteralToken(*value)), count))
+    }
+}
+
+impl Display for IntegerLiteralToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
     }
 }

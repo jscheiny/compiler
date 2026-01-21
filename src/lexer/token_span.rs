@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use std::fmt::Display;
 
 use crate::lexer::WhitespaceToken;
 
@@ -8,9 +8,9 @@ pub struct TokenSpan {
     pub end: CharacterLocation,
 }
 
-impl Debug for TokenSpan {
+impl Display for TokenSpan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?} -> {:?}", self.start, self.end)
+        write!(f, "{} -> {}", self.start, self.end)
     }
 }
 
@@ -36,7 +36,7 @@ impl CharacterLocation {
     }
 }
 
-impl Debug for CharacterLocation {
+impl Display for CharacterLocation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}:{}", self.line, self.column)
     }

@@ -1,9 +1,11 @@
+use std::fmt::Display;
+
 use crate::{
     lexer::{Token, TokenParse},
     parser::ParserPredicate,
 };
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct IdentifierToken(pub String);
 
 impl ParserPredicate for IdentifierToken {
@@ -33,5 +35,11 @@ impl TokenParse for IdentifierToken {
         } else {
             Some((Token::Identifier(IdentifierToken(identifier)), len))
         }
+    }
+}
+
+impl Display for IdentifierToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
     }
 }

@@ -1,6 +1,6 @@
 use crate::lexer::{
     CharacterLocation, IdentifierToken, IntegerLiteralToken, KeywordToken, LocatedToken,
-    OperatorToken, Token, TokenParse, TokenSpan, WhitespaceToken,
+    OperatorToken, StringLiteralToken, Token, TokenParse, TokenSpan, WhitespaceToken,
 };
 
 pub fn tokenize(mut text: &str) -> Vec<LocatedToken> {
@@ -38,6 +38,7 @@ pub fn tokenize(mut text: &str) -> Vec<LocatedToken> {
 fn next_token(text: &str) -> Option<(Token, usize, &str)> {
     OperatorToken::try_tokenize(text)
         .or_else(|| KeywordToken::try_tokenize(text))
+        .or_else(|| StringLiteralToken::try_tokenize(text))
         .or_else(|| IntegerLiteralToken::try_tokenize(text))
         .or_else(|| IdentifierToken::try_tokenize(text))
         .or_else(|| WhitespaceToken::try_tokenize(text))
