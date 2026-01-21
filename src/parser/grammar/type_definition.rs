@@ -14,7 +14,7 @@ fn primitive_type_definition(tokens: &mut TokenTraverser) -> Result<TypeDefiniti
     if let Token::Keyword(keyword) = tokens.peek() {
         match keyword {
             KeywordToken::Bool | KeywordToken::Int | KeywordToken::Float => {
-                let keyword = keyword.clone();
+                let keyword = *keyword;
                 tokens.next();
                 Ok(TypeDefinitionParseNode::Primitive(keyword))
             }

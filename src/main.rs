@@ -14,10 +14,6 @@ fn main() {
         }",
     );
 
-    if {
-        let x = 5;
-        x == 5
-    } {}
     for token in tokens.iter() {
         println!("{:#?}", token);
     }

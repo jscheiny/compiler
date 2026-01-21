@@ -16,7 +16,7 @@ impl TokenTraverser {
     }
 
     pub fn accept(&mut self, predicate: &impl ParserPredicate) -> bool {
-        if predicate.is_match(&self.peek()) {
+        if predicate.is_match(self.peek()) {
             self.next();
             true
         } else {

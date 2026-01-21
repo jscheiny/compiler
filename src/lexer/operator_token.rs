@@ -45,7 +45,7 @@ pub enum OperatorToken {
 }
 
 impl OperatorToken {
-    fn to_string(&self) -> &str {
+    fn as_string(&self) -> &str {
         use OperatorToken as O;
         match self {
             // Two character operators
@@ -86,19 +86,14 @@ impl OperatorToken {
     }
 
     pub fn maybe_match(text: &str) -> Option<OperatorToken> {
-        for operator in OperatorToken::iter() {
-            if text.starts_with(operator.to_string()) {
-                return Some(operator);
-            }
-        }
-        None
+        OperatorToken::iter().find(|operator| text.starts_with(operator.as_string()))
     }
 }
 
 impl TokenParse for OperatorToken {
     fn try_tokenize(text: &str) -> Option<(Token, usize)> {
         for operator in OperatorToken::iter() {
-            let operator_str = operator.to_string();
+            let operator_str = operator.as_string();
             if text.starts_with(operator_str) {
                 return Some((Token::Operator(operator), operator_str.len()));
             }

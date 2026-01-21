@@ -42,6 +42,6 @@ fn next_token(text: &str) -> Option<(Token, usize, &str)> {
         .or_else(|| WhitespaceToken::try_tokenize(text))
         .map(|(token, len)| {
             let (_, end) = text.split_at(len);
-            return (token, len, end);
+            (token, len, end)
         })
 }

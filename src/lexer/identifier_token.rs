@@ -8,10 +8,7 @@ pub struct IdentifierToken(pub String);
 
 impl ParserPredicate for IdentifierToken {
     fn is_match(&self, token: &Token) -> bool {
-        match token {
-            Token::Identifier(_) => true,
-            _ => false,
-        }
+        matches!(token, Token::Identifier(_))
     }
 }
 

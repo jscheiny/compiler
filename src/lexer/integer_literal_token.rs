@@ -19,10 +19,8 @@ impl TokenParse for IntegerLiteralToken {
         }
 
         let maybe_value = &text[0..count].parse::<i64>().ok();
-        if let Some(value) = maybe_value {
-            Some((Token::IntegerLiteral(IntegerLiteralToken(*value)), count))
-        } else {
-            None
-        }
+        maybe_value
+            .as_ref()
+            .map(|value| (Token::IntegerLiteral(IntegerLiteralToken(*value)), count))
     }
 }
