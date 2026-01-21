@@ -96,6 +96,7 @@ pub enum StatementParseNode {
     Break(),
     Continue(),
     WhileLoop(WhileLoopParseNode),
+    If(IfStatementParseNode),
 }
 
 #[derive(Debug)]
@@ -108,6 +109,18 @@ pub struct DeclarationParseNode {
 
 #[derive(Debug)]
 pub struct WhileLoopParseNode {
+    pub predicate: ExpressionParseNode,
+    pub body: Vec<StatementParseNode>,
+}
+
+#[derive(Debug)]
+pub struct IfStatementParseNode {
+    pub conditions: Vec<IfStatementConditionParseNode>,
+    pub else_branch: Option<Vec<StatementParseNode>>,
+}
+
+#[derive(Debug)]
+pub struct IfStatementConditionParseNode {
     pub predicate: ExpressionParseNode,
     pub body: Vec<StatementParseNode>,
 }

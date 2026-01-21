@@ -1,7 +1,8 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token},
     parser::{
-        DeclarationParseNode, StatementParseNode, TokenTraverser, WhileLoopParseNode,
+        DeclarationParseNode, ExpressionParseNode, IfStatementConditionParseNode,
+        IfStatementParseNode, StatementParseNode, TokenTraverser, WhileLoopParseNode,
         grammar::{block, expression, type_definition},
     },
 };
@@ -15,6 +16,7 @@ pub fn statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> 
             KeywordToken::Break => break_statement(tokens),
             KeywordToken::Continue => continue_statement(tokens),
             KeywordToken::While => while_loop(tokens),
+            KeywordToken::If => if_statement(tokens),
             _ => expression_statement(tokens),
         },
         Token::Operator(operator) => match operator {
@@ -83,9 +85,38 @@ fn while_loop(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
     }))
 }
 
+fn if_statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
+    tokens.next();
+    let mut conditions = vec![if_condition(tokens)?];
+    let mut else_branch = None;
+
+    while tokens.accept(&KeywordToken::Else) {
+        if tokens.accept(&KeywordToken::If) {
+            conditions.push(if_condition(tokens)?);
+        } else if tokens.accept(&OperatorToken::OpenBrace) {
+            else_branch = Some(block(tokens)?);
+        } else {
+            return Err(());
+        }
+    }
+
+    Ok(StatementParseNode::If(IfStatementParseNode {
+        conditions,
+        else_branch,
+    }))
+}
+
+fn if_condition(tokens: &mut TokenTraverser) -> Result<IfStatementConditionParseNode, ()> {
+    let predicate = expression(tokens)?;
+    tokens.expect(&OperatorToken::OpenBrace)?;
+    let body = block(tokens)?;
+    Ok(IfStatementConditionParseNode { predicate, body })
+}
+
 fn block_statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
     tokens.next();
-    Ok(StatementParseNode::Expression(block(tokens)?))
+    let block = ExpressionParseNode::Block(block(tokens)?);
+    Ok(StatementParseNode::Expression(block))
 }
 
 fn block_return(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {

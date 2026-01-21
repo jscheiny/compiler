@@ -8,16 +8,16 @@ pub mod parser;
 fn main() {
     let tokens = tokenize(
         "fn test() {
-            let x = ;
-            mut y = ;
-            return;
-            ->;
-            break;
-            continue;
-            while {}
-            {}
+            if {} {
+
+            } else if {} {} else if {} {}
         }",
     );
+
+    if {
+        let x = 5;
+        x == 5
+    } {}
     for token in tokens.iter() {
         println!("{:#?}", token);
     }
