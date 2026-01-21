@@ -1,5 +1,5 @@
 use crate::{
-    lexer::{KeywordToken, OperatorToken},
+    lexer::{KeywordToken, OperatorToken, Token},
     parser::{
         TokenTraverser, TypeDefinitionParseNode, UserDefinedTypeParseNode,
         grammar::comma_separated_list,
@@ -11,15 +11,14 @@ pub fn type_definition(tokens: &mut TokenTraverser) -> Result<TypeDefinitionPars
 }
 
 fn primitive_type_definition(tokens: &mut TokenTraverser) -> Result<TypeDefinitionParseNode, ()> {
-    let keyword = tokens.keyword();
-    if let Some(keyword) = keyword {
-        if keyword == KeywordToken::Bool
-            || keyword == KeywordToken::Int
-            || keyword == KeywordToken::Float
-        {
-            Ok(TypeDefinitionParseNode::Primitive(keyword))
-        } else {
-            Err(())
+    if let Token::Keyword(keyword) = tokens.peek() {
+        match keyword {
+            KeywordToken::Bool | KeywordToken::Int | KeywordToken::Float => {
+                let keyword = keyword.clone();
+                tokens.next();
+                Ok(TypeDefinitionParseNode::Primitive(keyword))
+            }
+            _ => Err(()),
         }
     } else {
         Err(())

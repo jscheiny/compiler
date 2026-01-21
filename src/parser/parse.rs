@@ -43,15 +43,6 @@ impl TokenTraverser {
         }
     }
 
-    pub fn keyword(&mut self) -> Option<KeywordToken> {
-        if let Token::Keyword(keyword) = self.peek().clone() {
-            self.next();
-            Some(keyword)
-        } else {
-            None
-        }
-    }
-
     pub fn peek(&self) -> &Token {
         &self.tokens[self.index].token
     }
