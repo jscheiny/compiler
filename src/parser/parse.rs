@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    lexer::{IdentifierToken, KeywordToken, LocatedToken, Token},
+    lexer::{IdentifierToken, LocatedToken, Token},
     parser::{ParserPredicate, ProgramParseNode, grammar::program},
 };
 
@@ -17,7 +17,6 @@ impl TokenTraverser {
 
     pub fn accept(&mut self, predicate: &impl ParserPredicate) -> bool {
         if predicate.is_match(&self.peek()) {
-            println!("Accept token {:?}", self.peek());
             self.next();
             true
         } else {
@@ -35,7 +34,6 @@ impl TokenTraverser {
 
     pub fn identifier(&mut self) -> Option<String> {
         if let Token::Identifier(IdentifierToken(identifier)) = self.peek().clone() {
-            println!("Accept identifier '{}'", identifier);
             self.next();
             Some(identifier)
         } else {
