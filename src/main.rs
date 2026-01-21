@@ -9,8 +9,6 @@ fn main() {
     let tokens = tokenize(
         "fn test() {
             if {} {
-            \"abcdefg\"
-34
             } else if {} {} else if {} {}
         }",
     );

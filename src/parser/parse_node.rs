@@ -1,6 +1,6 @@
 use crate::{
     lexer::KeywordToken,
-    parser::operator::{BinaryOperator, PrefixOperator},
+    parser::operator::{BinaryOperator, PostfixOperator, PrefixOperator},
 };
 
 #[derive(Debug)]
@@ -129,6 +129,7 @@ pub struct IfStatementConditionParseNode {
 pub enum ExpressionParseNode {
     PrefixOp(PrefixOpExpressionParseNode),
     BinaryOp(BinaryOpExpressionParseNode),
+    PostfixOp(PostfixOpExpressionParseNode),
     Block(Vec<StatementParseNode>),
     Identifier(String),
 }
@@ -144,4 +145,10 @@ pub struct BinaryOpExpressionParseNode {
     pub left: Box<ExpressionParseNode>,
     pub operator: BinaryOperator,
     pub right: Box<ExpressionParseNode>,
+}
+
+#[derive(Debug)]
+pub struct PostfixOpExpressionParseNode {
+    pub expression: Box<ExpressionParseNode>,
+    pub operator: PostfixOperator,
 }
