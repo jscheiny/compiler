@@ -1,18 +1,9 @@
 use std::fmt::Display;
 
-use crate::{
-    lexer::{Token, TokenParse},
-    parser::ParserPredicate,
-};
+use crate::lexer::{Token, TokenParse};
 
 #[derive(Clone)]
 pub struct IdentifierToken(pub String);
-
-impl ParserPredicate for IdentifierToken {
-    fn is_match(&self, token: &Token) -> bool {
-        matches!(token, Token::Identifier(_))
-    }
-}
 
 impl TokenParse for IdentifierToken {
     fn try_tokenize(text: &str) -> Option<(Token, usize)> {
