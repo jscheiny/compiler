@@ -1,6 +1,5 @@
 use crate::lexer::{
-    CharacterLocation, IdentifierToken, IntegerLiteralToken, KeywordToken, OperatorToken,
-    WhitespaceToken,
+    IdentifierToken, IntegerLiteralToken, KeywordToken, OperatorToken, TokenSpan, WhitespaceToken,
 };
 
 #[derive(Debug, Clone)]
@@ -15,8 +14,7 @@ pub enum Token {
 #[derive(Debug, Clone)]
 pub struct LocatedToken {
     pub token: Token,
-    pub start: CharacterLocation,
-    pub end: CharacterLocation,
+    pub span: TokenSpan,
 }
 
 pub trait TokenParse

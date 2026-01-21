@@ -3,6 +3,18 @@ use std::fmt::Debug;
 use crate::lexer::WhitespaceToken;
 
 #[derive(Clone, Copy)]
+pub struct TokenSpan {
+    pub start: CharacterLocation,
+    pub end: CharacterLocation,
+}
+
+impl Debug for TokenSpan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?} -> {:?}", self.start, self.end)
+    }
+}
+
+#[derive(Clone, Copy)]
 pub struct CharacterLocation {
     pub line: usize,
     pub column: usize,
