@@ -8,8 +8,12 @@ pub mod parser;
 fn main() {
     let tokens = tokenize(
         "fn test() {
-            if {} {
-            } else if {} {} else if {} {}
+            if test {
+            } else if predicate {
+            } else if neat {
+            } else {
+                x;
+            }
         }",
     );
 

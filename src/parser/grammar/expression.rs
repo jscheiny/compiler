@@ -7,7 +7,10 @@ pub fn expression(tokens: &mut TokenTraverser) -> Result<ExpressionParseNode, ()
     if tokens.accept(&OperatorToken::OpenBrace) {
         Ok(ExpressionParseNode::Block(block(tokens)?))
     } else {
-        Ok(ExpressionParseNode::Identifier(String::new()))
+        let identifier = tokens.identifier();
+        Ok(ExpressionParseNode::Identifier(
+            identifier.unwrap_or_else(|| String::new()),
+        ))
     }
 }
 
