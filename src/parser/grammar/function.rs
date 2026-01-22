@@ -15,7 +15,7 @@ pub fn function(
     if has_keyword {
         tokens.next();
     }
-    let identifier = tokens.located_identifier().ok_or(())?;
+    let identifier = tokens.identifier().ok_or(())?;
     let parameters = parameters(tokens)?;
     let return_type = if tokens.accept(&OperatorToken::Type) {
         Some(type_definition(tokens)?)
@@ -62,7 +62,7 @@ pub fn parameters(
 
 fn parameter(tokens: &mut TokenTraverser) -> ParseResult<ParameterParseNode> {
     let span = tokens.start_span();
-    let identifier = tokens.located_identifier().ok_or(())?;
+    let identifier = tokens.identifier().ok_or(())?;
     tokens.expect(&OperatorToken::Type)?;
     let type_def = type_definition(tokens)?;
 

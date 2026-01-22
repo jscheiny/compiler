@@ -32,16 +32,7 @@ impl TokenTraverser {
         }
     }
 
-    pub fn identifier(&mut self) -> Option<String> {
-        if let Token::Identifier(IdentifierToken(identifier)) = self.peek().clone() {
-            self.next();
-            Some(identifier)
-        } else {
-            None
-        }
-    }
-
-    pub fn located_identifier(&mut self) -> Option<LocatedNode<String>> {
+    pub fn identifier(&mut self) -> Option<LocatedNode<String>> {
         if let Token::Identifier(IdentifierToken(identifier)) = self.peek() {
             let identifier = identifier.clone();
             let span = self.start_span();

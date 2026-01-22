@@ -28,7 +28,7 @@ fn primitive_type_definition(tokens: &mut TokenTraverser) -> ParseResult<TypeDef
 
 fn user_type_definition(tokens: &mut TokenTraverser) -> ParseResult<TypeDefinitionParseNode> {
     let span = tokens.start_span();
-    let identifier = tokens.located_identifier().ok_or(())?;
+    let identifier = tokens.identifier().ok_or(())?;
     let generic_params = generic_type_params(tokens)?;
 
     Ok(span.close(

@@ -10,7 +10,7 @@ use crate::{
 pub fn interface(tokens: &mut TokenTraverser) -> ParseResult<InterfaceDefinitionParseNode> {
     let span = tokens.start_span();
     tokens.next();
-    let identifier = tokens.located_identifier().ok_or(())?;
+    let identifier = tokens.identifier().ok_or(())?;
     let method_signatures = method_signatures(tokens)?;
 
     Ok(span.close(
@@ -36,7 +36,7 @@ fn method_signatures(
 
 fn method_signature(tokens: &mut TokenTraverser) -> ParseResult<MethodSignatureParseNode> {
     let span = tokens.start_span();
-    let identifier = tokens.located_identifier().ok_or(())?;
+    let identifier = tokens.identifier().ok_or(())?;
     let parameters = parameters(tokens)?;
     tokens.expect(&OperatorToken::Type)?;
     let return_type = type_definition(tokens)?;
