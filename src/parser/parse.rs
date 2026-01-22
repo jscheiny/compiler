@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::{
     lexer::{IdentifierToken, LocatedToken, Token},
-    parser::{ParserPredicate, ProgramParseNode, grammar::program},
+    parser::{NodeSpanTracker, ParserPredicate, ProgramParseNode, grammar::program},
 };
 
 pub struct TokenTraverser {
@@ -51,6 +51,14 @@ impl TokenTraverser {
 
     pub fn is_done(&self) -> bool {
         self.index == self.tokens.len()
+    }
+
+    pub fn start_span(&self) -> NodeSpanTracker {
+        NodeSpanTracker::new(self.index)
+    }
+
+    pub fn index(&self) -> usize {
+        self.index
     }
 }
 

@@ -6,16 +6,7 @@ pub mod lexer;
 pub mod parser;
 
 fn main() {
-    let tokens = tokenize(
-        "fn test() {
-            if test {
-            } else if predicate {
-            } else if neat {
-            } else {
-                x; \"x..\\\"..\";
-            }
-        }",
-    );
+    let tokens = tokenize("struct T(){}");
 
     for token in tokens.iter() {
         println!("{}", token);

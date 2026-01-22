@@ -1,44 +1,51 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken},
     parser::{
-        MethodParseNode, RecordDefinitionParseNode, RecordMemberParseNode, RecordType,
+        MethodParseNode, ParseResult, RecordDefinitionParseNode, RecordMemberParseNode, RecordType,
         TokenTraverser,
         grammar::{comma_separated_list, function, type_definition},
     },
 };
 
-pub fn structure(tokens: &mut TokenTraverser) -> Result<RecordDefinitionParseNode, ()> {
+pub fn structure(tokens: &mut TokenTraverser) -> ParseResult<RecordDefinitionParseNode> {
     record(tokens, RecordType::Structure)
 }
 
-pub fn tuple(tokens: &mut TokenTraverser) -> Result<RecordDefinitionParseNode, ()> {
+pub fn tuple(tokens: &mut TokenTraverser) -> ParseResult<RecordDefinitionParseNode> {
     record(tokens, RecordType::Tuple)
 }
 
 fn record(
     tokens: &mut TokenTraverser,
     record_type: RecordType,
-) -> Result<RecordDefinitionParseNode, ()> {
+) -> ParseResult<RecordDefinitionParseNode> {
+    let span = tokens.start_span();
     tokens.next();
     let identifier = tokens.identifier().ok_or(())?;
     tokens.expect(&OperatorToken::OpenParen)?;
     let member_list = comma_separated_list(tokens, OperatorToken::CloseParen, member)?;
 
     if tokens.accept(&OperatorToken::EndStatement) {
-        Ok(RecordDefinitionParseNode {
-            record_type,
-            identifier,
-            member_list,
-            methods: vec![],
-        })
+        span.create_node(
+            tokens,
+            RecordDefinitionParseNode {
+                record_type,
+                identifier,
+                member_list,
+                methods: vec![],
+            },
+        )
     } else if tokens.accept(&OperatorToken::OpenBrace) {
         let methods = methods(tokens)?;
-        Ok(RecordDefinitionParseNode {
-            record_type,
-            identifier,
-            member_list,
-            methods,
-        })
+        span.create_node(
+            tokens,
+            RecordDefinitionParseNode {
+                record_type,
+                identifier,
+                member_list,
+                methods,
+            },
+        )
     } else {
         Err(())
     }

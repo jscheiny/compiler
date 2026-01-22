@@ -1,7 +1,18 @@
+use std::fmt::Debug;
+
 use crate::{
     lexer::KeywordToken,
     parser::operator::{BinaryOperator, PostfixOperator, PrefixOperator},
 };
+
+pub type ParseResult<ParseNode> = Result<LocatedNode<ParseNode>, ()>;
+
+#[derive(Debug)]
+pub struct LocatedNode<ParseNode: Debug> {
+    pub node: ParseNode,
+    pub token_start_index: usize,
+    pub token_end_index: usize,
+}
 
 #[derive(Debug)]
 pub struct ProgramParseNode {
@@ -10,7 +21,7 @@ pub struct ProgramParseNode {
 
 #[derive(Debug)]
 pub enum TopLevelDefinition {
-    Record(RecordDefinitionParseNode),
+    Record(LocatedNode<RecordDefinitionParseNode>),
     Interface(InterfaceDefinitionParseNode),
     Function(FunctionDefintionParseNode),
 }
