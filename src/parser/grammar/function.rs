@@ -7,8 +7,14 @@ use crate::{
     },
 };
 
-pub fn function(tokens: &mut TokenTraverser) -> ParseResult<FunctionDefintionParseNode> {
+pub fn function(
+    tokens: &mut TokenTraverser,
+    has_keyword: bool,
+) -> ParseResult<FunctionDefintionParseNode> {
     let span = tokens.start_span();
+    if has_keyword {
+        tokens.next();
+    }
     let identifier = tokens.located_identifier().ok_or(())?;
     let parameters = parameters(tokens)?;
     let return_type = if tokens.accept(&OperatorToken::Type) {

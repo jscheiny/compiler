@@ -6,7 +6,7 @@ pub mod lexer;
 pub mod parser;
 
 fn main() {
-    let tokens = tokenize("struct T(){ f(x:int)->x;}");
+    let tokens = tokenize("interface I { f(): X; }");
 
     for token in tokens.iter() {
         println!("{}", token);

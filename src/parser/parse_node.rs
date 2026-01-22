@@ -24,7 +24,7 @@ pub struct ProgramParseNode {
 #[derive(Debug)]
 pub enum TopLevelDefinition {
     Record(LocatedNode<RecordDefinitionParseNode>),
-    Interface(InterfaceDefinitionParseNode),
+    Interface(LocatedNode<InterfaceDefinitionParseNode>),
     Function(LocatedNode<FunctionDefintionParseNode>),
 }
 
@@ -42,8 +42,8 @@ pub struct UserDefinedTypeParseNode {
 
 #[derive(Debug)]
 pub struct InterfaceDefinitionParseNode {
-    pub identifier: String,
-    pub method_signatures: Vec<MethodSignatureParseNode>,
+    pub identifier: LocatedNode<String>,
+    pub method_signatures: LocatedNodeVec<MethodSignatureParseNode>,
 }
 
 #[derive(Debug)]

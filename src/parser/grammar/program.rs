@@ -19,10 +19,7 @@ pub fn program(tokens: &mut TokenTraverser) -> Result<ProgramParseNode, ()> {
                 K::Tuple => TopLevelDefinition::Record(tuple(tokens)?),
                 K::Struct => TopLevelDefinition::Record(structure(tokens)?),
                 K::Interface => TopLevelDefinition::Interface(interface(tokens)?),
-                K::Fn => {
-                    tokens.next(); // Only top level functions need the 'fn' keyword so we need to manually skip forward here
-                    TopLevelDefinition::Function(function(tokens)?)
-                }
+                K::Fn => TopLevelDefinition::Function(function(tokens, true)?),
                 _ => panic!("Fix this"),
             };
             definitions.push(definition);

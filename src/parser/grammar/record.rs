@@ -109,7 +109,7 @@ fn method(tokens: &mut TokenTraverser) -> ParseResult<MethodParseNode> {
         ));
     }
 
-    let function = function(tokens)?;
+    let function = function(tokens, false)?;
     Ok(span.close(
         tokens,
         MethodParseNode {
