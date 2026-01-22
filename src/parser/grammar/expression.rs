@@ -20,13 +20,10 @@ pub fn expression(tokens: &mut TokenTraverser) -> Result<ExpressionParseNode, ()
             tokens.next();
             Ok(ExpressionParseNode::StringLiteral(literal.clone()))
         }
-        Token::Operator(operator) => match operator {
-            OperatorToken::OpenBrace => {
-                tokens.next();
-                Ok(ExpressionParseNode::Block(block(tokens)?))
-            }
-            _ => Err(()),
-        },
+        Token::Operator(OperatorToken::OpenBrace) => {
+            tokens.next();
+            Ok(ExpressionParseNode::Block(block(tokens)?))
+        }
         _ => Err(()),
     }
 }
