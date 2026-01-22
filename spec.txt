@@ -1,0 +1,147 @@
+// Structs
+
+struct Coordinate(x: int, y: int) {
+    pub magnitude(): int -> sqrt(@x.squared() + @y.squared())
+}
+
+let x = Coordinate(x: 3, y: 5);
+x.magnitude // type () -> int
+Coordinate.magnitured // type (self: Coordinate) -> int
+
+// Tuples
+
+tuple Pair[T](pub first: T, pub second: T) {
+
+}
+
+let y = Pair(3, 4) // type Pair[int]
+Pair[int].first // type ()
+
+
+
+struct Coordinate(pub row: i8, pub column: i8) {
+    pub shift(row_delta: i8, column_delta: i8): Coordinate -> 
+        Coordinate(row: @row + row_relta, column: @column + column_delta);
+}
+
+enum Orientation(Horizontal, Vertical);
+
+struct MoveCoordinate(...pub coordinate: Coordinate, pub orientation: Orientation) {
+    shift(row_delta: i8, column_delta: i8): MoveCoordinate ->
+        MoveCoordinate(...self, coordinate: @coordinate.shift(row_delta, column_delta));
+    
+    pub forward(amount: i8): MoveCoordinate ->
+        match @orientation {
+            Orientation.Horizontal -> @shift(0, amount),
+            Orientation.Vertical -> @shift(amount, 0),
+        };
+    
+    pub backward(amount: i8): MoveCoordinate -> @forward(-amount)
+
+    pub next(): MoveCoordinate -> @forward(1)
+
+    pub prev(): MoveCoordinate -> @forward(-1)
+
+    pub ortho_forward(amount: i8): MoveCoordinate ->
+        match @orientation {
+            Orientation.Horizontal -> @shift(amount, 0),
+            Orientation.Vertical -> @shift(0, amount),
+        }
+
+    pub ortho_next(): MoveCoordinate -> @ortho_forward(1)
+
+    pub ortho_prev(): MoveCoordinate -> @ortho_forward(-1)
+
+    pub oriented_index(): i8 ->
+        @coordinate => match @orientation {
+            Orientation.Horizontal -> .row
+            Orientation.Vertical -> .column
+        };
+    
+    pub ortho_index(): i8 ->
+        @coordinate => match @orientation {
+            Orientation.Horizontal -> .column,
+            Orientation.Vertical -> .row,
+        };
+}
+
+struct SearchCoordinate(pub index: usize, orientation: Orientation, next_delta: usize) {
+    static new(coord: MoveCoordinate, board_columns: usize): SearchCoordinate {
+        let MoveCoordinate(coordinate, orientation) = coord;
+        let index = coord.row as usize * board_columns + coordinate.column as usize;
+        let next_delta = match orientation {
+            Orientation.Horizontal => 1,
+            Orientation.Vertical => board_columns,
+        };
+
+        -> SearchCoordinate(index, orientation, next_delta)
+    }
+
+    next(): SearchCoordinate ->
+        SearchCoordinate(
+            ...self,
+            index: @index + self.next_delta,
+        )
+}
+
+struct RawBoard[Square](
+    pub rows: usize,
+    pub columns: usize,
+    pub bounds: Coordinate,
+    pub contents: Vec[Square],
+) {
+    static pub new(rows: usize, columns: usize, fill: Square): RawBoard[Square] ->
+        RawBoard(
+            rows,
+            columns,
+            bounds: Coordinate(rows, columns),
+            contents: Vec.new(rows * columns, fill)
+        );
+
+    static pub from_vec(board: Vec[Vec[Square]]): RawBoard[Square] {
+        let rows = board.len();
+        let columns = board[0].len();
+        let bounds = Coordinate(rows, columns);
+        let contents = board.flatten().to_vec();
+        -> RawBoard(rows, columns, bounds, contents);
+    }
+
+    pub is_out_of_bounds(coordinate: Coordinate): bool ->
+        coordinate.row < 0
+            or coordinate.column < 0
+            or coordinate.row >= @rows
+            or coordinate.column >= @columns;
+
+    static make_board(rows: usize, columns: usize, fill: Square): Vec[Square] ->
+        Vec.new(rows * columns, fill);
+}
+
+enum Premium(
+    LetterMultiplier(Score),
+    WordMultiplier(Score),
+    None
+) {
+    static pub from(symbol: char): Premium {
+        if symbol.is_alphabetic() {
+            let letter_multiplier = LETTER_SYMBOLS.position(symbol);
+            -> match letter_multiplier {
+                Some(index): Premium.LetterMultiplier(index as Score + 2),
+                None: Premium.None,
+            };
+        } else if symbol.is_numeric() {
+            let word_multiplier = WORD_SYMBOLS.position(symbol);
+            -> match word_multiplier {
+                Some(index): Premium.WordMultiplier(index as Score + 2),
+                None: Premium.None,
+            }
+        } else {
+            None
+        }
+    }
+}
+
+struct GreedyStrategy;
+
+interface Strategy {
+    choose_action(state: GameStateView, game_metadata: GameMetadata, bag_size: usize): usize;
+}
