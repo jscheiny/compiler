@@ -9,10 +9,12 @@ pub type ParseResult<ParseNode> = Result<LocatedNode<ParseNode>, ()>;
 
 #[derive(Debug)]
 pub struct LocatedNode<ParseNode: Debug> {
-    pub node: ParseNode,
+    pub value: ParseNode,
     pub token_start_index: usize,
     pub token_end_index: usize,
 }
+
+pub type LocatedNodeVec<ParseNode> = LocatedNode<Vec<LocatedNode<ParseNode>>>;
 
 #[derive(Debug)]
 pub struct ProgramParseNode {
@@ -55,8 +57,8 @@ pub struct MethodSignatureParseNode {
 pub struct RecordDefinitionParseNode {
     pub record_type: LocatedNode<RecordType>,
     pub identifier: LocatedNode<String>,
-    pub member_list: LocatedNode<Vec<RecordMemberParseNode>>,
-    pub methods: Vec<MethodParseNode>,
+    pub member_list: LocatedNodeVec<RecordMemberParseNode>,
+    pub methods: LocatedNodeVec<MethodParseNode>,
 }
 
 #[derive(Debug)]

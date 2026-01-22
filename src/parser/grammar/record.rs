@@ -1,8 +1,8 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken},
     parser::{
-        MethodParseNode, ParseResult, RecordDefinitionParseNode, RecordMemberParseNode, RecordType,
-        TokenTraverser,
+        LocatedNode, MethodParseNode, ParseResult, RecordDefinitionParseNode,
+        RecordMemberParseNode, RecordType, TokenTraverser,
         grammar::{comma_separated_list, function, type_definition},
     },
 };
@@ -36,6 +36,7 @@ fn record(
         span.close(tokens, member_list)
     };
 
+    let methods_span = tokens.start_span();
     if tokens.accept(&OperatorToken::EndStatement) {
         Ok(record_span.close(
             tokens,
@@ -43,11 +44,14 @@ fn record(
                 record_type,
                 identifier,
                 member_list,
-                methods: vec![],
+                methods: methods_span.close(tokens, vec![]),
             },
         ))
     } else if tokens.accept(&OperatorToken::OpenBrace) {
-        let methods = methods(tokens)?;
+        let methods = {
+            let methods = methods(tokens)?;
+            methods_span.close(tokens, methods)
+        };
         Ok(record_span.close(
             tokens,
             RecordDefinitionParseNode {
@@ -62,26 +66,33 @@ fn record(
     }
 }
 
-fn member(tokens: &mut TokenTraverser) -> Result<RecordMemberParseNode, ()> {
+fn member(tokens: &mut TokenTraverser) -> ParseResult<RecordMemberParseNode> {
+    let span = tokens.start_span();
     if tokens.accept(&KeywordToken::Pub) {
         let member = member(tokens)?;
-        return Ok(RecordMemberParseNode {
-            public: true,
-            ..member
-        });
+        return Ok(span.close(
+            tokens,
+            RecordMemberParseNode {
+                public: true,
+                ..member.value
+            },
+        ));
     }
 
     let identifier = tokens.identifier().ok_or(())?;
     tokens.expect(&OperatorToken::Type)?;
     let type_def = type_definition(tokens)?;
-    Ok(RecordMemberParseNode {
-        identifier,
-        type_def,
-        public: false,
-    })
+    Ok(span.close(
+        tokens,
+        RecordMemberParseNode {
+            identifier,
+            type_def,
+            public: false,
+        },
+    ))
 }
 
-fn methods(tokens: &mut TokenTraverser) -> Result<Vec<MethodParseNode>, ()> {
+fn methods(tokens: &mut TokenTraverser) -> Result<Vec<LocatedNode<MethodParseNode>>, ()> {
     let mut methods = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {
         methods.push(method(tokens)?);
@@ -89,18 +100,25 @@ fn methods(tokens: &mut TokenTraverser) -> Result<Vec<MethodParseNode>, ()> {
     Ok(methods)
 }
 
-fn method(tokens: &mut TokenTraverser) -> Result<MethodParseNode, ()> {
+fn method(tokens: &mut TokenTraverser) -> ParseResult<MethodParseNode> {
+    let span = tokens.start_span();
     if tokens.accept(&KeywordToken::Pub) {
         let method = method(tokens)?;
-        return Ok(MethodParseNode {
-            public: true,
-            ..method
-        });
+        return Ok(span.close(
+            tokens,
+            MethodParseNode {
+                public: true,
+                ..method.value
+            },
+        ));
     }
 
     let function = function(tokens)?;
-    Ok(MethodParseNode {
-        public: false,
-        function,
-    })
+    Ok(span.close(
+        tokens,
+        MethodParseNode {
+            public: false,
+            function,
+        },
+    ))
 }

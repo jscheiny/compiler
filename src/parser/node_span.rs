@@ -17,7 +17,7 @@ impl NodeSpanTracker {
         node: ParseNode,
     ) -> LocatedNode<ParseNode> {
         LocatedNode {
-            node,
+            value: node,
             token_start_index: self.token_start_index,
             token_end_index: tokens.index(),
         }
@@ -25,7 +25,7 @@ impl NodeSpanTracker {
 
     pub fn singleton<ParseNode: Debug>(&self, node: ParseNode) -> LocatedNode<ParseNode> {
         LocatedNode {
-            node,
+            value: node,
             token_start_index: self.token_start_index,
             token_end_index: self.token_start_index + 1,
         }
