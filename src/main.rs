@@ -6,7 +6,7 @@ pub mod lexer;
 pub mod parser;
 
 fn main() {
-    let tokens = tokenize("struct T(pub value: Map[int, F]){}");
+    let tokens = tokenize("struct T(){ f(x:int)->x;}");
 
     for token in tokens.iter() {
         println!("{}", token);

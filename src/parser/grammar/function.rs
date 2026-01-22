@@ -1,13 +1,15 @@
 use crate::{
     lexer::OperatorToken,
     parser::{
-        FunctionBodyParseNode, FunctionDefintionParseNode, ParameterParseNode, TokenTraverser,
+        FunctionBodyParseNode, FunctionDefintionParseNode, LocatedNode, ParameterParseNode,
+        ParseResult, TokenTraverser,
         grammar::{expression, statement, type_definition, utils::comma_separated_list},
     },
 };
 
-pub fn function(tokens: &mut TokenTraverser) -> Result<FunctionDefintionParseNode, ()> {
-    let identifier = tokens.identifier().ok_or(())?;
+pub fn function(tokens: &mut TokenTraverser) -> ParseResult<FunctionDefintionParseNode> {
+    let span = tokens.start_span();
+    let identifier = tokens.located_identifier().ok_or(())?;
     let parameters = parameters(tokens)?;
     let return_type = if tokens.accept(&OperatorToken::Type) {
         Some(type_definition(tokens)?)
@@ -15,42 +17,54 @@ pub fn function(tokens: &mut TokenTraverser) -> Result<FunctionDefintionParseNod
         None
     };
     let body = function_body(tokens)?;
-    Ok(FunctionDefintionParseNode {
-        identifier,
-        parameters,
-        return_type,
-        body,
-    })
+    Ok(span.close(
+        tokens,
+        FunctionDefintionParseNode {
+            identifier,
+            parameters,
+            return_type,
+            body,
+        },
+    ))
 }
 
-fn function_body(tokens: &mut TokenTraverser) -> Result<FunctionBodyParseNode, ()> {
+fn function_body(tokens: &mut TokenTraverser) -> ParseResult<FunctionBodyParseNode> {
+    let span = tokens.start_span();
     if tokens.accept(&OperatorToken::FunctionDefinition) {
         let expression = expression(tokens)?;
         tokens.expect(&OperatorToken::EndStatement)?;
-        Ok(FunctionBodyParseNode::Expression(expression))
+        Ok(span.close(tokens, FunctionBodyParseNode::Expression(expression)))
     } else if tokens.accept(&OperatorToken::OpenBrace) {
         let mut statements = vec![];
         while !tokens.accept(&OperatorToken::CloseBrace) {
             statements.push(statement(tokens)?);
         }
-        Ok(FunctionBodyParseNode::Block(statements))
+        Ok(span.close(tokens, FunctionBodyParseNode::Block(statements)))
     } else {
         Err(())
     }
 }
 
-pub fn parameters(tokens: &mut TokenTraverser) -> Result<Vec<ParameterParseNode>, ()> {
+pub fn parameters(
+    tokens: &mut TokenTraverser,
+) -> ParseResult<Vec<LocatedNode<ParameterParseNode>>> {
+    let span = tokens.start_span();
     tokens.expect(&OperatorToken::OpenParen)?;
-    comma_separated_list(tokens, OperatorToken::CloseParen, parameter)
+    let list = comma_separated_list(tokens, OperatorToken::CloseParen, parameter)?;
+    Ok(span.close(tokens, list))
 }
 
-fn parameter(tokens: &mut TokenTraverser) -> Result<ParameterParseNode, ()> {
-    let identifier = tokens.identifier().ok_or(())?;
+fn parameter(tokens: &mut TokenTraverser) -> ParseResult<ParameterParseNode> {
+    let span = tokens.start_span();
+    let identifier = tokens.located_identifier().ok_or(())?;
     tokens.expect(&OperatorToken::Type)?;
     let type_def = type_definition(tokens)?;
 
-    Ok(ParameterParseNode {
-        identifier,
-        type_def,
-    })
+    Ok(span.close(
+        tokens,
+        ParameterParseNode {
+            identifier,
+            type_def,
+        },
+    ))
 }

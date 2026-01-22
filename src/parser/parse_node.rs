@@ -25,7 +25,7 @@ pub struct ProgramParseNode {
 pub enum TopLevelDefinition {
     Record(LocatedNode<RecordDefinitionParseNode>),
     Interface(InterfaceDefinitionParseNode),
-    Function(FunctionDefintionParseNode),
+    Function(LocatedNode<FunctionDefintionParseNode>),
 }
 
 #[derive(Debug)]
@@ -48,8 +48,8 @@ pub struct InterfaceDefinitionParseNode {
 
 #[derive(Debug)]
 pub struct MethodSignatureParseNode {
-    pub identifier: String,
-    pub parameters: Vec<ParameterParseNode>,
+    pub identifier: LocatedNode<String>,
+    pub parameters: LocatedNodeVec<ParameterParseNode>,
     pub return_type: LocatedNode<TypeDefinitionParseNode>,
 }
 
@@ -71,15 +71,15 @@ pub struct RecordMemberParseNode {
 #[derive(Debug)]
 pub struct MethodParseNode {
     pub public: bool,
-    pub function: FunctionDefintionParseNode,
+    pub function: LocatedNode<FunctionDefintionParseNode>,
 }
 
 #[derive(Debug)]
 pub struct FunctionDefintionParseNode {
-    pub identifier: String,
-    pub parameters: Vec<ParameterParseNode>,
+    pub identifier: LocatedNode<String>,
+    pub parameters: LocatedNodeVec<ParameterParseNode>,
     pub return_type: Option<LocatedNode<TypeDefinitionParseNode>>,
-    pub body: FunctionBodyParseNode,
+    pub body: LocatedNode<FunctionBodyParseNode>,
 }
 
 #[derive(Debug)]
@@ -90,7 +90,7 @@ pub enum FunctionBodyParseNode {
 
 #[derive(Debug)]
 pub struct ParameterParseNode {
-    pub identifier: String,
+    pub identifier: LocatedNode<String>,
     pub type_def: LocatedNode<TypeDefinitionParseNode>,
 }
 
