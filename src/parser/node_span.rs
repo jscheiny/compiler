@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use crate::parser::{LocatedNode, ParseResult, TokenTraverser};
+use crate::parser::{LocatedNode, TokenTraverser};
 
 pub struct NodeSpanTracker {
     token_start_index: usize,
@@ -11,15 +11,23 @@ impl NodeSpanTracker {
         Self { token_start_index }
     }
 
-    pub fn create_node<ParseNode: Debug>(
+    pub fn close<ParseNode: Debug>(
         &self,
         tokens: &TokenTraverser,
         node: ParseNode,
-    ) -> ParseResult<ParseNode> {
-        Ok(LocatedNode {
+    ) -> LocatedNode<ParseNode> {
+        LocatedNode {
             node,
             token_start_index: self.token_start_index,
             token_end_index: tokens.index(),
-        })
+        }
+    }
+
+    pub fn singleton<ParseNode: Debug>(&self, node: ParseNode) -> LocatedNode<ParseNode> {
+        LocatedNode {
+            node,
+            token_start_index: self.token_start_index,
+            token_end_index: self.token_start_index + 1,
+        }
     }
 }

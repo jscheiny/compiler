@@ -19,14 +19,25 @@ fn record(
     tokens: &mut TokenTraverser,
     record_type: RecordType,
 ) -> ParseResult<RecordDefinitionParseNode> {
-    let span = tokens.start_span();
+    let record_span = tokens.start_span();
+    let record_type = record_span.singleton(record_type);
     tokens.next();
-    let identifier = tokens.identifier().ok_or(())?;
-    tokens.expect(&OperatorToken::OpenParen)?;
-    let member_list = comma_separated_list(tokens, OperatorToken::CloseParen, member)?;
+
+    let identifier = {
+        let span = tokens.start_span();
+        let identifier = tokens.identifier().ok_or(())?;
+        span.singleton(identifier)
+    };
+
+    let member_list = {
+        let span = tokens.start_span();
+        tokens.expect(&OperatorToken::OpenParen)?;
+        let member_list = comma_separated_list(tokens, OperatorToken::CloseParen, member)?;
+        span.close(tokens, member_list)
+    };
 
     if tokens.accept(&OperatorToken::EndStatement) {
-        span.create_node(
+        Ok(record_span.close(
             tokens,
             RecordDefinitionParseNode {
                 record_type,
@@ -34,10 +45,10 @@ fn record(
                 member_list,
                 methods: vec![],
             },
-        )
+        ))
     } else if tokens.accept(&OperatorToken::OpenBrace) {
         let methods = methods(tokens)?;
-        span.create_node(
+        Ok(record_span.close(
             tokens,
             RecordDefinitionParseNode {
                 record_type,
@@ -45,7 +56,7 @@ fn record(
                 member_list,
                 methods,
             },
-        )
+        ))
     } else {
         Err(())
     }

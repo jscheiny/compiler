@@ -53,9 +53,9 @@ pub struct MethodSignatureParseNode {
 
 #[derive(Debug)]
 pub struct RecordDefinitionParseNode {
-    pub record_type: RecordType,
-    pub identifier: String,
-    pub member_list: Vec<RecordMemberParseNode>,
+    pub record_type: LocatedNode<RecordType>,
+    pub identifier: LocatedNode<String>,
+    pub member_list: LocatedNode<Vec<RecordMemberParseNode>>,
     pub methods: Vec<MethodParseNode>,
 }
 
