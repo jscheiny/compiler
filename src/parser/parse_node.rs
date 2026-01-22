@@ -36,8 +36,8 @@ pub enum TypeDefinitionParseNode {
 
 #[derive(Debug)]
 pub struct UserDefinedTypeParseNode {
-    pub identifier: String,
-    pub generic_params: Vec<TypeDefinitionParseNode>,
+    pub identifier: LocatedNode<String>,
+    pub generic_params: Option<LocatedNodeVec<TypeDefinitionParseNode>>,
 }
 
 #[derive(Debug)]
@@ -50,7 +50,7 @@ pub struct InterfaceDefinitionParseNode {
 pub struct MethodSignatureParseNode {
     pub identifier: String,
     pub parameters: Vec<ParameterParseNode>,
-    pub return_type: TypeDefinitionParseNode,
+    pub return_type: LocatedNode<TypeDefinitionParseNode>,
 }
 
 #[derive(Debug)]
@@ -65,7 +65,7 @@ pub struct RecordDefinitionParseNode {
 pub struct RecordMemberParseNode {
     pub public: bool,
     pub identifier: LocatedNode<String>,
-    pub type_def: TypeDefinitionParseNode,
+    pub type_def: LocatedNode<TypeDefinitionParseNode>,
 }
 
 #[derive(Debug)]
@@ -78,7 +78,7 @@ pub struct MethodParseNode {
 pub struct FunctionDefintionParseNode {
     pub identifier: String,
     pub parameters: Vec<ParameterParseNode>,
-    pub return_type: Option<TypeDefinitionParseNode>,
+    pub return_type: Option<LocatedNode<TypeDefinitionParseNode>>,
     pub body: FunctionBodyParseNode,
 }
 
@@ -91,7 +91,7 @@ pub enum FunctionBodyParseNode {
 #[derive(Debug)]
 pub struct ParameterParseNode {
     pub identifier: String,
-    pub type_def: TypeDefinitionParseNode,
+    pub type_def: LocatedNode<TypeDefinitionParseNode>,
 }
 
 #[derive(Debug)]
@@ -116,7 +116,7 @@ pub enum StatementParseNode {
 pub struct DeclarationParseNode {
     pub mutable: bool,
     pub identifier: String,
-    pub type_def: Option<TypeDefinitionParseNode>,
+    pub type_def: Option<LocatedNode<TypeDefinitionParseNode>>,
     pub expression: ExpressionParseNode,
 }
 
