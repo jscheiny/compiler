@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::{
     lexer::{IdentifierToken, LocatedToken, Token},
-    parser::{NodeSpanTracker, ParserPredicate, ProgramParseNode, grammar::program},
+    parser::{LocatedNode, NodeSpanTracker, ParserPredicate, ProgramParseNode, grammar::program},
 };
 
 pub struct TokenTraverser {
@@ -36,6 +36,17 @@ impl TokenTraverser {
         if let Token::Identifier(IdentifierToken(identifier)) = self.peek().clone() {
             self.next();
             Some(identifier)
+        } else {
+            None
+        }
+    }
+
+    pub fn located_identifier(&mut self) -> Option<LocatedNode<String>> {
+        if let Token::Identifier(IdentifierToken(identifier)) = self.peek() {
+            let identifier = identifier.clone();
+            let span = self.start_span();
+            self.next();
+            Some(span.close(self, identifier))
         } else {
             None
         }

@@ -64,7 +64,7 @@ pub struct RecordDefinitionParseNode {
 #[derive(Debug)]
 pub struct RecordMemberParseNode {
     pub public: bool,
-    pub identifier: String,
+    pub identifier: LocatedNode<String>,
     pub type_def: TypeDefinitionParseNode,
 }
 

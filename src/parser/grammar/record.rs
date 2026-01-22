@@ -23,11 +23,7 @@ fn record(
     let record_type = record_span.singleton(record_type);
     tokens.next();
 
-    let identifier = {
-        let span = tokens.start_span();
-        let identifier = tokens.identifier().ok_or(())?;
-        span.singleton(identifier)
-    };
+    let identifier = tokens.located_identifier().ok_or(())?;
 
     let member_list = {
         let span = tokens.start_span();
@@ -79,7 +75,7 @@ fn member(tokens: &mut TokenTraverser) -> ParseResult<RecordMemberParseNode> {
         ));
     }
 
-    let identifier = tokens.identifier().ok_or(())?;
+    let identifier = tokens.located_identifier().ok_or(())?;
     tokens.expect(&OperatorToken::Type)?;
     let type_def = type_definition(tokens)?;
     Ok(span.close(
