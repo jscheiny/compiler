@@ -1,37 +1,43 @@
 use crate::{
     lexer::{IdentifierToken, IntegerLiteralToken, OperatorToken, StringLiteralToken, Token},
-    parser::{ExpressionParseNode, StatementParseNode, TokenTraverser, grammar::statement},
+    parser::{
+        ExpressionParseNode, LocatedNodeVec, ParseResult, StatementParseNode, TokenTraverser,
+        grammar::statement,
+    },
 };
 
-pub fn expression(tokens: &mut TokenTraverser) -> Result<ExpressionParseNode, ()> {
+pub fn expression(tokens: &mut TokenTraverser) -> ParseResult<ExpressionParseNode> {
+    let span = tokens.start_span();
     match tokens.peek() {
         Token::Identifier(IdentifierToken(identifier)) => {
             let identifier = identifier.clone();
             tokens.next();
-            Ok(ExpressionParseNode::Identifier(identifier.clone()))
+            Ok(span.close(tokens, ExpressionParseNode::Identifier(identifier)))
         }
         Token::IntegerLiteral(IntegerLiteralToken(literal)) => {
             let literal = *literal;
             tokens.next();
-            Ok(ExpressionParseNode::IntegerLiteral(literal))
+            Ok(span.close(tokens, ExpressionParseNode::IntegerLiteral(literal)))
         }
         Token::StringLiteral(StringLiteralToken(literal)) => {
             let literal = literal.clone();
             tokens.next();
-            Ok(ExpressionParseNode::StringLiteral(literal.clone()))
+            Ok(span.close(tokens, ExpressionParseNode::StringLiteral(literal)))
         }
         Token::Operator(OperatorToken::OpenBrace) => {
             tokens.next();
-            Ok(ExpressionParseNode::Block(block(tokens)?))
+            let block = block(tokens)?;
+            Ok(span.close(tokens, ExpressionParseNode::Block(block)))
         }
         _ => Err(()),
     }
 }
 
-pub fn block(tokens: &mut TokenTraverser) -> Result<Vec<StatementParseNode>, ()> {
+pub fn block(tokens: &mut TokenTraverser) -> Result<LocatedNodeVec<StatementParseNode>, ()> {
+    let span = tokens.start_span(); // TODO this span is wrong, needs to start one earlier
     let mut statements = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {
         statements.push(statement(tokens)?);
     }
-    Ok(statements)
+    Ok(span.close(tokens, statements))
 }

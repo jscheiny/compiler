@@ -84,8 +84,8 @@ pub struct FunctionDefintionParseNode {
 
 #[derive(Debug)]
 pub enum FunctionBodyParseNode {
-    Expression(ExpressionParseNode),
-    Block(Vec<StatementParseNode>),
+    Expression(LocatedNode<ExpressionParseNode>),
+    Block(Vec<LocatedNode<StatementParseNode>>),
 }
 
 #[derive(Debug)]
@@ -104,8 +104,8 @@ pub enum RecordType {
 pub enum StatementParseNode {
     Declaration(DeclarationParseNode),
     Expression(ExpressionParseNode),
-    FunctionReturn(Option<ExpressionParseNode>),
-    BlockReturn(ExpressionParseNode),
+    FunctionReturn(Option<LocatedNode<ExpressionParseNode>>),
+    BlockReturn(LocatedNode<ExpressionParseNode>),
     Break(),
     Continue(),
     WhileLoop(WhileLoopParseNode),
@@ -115,27 +115,27 @@ pub enum StatementParseNode {
 #[derive(Debug)]
 pub struct DeclarationParseNode {
     pub mutable: bool,
-    pub identifier: String,
+    pub identifier: LocatedNode<String>,
     pub type_def: Option<LocatedNode<TypeDefinitionParseNode>>,
-    pub expression: ExpressionParseNode,
+    pub expression: LocatedNode<ExpressionParseNode>,
 }
 
 #[derive(Debug)]
 pub struct WhileLoopParseNode {
-    pub predicate: ExpressionParseNode,
-    pub body: Vec<StatementParseNode>,
+    pub predicate: LocatedNode<ExpressionParseNode>,
+    pub body: Vec<LocatedNode<StatementParseNode>>,
 }
 
 #[derive(Debug)]
 pub struct IfStatementParseNode {
     pub conditions: Vec<IfStatementConditionParseNode>,
-    pub else_branch: Option<Vec<StatementParseNode>>,
+    pub else_branch: Option<LocatedNodeVec<StatementParseNode>>,
 }
 
 #[derive(Debug)]
 pub struct IfStatementConditionParseNode {
-    pub predicate: ExpressionParseNode,
-    pub body: Vec<StatementParseNode>,
+    pub predicate: LocatedNode<ExpressionParseNode>,
+    pub body: LocatedNodeVec<StatementParseNode>,
 }
 
 #[derive(Debug)]
@@ -145,7 +145,7 @@ pub enum ExpressionParseNode {
     PostfixOp(PostfixOpExpressionParseNode),
     StringLiteral(String),
     IntegerLiteral(i64),
-    Block(Vec<StatementParseNode>),
+    Block(LocatedNodeVec<StatementParseNode>),
     Identifier(String),
 }
 

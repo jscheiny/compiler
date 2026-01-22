@@ -2,12 +2,12 @@ use crate::{
     lexer::{KeywordToken, OperatorToken, Token},
     parser::{
         DeclarationParseNode, ExpressionParseNode, IfStatementConditionParseNode,
-        IfStatementParseNode, StatementParseNode, TokenTraverser, WhileLoopParseNode,
+        IfStatementParseNode, ParseResult, StatementParseNode, TokenTraverser, WhileLoopParseNode,
         grammar::{block, expression, type_definition},
     },
 };
 
-pub fn statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
+pub fn statement(tokens: &mut TokenTraverser) -> ParseResult<StatementParseNode> {
     match tokens.peek() {
         Token::Keyword(keyword) => match keyword {
             KeywordToken::Let => declaration(tokens, false),
@@ -28,9 +28,10 @@ pub fn statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> 
     }
 }
 
-fn declaration(tokens: &mut TokenTraverser, mutable: bool) -> Result<StatementParseNode, ()> {
+fn declaration(tokens: &mut TokenTraverser, mutable: bool) -> ParseResult<StatementParseNode> {
+    let span = tokens.start_span();
     tokens.next();
-    let identifier = tokens.identifier().ok_or(())?;
+    let identifier = tokens.located_identifier().ok_or(())?;
     let type_def = if tokens.accept(&OperatorToken::Type) {
         Some(type_definition(tokens)?)
     } else {
@@ -40,38 +41,45 @@ fn declaration(tokens: &mut TokenTraverser, mutable: bool) -> Result<StatementPa
     tokens.expect(&OperatorToken::Assign)?;
     let expression = expression(tokens)?;
     tokens.expect(&OperatorToken::EndStatement)?;
-    Ok(StatementParseNode::Declaration(DeclarationParseNode {
-        mutable,
-        identifier,
-        type_def,
-        expression,
-    }))
+    Ok(span.close(
+        tokens,
+        StatementParseNode::Declaration(DeclarationParseNode {
+            mutable,
+            identifier,
+            type_def,
+            expression,
+        }),
+    ))
 }
 
-fn function_return(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
+fn function_return(tokens: &mut TokenTraverser) -> ParseResult<StatementParseNode> {
+    let span = tokens.start_span();
     tokens.next();
     if tokens.accept(&OperatorToken::EndStatement) {
-        Ok(StatementParseNode::FunctionReturn(None))
+        Ok(span.close(tokens, StatementParseNode::FunctionReturn(None)))
     } else {
         let expression = expression(tokens)?;
         tokens.expect(&OperatorToken::EndStatement)?;
-        Ok(StatementParseNode::FunctionReturn(Some(expression)))
+        Ok(span.close(tokens, StatementParseNode::FunctionReturn(Some(expression))))
     }
 }
 
-fn break_statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
+fn break_statement(tokens: &mut TokenTraverser) -> ParseResult<StatementParseNode> {
+    let span = tokens.start_span();
     tokens.next();
     tokens.expect(&OperatorToken::EndStatement)?;
-    Ok(StatementParseNode::Break())
+    Ok(span.close(tokens, StatementParseNode::Break()))
 }
 
-fn continue_statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
+fn continue_statement(tokens: &mut TokenTraverser) -> ParseResult<StatementParseNode> {
+    let span = tokens.start_span();
     tokens.next();
     tokens.expect(&OperatorToken::EndStatement)?;
-    Ok(StatementParseNode::Continue())
+    Ok(span.close(tokens, StatementParseNode::Break()))
 }
 
-fn while_loop(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
+fn while_loop(tokens: &mut TokenTraverser) -> ParseResult<StatementParseNode> {
+    let span = tokens.start_span();
     tokens.next();
     let predicate = expression(tokens)?;
     tokens.expect(&OperatorToken::OpenBrace)?;
@@ -79,13 +87,14 @@ fn while_loop(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
     while !tokens.accept(&OperatorToken::CloseBrace) {
         body.push(statement(tokens)?);
     }
-    Ok(StatementParseNode::WhileLoop(WhileLoopParseNode {
-        predicate,
-        body,
-    }))
+    Ok(span.close(
+        tokens,
+        StatementParseNode::WhileLoop(WhileLoopParseNode { predicate, body }),
+    ))
 }
 
-fn if_statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
+fn if_statement(tokens: &mut TokenTraverser) -> ParseResult<StatementParseNode> {
+    let span = tokens.start_span();
     tokens.next();
     let mut conditions = vec![if_condition(tokens)?];
     let mut else_branch = None;
@@ -100,10 +109,13 @@ fn if_statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
         }
     }
 
-    Ok(StatementParseNode::If(IfStatementParseNode {
-        conditions,
-        else_branch,
-    }))
+    Ok(span.close(
+        tokens,
+        StatementParseNode::If(IfStatementParseNode {
+            conditions,
+            else_branch,
+        }),
+    ))
 }
 
 fn if_condition(tokens: &mut TokenTraverser) -> Result<IfStatementConditionParseNode, ()> {
@@ -113,21 +125,24 @@ fn if_condition(tokens: &mut TokenTraverser) -> Result<IfStatementConditionParse
     Ok(IfStatementConditionParseNode { predicate, body })
 }
 
-fn block_statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
+fn block_statement(tokens: &mut TokenTraverser) -> ParseResult<StatementParseNode> {
+    let span = tokens.start_span();
     tokens.next();
     let block = ExpressionParseNode::Block(block(tokens)?);
-    Ok(StatementParseNode::Expression(block))
+    Ok(span.close(tokens, StatementParseNode::Expression(block)))
 }
 
-fn block_return(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
+fn block_return(tokens: &mut TokenTraverser) -> ParseResult<StatementParseNode> {
+    let span = tokens.start_span();
     tokens.next();
     let expression = expression(tokens)?;
     tokens.expect(&OperatorToken::EndStatement)?;
-    Ok(StatementParseNode::BlockReturn(expression))
+    Ok(span.close(tokens, StatementParseNode::BlockReturn(expression)))
 }
 
-fn expression_statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
+fn expression_statement(tokens: &mut TokenTraverser) -> ParseResult<StatementParseNode> {
+    let span = tokens.start_span();
     let expression = expression(tokens)?;
     tokens.expect(&OperatorToken::EndStatement)?;
-    Ok(StatementParseNode::Expression(expression))
+    Ok(span.close(tokens, StatementParseNode::Expression(expression.value)))
 }
