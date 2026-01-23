@@ -1,13 +1,16 @@
 use std::rc::Rc;
 
-use crate::{lexer::tokenize, parser::parse};
+use crate::{
+    lexer::tokenize,
+    parser::{TokenTraverser, program},
+};
 
 pub mod lexer;
 pub mod parser;
 
 fn main() {
     let tokens = tokenize(
-        "struct S(pub x: Y) {}
+        "pub struct S(pub x: Y) {}
         
         fn f() {
             if x {}
@@ -20,6 +23,8 @@ fn main() {
     for token in tokens.iter() {
         println!("{}", token);
     }
-    let x = parse(Rc::new(tokens)).unwrap();
-    println!("{:#?}", x);
+
+    let mut token_traverser = TokenTraverser::new(Rc::new(tokens));
+    let program = program(&mut token_traverser).unwrap();
+    println!("{:#?}", program);
 }

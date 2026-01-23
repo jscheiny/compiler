@@ -16,14 +16,20 @@ pub type LocatedNodeVec<ParseNode> = LocatedNode<Vec<LocatedNode<ParseNode>>>;
 
 #[derive(Debug)]
 pub struct ProgramParseNode {
-    pub definitions: Vec<TopLevelDefinition>,
+    pub definitions: Vec<LocatedNode<ModuleTopLevelDefinition>>,
+}
+
+#[derive(Debug)]
+pub struct ModuleTopLevelDefinition {
+    pub public: bool,
+    pub definition: TopLevelDefinition,
 }
 
 #[derive(Debug)]
 pub enum TopLevelDefinition {
-    Record(LocatedNode<RecordDefinitionParseNode>),
-    Interface(LocatedNode<InterfaceDefinitionParseNode>),
-    Function(LocatedNode<FunctionDefintionParseNode>),
+    Record(RecordDefinitionParseNode),
+    Interface(InterfaceDefinitionParseNode),
+    Function(FunctionDefintionParseNode),
 }
 
 #[derive(Debug)]

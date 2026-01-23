@@ -1,7 +1,7 @@
 use crate::{
     lexer::{KeywordToken, Token},
     parser::{
-        ProgramParseNode, TokenTraverser, TopLevelDefinition,
+        ModuleTopLevelDefinition, ProgramParseNode, TokenTraverser, TopLevelDefinition,
         grammar::{interface, structure, top_level_function, tuple},
     },
 };
@@ -9,23 +9,31 @@ use crate::{
 pub fn program(tokens: &mut TokenTraverser) -> Result<ProgramParseNode, ()> {
     let mut definitions = vec![];
     while !tokens.is_done() {
-        if tokens.accept(&KeywordToken::Pub) {
-            todo!("Mark as public");
-        }
-
-        if let Token::Keyword(keyword) = tokens.peek() {
-            use KeywordToken as K;
-            let definition = match keyword {
-                K::Tuple => TopLevelDefinition::Record(tokens.located(tuple)?),
-                K::Struct => TopLevelDefinition::Record(tokens.located(structure)?),
-                K::Interface => TopLevelDefinition::Interface(tokens.located(interface)?),
-                K::Fn => TopLevelDefinition::Function(tokens.located(top_level_function)?),
-                _ => panic!("Fix this"),
-            };
-            definitions.push(definition);
-        } else {
-            panic!("Not good");
-        }
+        let definition = tokens.located(module_top_level_definition)?;
+        definitions.push(definition);
     }
     Ok(ProgramParseNode { definitions })
+}
+
+fn module_top_level_definition(
+    tokens: &mut TokenTraverser,
+) -> Result<ModuleTopLevelDefinition, ()> {
+    let public = tokens.accept(&KeywordToken::Pub);
+    let definition = top_level_definition(tokens)?;
+    Ok(ModuleTopLevelDefinition { public, definition })
+}
+
+fn top_level_definition(tokens: &mut TokenTraverser) -> Result<TopLevelDefinition, ()> {
+    if let Token::Keyword(keyword) = tokens.peek() {
+        use KeywordToken as K;
+        match keyword {
+            K::Tuple => Ok(TopLevelDefinition::Record(tuple(tokens)?)),
+            K::Struct => Ok(TopLevelDefinition::Record(structure(tokens)?)),
+            K::Interface => Ok(TopLevelDefinition::Interface(interface(tokens)?)),
+            K::Fn => Ok(TopLevelDefinition::Function(top_level_function(tokens)?)),
+            _ => Err(()),
+        }
+    } else {
+        Err(())
+    }
 }
