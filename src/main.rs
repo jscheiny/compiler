@@ -7,7 +7,9 @@ pub mod parser;
 
 fn main() {
     let tokens = tokenize(
-        "fn f() {
+        "struct S(pub x: Y) {}
+        
+        fn f() {
             if x {}
             else if y {}
             else if z {}

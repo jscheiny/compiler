@@ -94,7 +94,7 @@ fn if_statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
         if KeywordToken::If.is_match(tokens.peek()) {
             conditions.push(tokens.located(if_condition)?);
         } else {
-            else_branch = Some(block(tokens)?);
+            else_branch = Some(tokens.located(block)?);
         }
     }
 
@@ -107,7 +107,7 @@ fn if_statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
 fn if_condition(tokens: &mut TokenTraverser) -> Result<IfStatementConditionParseNode, ()> {
     tokens.next();
     let predicate = tokens.located(expression)?;
-    let body = block(tokens)?;
+    let body = tokens.located(block)?;
     Ok(IfStatementConditionParseNode { predicate, body })
 }
 

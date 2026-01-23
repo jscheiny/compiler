@@ -53,10 +53,10 @@ pub struct MethodSignatureParseNode {
 
 #[derive(Debug)]
 pub struct RecordDefinitionParseNode {
-    pub record_type: LocatedNode<RecordType>,
+    pub record_type: RecordType,
     pub identifier: LocatedNode<String>,
     pub member_list: LocatedNodeVec<RecordMemberParseNode>,
-    pub methods: LocatedNodeVec<MethodParseNode>,
+    pub methods: Option<LocatedNodeVec<MethodParseNode>>,
 }
 
 #[derive(Debug)]
@@ -143,7 +143,7 @@ pub enum ExpressionParseNode {
     PostfixOp(PostfixOpExpressionParseNode),
     StringLiteral(String),
     IntegerLiteral(i64),
-    Block(LocatedNodeVec<StatementParseNode>),
+    Block(Vec<LocatedNode<StatementParseNode>>),
     Identifier(String),
 }
 
