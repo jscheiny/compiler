@@ -15,16 +15,17 @@ pub enum StatementParseNode {
 impl Traverse for StatementParseNode {
     fn traverse(&self, visit: &impl Fn(TokenSpan)) {
         match self {
-            StatementParseNode::BlockReturn(node) => node.traverse(visit),
-            StatementParseNode::Break() => todo!(),
-            StatementParseNode::Continue() => todo!(),
-            StatementParseNode::Declaration(node) => node.traverse(visit),
-            StatementParseNode::Expression(node) => node.traverse(visit),
-            StatementParseNode::FunctionReturn(node) => {
-                node.as_ref().map(|v| v.traverse(visit));
+            Self::BlockReturn(node) => node.traverse(visit),
+            Self::Declaration(node) => node.traverse(visit),
+            Self::Expression(node) => node.traverse(visit),
+            Self::If(node) => node.traverse(visit),
+            Self::WhileLoop(node) => node.traverse(visit),
+            Self::FunctionReturn(node) => {
+                if let Some(node) = node.as_ref() {
+                    node.traverse(visit);
+                }
             }
-            StatementParseNode::If(node) => node.traverse(visit),
-            StatementParseNode::WhileLoop(node) => node.traverse(visit),
+            Self::Break() | Self::Continue() => {}
         }
     }
 }
@@ -56,6 +57,7 @@ impl Traverse for DeclarationParseNode {
         if let Some(type_def) = self.type_def.as_ref() {
             type_def.traverse(visit);
         }
+        self.expression.traverse(visit);
     }
 }
 
