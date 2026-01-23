@@ -79,10 +79,6 @@ impl TokenTraverser {
             end_index: self.index,
         }
     }
-
-    pub fn index(&self) -> usize {
-        self.index
-    }
 }
 
 fn identifier(tokens: &mut TokenTraverser) -> Result<String, ()> {
