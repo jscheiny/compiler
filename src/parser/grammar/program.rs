@@ -18,7 +18,7 @@ pub fn program(tokens: &mut TokenTraverser) -> Result<ProgramParseNode, ()> {
             let definition = match keyword {
                 K::Tuple => TopLevelDefinition::Record(tuple(tokens)?),
                 K::Struct => TopLevelDefinition::Record(structure(tokens)?),
-                K::Interface => TopLevelDefinition::Interface(interface(tokens)?),
+                K::Interface => TopLevelDefinition::Interface(tokens.located(interface)?),
                 K::Fn => TopLevelDefinition::Function(function(tokens, true)?),
                 _ => panic!("Fix this"),
             };

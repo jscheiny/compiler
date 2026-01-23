@@ -1,52 +1,42 @@
 use crate::{
     lexer::OperatorToken,
     parser::{
-        InterfaceDefinitionParseNode, LocatedNodeVec, MethodSignatureParseNode, ParseResult,
-        TokenTraverser,
+        InterfaceDefinitionParseNode, LocatedNode, MethodSignatureParseNode, TokenTraverser,
         grammar::{parameters, type_definition},
     },
 };
 
-pub fn interface(tokens: &mut TokenTraverser) -> ParseResult<InterfaceDefinitionParseNode> {
-    let span = tokens.start_span();
+pub fn interface(tokens: &mut TokenTraverser) -> Result<InterfaceDefinitionParseNode, ()> {
     tokens.next();
     let identifier = tokens.identifier().ok_or(())?;
-    let method_signatures = method_signatures(tokens)?;
+    let method_signatures = tokens.located(method_signatures)?;
 
-    Ok(span.close(
-        tokens,
-        InterfaceDefinitionParseNode {
-            identifier,
-            method_signatures,
-        },
-    ))
+    Ok(InterfaceDefinitionParseNode {
+        identifier,
+        method_signatures,
+    })
 }
 
 fn method_signatures(
     tokens: &mut TokenTraverser,
-) -> Result<LocatedNodeVec<MethodSignatureParseNode>, ()> {
-    let span = tokens.start_span();
+) -> Result<Vec<LocatedNode<MethodSignatureParseNode>>, ()> {
     tokens.expect(&OperatorToken::OpenBrace)?;
     let mut methods = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {
-        methods.push(method_signature(tokens)?);
+        methods.push(tokens.located(method_signature)?);
     }
-    Ok(span.close(tokens, methods))
+    Ok(methods)
 }
 
-fn method_signature(tokens: &mut TokenTraverser) -> ParseResult<MethodSignatureParseNode> {
-    let span = tokens.start_span();
+fn method_signature(tokens: &mut TokenTraverser) -> Result<MethodSignatureParseNode, ()> {
     let identifier = tokens.identifier().ok_or(())?;
     let parameters = tokens.located(parameters)?;
     tokens.expect(&OperatorToken::Type)?;
     let return_type = tokens.located(type_definition)?;
     tokens.expect(&OperatorToken::EndStatement)?;
-    Ok(span.close(
-        tokens,
-        MethodSignatureParseNode {
-            identifier,
-            parameters,
-            return_type,
-        },
-    ))
+    Ok(MethodSignatureParseNode {
+        identifier,
+        parameters,
+        return_type,
+    })
 }
