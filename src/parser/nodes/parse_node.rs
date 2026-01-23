@@ -6,6 +6,17 @@ pub struct ParseNode<T: Debug> {
     pub span: TokenSpan,
 }
 
+impl<T: Debug + Traverse> Traverse for ParseNode<T> {
+    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
+        visit(self.span);
+        self.value.traverse(visit);
+    }
+}
+
+pub trait Traverse {
+    fn traverse(&self, visit: &impl Fn(TokenSpan));
+}
+
 #[derive(Clone, Copy)]
 pub struct TokenSpan {
     pub start_index: usize,

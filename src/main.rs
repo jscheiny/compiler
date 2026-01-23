@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::{
     lexer::tokenize,
-    parser::{TokenTraverser, program},
+    parser::{TokenTraverser, Traverse, program},
 };
 
 pub mod lexer;
@@ -29,4 +29,7 @@ fn main() {
     let mut token_traverser = TokenTraverser::new(Rc::new(tokens));
     let program = program(&mut token_traverser).unwrap();
     println!("{:#?}", program);
+    program.traverse(&|span| {
+        println!("{:?}", span);
+    });
 }
