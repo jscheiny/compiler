@@ -3,7 +3,7 @@ use std::rc::Rc;
 
 use crate::{
     lexer::{IdentifierToken, LocatedToken, Token},
-    parser::{ParseNode, ParserPredicate},
+    parser::{ParseNode, ParserPredicate, TokenSpan},
 };
 
 pub struct TokenTraverser {
@@ -53,12 +53,11 @@ impl TokenTraverser {
         &mut self,
         parse: impl Fn(&mut TokenTraverser) -> Result<P, ()>,
     ) -> Result<ParseNode<P>, ()> {
-        let token_start_index = self.index;
+        let start_index = self.index;
         let value = parse(self)?;
         Ok(ParseNode {
             value,
-            token_start_index,
-            token_end_index: self.index,
+            span: self.get_span(start_index),
         })
     }
 
@@ -66,13 +65,19 @@ impl TokenTraverser {
         &mut self,
         parse: impl Fn(&mut TokenTraverser) -> Result<Option<P>, ()>,
     ) -> Result<Option<ParseNode<P>>, ()> {
-        let token_start_index = self.index;
+        let start_index = self.index;
         let result = parse(self)?;
         Ok(result.map(|value| ParseNode {
             value,
-            token_start_index,
-            token_end_index: self.index,
+            span: self.get_span(start_index),
         }))
+    }
+
+    fn get_span(&self, start_index: usize) -> TokenSpan {
+        TokenSpan {
+            start_index,
+            end_index: self.index,
+        }
     }
 
     pub fn index(&self) -> usize {
