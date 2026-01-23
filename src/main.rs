@@ -1,7 +1,5 @@
-use std::rc::Rc;
-
 use crate::{
-    lexer::tokenize,
+    lexer::SourceCode,
     parser::{TokenTraverser, Traverse, program},
 };
 
@@ -9,7 +7,7 @@ pub mod lexer;
 pub mod parser;
 
 fn main() {
-    let tokens = tokenize(
+    let source = SourceCode::from(
         "pub struct S(pub x: Y) {
             pub test() {
                 while x {}
@@ -26,7 +24,7 @@ fn main() {
         }",
     );
 
-    let mut token_traverser = TokenTraverser::new(Rc::new(tokens));
+    let mut token_traverser = TokenTraverser::new(source.tokens);
     let program = program(&mut token_traverser).unwrap();
     println!("{:#?}", program);
     program.traverse(&|span| {
