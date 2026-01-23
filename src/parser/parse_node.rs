@@ -5,8 +5,6 @@ use crate::{
     parser::operator::{BinaryOperator, PostfixOperator, PrefixOperator},
 };
 
-pub type ParseResult<ParseNode> = Result<LocatedNode<ParseNode>, ()>;
-
 #[derive(Debug)]
 pub struct LocatedNode<ParseNode: Debug> {
     pub value: ParseNode,
