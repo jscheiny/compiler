@@ -3,12 +3,12 @@ use std::fmt::Display;
 use crate::lexer::WhitespaceToken;
 
 #[derive(Clone, Copy)]
-pub struct TokenSpan {
+pub struct CharacterSpan {
     pub start: CharacterLocation,
     pub end: CharacterLocation,
 }
 
-impl Display for TokenSpan {
+impl Display for CharacterSpan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} -> {}", self.start, self.end)
     }

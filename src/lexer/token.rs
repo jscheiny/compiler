@@ -1,8 +1,8 @@
 use std::fmt::Display;
 
 use crate::lexer::{
-    IdentifierToken, IntegerLiteralToken, KeywordToken, OperatorToken, StringLiteralToken,
-    TokenSpan, WhitespaceToken,
+    CharacterSpan, IdentifierToken, IntegerLiteralToken, KeywordToken, OperatorToken,
+    StringLiteralToken, WhitespaceToken,
 };
 
 #[derive(Clone)]
@@ -31,7 +31,7 @@ impl Display for Token {
 #[derive(Clone)]
 pub struct LocatedToken {
     pub token: Token,
-    pub span: TokenSpan,
+    pub span: CharacterSpan,
 }
 
 impl Display for LocatedToken {

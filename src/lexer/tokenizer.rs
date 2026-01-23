@@ -1,6 +1,6 @@
 use crate::lexer::{
-    CharacterLocation, IdentifierToken, IntegerLiteralToken, KeywordToken, LocatedToken,
-    OperatorToken, StringLiteralToken, Token, TokenParse, TokenSpan, WhitespaceToken,
+    CharacterLocation, CharacterSpan, IdentifierToken, IntegerLiteralToken, KeywordToken,
+    LocatedToken, OperatorToken, StringLiteralToken, Token, TokenParse, WhitespaceToken,
 };
 
 pub fn tokenize(mut text: &str) -> Vec<LocatedToken> {
@@ -20,7 +20,7 @@ pub fn tokenize(mut text: &str) -> Vec<LocatedToken> {
                     line: start.line,
                     column: start.column + token_len,
                 };
-                let span = TokenSpan { start, end };
+                let span = CharacterSpan { start, end };
                 tokens.push(LocatedToken { token, span });
                 end
             }
