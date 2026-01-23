@@ -16,13 +16,13 @@ pub fn function(
         tokens.next();
     }
     let identifier = tokens.identifier().ok_or(())?;
-    let parameters = parameters(tokens)?;
+    let parameters = tokens.located(parameters)?;
     let return_type = if tokens.accept(&OperatorToken::Type) {
-        Some(type_definition(tokens)?)
+        Some(tokens.located(type_definition)?)
     } else {
         None
     };
-    let body = function_body(tokens)?;
+    let body = tokens.located(function_body)?;
     Ok(span.close(
         tokens,
         FunctionDefintionParseNode {
@@ -34,43 +34,35 @@ pub fn function(
     ))
 }
 
-fn function_body(tokens: &mut TokenTraverser) -> ParseResult<FunctionBodyParseNode> {
-    let span = tokens.start_span();
+fn function_body(tokens: &mut TokenTraverser) -> Result<FunctionBodyParseNode, ()> {
     if tokens.accept(&OperatorToken::FunctionDefinition) {
         let expression = tokens.located(expression)?;
         tokens.expect(&OperatorToken::EndStatement)?;
-        Ok(span.close(tokens, FunctionBodyParseNode::Expression(expression)))
+        Ok(FunctionBodyParseNode::Expression(expression))
     } else if tokens.accept(&OperatorToken::OpenBrace) {
         let mut statements = vec![];
         while !tokens.accept(&OperatorToken::CloseBrace) {
             statements.push(tokens.located(statement)?);
         }
-        Ok(span.close(tokens, FunctionBodyParseNode::Block(statements)))
+        Ok(FunctionBodyParseNode::Block(statements))
     } else {
         Err(())
     }
 }
 
-pub fn parameters(
-    tokens: &mut TokenTraverser,
-) -> ParseResult<Vec<LocatedNode<ParameterParseNode>>> {
-    let span = tokens.start_span();
+pub fn parameters(tokens: &mut TokenTraverser) -> Result<Vec<LocatedNode<ParameterParseNode>>, ()> {
     tokens.expect(&OperatorToken::OpenParen)?;
     let list = comma_separated_list(tokens, OperatorToken::CloseParen, parameter)?;
-    Ok(span.close(tokens, list))
+    Ok(list)
 }
 
-fn parameter(tokens: &mut TokenTraverser) -> ParseResult<ParameterParseNode> {
-    let span = tokens.start_span();
+fn parameter(tokens: &mut TokenTraverser) -> Result<ParameterParseNode, ()> {
     let identifier = tokens.identifier().ok_or(())?;
     tokens.expect(&OperatorToken::Type)?;
-    let type_def = type_definition(tokens)?;
+    let type_def = tokens.located(type_definition)?;
 
-    Ok(span.close(
-        tokens,
-        ParameterParseNode {
-            identifier,
-            type_def,
-        },
-    ))
+    Ok(ParameterParseNode {
+        identifier,
+        type_def,
+    })
 }

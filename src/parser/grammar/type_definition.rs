@@ -1,23 +1,22 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token},
     parser::{
-        LocatedNodeVec, ParseResult, TokenTraverser, TypeDefinitionParseNode,
-        UserDefinedTypeParseNode, grammar::comma_separated_list,
+        LocatedNode, TokenTraverser, TypeDefinitionParseNode, UserDefinedTypeParseNode,
+        grammar::comma_separated_list,
     },
 };
 
-pub fn type_definition(tokens: &mut TokenTraverser) -> ParseResult<TypeDefinitionParseNode> {
+pub fn type_definition(tokens: &mut TokenTraverser) -> Result<TypeDefinitionParseNode, ()> {
     primitive_type_definition(tokens).or_else(|_| user_type_definition(tokens))
 }
 
-fn primitive_type_definition(tokens: &mut TokenTraverser) -> ParseResult<TypeDefinitionParseNode> {
+fn primitive_type_definition(tokens: &mut TokenTraverser) -> Result<TypeDefinitionParseNode, ()> {
     if let Token::Keyword(keyword) = tokens.peek() {
         match keyword {
             KeywordToken::Bool | KeywordToken::Int | KeywordToken::Float => {
-                let span = tokens.start_span();
                 let keyword = *keyword;
                 tokens.next();
-                Ok(span.singleton(TypeDefinitionParseNode::Primitive(keyword)))
+                Ok(TypeDefinitionParseNode::Primitive(keyword))
             }
             _ => Err(()),
         }
@@ -26,27 +25,22 @@ fn primitive_type_definition(tokens: &mut TokenTraverser) -> ParseResult<TypeDef
     }
 }
 
-fn user_type_definition(tokens: &mut TokenTraverser) -> ParseResult<TypeDefinitionParseNode> {
-    let span = tokens.start_span();
+fn user_type_definition(tokens: &mut TokenTraverser) -> Result<TypeDefinitionParseNode, ()> {
     let identifier = tokens.identifier().ok_or(())?;
-    let generic_params = generic_type_params(tokens)?;
+    let generic_params = tokens.maybe_located(generic_type_params)?;
 
-    Ok(span.close(
-        tokens,
-        TypeDefinitionParseNode::User(UserDefinedTypeParseNode {
-            identifier,
-            generic_params,
-        }),
-    ))
+    Ok(TypeDefinitionParseNode::User(UserDefinedTypeParseNode {
+        identifier,
+        generic_params,
+    }))
 }
 
 fn generic_type_params(
     tokens: &mut TokenTraverser,
-) -> Result<Option<LocatedNodeVec<TypeDefinitionParseNode>>, ()> {
-    let span = tokens.start_span();
+) -> Result<Option<Vec<LocatedNode<TypeDefinitionParseNode>>>, ()> {
     if tokens.accept(&OperatorToken::OpenBracket) {
         let params = comma_separated_list(tokens, OperatorToken::CloseBracket, type_definition)?;
-        Ok(Some(span.close(tokens, params)))
+        Ok(Some(params))
     } else {
         Ok(None)
     }

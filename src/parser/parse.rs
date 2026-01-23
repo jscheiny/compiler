@@ -72,6 +72,15 @@ impl TokenTraverser {
         Ok(span.close(self, result))
     }
 
+    pub fn maybe_located<ParseNode: Debug>(
+        &mut self,
+        parse: impl Fn(&mut TokenTraverser) -> Result<Option<ParseNode>, ()>,
+    ) -> Result<Option<LocatedNode<ParseNode>>, ()> {
+        let span = self.start_span();
+        let result = parse(self)?;
+        Ok(result.map(|node| span.close(self, node)))
+    }
+
     pub fn index(&self) -> usize {
         self.index
     }

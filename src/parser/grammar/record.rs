@@ -62,30 +62,23 @@ fn record(
     }
 }
 
-fn member(tokens: &mut TokenTraverser) -> ParseResult<RecordMemberParseNode> {
-    let span = tokens.start_span();
+fn member(tokens: &mut TokenTraverser) -> Result<RecordMemberParseNode, ()> {
     if tokens.accept(&KeywordToken::Pub) {
         let member = member(tokens)?;
-        return Ok(span.close(
-            tokens,
-            RecordMemberParseNode {
-                public: true,
-                ..member.value
-            },
-        ));
+        return Ok(RecordMemberParseNode {
+            public: true,
+            ..member
+        });
     }
 
     let identifier = tokens.identifier().ok_or(())?;
     tokens.expect(&OperatorToken::Type)?;
-    let type_def = type_definition(tokens)?;
-    Ok(span.close(
-        tokens,
-        RecordMemberParseNode {
-            identifier,
-            type_def,
-            public: false,
-        },
-    ))
+    let type_def = tokens.located(type_definition)?;
+    Ok(RecordMemberParseNode {
+        identifier,
+        type_def,
+        public: false,
+    })
 }
 
 fn methods(tokens: &mut TokenTraverser) -> Result<Vec<LocatedNode<MethodParseNode>>, ()> {

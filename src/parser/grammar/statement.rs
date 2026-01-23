@@ -33,7 +33,7 @@ fn declaration(tokens: &mut TokenTraverser, mutable: bool) -> Result<StatementPa
     tokens.next();
     let identifier = tokens.identifier().ok_or(())?;
     let type_def = if tokens.accept(&OperatorToken::Type) {
-        Some(type_definition(tokens)?)
+        Some(tokens.located(type_definition)?)
     } else {
         None
     };

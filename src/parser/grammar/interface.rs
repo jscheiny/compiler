@@ -37,9 +37,9 @@ fn method_signatures(
 fn method_signature(tokens: &mut TokenTraverser) -> ParseResult<MethodSignatureParseNode> {
     let span = tokens.start_span();
     let identifier = tokens.identifier().ok_or(())?;
-    let parameters = parameters(tokens)?;
+    let parameters = tokens.located(parameters)?;
     tokens.expect(&OperatorToken::Type)?;
-    let return_type = type_definition(tokens)?;
+    let return_type = tokens.located(type_definition)?;
     tokens.expect(&OperatorToken::EndStatement)?;
     Ok(span.close(
         tokens,
