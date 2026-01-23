@@ -7,14 +7,12 @@ pub mod parser;
 
 fn main() {
     let tokens = tokenize(
-        "
-        struct S() {
-            pub g() {
-                {
-                }
-            }
-        }
-    ",
+        "fn f() {
+            if x {}
+            else if y {}
+            else if z {}
+            else {}
+        }",
     );
 
     for token in tokens.iter() {

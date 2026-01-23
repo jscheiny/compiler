@@ -2,7 +2,8 @@ use crate::{
     lexer::{KeywordToken, OperatorToken, Token},
     parser::{
         DeclarationParseNode, ExpressionParseNode, IfStatementConditionParseNode,
-        IfStatementParseNode, ParseResult, StatementParseNode, TokenTraverser, WhileLoopParseNode,
+        IfStatementParseNode, ParseResult, ParserPredicate, StatementParseNode, TokenTraverser,
+        WhileLoopParseNode,
         grammar::{block, expression, type_definition},
     },
 };
@@ -99,7 +100,7 @@ fn if_statement(tokens: &mut TokenTraverser) -> ParseResult<StatementParseNode> 
     let mut else_branch = None;
 
     while tokens.accept(&KeywordToken::Else) {
-        if tokens.accept(&KeywordToken::If) {
+        if KeywordToken::If.is_match(tokens.peek()) {
             conditions.push(if_condition(tokens)?);
         } else {
             else_branch = Some(block(tokens)?);
