@@ -1,32 +1,30 @@
 use crate::{
     lexer::{IdentifierToken, IntegerLiteralToken, OperatorToken, StringLiteralToken, Token},
     parser::{
-        ExpressionParseNode, LocatedNodeVec, ParseResult, StatementParseNode, TokenTraverser,
-        grammar::statement,
+        ExpressionParseNode, LocatedNodeVec, StatementParseNode, TokenTraverser, grammar::statement,
     },
 };
 
-pub fn expression(tokens: &mut TokenTraverser) -> ParseResult<ExpressionParseNode> {
-    let span = tokens.start_span();
+pub fn expression(tokens: &mut TokenTraverser) -> Result<ExpressionParseNode, ()> {
     match tokens.peek() {
         Token::Identifier(IdentifierToken(identifier)) => {
             let identifier = identifier.clone();
             tokens.next();
-            Ok(span.close(tokens, ExpressionParseNode::Identifier(identifier)))
+            Ok(ExpressionParseNode::Identifier(identifier))
         }
         Token::IntegerLiteral(IntegerLiteralToken(literal)) => {
             let literal = *literal;
             tokens.next();
-            Ok(span.close(tokens, ExpressionParseNode::IntegerLiteral(literal)))
+            Ok(ExpressionParseNode::IntegerLiteral(literal))
         }
         Token::StringLiteral(StringLiteralToken(literal)) => {
             let literal = literal.clone();
             tokens.next();
-            Ok(span.close(tokens, ExpressionParseNode::StringLiteral(literal)))
+            Ok(ExpressionParseNode::StringLiteral(literal))
         }
         Token::Operator(OperatorToken::OpenBrace) => {
             let block = block(tokens)?;
-            Ok(span.close(tokens, ExpressionParseNode::Block(block)))
+            Ok(ExpressionParseNode::Block(block))
         }
         _ => Err(()),
     }

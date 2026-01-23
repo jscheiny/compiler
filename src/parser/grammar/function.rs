@@ -37,7 +37,7 @@ pub fn function(
 fn function_body(tokens: &mut TokenTraverser) -> ParseResult<FunctionBodyParseNode> {
     let span = tokens.start_span();
     if tokens.accept(&OperatorToken::FunctionDefinition) {
-        let expression = expression(tokens)?;
+        let expression = tokens.located(expression)?;
         tokens.expect(&OperatorToken::EndStatement)?;
         Ok(span.close(tokens, FunctionBodyParseNode::Expression(expression)))
     } else if tokens.accept(&OperatorToken::OpenBrace) {
