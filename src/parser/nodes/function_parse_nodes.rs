@@ -12,16 +12,16 @@ pub struct FunctionDefintionParseNode {
 }
 
 impl Traverse for FunctionDefintionParseNode {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
-        visit(self.identifier.span);
-        visit(self.parameters.span);
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        visit("FunctionDefinition.identifier", self.identifier.span);
+        visit("FunctionDefinition.parameters", self.parameters.span);
         for parameter in self.parameters.value.iter() {
-            parameter.traverse(visit);
+            parameter.traverse("FunctionDefintion.parameter", visit);
         }
         if let Some(return_type) = self.return_type.as_ref() {
-            return_type.traverse(visit);
+            return_type.traverse("FunctionDefinition.return", visit);
         }
-        self.body.traverse(visit);
+        self.body.traverse("FunctionDefinition.body", visit);
     }
 }
 
@@ -32,7 +32,7 @@ pub enum FunctionBodyParseNode {
 }
 
 impl Traverse for FunctionBodyParseNode {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         match self {
             Self::Expression(node) => node.traverse(visit),
             Self::Block(node) => node.traverse(visit),
@@ -47,8 +47,8 @@ pub struct ParameterParseNode {
 }
 
 impl Traverse for ParameterParseNode {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
-        visit(self.identifier.span);
-        self.type_def.traverse(visit);
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        visit("Parameter.identifier", self.identifier.span);
+        self.type_def.traverse("Parameter.type", visit);
     }
 }

@@ -10,7 +10,7 @@ pub enum TypeDefinitionParseNode {
 }
 
 impl Traverse for TypeDefinitionParseNode {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         match self {
             TypeDefinitionParseNode::Primitive(_) => {}
             TypeDefinitionParseNode::User(node) => node.traverse(visit),
@@ -25,12 +25,12 @@ pub struct UserDefinedTypeParseNode {
 }
 
 impl Traverse for UserDefinedTypeParseNode {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
-        visit(self.identifier.span);
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        visit("UserDefinedType.identifier", self.identifier.span);
         if let Some(generics) = self.generic_params.as_ref() {
-            visit(generics.span);
+            visit("UserDefinedType.generics", generics.span);
             for generic in generics.value.iter() {
-                generic.traverse(visit);
+                generic.traverse("UserDefinedType.generic", visit);
             }
         }
     }

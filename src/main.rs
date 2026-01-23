@@ -22,8 +22,8 @@ fn main() {
     let mut tokens = source.token_stream();
     let program = program(&mut tokens).unwrap();
     println!("{:#?}", program);
-    program.traverse(&|span| {
-        println!("{:?}", span);
+    program.traverse(&|name, span| {
+        println!("{} @ {:?}", name, span);
         println!("Source:[{}]", source.get_span_string(span));
     });
 }

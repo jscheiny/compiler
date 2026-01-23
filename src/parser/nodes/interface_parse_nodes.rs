@@ -9,11 +9,11 @@ pub struct InterfaceDefinitionParseNode {
 }
 
 impl Traverse for InterfaceDefinitionParseNode {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
-        visit(self.identifier.span);
-        visit(self.method_signatures.span);
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        visit("Interface.identifier", self.identifier.span);
+        visit("Interface.method_signatures", self.method_signatures.span);
         for method_signature in self.method_signatures.value.iter() {
-            method_signature.traverse(visit);
+            method_signature.traverse("Interface.method_signature", visit);
         }
     }
 }
@@ -26,12 +26,12 @@ pub struct MethodSignatureParseNode {
 }
 
 impl Traverse for MethodSignatureParseNode {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
-        visit(self.identifier.span);
-        visit(self.parameters.span);
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        visit("MethodSignature.identifier", self.identifier.span);
+        visit("MethodSignature.parameters", self.parameters.span);
         for parameter in self.parameters.value.iter() {
-            parameter.traverse(visit);
+            parameter.traverse("MethodSignature.parameter", visit);
         }
-        self.return_type.traverse(visit);
+        self.return_type.traverse("MethodSignature.return", visit);
     }
 }

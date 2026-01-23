@@ -12,16 +12,16 @@ pub struct RecordDefinitionParseNode {
 }
 
 impl Traverse for RecordDefinitionParseNode {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
-        visit(self.identifier.span);
-        visit(self.member_list.span);
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        visit("Record.identifier", self.identifier.span);
+        visit("Record.members", self.member_list.span);
         for member in self.member_list.value.iter() {
-            member.traverse(visit);
+            member.traverse("Record.member", visit);
         }
         if let Some(methods) = self.methods.as_ref() {
-            visit(methods.span);
+            visit("Record.methods", methods.span);
             for method in methods.value.iter() {
-                method.traverse(visit);
+                method.traverse("Record.method", visit);
             }
         }
     }
@@ -41,9 +41,9 @@ pub struct RecordMemberParseNode {
 }
 
 impl Traverse for RecordMemberParseNode {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
-        visit(self.identifier.span);
-        self.type_def.traverse(visit);
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        visit("RecordMember.identifier", self.identifier.span);
+        self.type_def.traverse("RecordMember.type", visit);
     }
 }
 
@@ -54,7 +54,7 @@ pub struct MethodParseNode {
 }
 
 impl Traverse for MethodParseNode {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
-        self.function.traverse(visit);
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        self.function.traverse("Method.function", visit);
     }
 }

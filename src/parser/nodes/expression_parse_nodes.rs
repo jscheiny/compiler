@@ -14,7 +14,7 @@ pub enum ExpressionParseNode {
 }
 
 impl Traverse for ExpressionParseNode {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         match self {
             Self::PrefixOp(node) => {
                 node.traverse(visit);
@@ -34,8 +34,8 @@ impl Traverse for ExpressionParseNode {
 }
 
 impl Traverse for ParseNode<Box<ExpressionParseNode>> {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
-        visit(self.span);
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        visit("ExpressionParseNode.self", self.span);
         self.value.traverse(visit);
     }
 }
@@ -47,8 +47,8 @@ pub struct PrefixOpExpressionParseNode {
 }
 
 impl Traverse for PrefixOpExpressionParseNode {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
-        visit(self.operator.span);
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        visit("PrefixOpExpression.operator", self.operator.span);
         self.expression.traverse(visit);
     }
 }
@@ -61,9 +61,9 @@ pub struct BinaryOpExpressionParseNode {
 }
 
 impl Traverse for BinaryOpExpressionParseNode {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         self.left.traverse(visit);
-        visit(self.operator.span);
+        visit("BinaryOpExpression.operator", self.operator.span);
         self.right.traverse(visit);
     }
 }
@@ -75,8 +75,8 @@ pub struct PostfixOpExpressionParseNode {
 }
 
 impl Traverse for PostfixOpExpressionParseNode {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         self.expression.traverse(visit);
-        visit(self.operator.span);
+        visit("PostfixOpExpression.operator", self.operator.span);
     }
 }

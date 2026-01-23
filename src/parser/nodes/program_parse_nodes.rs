@@ -9,9 +9,9 @@ pub struct ProgramParseNode {
 }
 
 impl Traverse for ProgramParseNode {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         for definition in self.definitions.iter() {
-            definition.traverse(visit);
+            definition.traverse("Program.definition", visit);
         }
     }
 }
@@ -23,7 +23,7 @@ pub struct ModuleTopLevelDefinition {
 }
 
 impl Traverse for ModuleTopLevelDefinition {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         self.definition.traverse(visit);
     }
 }
@@ -36,7 +36,7 @@ pub enum TopLevelDefinition {
 }
 
 impl Traverse for TopLevelDefinition {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         match self {
             TopLevelDefinition::Record(node) => node.traverse(visit),
             TopLevelDefinition::Interface(node) => node.traverse(visit),

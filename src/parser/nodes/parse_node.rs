@@ -6,15 +6,15 @@ pub struct ParseNode<T: Debug> {
     pub span: TokenSpan,
 }
 
-impl<T: Debug + Traverse> Traverse for ParseNode<T> {
-    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
-        visit(self.span);
+impl<T: Debug + Traverse> ParseNode<T> {
+    pub fn traverse(&self, field: &str, visit: &impl Fn(&str, TokenSpan)) {
+        visit(field, self.span);
         self.value.traverse(visit);
     }
 }
 
 pub trait Traverse {
-    fn traverse(&self, visit: &impl Fn(TokenSpan));
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan));
 }
 
 #[derive(Clone, Copy)]
