@@ -155,19 +155,19 @@ pub enum ExpressionParseNode {
 
 #[derive(Debug)]
 pub struct PrefixOpExpressionParseNode {
-    pub operator: PrefixOperator,
-    pub expression: Box<ExpressionParseNode>,
+    pub operator: LocatedNode<PrefixOperator>,
+    pub expression: LocatedNode<Box<ExpressionParseNode>>,
 }
 
 #[derive(Debug)]
 pub struct BinaryOpExpressionParseNode {
-    pub left: Box<ExpressionParseNode>,
-    pub operator: BinaryOperator,
-    pub right: Box<ExpressionParseNode>,
+    pub left: LocatedNode<Box<ExpressionParseNode>>,
+    pub operator: LocatedNode<BinaryOperator>,
+    pub right: LocatedNode<Box<ExpressionParseNode>>,
 }
 
 #[derive(Debug)]
 pub struct PostfixOpExpressionParseNode {
-    pub expression: Box<ExpressionParseNode>,
-    pub operator: PostfixOperator,
+    pub expression: LocatedNode<Box<ExpressionParseNode>>,
+    pub operator: LocatedNode<PostfixOperator>,
 }
