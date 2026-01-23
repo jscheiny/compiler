@@ -29,7 +29,6 @@ pub fn try_tokenize_multiline_comment(text: &str) -> Option<(Token, usize)> {
     let mut bytes = 0;
     let mut token = IgnoredToken::new();
     for character in text.chars() {
-        println!("{}", character);
         if text[bytes..].starts_with(MULTILINE_COMMENT_END) {
             bytes += MULTILINE_COMMENT_END.len();
             token.columns_since_last_new_line += MULTILINE_COMMENT_END.len();
