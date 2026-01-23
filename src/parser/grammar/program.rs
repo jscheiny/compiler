@@ -16,8 +16,8 @@ pub fn program(tokens: &mut TokenTraverser) -> Result<ProgramParseNode, ()> {
         if let Token::Keyword(keyword) = tokens.peek() {
             use KeywordToken as K;
             let definition = match keyword {
-                K::Tuple => TopLevelDefinition::Record(tuple(tokens)?),
-                K::Struct => TopLevelDefinition::Record(structure(tokens)?),
+                K::Tuple => TopLevelDefinition::Record(tokens.located(tuple)?),
+                K::Struct => TopLevelDefinition::Record(tokens.located(structure)?),
                 K::Interface => TopLevelDefinition::Interface(tokens.located(interface)?),
                 K::Fn => TopLevelDefinition::Function(function(tokens, true)?),
                 _ => panic!("Fix this"),

@@ -1,24 +1,24 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken},
     parser::{
-        LocatedNode, MethodParseNode, ParseResult, RecordDefinitionParseNode,
-        RecordMemberParseNode, RecordType, TokenTraverser,
+        LocatedNode, MethodParseNode, RecordDefinitionParseNode, RecordMemberParseNode, RecordType,
+        TokenTraverser,
         grammar::{comma_separated_list, function, type_definition},
     },
 };
 
-pub fn structure(tokens: &mut TokenTraverser) -> ParseResult<RecordDefinitionParseNode> {
+pub fn structure(tokens: &mut TokenTraverser) -> Result<RecordDefinitionParseNode, ()> {
     record(tokens, RecordType::Structure)
 }
 
-pub fn tuple(tokens: &mut TokenTraverser) -> ParseResult<RecordDefinitionParseNode> {
+pub fn tuple(tokens: &mut TokenTraverser) -> Result<RecordDefinitionParseNode, ()> {
     record(tokens, RecordType::Tuple)
 }
 
 fn record(
     tokens: &mut TokenTraverser,
     record_type: RecordType,
-) -> ParseResult<RecordDefinitionParseNode> {
+) -> Result<RecordDefinitionParseNode, ()> {
     let record_span = tokens.start_span();
     let record_type = record_span.singleton(record_type);
     tokens.next();
@@ -34,29 +34,23 @@ fn record(
 
     let methods_span = tokens.start_span();
     if tokens.accept(&OperatorToken::EndStatement) {
-        Ok(record_span.close(
-            tokens,
-            RecordDefinitionParseNode {
-                record_type,
-                identifier,
-                member_list,
-                methods: methods_span.close(tokens, vec![]),
-            },
-        ))
+        Ok(RecordDefinitionParseNode {
+            record_type,
+            identifier,
+            member_list,
+            methods: methods_span.close(tokens, vec![]),
+        })
     } else if tokens.accept(&OperatorToken::OpenBrace) {
         let methods = {
             let methods = methods(tokens)?;
             methods_span.close(tokens, methods)
         };
-        Ok(record_span.close(
-            tokens,
-            RecordDefinitionParseNode {
-                record_type,
-                identifier,
-                member_list,
-                methods,
-            },
-        ))
+        Ok(RecordDefinitionParseNode {
+            record_type,
+            identifier,
+            member_list,
+            methods,
+        })
     } else {
         Err(())
     }
@@ -84,30 +78,23 @@ fn member(tokens: &mut TokenTraverser) -> Result<RecordMemberParseNode, ()> {
 fn methods(tokens: &mut TokenTraverser) -> Result<Vec<LocatedNode<MethodParseNode>>, ()> {
     let mut methods = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {
-        methods.push(method(tokens)?);
+        methods.push(tokens.located(method)?);
     }
     Ok(methods)
 }
 
-fn method(tokens: &mut TokenTraverser) -> ParseResult<MethodParseNode> {
-    let span = tokens.start_span();
+fn method(tokens: &mut TokenTraverser) -> Result<MethodParseNode, ()> {
     if tokens.accept(&KeywordToken::Pub) {
         let method = method(tokens)?;
-        return Ok(span.close(
-            tokens,
-            MethodParseNode {
-                public: true,
-                ..method.value
-            },
-        ));
+        return Ok(MethodParseNode {
+            public: true,
+            ..method
+        });
     }
 
     let function = function(tokens, false)?;
-    Ok(span.close(
-        tokens,
-        MethodParseNode {
-            public: false,
-            function,
-        },
-    ))
+    Ok(MethodParseNode {
+        public: false,
+        function,
+    })
 }
