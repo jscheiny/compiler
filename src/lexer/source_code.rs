@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::{
     lexer::{LocatedToken, tokenize},
-    parser::TokenSpan,
+    parser::{TokenSpan, TokenStream},
 };
 
 pub struct SourceCode {
@@ -15,6 +15,10 @@ impl SourceCode {
         let tokens = Rc::new(tokenize(text));
         let source = text.to_owned();
         Self { tokens, source }
+    }
+
+    pub fn token_stream(&self) -> TokenStream {
+        TokenStream::from(self.tokens.clone())
     }
 
     pub fn get_span_string(&self, span: TokenSpan) -> String {

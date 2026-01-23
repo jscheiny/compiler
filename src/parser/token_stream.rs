@@ -2,7 +2,7 @@ use std::fmt::Debug;
 use std::rc::Rc;
 
 use crate::{
-    lexer::{IdentifierToken, LocatedToken, TokenMatch, Token},
+    lexer::{IdentifierToken, LocatedToken, Token, TokenMatch},
     parser::{ParseNode, TokenSpan},
 };
 
@@ -12,7 +12,7 @@ pub struct TokenStream {
 }
 
 impl TokenStream {
-    pub fn new(tokens: Rc<Vec<LocatedToken>>) -> Self {
+    pub fn from(tokens: Rc<Vec<LocatedToken>>) -> Self {
         TokenStream { tokens, index: 0 }
     }
 
