@@ -1,5 +1,5 @@
 use crate::{
-    lexer::{KeywordToken, OperatorToken},
+    lexer::{KeywordToken, OperatorToken, TokenMatch},
     parser::{
         MethodParseNode, ParseNode, RecordDefinitionParseNode, RecordMemberParseNode, RecordType,
         TokenStream,
@@ -31,7 +31,7 @@ fn record(
             member_list,
             methods: None,
         })
-    } else if tokens.accept(&OperatorToken::OpenBrace) {
+    } else if OperatorToken::OpenBrace.matches(tokens.peek()) {
         let methods = Some(tokens.located(methods)?);
         Ok(RecordDefinitionParseNode {
             record_type,
@@ -62,6 +62,7 @@ fn member(tokens: &mut TokenStream) -> Result<RecordMemberParseNode, ()> {
 }
 
 fn methods(tokens: &mut TokenStream) -> Result<Vec<ParseNode<MethodParseNode>>, ()> {
+    tokens.next();
     let mut methods = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {
         methods.push(tokens.located(method)?);
