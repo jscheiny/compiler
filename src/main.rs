@@ -7,23 +7,17 @@ pub mod lexer;
 pub mod parser;
 
 fn main() {
-    let source = SourceCode::from(
-        "struct Test() { // with a comment!
-        test() {/*
-            multiline!
-        */}
-    }",
-    );
+    let source = SourceCode::from("struct T(pub f: G[Y, int]) { pub f() -> x; }");
 
-    for token in source.tokens.iter() {
-        println!("{}", token)
-    }
+    // for token in source.tokens.iter() {
+    //     println!("{}", token)
+    // }
 
     let mut tokens = source.token_stream();
     let program = program(&mut tokens).unwrap();
-    println!("{:#?}", program);
+    // println!("{:#?}", program);
     program.traverse(&|name, span| {
         println!("{} @ {:?}", name, span);
-        println!("Source:[{}]", source.get_span_string(span));
+        println!("Source:[{}]\n", source.get_span_string(span));
     });
 }
