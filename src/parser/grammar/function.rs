@@ -2,16 +2,23 @@ use crate::{
     lexer::OperatorToken,
     parser::{
         FunctionBodyParseNode, FunctionDefintionParseNode, LocatedNode, ParameterParseNode,
-        ParseResult, TokenTraverser,
+        TokenTraverser,
         grammar::{expression, statement, type_definition, utils::comma_separated_list},
     },
 };
 
-pub fn function(
+pub fn top_level_function(tokens: &mut TokenTraverser) -> Result<FunctionDefintionParseNode, ()> {
+    function(tokens, true)
+}
+
+pub fn nested_function(tokens: &mut TokenTraverser) -> Result<FunctionDefintionParseNode, ()> {
+    function(tokens, false)
+}
+
+fn function(
     tokens: &mut TokenTraverser,
     has_keyword: bool,
-) -> ParseResult<FunctionDefintionParseNode> {
-    let span = tokens.start_span();
+) -> Result<FunctionDefintionParseNode, ()> {
     if has_keyword {
         tokens.next();
     }
@@ -23,15 +30,12 @@ pub fn function(
         None
     };
     let body = tokens.located(function_body)?;
-    Ok(span.close(
-        tokens,
-        FunctionDefintionParseNode {
-            identifier,
-            parameters,
-            return_type,
-            body,
-        },
-    ))
+    Ok(FunctionDefintionParseNode {
+        identifier,
+        parameters,
+        return_type,
+        body,
+    })
 }
 
 fn function_body(tokens: &mut TokenTraverser) -> Result<FunctionBodyParseNode, ()> {

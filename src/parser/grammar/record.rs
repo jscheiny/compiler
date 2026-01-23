@@ -3,7 +3,7 @@ use crate::{
     parser::{
         LocatedNode, MethodParseNode, RecordDefinitionParseNode, RecordMemberParseNode, RecordType,
         TokenTraverser,
-        grammar::{comma_separated_list, function, type_definition},
+        grammar::{comma_separated_list, nested_function, type_definition},
     },
 };
 
@@ -92,7 +92,7 @@ fn method(tokens: &mut TokenTraverser) -> Result<MethodParseNode, ()> {
         });
     }
 
-    let function = function(tokens, false)?;
+    let function = tokens.located(nested_function)?;
     Ok(MethodParseNode {
         public: false,
         function,
