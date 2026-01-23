@@ -1,18 +1,18 @@
-mod expression;
-mod function;
-mod interface;
-mod program;
-mod record;
-mod statement;
-mod type_definition;
+mod expression_parser;
+mod function_parser;
+mod interface_parser;
+mod program_parser;
+mod record_parser;
+mod statement_parser;
+mod type_definition_parser;
 mod utils;
 
-use expression::*;
-use function::*;
-use interface::*;
-use record::*;
-use statement::*;
-use type_definition::*;
+use expression_parser::*;
+use function_parser::*;
+use interface_parser::*;
+use record_parser::*;
+use statement_parser::*;
+use type_definition_parser::*;
 use utils::*;
 
-pub use program::*;
+pub use program_parser::*;
