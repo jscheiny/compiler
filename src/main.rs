@@ -6,7 +6,16 @@ pub mod lexer;
 pub mod parser;
 
 fn main() {
-    let tokens = tokenize("interface I { f(): X; }");
+    let tokens = tokenize(
+        "
+        struct S() {
+            pub g() {
+                {
+                }
+            }
+        }
+    ",
+    );
 
     for token in tokens.iter() {
         println!("{}", token);

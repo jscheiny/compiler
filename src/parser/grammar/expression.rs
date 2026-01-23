@@ -25,7 +25,6 @@ pub fn expression(tokens: &mut TokenTraverser) -> ParseResult<ExpressionParseNod
             Ok(span.close(tokens, ExpressionParseNode::StringLiteral(literal)))
         }
         Token::Operator(OperatorToken::OpenBrace) => {
-            tokens.next();
             let block = block(tokens)?;
             Ok(span.close(tokens, ExpressionParseNode::Block(block)))
         }
@@ -34,7 +33,8 @@ pub fn expression(tokens: &mut TokenTraverser) -> ParseResult<ExpressionParseNod
 }
 
 pub fn block(tokens: &mut TokenTraverser) -> Result<LocatedNodeVec<StatementParseNode>, ()> {
-    let span = tokens.start_span(); // TODO this span is wrong, needs to start one earlier
+    let span = tokens.start_span();
+    tokens.expect(&OperatorToken::OpenBrace)?;
     let mut statements = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {
         statements.push(statement(tokens)?);

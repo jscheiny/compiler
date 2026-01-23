@@ -95,17 +95,14 @@ fn while_loop(tokens: &mut TokenTraverser) -> ParseResult<StatementParseNode> {
 
 fn if_statement(tokens: &mut TokenTraverser) -> ParseResult<StatementParseNode> {
     let span = tokens.start_span();
-    tokens.next();
     let mut conditions = vec![if_condition(tokens)?];
     let mut else_branch = None;
 
     while tokens.accept(&KeywordToken::Else) {
         if tokens.accept(&KeywordToken::If) {
             conditions.push(if_condition(tokens)?);
-        } else if tokens.accept(&OperatorToken::OpenBrace) {
-            else_branch = Some(block(tokens)?);
         } else {
-            return Err(());
+            else_branch = Some(block(tokens)?);
         }
     }
 
@@ -119,15 +116,14 @@ fn if_statement(tokens: &mut TokenTraverser) -> ParseResult<StatementParseNode> 
 }
 
 fn if_condition(tokens: &mut TokenTraverser) -> Result<IfStatementConditionParseNode, ()> {
+    tokens.next();
     let predicate = expression(tokens)?;
-    tokens.expect(&OperatorToken::OpenBrace)?;
     let body = block(tokens)?;
     Ok(IfStatementConditionParseNode { predicate, body })
 }
 
 fn block_statement(tokens: &mut TokenTraverser) -> ParseResult<StatementParseNode> {
     let span = tokens.start_span();
-    tokens.next();
     let block = ExpressionParseNode::Block(block(tokens)?);
     Ok(span.close(tokens, StatementParseNode::Expression(block)))
 }
