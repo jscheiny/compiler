@@ -1,4 +1,4 @@
-use crate::parser::{ExpressionParseNode, ParseNode, Traverse, TypeDefinitionParseNode};
+use crate::parser::{ExpressionParseNode, ParseNode, TokenSpan, Traverse, TypeDefinitionParseNode};
 
 #[derive(Debug)]
 pub enum StatementParseNode {
@@ -13,7 +13,7 @@ pub enum StatementParseNode {
 }
 
 impl Traverse for StatementParseNode {
-    fn traverse(&self, visit: &impl Fn(super::TokenSpan)) {
+    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
         match self {
             StatementParseNode::BlockReturn(node) => node.traverse(visit),
             StatementParseNode::Break() => todo!(),
@@ -35,7 +35,7 @@ pub struct BlockParseNode {
 }
 
 impl Traverse for BlockParseNode {
-    fn traverse(&self, visit: &impl Fn(super::TokenSpan)) {
+    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
         for statement in self.statements.iter() {
             statement.traverse(visit);
         }
@@ -51,7 +51,7 @@ pub struct DeclarationParseNode {
 }
 
 impl Traverse for DeclarationParseNode {
-    fn traverse(&self, visit: &impl Fn(super::TokenSpan)) {
+    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
         visit(self.identifier.span);
         if let Some(type_def) = self.type_def.as_ref() {
             type_def.traverse(visit);
@@ -66,7 +66,7 @@ pub struct IfStatementParseNode {
 }
 
 impl Traverse for IfStatementParseNode {
-    fn traverse(&self, visit: &impl Fn(super::TokenSpan)) {
+    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
         for condition in self.conditions.iter() {
             condition.traverse(visit);
         }
@@ -83,7 +83,7 @@ pub struct IfStatementConditionParseNode {
 }
 
 impl Traverse for IfStatementConditionParseNode {
-    fn traverse(&self, visit: &impl Fn(super::TokenSpan)) {
+    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
         self.predicate.traverse(visit);
         self.body.traverse(visit);
     }
@@ -96,7 +96,7 @@ pub struct WhileLoopParseNode {
 }
 
 impl Traverse for WhileLoopParseNode {
-    fn traverse(&self, visit: &impl Fn(super::TokenSpan)) {
+    fn traverse(&self, visit: &impl Fn(TokenSpan)) {
         self.predicate.traverse(visit);
         self.body.traverse(visit);
     }
