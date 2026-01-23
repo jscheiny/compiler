@@ -50,21 +50,14 @@ fn member_list(tokens: &mut TokenTraverser) -> Result<Vec<LocatedNode<RecordMemb
 }
 
 fn member(tokens: &mut TokenTraverser) -> Result<RecordMemberParseNode, ()> {
-    if tokens.accept(&KeywordToken::Pub) {
-        let member = member(tokens)?;
-        return Ok(RecordMemberParseNode {
-            public: true,
-            ..member
-        });
-    }
-
+    let public = tokens.accept(&KeywordToken::Pub);
     let identifier = tokens.identifier()?;
     tokens.expect(&OperatorToken::Type)?;
     let type_def = tokens.located(type_definition)?;
     Ok(RecordMemberParseNode {
+        public,
         identifier,
         type_def,
-        public: false,
     })
 }
 
@@ -77,17 +70,7 @@ fn methods(tokens: &mut TokenTraverser) -> Result<Vec<LocatedNode<MethodParseNod
 }
 
 fn method(tokens: &mut TokenTraverser) -> Result<MethodParseNode, ()> {
-    if tokens.accept(&KeywordToken::Pub) {
-        let method = method(tokens)?;
-        return Ok(MethodParseNode {
-            public: true,
-            ..method
-        });
-    }
-
+    let public = tokens.accept(&KeywordToken::Pub);
     let function = tokens.located(nested_function)?;
-    Ok(MethodParseNode {
-        public: false,
-        function,
-    })
+    Ok(MethodParseNode { public, function })
 }
