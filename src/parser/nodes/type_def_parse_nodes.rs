@@ -1,6 +1,6 @@
 use crate::{
     lexer::KeywordToken,
-    parser::{LocatedNode, LocatedNodeVec},
+    parser::{ParseNode, ParseNodeVec},
 };
 
 #[derive(Debug)]
@@ -11,6 +11,6 @@ pub enum TypeDefinitionParseNode {
 
 #[derive(Debug)]
 pub struct UserDefinedTypeParseNode {
-    pub identifier: LocatedNode<String>,
-    pub generic_params: Option<LocatedNodeVec<TypeDefinitionParseNode>>,
+    pub identifier: ParseNode<String>,
+    pub generic_params: Option<ParseNodeVec<TypeDefinitionParseNode>>,
 }

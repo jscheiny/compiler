@@ -1,14 +1,14 @@
-use crate::parser::{LocatedNode, LocatedNodeVec, ParameterParseNode, TypeDefinitionParseNode};
+use crate::parser::{ParameterParseNode, ParseNode, ParseNodeVec, TypeDefinitionParseNode};
 
 #[derive(Debug)]
 pub struct InterfaceDefinitionParseNode {
-    pub identifier: LocatedNode<String>,
-    pub method_signatures: LocatedNodeVec<MethodSignatureParseNode>,
+    pub identifier: ParseNode<String>,
+    pub method_signatures: ParseNodeVec<MethodSignatureParseNode>,
 }
 
 #[derive(Debug)]
 pub struct MethodSignatureParseNode {
-    pub identifier: LocatedNode<String>,
-    pub parameters: LocatedNodeVec<ParameterParseNode>,
-    pub return_type: LocatedNode<TypeDefinitionParseNode>,
+    pub identifier: ParseNode<String>,
+    pub parameters: ParseNodeVec<ParameterParseNode>,
+    pub return_type: ParseNode<TypeDefinitionParseNode>,
 }

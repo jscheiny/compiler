@@ -1,7 +1,7 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token},
     parser::{
-        LocatedNode, TokenTraverser, TypeDefinitionParseNode, UserDefinedTypeParseNode,
+        ParseNode, TokenTraverser, TypeDefinitionParseNode, UserDefinedTypeParseNode,
         grammar::comma_separated_list,
     },
 };
@@ -37,7 +37,7 @@ fn user_type_definition(tokens: &mut TokenTraverser) -> Result<TypeDefinitionPar
 
 fn generic_type_params(
     tokens: &mut TokenTraverser,
-) -> Result<Option<Vec<LocatedNode<TypeDefinitionParseNode>>>, ()> {
+) -> Result<Option<Vec<ParseNode<TypeDefinitionParseNode>>>, ()> {
     if tokens.accept(&OperatorToken::OpenBracket) {
         let params = comma_separated_list(tokens, OperatorToken::CloseBracket, type_definition)?;
         Ok(Some(params))

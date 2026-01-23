@@ -1,7 +1,7 @@
 use crate::{
     lexer::OperatorToken,
     parser::{
-        FunctionBodyParseNode, FunctionDefintionParseNode, LocatedNode, ParameterParseNode,
+        FunctionBodyParseNode, FunctionDefintionParseNode, ParameterParseNode, ParseNode,
         ParserPredicate, TokenTraverser,
         grammar::{block, expression, type_definition, utils::comma_separated_list},
     },
@@ -50,7 +50,7 @@ fn function_body(tokens: &mut TokenTraverser) -> Result<FunctionBodyParseNode, (
     }
 }
 
-pub fn parameters(tokens: &mut TokenTraverser) -> Result<Vec<LocatedNode<ParameterParseNode>>, ()> {
+pub fn parameters(tokens: &mut TokenTraverser) -> Result<Vec<ParseNode<ParameterParseNode>>, ()> {
     tokens.expect(&OperatorToken::OpenParen)?;
     let list = comma_separated_list(tokens, OperatorToken::CloseParen, parameter)?;
     Ok(list)

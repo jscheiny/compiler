@@ -1,13 +1,11 @@
-use crate::parser::{
-    FunctionDefintionParseNode, LocatedNode, LocatedNodeVec, TypeDefinitionParseNode,
-};
+use crate::parser::{FunctionDefintionParseNode, ParseNode, ParseNodeVec, TypeDefinitionParseNode};
 
 #[derive(Debug)]
 pub struct RecordDefinitionParseNode {
     pub record_type: RecordType,
-    pub identifier: LocatedNode<String>,
-    pub member_list: LocatedNodeVec<RecordMemberParseNode>,
-    pub methods: Option<LocatedNodeVec<MethodParseNode>>,
+    pub identifier: ParseNode<String>,
+    pub member_list: ParseNodeVec<RecordMemberParseNode>,
+    pub methods: Option<ParseNodeVec<MethodParseNode>>,
 }
 
 #[derive(Debug)]
@@ -19,12 +17,12 @@ pub enum RecordType {
 #[derive(Debug)]
 pub struct RecordMemberParseNode {
     pub public: bool,
-    pub identifier: LocatedNode<String>,
-    pub type_def: LocatedNode<TypeDefinitionParseNode>,
+    pub identifier: ParseNode<String>,
+    pub type_def: ParseNode<TypeDefinitionParseNode>,
 }
 
 #[derive(Debug)]
 pub struct MethodParseNode {
     pub public: bool,
-    pub function: LocatedNode<FunctionDefintionParseNode>,
+    pub function: ParseNode<FunctionDefintionParseNode>,
 }

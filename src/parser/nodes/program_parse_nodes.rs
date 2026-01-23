@@ -1,11 +1,11 @@
 use crate::parser::{
-    FunctionDefintionParseNode, InterfaceDefinitionParseNode, LocatedNode,
+    FunctionDefintionParseNode, InterfaceDefinitionParseNode, ParseNode,
     RecordDefinitionParseNode,
 };
 
 #[derive(Debug)]
 pub struct ProgramParseNode {
-    pub definitions: Vec<LocatedNode<ModuleTopLevelDefinition>>,
+    pub definitions: Vec<ParseNode<ModuleTopLevelDefinition>>,
 }
 
 #[derive(Debug)]

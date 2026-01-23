@@ -1,7 +1,7 @@
 use crate::{
     lexer::OperatorToken,
     parser::{
-        InterfaceDefinitionParseNode, LocatedNode, MethodSignatureParseNode, TokenTraverser,
+        InterfaceDefinitionParseNode, ParseNode, MethodSignatureParseNode, TokenTraverser,
         grammar::{parameters, type_definition},
     },
 };
@@ -19,7 +19,7 @@ pub fn interface(tokens: &mut TokenTraverser) -> Result<InterfaceDefinitionParse
 
 fn method_signatures(
     tokens: &mut TokenTraverser,
-) -> Result<Vec<LocatedNode<MethodSignatureParseNode>>, ()> {
+) -> Result<Vec<ParseNode<MethodSignatureParseNode>>, ()> {
     tokens.expect(&OperatorToken::OpenBrace)?;
     let mut methods = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {

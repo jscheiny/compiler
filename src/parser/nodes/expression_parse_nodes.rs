@@ -1,4 +1,4 @@
-use crate::parser::{BinaryOperator, BlockParseNode, LocatedNode, PostfixOperator, PrefixOperator};
+use crate::parser::{BinaryOperator, BlockParseNode, ParseNode, PostfixOperator, PrefixOperator};
 
 #[derive(Debug)]
 pub enum ExpressionParseNode {
@@ -13,19 +13,19 @@ pub enum ExpressionParseNode {
 
 #[derive(Debug)]
 pub struct PrefixOpExpressionParseNode {
-    pub operator: LocatedNode<PrefixOperator>,
-    pub expression: LocatedNode<Box<ExpressionParseNode>>,
+    pub operator: ParseNode<PrefixOperator>,
+    pub expression: ParseNode<Box<ExpressionParseNode>>,
 }
 
 #[derive(Debug)]
 pub struct BinaryOpExpressionParseNode {
-    pub left: LocatedNode<Box<ExpressionParseNode>>,
-    pub operator: LocatedNode<BinaryOperator>,
-    pub right: LocatedNode<Box<ExpressionParseNode>>,
+    pub left: ParseNode<Box<ExpressionParseNode>>,
+    pub operator: ParseNode<BinaryOperator>,
+    pub right: ParseNode<Box<ExpressionParseNode>>,
 }
 
 #[derive(Debug)]
 pub struct PostfixOpExpressionParseNode {
-    pub expression: LocatedNode<Box<ExpressionParseNode>>,
-    pub operator: LocatedNode<PostfixOperator>,
+    pub expression: ParseNode<Box<ExpressionParseNode>>,
+    pub operator: ParseNode<PostfixOperator>,
 }

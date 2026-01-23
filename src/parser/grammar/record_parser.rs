@@ -1,7 +1,7 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken},
     parser::{
-        LocatedNode, MethodParseNode, RecordDefinitionParseNode, RecordMemberParseNode, RecordType,
+        ParseNode, MethodParseNode, RecordDefinitionParseNode, RecordMemberParseNode, RecordType,
         TokenTraverser,
         grammar::{comma_separated_list, nested_function, type_definition},
     },
@@ -44,7 +44,7 @@ fn record(
     }
 }
 
-fn member_list(tokens: &mut TokenTraverser) -> Result<Vec<LocatedNode<RecordMemberParseNode>>, ()> {
+fn member_list(tokens: &mut TokenTraverser) -> Result<Vec<ParseNode<RecordMemberParseNode>>, ()> {
     tokens.expect(&OperatorToken::OpenParen)?;
     comma_separated_list(tokens, OperatorToken::CloseParen, member)
 }
@@ -61,7 +61,7 @@ fn member(tokens: &mut TokenTraverser) -> Result<RecordMemberParseNode, ()> {
     })
 }
 
-fn methods(tokens: &mut TokenTraverser) -> Result<Vec<LocatedNode<MethodParseNode>>, ()> {
+fn methods(tokens: &mut TokenTraverser) -> Result<Vec<ParseNode<MethodParseNode>>, ()> {
     let mut methods = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {
         methods.push(tokens.located(method)?);

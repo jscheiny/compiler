@@ -1,10 +1,10 @@
 use std::fmt::Debug;
 
 #[derive(Debug)]
-pub struct LocatedNode<ParseNode: Debug> {
-    pub value: ParseNode,
+pub struct ParseNode<T: Debug> {
+    pub value: T,
     pub token_start_index: usize,
     pub token_end_index: usize,
 }
 
-pub type LocatedNodeVec<ParseNode> = LocatedNode<Vec<LocatedNode<ParseNode>>>;
+pub type ParseNodeVec<T> = ParseNode<Vec<ParseNode<T>>>;
