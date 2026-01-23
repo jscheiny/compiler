@@ -1,10 +1,7 @@
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use crate::{
-    lexer::{Token, TokenParse},
-    parser::ParserPredicate,
-};
+use crate::lexer::{Token, TokenMatch, TokenParse};
 
 #[derive(Debug, Clone, Copy, EnumIter, PartialEq, Eq)]
 pub enum KeywordToken {
@@ -65,8 +62,8 @@ impl TokenParse for KeywordToken {
     }
 }
 
-impl ParserPredicate for KeywordToken {
-    fn is_match(&self, token: &Token) -> bool {
+impl TokenMatch for KeywordToken {
+    fn matches(&self, token: &Token) -> bool {
         match token {
             Token::Keyword(op) => *op == *self,
             _ => false,

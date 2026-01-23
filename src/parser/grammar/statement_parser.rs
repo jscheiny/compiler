@@ -1,9 +1,8 @@
 use crate::{
-    lexer::{KeywordToken, OperatorToken, Token},
+    lexer::{KeywordToken, OperatorToken, Token, TokenMatch},
     parser::{
         DeclarationParseNode, ExpressionParseNode, IfStatementConditionParseNode,
-        IfStatementParseNode, ParserPredicate, StatementParseNode, TokenStream,
-        WhileLoopParseNode,
+        IfStatementParseNode, StatementParseNode, TokenStream, WhileLoopParseNode,
         grammar::{block, expression, type_definition},
     },
 };
@@ -87,7 +86,7 @@ fn if_statement(tokens: &mut TokenStream) -> Result<StatementParseNode, ()> {
     let mut else_branch = None;
 
     while tokens.accept(&KeywordToken::Else) {
-        if KeywordToken::If.is_match(tokens.peek()) {
+        if KeywordToken::If.matches(tokens.peek()) {
             conditions.push(tokens.located(if_condition)?);
         } else {
             else_branch = Some(tokens.located(block)?);

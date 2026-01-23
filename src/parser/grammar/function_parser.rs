@@ -1,8 +1,8 @@
 use crate::{
-    lexer::OperatorToken,
+    lexer::{OperatorToken, TokenMatch},
     parser::{
         FunctionBodyParseNode, FunctionDefintionParseNode, ParameterParseNode, ParseNode,
-        ParserPredicate, TokenStream,
+        TokenStream,
         grammar::{block, expression, type_definition, utils::comma_separated_list},
     },
 };
@@ -15,10 +15,7 @@ pub fn nested_function(tokens: &mut TokenStream) -> Result<FunctionDefintionPars
     function(tokens, false)
 }
 
-fn function(
-    tokens: &mut TokenStream,
-    has_keyword: bool,
-) -> Result<FunctionDefintionParseNode, ()> {
+fn function(tokens: &mut TokenStream, has_keyword: bool) -> Result<FunctionDefintionParseNode, ()> {
     if has_keyword {
         tokens.next();
     }
@@ -43,7 +40,7 @@ fn function_body(tokens: &mut TokenStream) -> Result<FunctionBodyParseNode, ()> 
         let expression = expression(tokens)?;
         tokens.expect(&OperatorToken::EndStatement)?;
         Ok(FunctionBodyParseNode::Expression(expression))
-    } else if OperatorToken::OpenBrace.is_match(tokens.peek()) {
+    } else if OperatorToken::OpenBrace.matches(tokens.peek()) {
         Ok(FunctionBodyParseNode::Block(block(tokens)?))
     } else {
         Err(())

@@ -3,10 +3,7 @@ use std::fmt::Display;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use crate::{
-    lexer::{Token, TokenParse},
-    parser::ParserPredicate,
-};
+use crate::lexer::{Token, TokenMatch, TokenParse};
 
 #[derive(Clone, Copy, EnumIter, PartialEq, Eq)]
 pub enum OperatorToken {
@@ -100,8 +97,8 @@ impl TokenParse for OperatorToken {
     }
 }
 
-impl ParserPredicate for OperatorToken {
-    fn is_match(&self, token: &Token) -> bool {
+impl TokenMatch for OperatorToken {
+    fn matches(&self, token: &Token) -> bool {
         match token {
             Token::Operator(op) => *op == *self,
             _ => false,

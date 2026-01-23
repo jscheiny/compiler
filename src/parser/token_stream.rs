@@ -2,8 +2,8 @@ use std::fmt::Debug;
 use std::rc::Rc;
 
 use crate::{
-    lexer::{IdentifierToken, LocatedToken, Token},
-    parser::{ParseNode, ParserPredicate, TokenSpan},
+    lexer::{IdentifierToken, LocatedToken, TokenMatch, Token},
+    parser::{ParseNode, TokenSpan},
 };
 
 pub struct TokenStream {
@@ -16,8 +16,8 @@ impl TokenStream {
         TokenStream { tokens, index: 0 }
     }
 
-    pub fn accept(&mut self, predicate: &impl ParserPredicate) -> bool {
-        if predicate.is_match(self.peek()) {
+    pub fn accept(&mut self, predicate: &impl TokenMatch) -> bool {
+        if predicate.matches(self.peek()) {
             self.next();
             true
         } else {
@@ -25,7 +25,7 @@ impl TokenStream {
         }
     }
 
-    pub fn expect(&mut self, predicate: &impl ParserPredicate) -> Result<(), ()> {
+    pub fn expect(&mut self, predicate: &impl TokenMatch) -> Result<(), ()> {
         if self.accept(predicate) {
             Ok(())
         } else {

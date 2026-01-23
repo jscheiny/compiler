@@ -24,8 +24,8 @@ fn main() {
         }",
     );
 
-    let mut token_traverser = TokenStream::new(source.tokens.clone());
-    let program = program(&mut token_traverser).unwrap();
+    let mut tokens = TokenStream::new(source.tokens.clone());
+    let program = program(&mut tokens).unwrap();
     println!("{:#?}", program);
     program.traverse(&|span| {
         println!("{:?}", span);
