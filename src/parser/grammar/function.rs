@@ -2,8 +2,8 @@ use crate::{
     lexer::OperatorToken,
     parser::{
         FunctionBodyParseNode, FunctionDefintionParseNode, LocatedNode, ParameterParseNode,
-        TokenTraverser,
-        grammar::{expression, statement, type_definition, utils::comma_separated_list},
+        ParserPredicate, TokenTraverser,
+        grammar::{block, expression, type_definition, utils::comma_separated_list},
     },
 };
 
@@ -43,12 +43,8 @@ fn function_body(tokens: &mut TokenTraverser) -> Result<FunctionBodyParseNode, (
         let expression = tokens.located(expression)?;
         tokens.expect(&OperatorToken::EndStatement)?;
         Ok(FunctionBodyParseNode::Expression(expression))
-    } else if tokens.accept(&OperatorToken::OpenBrace) {
-        let mut statements = vec![];
-        while !tokens.accept(&OperatorToken::CloseBrace) {
-            statements.push(tokens.located(statement)?);
-        }
-        Ok(FunctionBodyParseNode::Block(statements))
+    } else if OperatorToken::OpenBrace.is_match(tokens.peek()) {
+        Ok(FunctionBodyParseNode::Block(block(tokens)?))
     } else {
         Err(())
     }

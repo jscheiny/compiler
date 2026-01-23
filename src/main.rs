@@ -10,7 +10,13 @@ pub mod parser;
 
 fn main() {
     let tokens = tokenize(
-        "pub struct S(pub x: Y) {}
+        "pub struct S(pub x: Y) {
+            pub test() {
+                while x {}
+            }
+
+            test() -> x;
+        }
         
         fn f() {
             if x {}

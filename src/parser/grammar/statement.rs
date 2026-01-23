@@ -75,11 +75,7 @@ fn continue_statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode,
 fn while_loop(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
     tokens.next();
     let predicate = tokens.located(expression)?;
-    tokens.expect(&OperatorToken::OpenBrace)?;
-    let mut body = vec![];
-    while !tokens.accept(&OperatorToken::CloseBrace) {
-        body.push(tokens.located(statement)?);
-    }
+    let body = block(tokens)?;
     Ok(StatementParseNode::WhileLoop(WhileLoopParseNode {
         predicate,
         body,
