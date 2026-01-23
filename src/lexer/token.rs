@@ -39,10 +39,3 @@ impl Display for Token {
         }
     }
 }
-
-pub trait TokenParse
-where
-    Self: Sized,
-{
-    fn try_tokenize(text: &str) -> Option<(Token, usize)>;
-}

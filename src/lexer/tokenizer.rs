@@ -1,7 +1,8 @@
 use crate::lexer::{
-    CharacterLocation, CharacterSpan, IdentifierToken, IntegerLiteralToken, KeywordToken,
-    LocatedToken, OperatorToken, StringLiteralToken, Token, TokenParse,
-    try_tokenize_multiline_comment, try_tokenize_single_line_comment, try_tokenize_whitespace,
+    CharacterLocation, CharacterSpan, LocatedToken, Token, try_tokenize_identifier,
+    try_tokenize_integer_literal, try_tokenize_keyword, try_tokenize_multiline_comment,
+    try_tokenize_operator, try_tokenize_single_line_comment, try_tokenize_string_literal,
+    try_tokenize_whitespace,
 };
 
 pub fn tokenize(mut text: &str) -> Vec<LocatedToken> {
@@ -45,11 +46,11 @@ pub fn tokenize(mut text: &str) -> Vec<LocatedToken> {
 fn next_token(text: &str) -> Option<(Token, usize, &str)> {
     try_tokenize_single_line_comment(text)
         .or_else(|| try_tokenize_multiline_comment(text))
-        .or_else(|| OperatorToken::try_tokenize(text))
-        .or_else(|| KeywordToken::try_tokenize(text))
-        .or_else(|| StringLiteralToken::try_tokenize(text))
-        .or_else(|| IntegerLiteralToken::try_tokenize(text))
-        .or_else(|| IdentifierToken::try_tokenize(text))
+        .or_else(|| try_tokenize_operator(text))
+        .or_else(|| try_tokenize_keyword(text))
+        .or_else(|| try_tokenize_string_literal(text))
+        .or_else(|| try_tokenize_integer_literal(text))
+        .or_else(|| try_tokenize_identifier(text))
         .or_else(|| try_tokenize_whitespace(text))
         .map(|(token, len)| {
             let (_, end) = text.split_at(len);

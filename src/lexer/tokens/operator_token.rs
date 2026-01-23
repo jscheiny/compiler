@@ -3,7 +3,7 @@ use std::fmt::Display;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use crate::lexer::{Token, TokenMatch, TokenParse};
+use crate::lexer::{Token, TokenMatch};
 
 #[derive(Clone, Copy, EnumIter, PartialEq, Eq)]
 pub enum OperatorToken {
@@ -79,22 +79,6 @@ impl OperatorToken {
             O::Comma => ",",
         }
     }
-
-    pub fn maybe_match(text: &str) -> Option<OperatorToken> {
-        OperatorToken::iter().find(|operator| text.starts_with(operator.as_string()))
-    }
-}
-
-impl TokenParse for OperatorToken {
-    fn try_tokenize(text: &str) -> Option<(Token, usize)> {
-        for operator in OperatorToken::iter() {
-            let operator_str = operator.as_string();
-            if text.starts_with(operator_str) {
-                return Some((Token::Operator(operator), operator_str.len()));
-            }
-        }
-        None
-    }
 }
 
 impl TokenMatch for OperatorToken {
@@ -110,4 +94,14 @@ impl Display for OperatorToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.as_string())
     }
+}
+
+pub fn try_tokenize_operator(text: &str) -> Option<(Token, usize)> {
+    for operator in OperatorToken::iter() {
+        let operator_str = operator.as_string();
+        if text.starts_with(operator_str) {
+            return Some((Token::Operator(operator), operator_str.len()));
+        }
+    }
+    None
 }
