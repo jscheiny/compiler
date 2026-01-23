@@ -76,7 +76,7 @@ impl TokenTraverser {
     fn get_span(&self, start_index: usize) -> TokenSpan {
         TokenSpan {
             start_index,
-            end_index: self.index,
+            end_index: self.index - 1,
         }
     }
 }

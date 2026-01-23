@@ -18,6 +18,7 @@ impl Display for CharacterSpan {
 pub struct CharacterLocation {
     pub line: usize,
     pub column: usize,
+    pub byte: usize,
 }
 
 impl CharacterLocation {
@@ -25,13 +26,15 @@ impl CharacterLocation {
         CharacterLocation {
             line: self.line,
             column: self.column + columns,
+            byte: self.byte + columns,
         }
     }
 
-    pub fn add_lines(&self, whitespace: WhitespaceToken) -> Self {
+    pub fn add_lines(&self, whitespace: WhitespaceToken, bytes: usize) -> Self {
         CharacterLocation {
             line: self.line + whitespace.new_lines,
             column: whitespace.columns_since_last_new_line,
+            byte: self.byte + bytes,
         }
     }
 }

@@ -24,10 +24,11 @@ fn main() {
         }",
     );
 
-    let mut token_traverser = TokenTraverser::new(source.tokens);
+    let mut token_traverser = TokenTraverser::new(source.tokens.clone());
     let program = program(&mut token_traverser).unwrap();
     println!("{:#?}", program);
     program.traverse(&|span| {
         println!("{:?}", span);
+        println!("Source:[{}]", source.get_span_string(span));
     });
 }
