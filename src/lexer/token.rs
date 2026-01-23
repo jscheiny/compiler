@@ -6,6 +6,18 @@ use crate::lexer::{
 };
 
 #[derive(Clone)]
+pub struct LocatedToken {
+    pub token: Token,
+    pub span: CharacterSpan,
+}
+
+impl Display for LocatedToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} @ {}", self.token, self.span)
+    }
+}
+
+#[derive(Clone)]
 pub enum Token {
     Identifier(IdentifierToken),
     IntegerLiteral(IntegerLiteralToken),
@@ -25,18 +37,6 @@ impl Display for Token {
             Self::Keyword(keyword) => write!(f, "Keyword:{:?}", keyword),
             Self::Whitespace(_) => write!(f, "Whitespace"),
         }
-    }
-}
-
-#[derive(Clone)]
-pub struct LocatedToken {
-    pub token: Token,
-    pub span: CharacterSpan,
-}
-
-impl Display for LocatedToken {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} @ {}", self.token, self.span)
     }
 }
 
