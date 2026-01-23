@@ -1,8 +1,12 @@
+use std::fmt::Debug;
 use std::rc::Rc;
 
 use crate::{
     lexer::{IdentifierToken, LocatedToken, Token},
-    parser::{LocatedNode, NodeSpanTracker, ParserPredicate, ProgramParseNode, grammar::program},
+    parser::{
+        LocatedNode, NodeSpanTracker, ParseResult, ParserPredicate, ProgramParseNode,
+        grammar::program,
+    },
 };
 
 pub struct TokenTraverser {
@@ -57,6 +61,15 @@ impl TokenTraverser {
 
     pub fn start_span(&self) -> NodeSpanTracker {
         NodeSpanTracker::new(self.index)
+    }
+
+    pub fn located<ParseNode: Debug>(
+        &mut self,
+        parse: impl Fn(&mut TokenTraverser) -> Result<ParseNode, ()>,
+    ) -> ParseResult<ParseNode> {
+        let span = self.start_span();
+        let result = parse(self)?;
+        Ok(span.close(self, result))
     }
 
     pub fn index(&self) -> usize {

@@ -128,7 +128,7 @@ pub struct WhileLoopParseNode {
 
 #[derive(Debug)]
 pub struct IfStatementParseNode {
-    pub conditions: Vec<IfStatementConditionParseNode>,
+    pub conditions: Vec<LocatedNode<IfStatementConditionParseNode>>,
     pub else_branch: Option<LocatedNodeVec<StatementParseNode>>,
 }
 
