@@ -2,21 +2,21 @@ use crate::{
     lexer::OperatorToken,
     parser::{
         FunctionBodyParseNode, FunctionDefintionParseNode, ParameterParseNode, ParseNode,
-        ParserPredicate, TokenTraverser,
+        ParserPredicate, TokenStream,
         grammar::{block, expression, type_definition, utils::comma_separated_list},
     },
 };
 
-pub fn top_level_function(tokens: &mut TokenTraverser) -> Result<FunctionDefintionParseNode, ()> {
+pub fn top_level_function(tokens: &mut TokenStream) -> Result<FunctionDefintionParseNode, ()> {
     function(tokens, true)
 }
 
-pub fn nested_function(tokens: &mut TokenTraverser) -> Result<FunctionDefintionParseNode, ()> {
+pub fn nested_function(tokens: &mut TokenStream) -> Result<FunctionDefintionParseNode, ()> {
     function(tokens, false)
 }
 
 fn function(
-    tokens: &mut TokenTraverser,
+    tokens: &mut TokenStream,
     has_keyword: bool,
 ) -> Result<FunctionDefintionParseNode, ()> {
     if has_keyword {
@@ -38,7 +38,7 @@ fn function(
     })
 }
 
-fn function_body(tokens: &mut TokenTraverser) -> Result<FunctionBodyParseNode, ()> {
+fn function_body(tokens: &mut TokenStream) -> Result<FunctionBodyParseNode, ()> {
     if tokens.accept(&OperatorToken::FunctionDefinition) {
         let expression = expression(tokens)?;
         tokens.expect(&OperatorToken::EndStatement)?;
@@ -50,13 +50,13 @@ fn function_body(tokens: &mut TokenTraverser) -> Result<FunctionBodyParseNode, (
     }
 }
 
-pub fn parameters(tokens: &mut TokenTraverser) -> Result<Vec<ParseNode<ParameterParseNode>>, ()> {
+pub fn parameters(tokens: &mut TokenStream) -> Result<Vec<ParseNode<ParameterParseNode>>, ()> {
     tokens.expect(&OperatorToken::OpenParen)?;
     let list = comma_separated_list(tokens, OperatorToken::CloseParen, parameter)?;
     Ok(list)
 }
 
-fn parameter(tokens: &mut TokenTraverser) -> Result<ParameterParseNode, ()> {
+fn parameter(tokens: &mut TokenStream) -> Result<ParameterParseNode, ()> {
     let identifier = tokens.identifier()?;
     tokens.expect(&OperatorToken::Type)?;
     let type_def = tokens.located(type_definition)?;

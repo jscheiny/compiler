@@ -6,14 +6,14 @@ use crate::{
     parser::{ParseNode, ParserPredicate, TokenSpan},
 };
 
-pub struct TokenTraverser {
+pub struct TokenStream {
     tokens: Rc<Vec<LocatedToken>>,
     index: usize,
 }
 
-impl TokenTraverser {
+impl TokenStream {
     pub fn new(tokens: Rc<Vec<LocatedToken>>) -> Self {
-        TokenTraverser { tokens, index: 0 }
+        TokenStream { tokens, index: 0 }
     }
 
     pub fn accept(&mut self, predicate: &impl ParserPredicate) -> bool {
@@ -51,7 +51,7 @@ impl TokenTraverser {
 
     pub fn located<P: Debug>(
         &mut self,
-        parse: impl Fn(&mut TokenTraverser) -> Result<P, ()>,
+        parse: impl Fn(&mut TokenStream) -> Result<P, ()>,
     ) -> Result<ParseNode<P>, ()> {
         let start_index = self.index;
         let value = parse(self)?;
@@ -63,7 +63,7 @@ impl TokenTraverser {
 
     pub fn maybe_located<P: Debug>(
         &mut self,
-        parse: impl Fn(&mut TokenTraverser) -> Result<Option<P>, ()>,
+        parse: impl Fn(&mut TokenStream) -> Result<Option<P>, ()>,
     ) -> Result<Option<ParseNode<P>>, ()> {
         let start_index = self.index;
         let result = parse(self)?;
@@ -81,7 +81,7 @@ impl TokenTraverser {
     }
 }
 
-fn identifier(tokens: &mut TokenTraverser) -> Result<String, ()> {
+fn identifier(tokens: &mut TokenStream) -> Result<String, ()> {
     if let Token::Identifier(IdentifierToken(identifier)) = tokens.peek() {
         let identifier = identifier.clone();
         tokens.next();

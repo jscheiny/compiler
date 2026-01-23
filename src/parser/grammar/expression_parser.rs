@@ -1,9 +1,9 @@
 use crate::{
     lexer::{IdentifierToken, IntegerLiteralToken, OperatorToken, StringLiteralToken, Token},
-    parser::{BlockParseNode, ExpressionParseNode, TokenTraverser, grammar::statement},
+    parser::{BlockParseNode, ExpressionParseNode, TokenStream, grammar::statement},
 };
 
-pub fn expression(tokens: &mut TokenTraverser) -> Result<ExpressionParseNode, ()> {
+pub fn expression(tokens: &mut TokenStream) -> Result<ExpressionParseNode, ()> {
     match tokens.peek() {
         Token::Identifier(IdentifierToken(identifier)) => {
             let identifier = identifier.clone();
@@ -28,7 +28,7 @@ pub fn expression(tokens: &mut TokenTraverser) -> Result<ExpressionParseNode, ()
     }
 }
 
-pub fn block(tokens: &mut TokenTraverser) -> Result<BlockParseNode, ()> {
+pub fn block(tokens: &mut TokenStream) -> Result<BlockParseNode, ()> {
     tokens.expect(&OperatorToken::OpenBrace)?;
     let mut statements = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {

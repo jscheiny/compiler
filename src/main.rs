@@ -1,6 +1,6 @@
 use crate::{
     lexer::SourceCode,
-    parser::{TokenTraverser, Traverse, program},
+    parser::{TokenStream, Traverse, program},
 };
 
 pub mod lexer;
@@ -24,7 +24,7 @@ fn main() {
         }",
     );
 
-    let mut token_traverser = TokenTraverser::new(source.tokens.clone());
+    let mut token_traverser = TokenStream::new(source.tokens.clone());
     let program = program(&mut token_traverser).unwrap();
     println!("{:#?}", program);
     program.traverse(&|span| {

@@ -1,16 +1,16 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token},
     parser::{
-        ParseNode, TokenTraverser, TypeDefinitionParseNode, UserDefinedTypeParseNode,
+        ParseNode, TokenStream, TypeDefinitionParseNode, UserDefinedTypeParseNode,
         grammar::comma_separated_list,
     },
 };
 
-pub fn type_definition(tokens: &mut TokenTraverser) -> Result<TypeDefinitionParseNode, ()> {
+pub fn type_definition(tokens: &mut TokenStream) -> Result<TypeDefinitionParseNode, ()> {
     primitive_type_definition(tokens).or_else(|_| user_type_definition(tokens))
 }
 
-fn primitive_type_definition(tokens: &mut TokenTraverser) -> Result<TypeDefinitionParseNode, ()> {
+fn primitive_type_definition(tokens: &mut TokenStream) -> Result<TypeDefinitionParseNode, ()> {
     if let Token::Keyword(keyword) = tokens.peek() {
         match keyword {
             KeywordToken::Bool | KeywordToken::Int | KeywordToken::Float => {
@@ -25,7 +25,7 @@ fn primitive_type_definition(tokens: &mut TokenTraverser) -> Result<TypeDefiniti
     }
 }
 
-fn user_type_definition(tokens: &mut TokenTraverser) -> Result<TypeDefinitionParseNode, ()> {
+fn user_type_definition(tokens: &mut TokenStream) -> Result<TypeDefinitionParseNode, ()> {
     let identifier = tokens.identifier()?;
     let generic_params = tokens.maybe_located(generic_type_params)?;
 
@@ -36,7 +36,7 @@ fn user_type_definition(tokens: &mut TokenTraverser) -> Result<TypeDefinitionPar
 }
 
 fn generic_type_params(
-    tokens: &mut TokenTraverser,
+    tokens: &mut TokenStream,
 ) -> Result<Option<Vec<ParseNode<TypeDefinitionParseNode>>>, ()> {
     if tokens.accept(&OperatorToken::OpenBracket) {
         let params = comma_separated_list(tokens, OperatorToken::CloseBracket, type_definition)?;
