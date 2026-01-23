@@ -26,10 +26,6 @@ fn main() {
         }",
     );
 
-    for token in tokens.iter() {
-        println!("{}", token);
-    }
-
     let mut token_traverser = TokenTraverser::new(Rc::new(tokens));
     let program = program(&mut token_traverser).unwrap();
     println!("{:#?}", program);
