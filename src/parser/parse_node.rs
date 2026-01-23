@@ -88,8 +88,8 @@ pub struct FunctionDefintionParseNode {
 
 #[derive(Debug)]
 pub enum FunctionBodyParseNode {
-    Expression(LocatedNode<ExpressionParseNode>),
-    Block(Vec<LocatedNode<StatementParseNode>>),
+    Expression(ExpressionParseNode),
+    Block(BlockParseNode),
 }
 
 #[derive(Debug)]
@@ -117,6 +117,11 @@ pub enum StatementParseNode {
 }
 
 #[derive(Debug)]
+pub struct BlockParseNode {
+    pub statements: Vec<LocatedNode<StatementParseNode>>,
+}
+
+#[derive(Debug)]
 pub struct DeclarationParseNode {
     pub mutable: bool,
     pub identifier: LocatedNode<String>,
@@ -127,19 +132,19 @@ pub struct DeclarationParseNode {
 #[derive(Debug)]
 pub struct WhileLoopParseNode {
     pub predicate: LocatedNode<ExpressionParseNode>,
-    pub body: Vec<LocatedNode<StatementParseNode>>,
+    pub body: LocatedNode<BlockParseNode>,
 }
 
 #[derive(Debug)]
 pub struct IfStatementParseNode {
     pub conditions: Vec<LocatedNode<IfStatementConditionParseNode>>,
-    pub else_branch: Option<LocatedNodeVec<StatementParseNode>>,
+    pub else_branch: Option<LocatedNode<BlockParseNode>>,
 }
 
 #[derive(Debug)]
 pub struct IfStatementConditionParseNode {
     pub predicate: LocatedNode<ExpressionParseNode>,
-    pub body: LocatedNodeVec<StatementParseNode>,
+    pub body: LocatedNode<BlockParseNode>,
 }
 
 #[derive(Debug)]
@@ -149,7 +154,7 @@ pub enum ExpressionParseNode {
     PostfixOp(PostfixOpExpressionParseNode),
     StringLiteral(String),
     IntegerLiteral(i64),
-    Block(Vec<LocatedNode<StatementParseNode>>),
+    Block(BlockParseNode),
     Identifier(String),
 }
 

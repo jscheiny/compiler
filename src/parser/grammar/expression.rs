@@ -1,8 +1,6 @@
 use crate::{
     lexer::{IdentifierToken, IntegerLiteralToken, OperatorToken, StringLiteralToken, Token},
-    parser::{
-        ExpressionParseNode, LocatedNode, StatementParseNode, TokenTraverser, grammar::statement,
-    },
+    parser::{BlockParseNode, ExpressionParseNode, TokenTraverser, grammar::statement},
 };
 
 pub fn expression(tokens: &mut TokenTraverser) -> Result<ExpressionParseNode, ()> {
@@ -30,11 +28,11 @@ pub fn expression(tokens: &mut TokenTraverser) -> Result<ExpressionParseNode, ()
     }
 }
 
-pub fn block(tokens: &mut TokenTraverser) -> Result<Vec<LocatedNode<StatementParseNode>>, ()> {
+pub fn block(tokens: &mut TokenTraverser) -> Result<BlockParseNode, ()> {
     tokens.expect(&OperatorToken::OpenBrace)?;
     let mut statements = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {
         statements.push(tokens.located(statement)?);
     }
-    Ok(statements)
+    Ok(BlockParseNode { statements })
 }

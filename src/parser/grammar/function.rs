@@ -40,7 +40,7 @@ fn function(
 
 fn function_body(tokens: &mut TokenTraverser) -> Result<FunctionBodyParseNode, ()> {
     if tokens.accept(&OperatorToken::FunctionDefinition) {
-        let expression = tokens.located(expression)?;
+        let expression = expression(tokens)?;
         tokens.expect(&OperatorToken::EndStatement)?;
         Ok(FunctionBodyParseNode::Expression(expression))
     } else if OperatorToken::OpenBrace.is_match(tokens.peek()) {
