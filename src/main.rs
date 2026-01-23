@@ -8,21 +8,16 @@ pub mod parser;
 
 fn main() {
     let source = SourceCode::from(
-        "pub struct S(pub x: Y) {
-            pub test() {
-                while x {}
-            }
-
-            test() -> x;
-        }
-        
-        fn f() {
-            if x {}
-            else if y {}
-            else if z {}
-            else {}
-        }",
+        "struct Test() { // with a comment!
+        test() {/*
+            multiline!
+        */}
+    }",
     );
+
+    for token in source.tokens.iter() {
+        println!("{}", token)
+    }
 
     let mut tokens = source.token_stream();
     let program = program(&mut tokens).unwrap();

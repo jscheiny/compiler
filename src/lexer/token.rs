@@ -1,8 +1,8 @@
 use std::fmt::Display;
 
 use crate::lexer::{
-    CharacterSpan, IdentifierToken, IntegerLiteralToken, KeywordToken, OperatorToken,
-    StringLiteralToken, WhitespaceToken,
+    CharacterSpan, IdentifierToken, IgnoredToken, IntegerLiteralToken, KeywordToken, OperatorToken,
+    StringLiteralToken,
 };
 
 #[derive(Clone)]
@@ -24,7 +24,7 @@ pub enum Token {
     StringLiteral(StringLiteralToken),
     Operator(OperatorToken),
     Keyword(KeywordToken),
-    Whitespace(WhitespaceToken),
+    Ignored(IgnoredToken),
 }
 
 impl Display for Token {
@@ -35,7 +35,7 @@ impl Display for Token {
             Self::StringLiteral(string_literal) => write!(f, "String:{}", string_literal),
             Self::Operator(operator) => write!(f, "Operator:{}", operator),
             Self::Keyword(keyword) => write!(f, "Keyword:{:?}", keyword),
-            Self::Whitespace(_) => write!(f, "Whitespace"),
+            Self::Ignored(_) => write!(f, "[Ignored]"),
         }
     }
 }
