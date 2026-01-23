@@ -2,36 +2,34 @@ use crate::{
     lexer::{KeywordToken, OperatorToken, Token},
     parser::{
         DeclarationParseNode, ExpressionParseNode, IfStatementConditionParseNode,
-        IfStatementParseNode, ParseResult, ParserPredicate, StatementParseNode, TokenTraverser,
+        IfStatementParseNode, ParserPredicate, StatementParseNode, TokenTraverser,
         WhileLoopParseNode,
         grammar::{block, expression, type_definition},
     },
 };
 
-pub fn statement(tokens: &mut TokenTraverser) -> ParseResult<StatementParseNode> {
+pub fn statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
     match tokens.peek() {
         Token::Keyword(keyword) => match keyword {
             KeywordToken::Let => declaration(tokens, false),
             KeywordToken::Mut => declaration(tokens, true),
-            KeywordToken::Return => tokens.located(function_return),
-            KeywordToken::Break => tokens.located(break_statement),
-            KeywordToken::Continue => tokens.located(continue_statement),
-            KeywordToken::While => tokens.located(while_loop),
-            KeywordToken::If => tokens.located(if_statement),
-            _ => tokens.located(expression_statement),
+            KeywordToken::Return => function_return(tokens),
+            KeywordToken::Break => break_statement(tokens),
+            KeywordToken::Continue => continue_statement(tokens),
+            KeywordToken::While => while_loop(tokens),
+            KeywordToken::If => if_statement(tokens),
+            _ => expression_statement(tokens),
         },
         Token::Operator(operator) => match operator {
-            OperatorToken::OpenBrace => tokens.located(block_statement),
-            OperatorToken::FunctionDefinition => tokens.located(block_return),
-            _ => tokens.located(expression_statement),
+            OperatorToken::OpenBrace => block_statement(tokens),
+            OperatorToken::FunctionDefinition => block_return(tokens),
+            _ => expression_statement(tokens),
         },
-        _ => tokens.located(expression_statement),
+        _ => expression_statement(tokens),
     }
 }
 
-// todo refactor this
-fn declaration(tokens: &mut TokenTraverser, mutable: bool) -> ParseResult<StatementParseNode> {
-    let span = tokens.start_span();
+fn declaration(tokens: &mut TokenTraverser, mutable: bool) -> Result<StatementParseNode, ()> {
     tokens.next();
     let identifier = tokens.identifier().ok_or(())?;
     let type_def = if tokens.accept(&OperatorToken::Type) {
@@ -43,15 +41,12 @@ fn declaration(tokens: &mut TokenTraverser, mutable: bool) -> ParseResult<Statem
     tokens.expect(&OperatorToken::Assign)?;
     let expression = expression(tokens)?;
     tokens.expect(&OperatorToken::EndStatement)?;
-    Ok(span.close(
-        tokens,
-        StatementParseNode::Declaration(DeclarationParseNode {
-            mutable,
-            identifier,
-            type_def,
-            expression,
-        }),
-    ))
+    Ok(StatementParseNode::Declaration(DeclarationParseNode {
+        mutable,
+        identifier,
+        type_def,
+        expression,
+    }))
 }
 
 fn function_return(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
@@ -83,7 +78,7 @@ fn while_loop(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> {
     tokens.expect(&OperatorToken::OpenBrace)?;
     let mut body = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {
-        body.push(statement(tokens)?);
+        body.push(tokens.located(statement)?);
     }
     Ok(StatementParseNode::WhileLoop(WhileLoopParseNode {
         predicate,

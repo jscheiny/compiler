@@ -37,7 +37,7 @@ pub fn block(tokens: &mut TokenTraverser) -> Result<LocatedNodeVec<StatementPars
     tokens.expect(&OperatorToken::OpenBrace)?;
     let mut statements = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {
-        statements.push(statement(tokens)?);
+        statements.push(tokens.located(statement)?);
     }
     Ok(span.close(tokens, statements))
 }
