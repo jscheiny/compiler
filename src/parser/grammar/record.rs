@@ -21,7 +21,7 @@ fn record(
 ) -> Result<RecordDefinitionParseNode, ()> {
     tokens.next();
 
-    let identifier = tokens.identifier().ok_or(())?;
+    let identifier = tokens.identifier()?;
     let member_list = tokens.located(member_list)?;
 
     if tokens.accept(&OperatorToken::EndStatement) {
@@ -58,7 +58,7 @@ fn member(tokens: &mut TokenTraverser) -> Result<RecordMemberParseNode, ()> {
         });
     }
 
-    let identifier = tokens.identifier().ok_or(())?;
+    let identifier = tokens.identifier()?;
     tokens.expect(&OperatorToken::Type)?;
     let type_def = tokens.located(type_definition)?;
     Ok(RecordMemberParseNode {

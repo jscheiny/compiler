@@ -22,7 +22,7 @@ fn function(
     if has_keyword {
         tokens.next();
     }
-    let identifier = tokens.identifier().ok_or(())?;
+    let identifier = tokens.identifier()?;
     let parameters = tokens.located(parameters)?;
     let return_type = if tokens.accept(&OperatorToken::Type) {
         Some(tokens.located(type_definition)?)
@@ -61,7 +61,7 @@ pub fn parameters(tokens: &mut TokenTraverser) -> Result<Vec<LocatedNode<Paramet
 }
 
 fn parameter(tokens: &mut TokenTraverser) -> Result<ParameterParseNode, ()> {
-    let identifier = tokens.identifier().ok_or(())?;
+    let identifier = tokens.identifier()?;
     tokens.expect(&OperatorToken::Type)?;
     let type_def = tokens.located(type_definition)?;
 

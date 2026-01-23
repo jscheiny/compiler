@@ -26,7 +26,7 @@ fn primitive_type_definition(tokens: &mut TokenTraverser) -> Result<TypeDefiniti
 }
 
 fn user_type_definition(tokens: &mut TokenTraverser) -> Result<TypeDefinitionParseNode, ()> {
-    let identifier = tokens.identifier().ok_or(())?;
+    let identifier = tokens.identifier()?;
     let generic_params = tokens.maybe_located(generic_type_params)?;
 
     Ok(TypeDefinitionParseNode::User(UserDefinedTypeParseNode {

@@ -33,15 +33,8 @@ impl TokenTraverser {
         }
     }
 
-    pub fn identifier(&mut self) -> Option<LocatedNode<String>> {
-        if let Token::Identifier(IdentifierToken(identifier)) = self.peek() {
-            let identifier = identifier.clone();
-            let span = self.start_span();
-            self.next();
-            Some(span.close(self, identifier))
-        } else {
-            None
-        }
+    pub fn identifier(&mut self) -> Result<LocatedNode<String>, ()> {
+        self.located(identifier)
     }
 
     pub fn peek(&self) -> &Token {
@@ -88,6 +81,16 @@ impl TokenTraverser {
 
     pub fn index(&self) -> usize {
         self.index
+    }
+}
+
+fn identifier(tokens: &mut TokenTraverser) -> Result<String, ()> {
+    if let Token::Identifier(IdentifierToken(identifier)) = tokens.peek() {
+        let identifier = identifier.clone();
+        tokens.next();
+        Ok(identifier)
+    } else {
+        Err(())
     }
 }
 

@@ -31,7 +31,7 @@ pub fn statement(tokens: &mut TokenTraverser) -> Result<StatementParseNode, ()> 
 
 fn declaration(tokens: &mut TokenTraverser, mutable: bool) -> Result<StatementParseNode, ()> {
     tokens.next();
-    let identifier = tokens.identifier().ok_or(())?;
+    let identifier = tokens.identifier()?;
     let type_def = if tokens.accept(&OperatorToken::Type) {
         Some(tokens.located(type_definition)?)
     } else {
