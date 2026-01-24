@@ -1,4 +1,4 @@
-use crate::parser::{ExpressionParseNode, ParseNode, TokenSpan, Traverse, TypeDefinitionParseNode};
+use crate::parser::{ExpressionParseNode, ParseNode, TokenSpan, Traverse, TypeParseNode};
 
 #[derive(Debug)]
 pub enum StatementParseNode {
@@ -47,7 +47,7 @@ impl Traverse for BlockParseNode {
 pub struct DeclarationParseNode {
     pub mutable: bool,
     pub identifier: ParseNode<String>,
-    pub type_def: Option<ParseNode<TypeDefinitionParseNode>>,
+    pub type_def: Option<ParseNode<TypeParseNode>>,
     pub expression: ParseNode<ExpressionParseNode>,
 }
 

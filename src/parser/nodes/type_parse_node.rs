@@ -4,16 +4,16 @@ use crate::{
 };
 
 #[derive(Debug)]
-pub enum TypeDefinitionParseNode {
+pub enum TypeParseNode {
     Primitive(KeywordToken),
-    User(UserDefinedTypeParseNode),
+    UserDefined(UserDefinedTypeParseNode),
 }
 
-impl Traverse for TypeDefinitionParseNode {
+impl Traverse for TypeParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         match self {
-            TypeDefinitionParseNode::Primitive(_) => {}
-            TypeDefinitionParseNode::User(node) => node.traverse(visit),
+            Self::Primitive(_) => {}
+            Self::UserDefined(node) => node.traverse(visit),
         }
     }
 }
@@ -21,7 +21,7 @@ impl Traverse for TypeDefinitionParseNode {
 #[derive(Debug)]
 pub struct UserDefinedTypeParseNode {
     pub identifier: ParseNode<String>,
-    pub generic_params: Option<ParseNodeVec<TypeDefinitionParseNode>>,
+    pub generic_params: Option<ParseNodeVec<TypeParseNode>>,
 }
 
 impl Traverse for UserDefinedTypeParseNode {

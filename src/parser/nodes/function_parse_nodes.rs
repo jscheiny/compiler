@@ -1,13 +1,13 @@
 use crate::parser::{
     BlockParseNode, ExpressionParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse,
-    TypeDefinitionParseNode,
+    TypeParseNode,
 };
 
 #[derive(Debug)]
 pub struct FunctionDefintionParseNode {
     pub identifier: ParseNode<String>,
     pub parameters: ParseNodeVec<ParameterParseNode>,
-    pub return_type: Option<ParseNode<TypeDefinitionParseNode>>,
+    pub return_type: Option<ParseNode<TypeParseNode>>,
     pub body: ParseNode<FunctionBodyParseNode>,
 }
 
@@ -43,7 +43,7 @@ impl Traverse for FunctionBodyParseNode {
 #[derive(Debug)]
 pub struct ParameterParseNode {
     pub identifier: ParseNode<String>,
-    pub type_def: ParseNode<TypeDefinitionParseNode>,
+    pub type_def: ParseNode<TypeParseNode>,
 }
 
 impl Traverse for ParameterParseNode {

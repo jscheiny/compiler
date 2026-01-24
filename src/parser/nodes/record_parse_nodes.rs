@@ -1,6 +1,5 @@
 use crate::parser::{
-    FunctionDefintionParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse,
-    TypeDefinitionParseNode,
+    FunctionDefintionParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse, TypeParseNode,
 };
 
 #[derive(Debug)]
@@ -37,7 +36,7 @@ pub enum RecordType {
 pub struct RecordMemberParseNode {
     pub public: bool,
     pub identifier: ParseNode<String>,
-    pub type_def: ParseNode<TypeDefinitionParseNode>,
+    pub type_def: ParseNode<TypeParseNode>,
 }
 
 impl Traverse for RecordMemberParseNode {

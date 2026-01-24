@@ -1,22 +1,22 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token},
     parser::{
-        ParseNode, TokenStream, TypeDefinitionParseNode, UserDefinedTypeParseNode,
+        ParseNode, TokenStream, TypeParseNode, UserDefinedTypeParseNode,
         grammar::comma_separated_list,
     },
 };
 
-pub fn type_definition(tokens: &mut TokenStream) -> Result<TypeDefinitionParseNode, ()> {
-    primitive_type_definition(tokens).or_else(|_| user_type_definition(tokens))
+pub fn type_definition(tokens: &mut TokenStream) -> Result<TypeParseNode, ()> {
+    primitive_type(tokens).or_else(|_| user_defined_type(tokens))
 }
 
-fn primitive_type_definition(tokens: &mut TokenStream) -> Result<TypeDefinitionParseNode, ()> {
+fn primitive_type(tokens: &mut TokenStream) -> Result<TypeParseNode, ()> {
     if let Token::Keyword(keyword) = tokens.peek() {
         match keyword {
             KeywordToken::Bool | KeywordToken::Int | KeywordToken::Float => {
                 let keyword = *keyword;
                 tokens.next();
-                Ok(TypeDefinitionParseNode::Primitive(keyword))
+                Ok(TypeParseNode::Primitive(keyword))
             }
             _ => Err(()),
         }
@@ -25,11 +25,11 @@ fn primitive_type_definition(tokens: &mut TokenStream) -> Result<TypeDefinitionP
     }
 }
 
-fn user_type_definition(tokens: &mut TokenStream) -> Result<TypeDefinitionParseNode, ()> {
+fn user_defined_type(tokens: &mut TokenStream) -> Result<TypeParseNode, ()> {
     let identifier = tokens.identifier()?;
     let generic_params = tokens.maybe_located(generic_type_params)?;
 
-    Ok(TypeDefinitionParseNode::User(UserDefinedTypeParseNode {
+    Ok(TypeParseNode::UserDefined(UserDefinedTypeParseNode {
         identifier,
         generic_params,
     }))
@@ -37,7 +37,7 @@ fn user_type_definition(tokens: &mut TokenStream) -> Result<TypeDefinitionParseN
 
 fn generic_type_params(
     tokens: &mut TokenStream,
-) -> Result<Option<Vec<ParseNode<TypeDefinitionParseNode>>>, ()> {
+) -> Result<Option<Vec<ParseNode<TypeParseNode>>>, ()> {
     if tokens.accept(&OperatorToken::OpenBracket) {
         let params = comma_separated_list(tokens, OperatorToken::CloseBracket, type_definition)?;
         Ok(Some(params))

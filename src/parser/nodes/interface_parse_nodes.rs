@@ -1,5 +1,5 @@
 use crate::parser::{
-    ParameterParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse, TypeDefinitionParseNode,
+    ParameterParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse, TypeParseNode,
 };
 
 #[derive(Debug)]
@@ -22,7 +22,7 @@ impl Traverse for InterfaceDefinitionParseNode {
 pub struct MethodSignatureParseNode {
     pub identifier: ParseNode<String>,
     pub parameters: ParseNodeVec<ParameterParseNode>,
-    pub return_type: ParseNode<TypeDefinitionParseNode>,
+    pub return_type: ParseNode<TypeParseNode>,
 }
 
 impl Traverse for MethodSignatureParseNode {
