@@ -23,6 +23,7 @@ fn main() {
     let program = program(&mut tokens).unwrap();
     program.traverse(&|name, span| {
         println!("{} @ {:?}", name, span);
-        println!("[{}]\n", source.get_span_string(span));
+        source.print_span(span);
+        println!();
     });
 }
