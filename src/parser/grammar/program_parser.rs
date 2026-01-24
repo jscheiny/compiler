@@ -1,12 +1,12 @@
 use crate::{
     lexer::{KeywordToken, Token},
     parser::{
-        ModuleTopLevelDefinition, ProgramParseNode, TokenStream, TopLevelDefinition,
+        ModuleTopLevelDefinition, ParseResult, ProgramParseNode, TokenStream, TopLevelDefinition,
         grammar::{interface, structure, top_level_function, tuple},
     },
 };
 
-pub fn program(tokens: &mut TokenStream) -> Result<ProgramParseNode, ()> {
+pub fn program(tokens: &mut TokenStream) -> ParseResult<ProgramParseNode> {
     let mut definitions = vec![];
     while !tokens.is_done() {
         let definition = tokens.located(module_top_level_definition)?;
@@ -15,15 +15,13 @@ pub fn program(tokens: &mut TokenStream) -> Result<ProgramParseNode, ()> {
     Ok(ProgramParseNode { definitions })
 }
 
-fn module_top_level_definition(
-    tokens: &mut TokenStream,
-) -> Result<ModuleTopLevelDefinition, ()> {
+fn module_top_level_definition(tokens: &mut TokenStream) -> ParseResult<ModuleTopLevelDefinition> {
     let public = tokens.accept(&KeywordToken::Pub);
     let definition = top_level_definition(tokens)?;
     Ok(ModuleTopLevelDefinition { public, definition })
 }
 
-fn top_level_definition(tokens: &mut TokenStream) -> Result<TopLevelDefinition, ()> {
+fn top_level_definition(tokens: &mut TokenStream) -> ParseResult<TopLevelDefinition> {
     if let Token::Keyword(keyword) = tokens.peek() {
         use KeywordToken as K;
         match keyword {

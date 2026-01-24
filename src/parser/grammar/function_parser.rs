@@ -2,20 +2,23 @@ use crate::{
     lexer::{OperatorToken, TokenMatch},
     parser::{
         FunctionBodyParseNode, FunctionDefintionParseNode, ParameterParseNode, ParseNode,
-        TokenStream,
+        ParseResult, TokenStream,
         grammar::{block, expression, type_definition, utils::comma_separated_list},
     },
 };
 
-pub fn top_level_function(tokens: &mut TokenStream) -> Result<FunctionDefintionParseNode, ()> {
+pub fn top_level_function(tokens: &mut TokenStream) -> ParseResult<FunctionDefintionParseNode> {
     function(tokens, true)
 }
 
-pub fn nested_function(tokens: &mut TokenStream) -> Result<FunctionDefintionParseNode, ()> {
+pub fn nested_function(tokens: &mut TokenStream) -> ParseResult<FunctionDefintionParseNode> {
     function(tokens, false)
 }
 
-fn function(tokens: &mut TokenStream, has_keyword: bool) -> Result<FunctionDefintionParseNode, ()> {
+fn function(
+    tokens: &mut TokenStream,
+    has_keyword: bool,
+) -> ParseResult<FunctionDefintionParseNode> {
     if has_keyword {
         tokens.next();
     }
@@ -35,7 +38,7 @@ fn function(tokens: &mut TokenStream, has_keyword: bool) -> Result<FunctionDefin
     })
 }
 
-fn function_body(tokens: &mut TokenStream) -> Result<FunctionBodyParseNode, ()> {
+fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyParseNode> {
     if tokens.accept(&OperatorToken::FunctionDefinition) {
         let expression = expression(tokens)?;
         tokens.expect(&OperatorToken::EndStatement)?;
@@ -47,13 +50,13 @@ fn function_body(tokens: &mut TokenStream) -> Result<FunctionBodyParseNode, ()> 
     }
 }
 
-pub fn parameters(tokens: &mut TokenStream) -> Result<Vec<ParseNode<ParameterParseNode>>, ()> {
+pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<ParameterParseNode>>> {
     tokens.expect(&OperatorToken::OpenParen)?;
     let list = comma_separated_list(tokens, OperatorToken::CloseParen, parameter)?;
     Ok(list)
 }
 
-fn parameter(tokens: &mut TokenStream) -> Result<ParameterParseNode, ()> {
+fn parameter(tokens: &mut TokenStream) -> ParseResult<ParameterParseNode> {
     let identifier = tokens.identifier()?;
     tokens.expect(&OperatorToken::Type)?;
     let type_def = tokens.located(type_definition)?;

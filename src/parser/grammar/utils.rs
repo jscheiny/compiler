@@ -2,14 +2,14 @@ use std::fmt::Debug;
 
 use crate::{
     lexer::OperatorToken,
-    parser::{ParseNode, TokenStream},
+    parser::{ParseNode, ParseResult, TokenStream},
 };
 
 pub fn comma_separated_list<T: Debug>(
     tokens: &mut TokenStream,
     close_symbol: OperatorToken,
-    parse_entry: impl Fn(&mut TokenStream) -> Result<T, ()>,
-) -> Result<Vec<ParseNode<T>>, ()> {
+    parse_entry: impl Fn(&mut TokenStream) -> ParseResult<T>,
+) -> ParseResult<Vec<ParseNode<T>>> {
     let mut entries = vec![];
     while !tokens.accept(&close_symbol) {
         entries.push(tokens.located(&parse_entry)?);

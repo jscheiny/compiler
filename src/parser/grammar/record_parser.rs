@@ -1,24 +1,24 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, TokenMatch},
     parser::{
-        MethodParseNode, ParseNode, RecordDefinitionParseNode, RecordMemberParseNode, RecordType,
-        TokenStream,
+        MethodParseNode, ParseNode, ParseResult, RecordDefinitionParseNode, RecordMemberParseNode,
+        RecordType, TokenStream,
         grammar::{comma_separated_list, nested_function, type_definition},
     },
 };
 
-pub fn structure(tokens: &mut TokenStream) -> Result<RecordDefinitionParseNode, ()> {
+pub fn structure(tokens: &mut TokenStream) -> ParseResult<RecordDefinitionParseNode> {
     record(tokens, RecordType::Structure)
 }
 
-pub fn tuple(tokens: &mut TokenStream) -> Result<RecordDefinitionParseNode, ()> {
+pub fn tuple(tokens: &mut TokenStream) -> ParseResult<RecordDefinitionParseNode> {
     record(tokens, RecordType::Tuple)
 }
 
 fn record(
     tokens: &mut TokenStream,
     record_type: RecordType,
-) -> Result<RecordDefinitionParseNode, ()> {
+) -> ParseResult<RecordDefinitionParseNode> {
     tokens.next();
 
     let identifier = tokens.identifier()?;
@@ -44,12 +44,12 @@ fn record(
     }
 }
 
-fn member_list(tokens: &mut TokenStream) -> Result<Vec<ParseNode<RecordMemberParseNode>>, ()> {
+fn member_list(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<RecordMemberParseNode>>> {
     tokens.expect(&OperatorToken::OpenParen)?;
     comma_separated_list(tokens, OperatorToken::CloseParen, member)
 }
 
-fn member(tokens: &mut TokenStream) -> Result<RecordMemberParseNode, ()> {
+fn member(tokens: &mut TokenStream) -> ParseResult<RecordMemberParseNode> {
     let public = tokens.accept(&KeywordToken::Pub);
     let identifier = tokens.identifier()?;
     tokens.expect(&OperatorToken::Type)?;
@@ -61,7 +61,7 @@ fn member(tokens: &mut TokenStream) -> Result<RecordMemberParseNode, ()> {
     })
 }
 
-fn methods(tokens: &mut TokenStream) -> Result<Vec<ParseNode<MethodParseNode>>, ()> {
+fn methods(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<MethodParseNode>>> {
     tokens.next();
     let mut methods = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {
@@ -70,7 +70,7 @@ fn methods(tokens: &mut TokenStream) -> Result<Vec<ParseNode<MethodParseNode>>, 
     Ok(methods)
 }
 
-fn method(tokens: &mut TokenStream) -> Result<MethodParseNode, ()> {
+fn method(tokens: &mut TokenStream) -> ParseResult<MethodParseNode> {
     let public = tokens.accept(&KeywordToken::Pub);
     let function = tokens.located(nested_function)?;
     Ok(MethodParseNode { public, function })
