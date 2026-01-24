@@ -38,9 +38,9 @@ pub enum TopLevelDefinition {
 impl Traverse for TopLevelDefinition {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         match self {
-            TopLevelDefinition::Record(node) => node.traverse(visit),
-            TopLevelDefinition::Interface(node) => node.traverse(visit),
-            TopLevelDefinition::Function(node) => node.traverse(visit),
+            Self::Record(node) => node.traverse(visit),
+            Self::Interface(node) => node.traverse(visit),
+            Self::Function(node) => node.traverse(visit),
         }
     }
 }

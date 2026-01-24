@@ -16,18 +16,10 @@ pub enum ExpressionParseNode {
 impl Traverse for ExpressionParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         match self {
-            Self::PrefixOp(node) => {
-                node.traverse(visit);
-            }
-            Self::BinaryOp(node) => {
-                node.traverse(visit);
-            }
-            Self::PostfixOp(node) => {
-                node.traverse(visit);
-            }
-            Self::Block(node) => {
-                node.traverse(visit);
-            }
+            Self::PrefixOp(node) => node.traverse(visit),
+            Self::BinaryOp(node) => node.traverse(visit),
+            Self::PostfixOp(node) => node.traverse(visit),
+            Self::Block(node) => node.traverse(visit),
             Self::StringLiteral(_) | Self::IntegerLiteral(_) | Self::Identifier(_) => {}
         }
     }
