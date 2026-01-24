@@ -7,7 +7,13 @@ pub mod lexer;
 pub mod parser;
 
 fn main() {
-    let source = SourceCode::from("struct T(pub f: G[Y, int]) { pub f() -> x; }");
+    let source = SourceCode::from(
+        "fn test() {
+        if x { let y = z; }
+        else if y { let z = x; }
+        else {}
+    }",
+    );
 
     // for token in source.tokens.iter() {
     //     println!("{}", token)
@@ -18,6 +24,6 @@ fn main() {
     // println!("{:#?}", program);
     program.traverse(&|name, span| {
         println!("{} @ {:?}", name, span);
-        println!("Source:[{}]\n", source.get_span_string(span));
+        println!("[{}]\n", source.get_span_string(span));
     });
 }
