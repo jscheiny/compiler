@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct IgnoredToken {
     pub new_lines: usize,
     pub columns_since_last_new_line: usize,
