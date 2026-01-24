@@ -6,6 +6,7 @@ mod keyword_token;
 mod operator_token;
 mod string_literal_token;
 mod token_match;
+mod token_width;
 mod whitespace;
 
 pub use comments::*;
@@ -16,4 +17,5 @@ pub use keyword_token::*;
 pub use operator_token::*;
 pub use string_literal_token::*;
 pub use token_match::*;
+pub use token_width::*;
 pub use whitespace::*;

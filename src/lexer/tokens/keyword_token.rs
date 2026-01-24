@@ -1,7 +1,7 @@
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use crate::lexer::{Token, TokenMatch};
+use crate::lexer::{Token, TokenMatch, TokenWidth, TryTokenizeResult};
 
 #[derive(Debug, Clone, Copy, EnumIter, PartialEq, Eq)]
 pub enum KeywordToken {
@@ -59,11 +59,14 @@ impl TokenMatch for KeywordToken {
     }
 }
 
-pub fn try_tokenize_keyword(text: &str) -> Option<(Token, usize)> {
+pub fn try_tokenize_keyword(text: &str) -> Option<TryTokenizeResult> {
     for keyword in KeywordToken::iter() {
         let keyword_str = keyword.to_string();
         if text.starts_with(keyword_str) {
-            return Some((Token::Keyword(keyword), keyword_str.len()));
+            return Some(TryTokenizeResult {
+                token: Token::Keyword(keyword),
+                width: TokenWidth::from(keyword_str),
+            });
         }
     }
     None

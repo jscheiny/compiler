@@ -1,4 +1,4 @@
-use crate::lexer::{IgnoredToken, Token};
+use crate::lexer::{IgnoredToken, Token, TokenWidth, TryTokenizeResult};
 
 #[derive(Debug, Clone)]
 pub struct WhitespaceToken {
@@ -6,21 +6,24 @@ pub struct WhitespaceToken {
     pub columns_since_last_new_line: usize,
 }
 
-pub fn try_tokenize_whitespace(text: &str) -> Option<(Token, usize)> {
-    let mut bytes = 0;
+pub fn try_tokenize_whitespace(text: &str) -> Option<TryTokenizeResult> {
+    let mut width = TokenWidth::new();
     let mut token = IgnoredToken::new();
     for character in text.chars() {
         if !character.is_whitespace() {
             break;
         }
 
-        bytes += character.len_utf8();
+        width.add_char(character);
         token.add(character);
     }
 
-    if bytes == 0 {
+    if width.bytes == 0 {
         return None;
     }
 
-    Some((Token::Ignored(token), bytes))
+    Some(TryTokenizeResult {
+        token: Token::Ignored(token),
+        width,
+    })
 }

@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::lexer::Token;
+use crate::lexer::{Token, TokenWidth, TryTokenizeResult};
 
 #[derive(Clone)]
 pub struct IdentifierToken(pub String);
@@ -11,7 +11,8 @@ impl Display for IdentifierToken {
     }
 }
 
-pub fn try_tokenize_identifier(text: &str) -> Option<(Token, usize)> {
+pub fn try_tokenize_identifier(text: &str) -> Option<TryTokenizeResult> {
+    let mut width = TokenWidth::new();
     let mut identifier = String::from("");
     for character in text.chars() {
         if identifier.is_empty() && !character.is_alphabetic() {
@@ -23,12 +24,16 @@ pub fn try_tokenize_identifier(text: &str) -> Option<(Token, usize)> {
         }
 
         identifier.push(character);
+        width.add_char(character);
     }
 
     let len = identifier.len();
     if len == 0 {
-        None
-    } else {
-        Some((Token::Identifier(IdentifierToken(identifier)), len))
+        return None;
     }
+
+    Some(TryTokenizeResult {
+        token: Token::Identifier(IdentifierToken(identifier)),
+        width,
+    })
 }

@@ -9,7 +9,7 @@ pub mod parser;
 fn main() {
     let source = SourceCode::from(
         "fn test() {
-        if x { let y = z; }
+        if x { let y = \"This is a test\"; }
         else if y { let z = x; }
         else {}
     }",
@@ -21,7 +21,6 @@ fn main() {
 
     let mut tokens = source.token_stream();
     let program = program(&mut tokens).unwrap();
-    // println!("{:#?}", program);
     program.traverse(&|name, span| {
         println!("{} @ {:?}", name, span);
         println!("[{}]\n", source.get_span_string(span));

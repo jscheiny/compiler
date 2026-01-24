@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::lexer::Token;
+use crate::lexer::{Token, TokenWidth, TryTokenizeResult};
 
 #[derive(Clone)]
 pub struct StringLiteralToken(pub String);
@@ -14,14 +14,15 @@ impl Display for StringLiteralToken {
 const DOUBLE_QUOTE: char = '"';
 const ESCAPE: char = '\\';
 
-pub fn try_tokenize_string_literal(text: &str) -> Option<(Token, usize)> {
+pub fn try_tokenize_string_literal(text: &str) -> Option<TryTokenizeResult> {
     if !text.starts_with(DOUBLE_QUOTE) {
         return None;
     }
 
     let mut skip_endquote = false;
     let mut has_endquote = false;
-    let mut count = 0;
+    let mut width = TokenWidth::new();
+    width.add_char(DOUBLE_QUOTE);
 
     for character in text[1..].chars() {
         if character == DOUBLE_QUOTE && !skip_endquote {
@@ -34,14 +35,17 @@ pub fn try_tokenize_string_literal(text: &str) -> Option<(Token, usize)> {
         }
 
         skip_endquote = character == ESCAPE;
-        count += character.len_utf8();
+        width.add_char(character);
     }
 
     if !has_endquote {
         return None;
     }
 
-    let string = text[1..=count].to_string();
-    let token = Token::StringLiteral(StringLiteralToken(string));
-    Some((token, count + 2))
+    let string = text[1..width.bytes].to_string();
+    width.add_char(DOUBLE_QUOTE);
+    Some(TryTokenizeResult {
+        token: Token::StringLiteral(StringLiteralToken(string)),
+        width,
+    })
 }

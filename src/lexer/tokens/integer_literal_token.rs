@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::lexer::Token;
+use crate::lexer::{Token, TokenWidth, TryTokenizeResult};
 
 #[derive(Clone)]
 pub struct IntegerLiteralToken(pub i64);
@@ -11,10 +11,10 @@ impl Display for IntegerLiteralToken {
     }
 }
 
-pub fn try_tokenize_integer_literal(text: &str) -> Option<(Token, usize)> {
-    let mut count = 0;
+pub fn try_tokenize_integer_literal(text: &str) -> Option<TryTokenizeResult> {
+    let mut width = TokenWidth::new();
     for character in text.chars() {
-        if count == 0 && !character.is_numeric() {
+        if width.bytes == 0 && !character.is_numeric() {
             return None;
         }
 
@@ -22,11 +22,12 @@ pub fn try_tokenize_integer_literal(text: &str) -> Option<(Token, usize)> {
             break;
         }
 
-        count += character.len_utf8();
+        width.add_char(character);
     }
 
-    let maybe_value = &text[0..count].parse::<i64>().ok();
-    maybe_value
-        .as_ref()
-        .map(|value| (Token::IntegerLiteral(IntegerLiteralToken(*value)), count))
+    let maybe_value = &text[0..width.bytes].parse::<i64>().ok();
+    maybe_value.as_ref().map(|value| TryTokenizeResult {
+        token: Token::IntegerLiteral(IntegerLiteralToken(*value)),
+        width,
+    })
 }
