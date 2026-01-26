@@ -47,8 +47,8 @@ impl SourceCode {
             self.path,
             end_character,
         );
-        let mut line = start_character.line + 1;
 
+        let mut line = start_character.line + 1;
         let mut first_line = true;
         for line_text in body.split('\n') {
             if !first_line {
