@@ -1,0 +1,11 @@
+fn test() {
+    if x { 
+        let y = "This is a test";
+    } else if y { 
+        let z = x;
+    } else {
+        while true {
+            println;
+        }
+    }
+}

@@ -1,5 +1,5 @@
 use colored::Colorize;
-use std::rc::Rc;
+use std::{error::Error, fs::read_to_string, rc::Rc};
 
 use crate::{
     lexer::{LocatedToken, tokenize},
@@ -7,15 +7,21 @@ use crate::{
 };
 
 pub struct SourceCode {
+    pub path: String,
     pub tokens: Rc<Vec<LocatedToken>>,
     pub source: String,
 }
 
 impl SourceCode {
-    pub fn from(text: &str) -> Self {
-        let tokens = Rc::new(tokenize(text));
-        let source = text.to_owned();
-        Self { tokens, source }
+    pub fn read(path: &str) -> Result<Self, Box<dyn Error>> {
+        let source = read_to_string(path)?;
+        let tokens = Rc::new(tokenize(&source));
+        let path = path.to_owned();
+        Ok(SourceCode {
+            path,
+            tokens,
+            source,
+        })
     }
 
     pub fn token_stream(&self) -> TokenStream {
@@ -36,11 +42,14 @@ impl SourceCode {
         let end_character = &self.tokens[span.end_index].span.end;
         let end_byte = end_character.byte;
 
-        let prefix = &self.source[..start_byte];
-        let start_line_byte = prefix.rfind('\n').map(|start| start + 1).unwrap_or(0);
-        let prefix = &prefix[start_line_byte..];
+        let prefix = {
+            let prefix = &self.source[..start_byte];
+            let start_line_byte = prefix.rfind('\n').map(|start| start + 1).unwrap_or(0);
+            &prefix[start_line_byte..]
+        };
 
         let body = &self.source[start_byte..end_byte];
+
         let suffix = if end_byte == self.source.len() {
             ""
         } else {
@@ -50,32 +59,35 @@ impl SourceCode {
         };
 
         println!(
-            "  {} source/file:{}:{} -> source/file:{}:{}",
-            "-->".magenta().bold(),
-            start_character.line,
-            start_character.column,
-            end_character.line,
-            end_character.column,
+            "  {} {}:{} -> {}:{}",
+            "-->".cyan().bold(),
+            self.path,
+            start_character,
+            self.path,
+            end_character,
         );
         let mut line = start_character.line + 1;
-        print!(
-            "{:>2} {} {}",
-            line.to_string().bold().purple(),
-            "|".bold().purple(),
-            prefix,
-        );
+
+        print_line_header(line);
+        print!("{}", prefix);
+
         for character in body.chars() {
             if character == '\n' {
                 line += 1;
-                print!(
-                    "\n{:>2} {} ",
-                    line.to_string().bold().purple(),
-                    "|".bold().purple(),
-                )
+                println!();
+                print_line_header(line);
             } else {
-                print!("{}", character.to_string().bold().cyan());
+                print!("{}", character.to_string().bold().yellow());
             }
         }
         println!("{}", suffix);
     }
+}
+
+fn print_line_header(line: usize) {
+    print!(
+        "{:>2} {} ",
+        line.to_string().bold().cyan(),
+        "|".bold().cyan(),
+    );
 }

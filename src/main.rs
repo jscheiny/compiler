@@ -1,3 +1,5 @@
+use std::env;
+
 use crate::{
     lexer::SourceCode,
     parser::{Traverse, program},
@@ -7,13 +9,8 @@ pub mod lexer;
 pub mod parser;
 
 fn main() {
-    let source = SourceCode::from(
-        "fn test() {
-        if x { let y = \"This is a test\"; }
-        else if y { let z = x; }
-        else {}
-    }",
-    );
+    let args = env::args().collect::<Vec<_>>();
+    let source = SourceCode::read(&args[1].as_str()).unwrap();
 
     // for token in source.tokens.iter() {
     //     println!("{}", token)
