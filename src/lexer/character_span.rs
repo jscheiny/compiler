@@ -41,6 +41,6 @@ impl CharacterLocation {
 
 impl Display for CharacterLocation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}:{}", self.line, self.column)
+        write!(f, "{}:{}", self.line + 1, self.column + 1)
     }
 }
