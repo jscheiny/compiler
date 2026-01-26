@@ -28,7 +28,7 @@ impl SourceCode {
         TokenStream::from(self.tokens.clone())
     }
 
-    pub fn print_span(&self, span: TokenSpan) {
+    pub fn print_span(&self, span: TokenSpan, message: &str) {
         let start_character = &self.tokens[span.start_index].span.start;
         let start_byte = start_character.byte;
 
@@ -48,21 +48,44 @@ impl SourceCode {
             end_character,
         );
 
-        let mut line = start_character.line + 1;
-        let mut first_line = true;
-        for line_text in body.split('\n') {
-            if !first_line {
+        let lines = body.split('\n').collect::<Vec<_>>();
+        for (line_offset, &line_text) in lines.iter().enumerate() {
+            let line = start_character.line + line_offset + 1;
+            print_line_header(line);
+            if line_offset == 0 {
+                print!("{}", prefix);
+            }
+
+            print!("{}", line_text);
+            if line_offset == lines.len() - 1 {
+                println!("{}", suffix);
+            } else {
                 println!();
             }
-            print_line_header(line);
-            if first_line {
-                print!("{}", prefix);
-                first_line = false;
+
+            print!("   {} ", "|".bold().cyan());
+            if line_offset == 0 {
+                for _ in prefix.chars() {
+                    print!(" ")
+                }
             }
-            print!("{}", line_text.to_string().bold().yellow());
-            line += 1;
+            let mut is_initial_whitespace = true;
+            for character in line_text.chars() {
+                if !character.is_whitespace() {
+                    is_initial_whitespace = false;
+                }
+                if is_initial_whitespace {
+                    print!(" ");
+                } else {
+                    print!("{}", "^".bold().red());
+                }
+            }
+
+            if line_offset == lines.len() - 1 {
+                print!(" {}", message.bold().red())
+            }
+            println!();
         }
-        println!("{}", suffix);
     }
 
     fn span_prefix(&self, start_byte: usize) -> &str {
