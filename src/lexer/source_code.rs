@@ -68,17 +68,18 @@ impl SourceCode {
         );
         let mut line = start_character.line + 1;
 
-        print_line_header(line);
-        print!("{}", prefix);
-
-        for character in body.chars() {
-            if character == '\n' {
-                line += 1;
+        let mut first_line = true;
+        for line_text in body.split('\n') {
+            if !first_line {
                 println!();
-                print_line_header(line);
-            } else {
-                print!("{}", character.to_string().bold().yellow());
             }
+            print_line_header(line);
+            if first_line {
+                print!("{}", prefix);
+                first_line = false;
+            }
+            print!("{}", line_text.to_string().bold().yellow());
+            line += 1;
         }
         println!("{}", suffix);
     }
