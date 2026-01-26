@@ -42,21 +42,9 @@ impl SourceCode {
         let end_character = &self.tokens[span.end_index].span.end;
         let end_byte = end_character.byte;
 
-        let prefix = {
-            let prefix = &self.source[..start_byte];
-            let start_line_byte = prefix.rfind('\n').map(|start| start + 1).unwrap_or(0);
-            &prefix[start_line_byte..]
-        };
-
+        let prefix = self.span_prefix(start_byte);
         let body = &self.source[start_byte..end_byte];
-
-        let suffix = if end_byte == self.source.len() {
-            ""
-        } else {
-            let suffix = &self.source[end_byte..];
-            let end_line_byte = suffix.find('\n').unwrap_or(suffix.len() - 1);
-            &suffix[..end_line_byte]
-        };
+        let suffix = self.span_suffix(end_byte);
 
         println!(
             "  {} {}:{} -> {}:{}",
@@ -82,6 +70,22 @@ impl SourceCode {
             line += 1;
         }
         println!("{}", suffix);
+    }
+
+    fn span_prefix(&self, start_byte: usize) -> &str {
+        let prefix = &self.source[..start_byte];
+        let start_line_byte = prefix.rfind('\n').map(|start| start + 1).unwrap_or(0);
+        &prefix[start_line_byte..]
+    }
+
+    fn span_suffix(&self, end_byte: usize) -> &str {
+        if end_byte == self.source.len() {
+            ""
+        } else {
+            let suffix = &self.source[end_byte..];
+            let end_line_byte = suffix.find('\n').unwrap_or(suffix.len() - 1);
+            &suffix[..end_line_byte]
+        }
     }
 }
 
