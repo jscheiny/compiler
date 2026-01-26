@@ -28,13 +28,6 @@ impl SourceCode {
         TokenStream::from(self.tokens.clone())
     }
 
-    pub fn get_span_string(&self, span: TokenSpan) -> String {
-        let start_byte = self.tokens[span.start_index].span.start.byte;
-        let end_byte = self.tokens[span.end_index].span.end.byte;
-        let source_slice = self.source[start_byte..end_byte].to_owned();
-        source_slice
-    }
-
     pub fn print_span(&self, span: TokenSpan) {
         let start_character = &self.tokens[span.start_index].span.start;
         let start_byte = start_character.byte;
