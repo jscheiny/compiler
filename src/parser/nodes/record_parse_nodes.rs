@@ -6,15 +6,15 @@ use crate::parser::{
 pub struct RecordDefinitionParseNode {
     pub record_type: RecordType,
     pub identifier: ParseNode<String>,
-    pub member_list: ParseNodeVec<RecordMemberParseNode>,
+    pub members: ParseNodeVec<RecordMemberParseNode>,
     pub methods: Option<ParseNodeVec<MethodParseNode>>,
 }
 
 impl Traverse for RecordDefinitionParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         visit("Record.identifier", self.identifier.span);
-        visit("Record.members", self.member_list.span);
-        for member in self.member_list.value.iter() {
+        visit("Record.members", self.members.span);
+        for member in self.members.value.iter() {
             member.traverse("Record.member", visit);
         }
         if let Some(methods) = self.methods.as_ref() {

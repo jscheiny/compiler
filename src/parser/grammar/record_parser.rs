@@ -22,13 +22,13 @@ fn record(
     tokens.next();
 
     let identifier = tokens.identifier()?;
-    let member_list = tokens.located(member_list)?;
+    let members = tokens.located(members)?;
 
     if tokens.accept(&OperatorToken::EndStatement) {
         Ok(RecordDefinitionParseNode {
             record_type,
             identifier,
-            member_list,
+            members,
             methods: None,
         })
     } else if OperatorToken::OpenBrace.matches(tokens.peek()) {
@@ -36,7 +36,7 @@ fn record(
         Ok(RecordDefinitionParseNode {
             record_type,
             identifier,
-            member_list,
+            members,
             methods,
         })
     } else {
@@ -44,7 +44,7 @@ fn record(
     }
 }
 
-fn member_list(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<RecordMemberParseNode>>> {
+fn members(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<RecordMemberParseNode>>> {
     tokens.expect(&OperatorToken::OpenParen)?;
     comma_separated_list(tokens, OperatorToken::CloseParen, member)
 }
