@@ -49,10 +49,10 @@ impl TokenStream {
         self.index == self.tokens.len()
     }
 
-    pub fn located<P: Debug>(
+    pub fn located<P: Debug, E>(
         &mut self,
-        parse: impl Fn(&mut TokenStream) -> Result<P, ()>,
-    ) -> Result<ParseNode<P>, ()> {
+        parse: impl Fn(&mut TokenStream) -> Result<P, E>,
+    ) -> Result<ParseNode<P>, E> {
         let start_index = self.index;
         let value = parse(self)?;
         Ok(ParseNode {
@@ -61,10 +61,10 @@ impl TokenStream {
         })
     }
 
-    pub fn maybe_located<P: Debug>(
+    pub fn maybe_located<P: Debug, E>(
         &mut self,
-        parse: impl Fn(&mut TokenStream) -> Result<Option<P>, ()>,
-    ) -> Result<Option<ParseNode<P>>, ()> {
+        parse: impl Fn(&mut TokenStream) -> Result<Option<P>, E>,
+    ) -> Result<Option<ParseNode<P>>, E> {
         let start_index = self.index;
         let result = parse(self)?;
         Ok(result.map(|value| ParseNode {
