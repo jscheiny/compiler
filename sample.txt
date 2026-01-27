@@ -1,11 +1,1 @@
-fn test(map: Map[int, T], x: int): float {
-    if x { 
-        let y = "This is a test";
-    } else if y { 
-        let z = x;
-    } else {
-        while true {
-            println;
-        }
-    }
-}
+enum Test(X(List[int]), Y(int));
