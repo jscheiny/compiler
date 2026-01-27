@@ -12,16 +12,11 @@ fn main() {
     let args = env::args().collect::<Vec<_>>();
     let source = SourceCode::read(&args[1].as_str()).unwrap();
 
-    // for token in source.tokens.iter() {
-    //     println!("{}", token)
-    // }
-
     let mut tokens = source.token_stream();
     let program = program(&mut tokens).unwrap();
     program.traverse(&|name, span| {
         if source.is_single_line(span) {
-            println!("{} @ {:?}", name, span);
-            source.print_span(span, '^', name, Severity::Note);
+            source.print_span(span, '^', name, Severity::Error);
             println!();
         }
     });
