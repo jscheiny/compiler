@@ -1,7 +1,7 @@
 use std::env;
 
 use crate::{
-    lexer::SourceCode,
+    lexer::{Severity, SourceCode},
     parser::{Traverse, program},
 };
 
@@ -20,7 +20,7 @@ fn main() {
     let program = program(&mut tokens).unwrap();
     program.traverse(&|name, span| {
         println!("{} @ {:?}", name, span);
-        source.print_span(span, name);
+        source.print_span(span, '^', name, Severity::Note);
         println!();
     });
 }

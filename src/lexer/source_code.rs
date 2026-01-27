@@ -1,4 +1,4 @@
-use colored::Colorize;
+use colored::{ColoredString, Colorize};
 use std::{error::Error, fs::read_to_string, rc::Rc};
 
 use crate::{
@@ -10,6 +10,13 @@ pub struct SourceCode {
     pub path: String,
     pub tokens: Rc<Vec<LocatedToken>>,
     pub source: String,
+}
+
+#[derive(Clone, Copy)]
+pub enum Severity {
+    Error,
+    Warning,
+    Note,
 }
 
 impl SourceCode {
@@ -28,7 +35,7 @@ impl SourceCode {
         TokenStream::from(self.tokens.clone())
     }
 
-    pub fn print_span(&self, span: TokenSpan, message: &str) {
+    pub fn print_span(&self, span: TokenSpan, underline: char, message: &str, severity: Severity) {
         let start_character = &self.tokens[span.start_index].span.start;
         let start_byte = start_character.byte;
 
@@ -69,6 +76,8 @@ impl SourceCode {
                     print!(" ")
                 }
             }
+
+            let underline = underline.to_string();
             let mut is_initial_whitespace = true;
             for character in line_text.chars() {
                 if !character.is_whitespace() {
@@ -77,12 +86,12 @@ impl SourceCode {
                 if is_initial_whitespace {
                     print!(" ");
                 } else {
-                    print!("{}", "^".bold().red());
+                    print!("{}", apply_severity(underline.as_str(), severity));
                 }
             }
 
             if line_offset == lines.len() - 1 {
-                print!(" {}", message.bold().red())
+                print!(" {}", apply_severity(message, severity))
             }
             println!();
         }
@@ -102,6 +111,14 @@ impl SourceCode {
             let end_line_byte = suffix.find('\n').unwrap_or(suffix.len() - 1);
             &suffix[..end_line_byte]
         }
+    }
+}
+
+fn apply_severity(text: &str, severity: Severity) -> ColoredString {
+    match severity {
+        Severity::Error => text.red().bold(),
+        Severity::Warning => text.yellow().bold(),
+        Severity::Note => text.green().bold(),
     }
 }
 
