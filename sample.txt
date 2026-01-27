@@ -1,4 +1,4 @@
-fn test() {
+fn test(map: Map[int, T], x: int): float {
     if x { 
         let y = "This is a test";
     } else if y { 

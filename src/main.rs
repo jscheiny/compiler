@@ -19,8 +19,10 @@ fn main() {
     let mut tokens = source.token_stream();
     let program = program(&mut tokens).unwrap();
     program.traverse(&|name, span| {
-        println!("{} @ {:?}", name, span);
-        source.print_span(span, '^', name, Severity::Note);
-        println!();
+        if source.is_single_line(span) {
+            println!("{} @ {:?}", name, span);
+            source.print_span(span, '^', name, Severity::Note);
+            println!();
+        }
     });
 }

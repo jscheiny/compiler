@@ -35,6 +35,12 @@ impl SourceCode {
         TokenStream::from(self.tokens.clone())
     }
 
+    pub fn is_single_line(&self, span: TokenSpan) -> bool {
+        let start_line = &self.tokens[span.start_index].span.start.line;
+        let end_line = &self.tokens[span.end_index].span.end.line;
+        start_line == end_line
+    }
+
     pub fn print_span(&self, span: TokenSpan, underline: char, message: &str, severity: Severity) {
         let start_character = &self.tokens[span.start_index].span.start;
         let start_byte = start_character.byte;
