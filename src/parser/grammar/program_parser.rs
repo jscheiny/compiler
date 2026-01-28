@@ -2,7 +2,7 @@ use crate::{
     lexer::{KeywordToken, Token},
     parser::{
         ModuleTopLevelDefinition, ParseResult, ProgramParseNode, TokenStream, TopLevelDefinition,
-        grammar::{interface, structure, top_level_function, tuple},
+        grammar::{enumeration, interface, structure, top_level_function, tuple},
     },
 };
 
@@ -27,6 +27,7 @@ fn top_level_definition(tokens: &mut TokenStream) -> ParseResult<TopLevelDefinit
         match keyword {
             K::Tuple => Ok(TopLevelDefinition::Record(tuple(tokens)?)),
             K::Struct => Ok(TopLevelDefinition::Record(structure(tokens)?)),
+            K::Enum => Ok(TopLevelDefinition::Enum(enumeration(tokens)?)),
             K::Interface => Ok(TopLevelDefinition::Interface(interface(tokens)?)),
             K::Fn => Ok(TopLevelDefinition::Function(top_level_function(tokens)?)),
             _ => Err(()),

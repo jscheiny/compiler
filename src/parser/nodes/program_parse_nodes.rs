@@ -1,6 +1,6 @@
 use crate::parser::{
-    FunctionDefintionParseNode, InterfaceDefinitionParseNode, ParseNode, RecordDefinitionParseNode,
-    TokenSpan, Traverse,
+    EnumParseNode, FunctionDefintionParseNode, InterfaceDefinitionParseNode, ParseNode,
+    RecordDefinitionParseNode, TokenSpan, Traverse,
 };
 
 #[derive(Debug)]
@@ -31,6 +31,7 @@ impl Traverse for ModuleTopLevelDefinition {
 #[derive(Debug)]
 pub enum TopLevelDefinition {
     Record(RecordDefinitionParseNode),
+    Enum(EnumParseNode),
     Interface(InterfaceDefinitionParseNode),
     Function(FunctionDefintionParseNode),
 }
@@ -39,6 +40,7 @@ impl Traverse for TopLevelDefinition {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         match self {
             Self::Record(node) => node.traverse(visit),
+            Self::Enum(node) => node.traverse(visit),
             Self::Interface(node) => node.traverse(visit),
             Self::Function(node) => node.traverse(visit),
         }
