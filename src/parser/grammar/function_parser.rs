@@ -15,7 +15,8 @@ pub fn methods(
     } else if tokens.accept(&OperatorToken::EndStatement) {
         Ok(None)
     } else {
-        Err(tokens.make_error(SyntaxErrorType::Unimplemented))
+        tokens.push_error(SyntaxErrorType::ExpectedMethods);
+        Ok(None)
     }
 }
 
