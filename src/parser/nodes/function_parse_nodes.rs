@@ -4,6 +4,18 @@ use crate::parser::{
 };
 
 #[derive(Debug)]
+pub struct MethodParseNode {
+    pub public: bool,
+    pub function: ParseNode<FunctionDefintionParseNode>,
+}
+
+impl Traverse for MethodParseNode {
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        self.function.traverse("Method.function", visit);
+    }
+}
+
+#[derive(Debug)]
 pub struct FunctionDefintionParseNode {
     pub identifier: ParseNode<String>,
     pub parameters: ParseNodeVec<ParameterParseNode>,

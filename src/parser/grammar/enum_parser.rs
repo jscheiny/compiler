@@ -2,7 +2,10 @@ use crate::{
     lexer::OperatorToken,
     parser::{
         EnumParseNode, EnumVariantParseNode, ParseNode, ParseResult, TokenStream,
-        grammar::{type_definition_parser::type_definition, utils::comma_separated_list},
+        grammar::{
+            function_parser::methods, type_definition_parser::type_definition,
+            utils::comma_separated_list,
+        },
     },
 };
 
@@ -10,11 +13,11 @@ pub fn enumeration(tokens: &mut TokenStream) -> ParseResult<EnumParseNode> {
     tokens.next();
     let identifier = tokens.identifier()?;
     let variants = tokens.located(enum_variants)?;
-    tokens.expect(&OperatorToken::EndStatement)?;
+    let methods = methods(tokens)?;
     Ok(EnumParseNode {
         identifier,
         variants,
-        methods: None, // todo fill this in
+        methods,
     })
 }
 

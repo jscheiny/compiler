@@ -10,7 +10,7 @@ pub mod parser;
 
 fn main() {
     let args = env::args().collect::<Vec<_>>();
-    let source = SourceCode::read(&args[1].as_str()).unwrap();
+    let source = SourceCode::read(args[1].as_str()).unwrap();
 
     let mut tokens = source.token_stream();
     let program = program(&mut tokens).unwrap();

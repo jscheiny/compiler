@@ -1,1 +1,4 @@
-enum Test(X(List[int]), Y(int));
+enum Test();
+enum Test() {}
+struct Test();
+struct Test() {}

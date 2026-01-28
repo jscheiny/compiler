@@ -1,17 +1,44 @@
 use crate::{
-    lexer::{OperatorToken, TokenMatch},
+    lexer::{KeywordToken, OperatorToken, TokenMatch},
     parser::{
-        FunctionBodyParseNode, FunctionDefintionParseNode, ParameterParseNode, ParseNode,
-        ParseResult, TokenStream,
+        FunctionBodyParseNode, FunctionDefintionParseNode, MethodParseNode, ParameterParseNode,
+        ParseNode, ParseResult, TokenStream,
         grammar::{block, expression, type_definition, utils::comma_separated_list},
     },
 };
+
+pub fn methods(
+    tokens: &mut TokenStream,
+) -> ParseResult<Option<ParseNode<Vec<ParseNode<MethodParseNode>>>>> {
+    if OperatorToken::OpenBrace.matches(tokens.peek()) {
+        Ok(Some(tokens.located(methods_impl)?))
+    } else if tokens.accept(&OperatorToken::EndStatement) {
+        Ok(None)
+    } else {
+        Err(())
+    }
+}
+
+fn methods_impl(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<MethodParseNode>>> {
+    tokens.next();
+    let mut methods = vec![];
+    while !tokens.accept(&OperatorToken::CloseBrace) {
+        methods.push(tokens.located(method)?);
+    }
+    Ok(methods)
+}
+
+fn method(tokens: &mut TokenStream) -> ParseResult<MethodParseNode> {
+    let public = tokens.accept(&KeywordToken::Pub);
+    let function = tokens.located(nested_function)?;
+    Ok(MethodParseNode { public, function })
+}
 
 pub fn top_level_function(tokens: &mut TokenStream) -> ParseResult<FunctionDefintionParseNode> {
     function(tokens, true)
 }
 
-pub fn nested_function(tokens: &mut TokenStream) -> ParseResult<FunctionDefintionParseNode> {
+fn nested_function(tokens: &mut TokenStream) -> ParseResult<FunctionDefintionParseNode> {
     function(tokens, false)
 }
 

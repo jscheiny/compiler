@@ -1,9 +1,9 @@
 use crate::{
-    lexer::{KeywordToken, OperatorToken, TokenMatch},
+    lexer::{KeywordToken, OperatorToken},
     parser::{
-        MethodParseNode, ParseNode, ParseResult, RecordDefinitionParseNode, RecordMemberParseNode,
-        RecordType, TokenStream,
-        grammar::{comma_separated_list, nested_function, type_definition},
+        ParseNode, ParseResult, RecordDefinitionParseNode, RecordMemberParseNode, RecordType,
+        TokenStream,
+        grammar::{comma_separated_list, function_parser::methods, type_definition},
     },
 };
 
@@ -24,24 +24,13 @@ fn record(
     let identifier = tokens.identifier()?;
     let members = tokens.located(members)?;
 
-    if tokens.accept(&OperatorToken::EndStatement) {
-        Ok(RecordDefinitionParseNode {
-            record_type,
-            identifier,
-            members,
-            methods: None,
-        })
-    } else if OperatorToken::OpenBrace.matches(tokens.peek()) {
-        let methods = Some(tokens.located(methods)?);
-        Ok(RecordDefinitionParseNode {
-            record_type,
-            identifier,
-            members,
-            methods,
-        })
-    } else {
-        Err(())
-    }
+    let methods = methods(tokens)?;
+    Ok(RecordDefinitionParseNode {
+        record_type,
+        identifier,
+        members,
+        methods,
+    })
 }
 
 fn members(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<RecordMemberParseNode>>> {
@@ -59,19 +48,4 @@ fn member(tokens: &mut TokenStream) -> ParseResult<RecordMemberParseNode> {
         identifier,
         type_def,
     })
-}
-
-fn methods(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<MethodParseNode>>> {
-    tokens.next();
-    let mut methods = vec![];
-    while !tokens.accept(&OperatorToken::CloseBrace) {
-        methods.push(tokens.located(method)?);
-    }
-    Ok(methods)
-}
-
-fn method(tokens: &mut TokenStream) -> ParseResult<MethodParseNode> {
-    let public = tokens.accept(&KeywordToken::Pub);
-    let function = tokens.located(nested_function)?;
-    Ok(MethodParseNode { public, function })
 }

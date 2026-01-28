@@ -1,6 +1,4 @@
-use crate::parser::{
-    FunctionDefintionParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse, TypeParseNode,
-};
+use crate::parser::{MethodParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse, TypeParseNode};
 
 #[derive(Debug)]
 pub struct RecordDefinitionParseNode {
@@ -43,17 +41,5 @@ impl Traverse for RecordMemberParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         visit("RecordMember.identifier", self.identifier.span);
         self.type_def.traverse("RecordMember.type", visit);
-    }
-}
-
-#[derive(Debug)]
-pub struct MethodParseNode {
-    pub public: bool,
-    pub function: ParseNode<FunctionDefintionParseNode>,
-}
-
-impl Traverse for MethodParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        self.function.traverse("Method.function", visit);
     }
 }
