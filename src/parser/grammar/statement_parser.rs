@@ -3,7 +3,7 @@ use crate::{
     parser::{
         DeclarationParseNode, ExpressionParseNode, IfStatementConditionParseNode,
         IfStatementParseNode, ParseResult, StatementParseNode, TokenStream, WhileLoopParseNode,
-        grammar::{block, expression, type_definition},
+        grammar::{block, expression, identifier, type_definition},
     },
 };
 
@@ -30,7 +30,7 @@ pub fn statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
 
 fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<StatementParseNode> {
     tokens.next();
-    let identifier = tokens.identifier()?;
+    let identifier = tokens.located(identifier)?;
     let type_def = if tokens.accept(&OperatorToken::Type) {
         Some(tokens.located(type_definition)?)
     } else {

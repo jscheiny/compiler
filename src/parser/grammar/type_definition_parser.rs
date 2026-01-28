@@ -2,7 +2,7 @@ use crate::{
     lexer::{KeywordToken, OperatorToken, Token},
     parser::{
         ParseNode, ParseResult, TokenStream, TypeParseNode, UserDefinedTypeParseNode,
-        grammar::comma_separated_list,
+        grammar::{comma_separated_list, identifier},
     },
 };
 
@@ -26,7 +26,7 @@ fn primitive_type(tokens: &mut TokenStream) -> ParseResult<TypeParseNode> {
 }
 
 fn user_defined_type(tokens: &mut TokenStream) -> ParseResult<TypeParseNode> {
-    let identifier = tokens.identifier()?;
+    let identifier = tokens.located(identifier)?;
     let generic_params = tokens.maybe_located(generic_type_params)?;
 
     Ok(TypeParseNode::UserDefined(UserDefinedTypeParseNode {

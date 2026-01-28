@@ -3,7 +3,7 @@ use crate::{
     parser::{
         FunctionBodyParseNode, FunctionDefintionParseNode, MethodParseNode, ParameterParseNode,
         ParseNode, ParseResult, TokenStream,
-        grammar::{block, expression, type_definition, utils::comma_separated_list},
+        grammar::{block, comma_separated_list, expression, identifier, type_definition},
     },
 };
 
@@ -49,7 +49,7 @@ fn function(
     if has_keyword {
         tokens.next();
     }
-    let identifier = tokens.identifier()?;
+    let identifier = tokens.located(identifier)?;
     let parameters = tokens.located(parameters)?;
     let return_type = if tokens.accept(&OperatorToken::Type) {
         Some(tokens.located(type_definition)?)
@@ -84,7 +84,7 @@ pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<Paramet
 }
 
 fn parameter(tokens: &mut TokenStream) -> ParseResult<ParameterParseNode> {
-    let identifier = tokens.identifier()?;
+    let identifier = tokens.located(identifier)?;
     tokens.expect(&OperatorToken::Type)?;
     let type_def = tokens.located(type_definition)?;
 

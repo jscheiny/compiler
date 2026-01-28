@@ -2,7 +2,7 @@ use std::fmt::Debug;
 use std::rc::Rc;
 
 use crate::{
-    lexer::{IdentifierToken, LocatedToken, Token, TokenMatch},
+    lexer::{LocatedToken, Token, TokenMatch},
     parser::{ParseNode, TokenSpan},
 };
 
@@ -33,10 +33,6 @@ impl TokenStream {
         }
     }
 
-    pub fn identifier(&mut self) -> Result<ParseNode<String>, ()> {
-        self.located(identifier)
-    }
-
     pub fn peek(&self) -> &Token {
         &self.tokens[self.index].token
     }
@@ -57,7 +53,7 @@ impl TokenStream {
         let value = parse(self)?;
         Ok(ParseNode {
             value,
-            span: self.get_span(start_index),
+            span: self.span(start_index),
         })
     }
 
@@ -69,24 +65,14 @@ impl TokenStream {
         let result = parse(self)?;
         Ok(result.map(|value| ParseNode {
             value,
-            span: self.get_span(start_index),
+            span: self.span(start_index),
         }))
     }
 
-    fn get_span(&self, start_index: usize) -> TokenSpan {
+    fn span(&self, start_index: usize) -> TokenSpan {
         TokenSpan {
             start_index,
             end_index: self.index - 1,
         }
-    }
-}
-
-fn identifier(tokens: &mut TokenStream) -> Result<String, ()> {
-    if let Token::Identifier(IdentifierToken(identifier)) = tokens.peek() {
-        let identifier = identifier.clone();
-        tokens.next();
-        Ok(identifier)
-    } else {
-        Err(())
     }
 }
