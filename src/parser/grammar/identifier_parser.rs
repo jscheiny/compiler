@@ -1,9 +1,9 @@
 use crate::{
     lexer::{IdentifierToken, Token},
-    parser::{IdentifierParseNode, SyntaxError, SyntaxErrorType, TokenStream},
+    parser::{IdentifierParseNode, ParseResult, SyntaxErrorType, TokenStream},
 };
 
-pub fn identifier(tokens: &mut TokenStream) -> Result<IdentifierParseNode, ()> {
+pub fn identifier(tokens: &mut TokenStream) -> ParseResult<IdentifierParseNode> {
     let token = tokens.peek();
     match token {
         Token::Identifier(IdentifierToken(identifier)) => {
@@ -13,13 +13,10 @@ pub fn identifier(tokens: &mut TokenStream) -> Result<IdentifierParseNode, ()> {
         }
         Token::Keyword(keyword) => {
             let identifier = keyword.to_string().to_owned();
-            tokens.error(SyntaxError {
-                span: tokens.current_span(),
-                kind: SyntaxErrorType::ExpectedIdentifier,
-            });
+            tokens.push_error(SyntaxErrorType::ExpectedIdentifier);
             tokens.next();
             Ok(IdentifierParseNode(identifier))
         }
-        _ => Err(()),
+        _ => Err(tokens.make_error(SyntaxErrorType::Unimplemented)),
     }
 }

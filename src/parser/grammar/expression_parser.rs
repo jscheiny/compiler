@@ -1,6 +1,9 @@
 use crate::{
     lexer::{IdentifierToken, IntegerLiteralToken, OperatorToken, StringLiteralToken, Token},
-    parser::{BlockParseNode, ExpressionParseNode, ParseResult, TokenStream, grammar::statement},
+    parser::{
+        BlockParseNode, ExpressionParseNode, ParseResult, SyntaxErrorType, TokenStream,
+        grammar::statement,
+    },
 };
 
 pub fn expression(tokens: &mut TokenStream) -> ParseResult<ExpressionParseNode> {
@@ -24,7 +27,7 @@ pub fn expression(tokens: &mut TokenStream) -> ParseResult<ExpressionParseNode> 
             let block = block(tokens)?;
             Ok(ExpressionParseNode::Block(block))
         }
-        _ => Err(()),
+        _ => Err(tokens.make_error(SyntaxErrorType::Unimplemented)),
     }
 }
 

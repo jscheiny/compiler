@@ -3,7 +3,7 @@ use std::rc::Rc;
 
 use crate::{
     lexer::{LocatedToken, Token, TokenMatch},
-    parser::{ParseNode, SyntaxError, TokenSpan},
+    parser::{ParseNode, SyntaxError, SyntaxErrorType, TokenSpan},
 };
 
 pub struct TokenStream {
@@ -30,11 +30,11 @@ impl TokenStream {
         }
     }
 
-    pub fn expect(&mut self, predicate: &impl TokenMatch) -> Result<(), ()> {
+    pub fn expect(&mut self, predicate: &impl TokenMatch) -> Result<(), SyntaxError> {
         if self.accept(predicate) {
             Ok(())
         } else {
-            Err(())
+            Err(self.make_error(SyntaxErrorType::Unimplemented))
         }
     }
 
@@ -88,7 +88,14 @@ impl TokenStream {
         }
     }
 
-    pub fn error(&mut self, error: SyntaxError) {
-        self.errors.push(error);
+    pub fn push_error(&mut self, kind: SyntaxErrorType) {
+        self.errors.push(self.make_error(kind));
+    }
+
+    pub fn make_error(&self, kind: SyntaxErrorType) -> SyntaxError {
+        SyntaxError {
+            span: self.current_span(),
+            kind,
+        }
     }
 }

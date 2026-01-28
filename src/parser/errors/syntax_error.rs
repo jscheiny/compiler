@@ -5,6 +5,7 @@ use crate::{
     parser::TokenSpan,
 };
 
+#[derive(Debug)]
 pub struct SyntaxError {
     pub span: TokenSpan,
     pub kind: SyntaxErrorType,
@@ -28,18 +29,22 @@ impl SyntaxError {
                     }
                 }
             }
+            SyntaxErrorType::Unimplemented => unimplemented!("Unimplemented syntax error type"),
         }
     }
 }
 
+#[derive(Debug)]
 pub enum SyntaxErrorType {
     ExpectedIdentifier,
+    Unimplemented,
 }
 
 impl Display for SyntaxErrorType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             SyntaxErrorType::ExpectedIdentifier => write!(f, "expected identifier"),
+            SyntaxErrorType::Unimplemented => unimplemented!("Unimplemented syntax error type"),
         }
     }
 }
