@@ -3,17 +3,22 @@ use std::rc::Rc;
 
 use crate::{
     lexer::{LocatedToken, Token, TokenMatch},
-    parser::{ParseNode, TokenSpan},
+    parser::{ParseNode, SyntaxError, TokenSpan},
 };
 
 pub struct TokenStream {
     tokens: Rc<Vec<LocatedToken>>,
     index: usize,
+    pub errors: Vec<SyntaxError>,
 }
 
 impl TokenStream {
     pub fn from(tokens: Rc<Vec<LocatedToken>>) -> Self {
-        TokenStream { tokens, index: 0 }
+        TokenStream {
+            tokens,
+            index: 0,
+            errors: vec![],
+        }
     }
 
     pub fn accept(&mut self, predicate: &impl TokenMatch) -> bool {
@@ -74,5 +79,16 @@ impl TokenStream {
             start_index,
             end_index: self.index - 1,
         }
+    }
+
+    pub fn current_span(&self) -> TokenSpan {
+        TokenSpan {
+            start_index: self.index,
+            end_index: self.index,
+        }
+    }
+
+    pub fn error(&mut self, error: SyntaxError) {
+        self.errors.push(error);
     }
 }

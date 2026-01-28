@@ -1,4 +1,3 @@
-enum Test();
-enum Test() {}
-struct Test();
-struct Test() {}
+enum enum() {
+    fn() -> x;
+}
