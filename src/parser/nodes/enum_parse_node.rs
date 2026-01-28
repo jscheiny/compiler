@@ -1,8 +1,11 @@
-use crate::parser::{MethodParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse, TypeParseNode};
+use crate::parser::{
+    IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse,
+    TypeParseNode,
+};
 
 #[derive(Debug)]
 pub struct EnumParseNode {
-    pub identifier: ParseNode<String>,
+    pub identifier: ParseNode<IdentifierParseNode>,
     pub variants: ParseNodeVec<EnumVariantParseNode>,
     pub methods: Option<ParseNodeVec<MethodParseNode>>,
 }
@@ -25,7 +28,7 @@ impl Traverse for EnumParseNode {
 
 #[derive(Debug)]
 pub struct EnumVariantParseNode {
-    pub identifier: ParseNode<String>,
+    pub identifier: ParseNode<IdentifierParseNode>,
     pub type_def: Option<ParseNode<TypeParseNode>>,
 }
 

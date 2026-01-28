@@ -1,6 +1,6 @@
 use crate::{
     lexer::KeywordToken,
-    parser::{ParseNode, ParseNodeVec, TokenSpan, Traverse},
+    parser::{IdentifierParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse},
 };
 
 #[derive(Debug)]
@@ -20,7 +20,7 @@ impl Traverse for TypeParseNode {
 
 #[derive(Debug)]
 pub struct UserDefinedTypeParseNode {
-    pub identifier: ParseNode<String>,
+    pub identifier: ParseNode<IdentifierParseNode>,
     pub generic_params: Option<ParseNodeVec<TypeParseNode>>,
 }
 

@@ -1,9 +1,12 @@
-use crate::parser::{MethodParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse, TypeParseNode};
+use crate::parser::{
+    IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse,
+    TypeParseNode,
+};
 
 #[derive(Debug)]
 pub struct RecordDefinitionParseNode {
     pub record_type: RecordType,
-    pub identifier: ParseNode<String>,
+    pub identifier: ParseNode<IdentifierParseNode>,
     pub members: ParseNodeVec<RecordMemberParseNode>,
     pub methods: Option<ParseNodeVec<MethodParseNode>>,
 }
@@ -33,7 +36,7 @@ pub enum RecordType {
 #[derive(Debug)]
 pub struct RecordMemberParseNode {
     pub public: bool,
-    pub identifier: ParseNode<String>,
+    pub identifier: ParseNode<IdentifierParseNode>,
     pub type_def: ParseNode<TypeParseNode>,
 }
 

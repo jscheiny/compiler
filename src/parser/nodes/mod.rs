@@ -1,6 +1,7 @@
 mod enum_parse_node;
 mod expression_parse_nodes;
 mod function_parse_nodes;
+mod identifier_parse_node;
 mod interface_parse_nodes;
 mod parse_node;
 mod parse_result;
@@ -12,6 +13,7 @@ mod type_parse_node;
 pub use enum_parse_node::*;
 pub use expression_parse_nodes::*;
 pub use function_parse_nodes::*;
+pub use identifier_parse_node::*;
 pub use interface_parse_nodes::*;
 pub use parse_node::*;
 pub use parse_result::*;

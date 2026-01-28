@@ -1,13 +1,13 @@
 use crate::{
     lexer::{IdentifierToken, Token},
-    parser::TokenStream,
+    parser::{IdentifierParseNode, TokenStream},
 };
 
-pub fn identifier(tokens: &mut TokenStream) -> Result<String, ()> {
+pub fn identifier(tokens: &mut TokenStream) -> Result<IdentifierParseNode, ()> {
     if let Token::Identifier(IdentifierToken(identifier)) = tokens.peek() {
         let identifier = identifier.clone();
         tokens.next();
-        Ok(identifier)
+        Ok(IdentifierParseNode(identifier))
     } else {
         Err(())
     }
