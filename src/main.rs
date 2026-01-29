@@ -15,7 +15,10 @@ fn main() {
     let source = SourceCode::read(args[1].as_str()).unwrap();
 
     let mut tokens = source.token_stream();
-    program(&mut tokens).unwrap();
+    let result = program(&mut tokens);
+    if let Err(syntax_err) = result {
+        tokens.errors.push(syntax_err);
+    }
     println!(
         "Found {} {}\n",
         tokens.errors.len().to_string().cyan().red(),
