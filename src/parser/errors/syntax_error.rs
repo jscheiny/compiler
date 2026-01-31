@@ -20,7 +20,7 @@ impl SyntaxError {
                 print!("{}", self.kind);
                 self.print_found_token(tokens);
             }
-            SyntaxErrorType::Unimplemented => unimplemented!("Unimplemented syntax error type"),
+            SyntaxErrorType::Unimplemented => print!("Unimplemented syntax error type"),
         }
     }
 
@@ -56,7 +56,7 @@ impl Display for SyntaxErrorType {
                 OperatorToken::EndStatement,
             ),
             Self::ExpectedType => write!(f, "expected type"),
-            Self::Unimplemented => unimplemented!("Unimplemented syntax error type"),
+            Self::Unimplemented => write!(f, "Unimplemented syntax error type"),
         }
     }
 }
