@@ -39,6 +39,13 @@ pub fn tokenize(mut text: &str) -> Vec<LocatedToken> {
         println!("{}", text);
         panic!("Tokenizer error");
     }
+    tokens.push(LocatedToken {
+        token: Token::EndOfFile,
+        span: CharacterSpan {
+            start,
+            end: start.add_byte(),
+        },
+    });
     tokens
 }
 

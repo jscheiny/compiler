@@ -25,6 +25,7 @@ pub enum Token {
     Operator(OperatorToken),
     Keyword(KeywordToken),
     Ignored(IgnoredToken),
+    EndOfFile,
 }
 
 impl Display for Token {
@@ -36,6 +37,7 @@ impl Display for Token {
             Self::Operator(operator) => write!(f, "Operator:{}", operator),
             Self::Keyword(keyword) => write!(f, "Keyword:{:?}", keyword),
             Self::Ignored(_) => write!(f, "[Ignored]"),
+            Self::EndOfFile => write!(f, "[EOF]"),
         }
     }
 }

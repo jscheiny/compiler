@@ -47,7 +47,8 @@ impl TokenStream {
     }
 
     pub fn is_done(&self) -> bool {
-        self.index == self.tokens.len()
+        // The last token is an EOF token
+        self.index >= self.tokens.len() - 1
     }
 
     pub fn located<P: Debug, E>(

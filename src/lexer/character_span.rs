@@ -30,6 +30,14 @@ impl CharacterLocation {
         }
     }
 
+    pub fn add_byte(&self) -> Self {
+        CharacterLocation {
+            line: self.line,
+            column: self.column + 1,
+            byte: self.byte + 1,
+        }
+    }
+
     pub fn add_lines(&self, token: IgnoredToken, bytes: usize) -> Self {
         CharacterLocation {
             line: self.line + token.new_lines,

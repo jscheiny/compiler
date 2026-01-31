@@ -1,6 +1,1 @@
-enum enum()
-
-struct Test() {
-    test(f: "test") -> x;
-    "test"
-}
+enum Test()

@@ -1,5 +1,5 @@
 use colored::{ColoredString, Colorize};
-use std::{error::Error, fs::read_to_string, rc::Rc};
+use std::{cmp::min, error::Error, fs::read_to_string, rc::Rc};
 
 use crate::{
     lexer::{LocatedToken, tokenize},
@@ -47,9 +47,10 @@ impl SourceCode {
 
         let end_character = &self.tokens[span.end_index].span.end;
         let end_byte = end_character.byte;
+        let end_byte_clamped = min(end_byte, self.source.len());
 
         let prefix = self.span_prefix(start_byte);
-        let body = &self.source[start_byte..end_byte];
+        let body = &self.source[start_byte..min(end_byte, end_byte_clamped)];
         let suffix = self.span_suffix(end_byte);
 
         println!(
@@ -82,16 +83,9 @@ impl SourceCode {
             }
 
             let underline = underline.to_string();
-            let mut is_initial_whitespace = true;
-            for character in line_text.chars() {
-                if !character.is_whitespace() {
-                    is_initial_whitespace = false;
-                }
-                if is_initial_whitespace {
-                    print!(" ");
-                } else {
-                    print!("{}", apply_severity(underline.as_str(), severity));
-                }
+            let span_bytes = end_byte - start_byte;
+            for _ in 0..span_bytes {
+                print!("{}", apply_severity(underline.as_str(), severity));
             }
 
             if line_offset == lines.len() - 1 {
@@ -108,7 +102,7 @@ impl SourceCode {
     }
 
     fn span_suffix(&self, end_byte: usize) -> &str {
-        if end_byte == self.source.len() {
+        if end_byte >= self.source.len() {
             ""
         } else {
             let suffix = &self.source[end_byte..];
