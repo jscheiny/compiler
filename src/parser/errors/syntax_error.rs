@@ -14,7 +14,9 @@ pub struct SyntaxError {
 impl SyntaxError {
     pub fn print(&self, tokens: &Vec<LocatedToken>) {
         match self.kind {
-            SyntaxErrorType::ExpectedIdentifier | SyntaxErrorType::ExpectedMethods => {
+            SyntaxErrorType::ExpectedIdentifier
+            | SyntaxErrorType::ExpectedMethods
+            | SyntaxErrorType::ExpectedType => {
                 print!("{}", self.kind);
                 self.print_found_token(tokens);
             }
@@ -36,10 +38,11 @@ impl SyntaxError {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum SyntaxErrorType {
     ExpectedIdentifier,
     ExpectedMethods,
+    ExpectedType,
     Unimplemented,
 }
 
@@ -52,6 +55,7 @@ impl Display for SyntaxErrorType {
                 "expected methods block or `{}`",
                 OperatorToken::EndStatement,
             ),
+            Self::ExpectedType => write!(f, "expected type"),
             Self::Unimplemented => unimplemented!("Unimplemented syntax error type"),
         }
     }

@@ -3,6 +3,18 @@ use crate::{
     parser::{IdentifierParseNode, ParseResult, SyntaxErrorType, TokenStream},
 };
 
+pub fn identifier_fail(tokens: &mut TokenStream) -> ParseResult<IdentifierParseNode> {
+    let token = tokens.peek();
+    match token {
+        Token::Identifier(IdentifierToken(identifier)) => {
+            let identifier = identifier.clone();
+            tokens.next();
+            Ok(IdentifierParseNode(identifier))
+        }
+        _ => Err(tokens.make_error(SyntaxErrorType::ExpectedIdentifier)),
+    }
+}
+
 pub fn identifier(tokens: &mut TokenStream) -> ParseResult<IdentifierParseNode> {
     let token = tokens.peek();
     match token {
