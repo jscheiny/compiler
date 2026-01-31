@@ -19,7 +19,7 @@ pub fn identifier_with(
             Ok(IdentifierParseNode(identifier))
         }
         Token::Keyword(keyword) => {
-            let identifier = keyword.to_string().to_owned();
+            let identifier = keyword.as_str().to_owned();
             tokens.push_error(error);
             tokens.next();
             Ok(IdentifierParseNode(identifier))

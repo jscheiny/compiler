@@ -42,7 +42,7 @@ pub enum OperatorToken {
 }
 
 impl OperatorToken {
-    fn as_string(&self) -> &str {
+    fn as_str(&self) -> &str {
         match self {
             // Two character operators
             Self::AddAssign => "+=",
@@ -80,6 +80,12 @@ impl OperatorToken {
     }
 }
 
+impl Display for OperatorToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
 impl TokenMatch for OperatorToken {
     fn matches(&self, token: &Token) -> bool {
         match token {
@@ -89,15 +95,9 @@ impl TokenMatch for OperatorToken {
     }
 }
 
-impl Display for OperatorToken {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.as_string())
-    }
-}
-
 pub fn try_tokenize_operator(text: &str) -> Option<TryTokenizeResult> {
     for operator in OperatorToken::iter() {
-        let operator_str = operator.as_string();
+        let operator_str = operator.as_str();
         if text.starts_with(operator_str) {
             return Some(TryTokenizeResult {
                 token: Token::Operator(operator),

@@ -35,7 +35,7 @@ impl Display for Token {
             Self::IntegerLiteral(integer_literal) => write!(f, "Integer:{}", integer_literal),
             Self::StringLiteral(string_literal) => write!(f, "String:{}", string_literal),
             Self::Operator(operator) => write!(f, "Operator:{}", operator),
-            Self::Keyword(keyword) => write!(f, "Keyword:{:?}", keyword),
+            Self::Keyword(keyword) => write!(f, "Keyword:{}", keyword),
             Self::Ignored(_) => write!(f, "[Ignored]"),
             Self::EndOfFile => write!(f, "[EOF]"),
         }
