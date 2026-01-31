@@ -1,11 +1,9 @@
-use std::fmt::Debug;
-
 use crate::{
     lexer::OperatorToken,
     parser::{ParseNode, ParseResult, TokenStream},
 };
 
-pub fn comma_separated_list<T: Debug>(
+pub fn comma_separated_list<T>(
     tokens: &mut TokenStream,
     close_symbol: OperatorToken,
     parse_entry: impl Fn(&mut TokenStream) -> ParseResult<T>,

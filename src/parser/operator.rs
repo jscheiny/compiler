@@ -1,10 +1,8 @@
-#[derive(Debug)]
 pub enum PrefixOperator {
     Negative, // not
     SelfRef,  // @
 }
 
-#[derive(Debug)]
 pub enum BinaryOperator {
     Add,                 // +
     AddAssign,           // +=
@@ -28,7 +26,6 @@ pub enum BinaryOperator {
     Or,                  // or
 }
 
-#[derive(Debug)]
 pub enum PostfixOperator {
     NullShortCircuit, // ?
 }

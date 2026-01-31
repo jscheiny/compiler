@@ -3,7 +3,6 @@ use crate::{
     parser::{IdentifierParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse},
 };
 
-#[derive(Debug)]
 pub enum TypeParseNode {
     Primitive(KeywordToken),
     UserDefined(UserDefinedTypeParseNode),
@@ -18,7 +17,6 @@ impl Traverse for TypeParseNode {
     }
 }
 
-#[derive(Debug)]
 pub struct UserDefinedTypeParseNode {
     pub identifier: ParseNode<IdentifierParseNode>,
     pub generic_params: Option<ParseNodeVec<TypeParseNode>>,

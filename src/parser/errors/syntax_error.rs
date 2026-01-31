@@ -5,7 +5,6 @@ use crate::{
     parser::TokenSpan,
 };
 
-#[derive(Debug)]
 pub struct SyntaxError {
     pub span: TokenSpan,
     pub kind: SyntaxErrorType,
@@ -39,7 +38,7 @@ impl SyntaxError {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub enum SyntaxErrorType {
     ExpectedIdentifier,
     ExpectedMethods,

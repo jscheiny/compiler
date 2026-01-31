@@ -3,7 +3,6 @@ use crate::parser::{
     TypeParseNode,
 };
 
-#[derive(Debug)]
 pub struct RecordDefinitionParseNode {
     pub record_type: RecordType,
     pub identifier: ParseNode<IdentifierParseNode>,
@@ -27,13 +26,11 @@ impl Traverse for RecordDefinitionParseNode {
     }
 }
 
-#[derive(Debug)]
 pub enum RecordType {
     Structure,
     Tuple,
 }
 
-#[derive(Debug)]
 pub struct RecordMemberParseNode {
     pub public: bool,
     pub identifier: ParseNode<IdentifierParseNode>,

@@ -1,4 +1,3 @@
-use std::fmt::Debug;
 use std::rc::Rc;
 
 use crate::{
@@ -51,7 +50,7 @@ impl TokenStream {
         self.index >= self.tokens.len() - 1
     }
 
-    pub fn located<P: Debug, E>(
+    pub fn located<P, E>(
         &mut self,
         parse: impl Fn(&mut TokenStream) -> Result<P, E>,
     ) -> Result<ParseNode<P>, E> {
@@ -63,7 +62,7 @@ impl TokenStream {
         })
     }
 
-    pub fn located_with<P: Debug, Arg, E>(
+    pub fn located_with<P, Arg, E>(
         &mut self,
         parse: impl Fn(&mut TokenStream, Arg) -> Result<P, E>,
         arg: Arg,
@@ -76,7 +75,7 @@ impl TokenStream {
         })
     }
 
-    pub fn maybe_located<P: Debug, E>(
+    pub fn maybe_located<P, E>(
         &mut self,
         parse: impl Fn(&mut TokenStream) -> Result<Option<P>, E>,
     ) -> Result<Option<ParseNode<P>>, E> {

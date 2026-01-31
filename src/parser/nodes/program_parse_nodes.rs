@@ -3,7 +3,6 @@ use crate::parser::{
     RecordDefinitionParseNode, TokenSpan, Traverse,
 };
 
-#[derive(Debug)]
 pub struct ProgramParseNode {
     pub definitions: Vec<ParseNode<ModuleTopLevelDefinition>>,
 }
@@ -16,7 +15,6 @@ impl Traverse for ProgramParseNode {
     }
 }
 
-#[derive(Debug)]
 pub struct ModuleTopLevelDefinition {
     pub public: bool,
     pub definition: TopLevelDefinition,
@@ -28,7 +26,6 @@ impl Traverse for ModuleTopLevelDefinition {
     }
 }
 
-#[derive(Debug)]
 pub enum TopLevelDefinition {
     Record(RecordDefinitionParseNode),
     Enum(EnumParseNode),

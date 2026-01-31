@@ -3,7 +3,6 @@ use crate::parser::{
     Traverse, TypeParseNode,
 };
 
-#[derive(Debug)]
 pub struct MethodParseNode {
     pub public: bool,
     pub function: ParseNode<FunctionDefintionParseNode>,
@@ -15,7 +14,6 @@ impl Traverse for MethodParseNode {
     }
 }
 
-#[derive(Debug)]
 pub struct FunctionDefintionParseNode {
     pub identifier: ParseNode<IdentifierParseNode>,
     pub parameters: ParseNodeVec<ParameterParseNode>,
@@ -37,7 +35,6 @@ impl Traverse for FunctionDefintionParseNode {
     }
 }
 
-#[derive(Debug)]
 pub enum FunctionBodyParseNode {
     Expression(ExpressionParseNode),
     Block(BlockParseNode),
@@ -52,7 +49,6 @@ impl Traverse for FunctionBodyParseNode {
     }
 }
 
-#[derive(Debug)]
 pub struct ParameterParseNode {
     pub identifier: ParseNode<IdentifierParseNode>,
     pub type_def: ParseNode<TypeParseNode>,

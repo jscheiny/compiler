@@ -2,7 +2,6 @@ use crate::parser::{
     ExpressionParseNode, IdentifierParseNode, ParseNode, TokenSpan, Traverse, TypeParseNode,
 };
 
-#[derive(Debug)]
 pub enum StatementParseNode {
     BlockReturn(ParseNode<ExpressionParseNode>),
     Break(),
@@ -32,7 +31,6 @@ impl Traverse for StatementParseNode {
     }
 }
 
-#[derive(Debug)]
 pub struct BlockParseNode {
     pub statements: Vec<ParseNode<StatementParseNode>>,
 }
@@ -45,7 +43,6 @@ impl Traverse for BlockParseNode {
     }
 }
 
-#[derive(Debug)]
 pub struct DeclarationParseNode {
     pub mutable: bool,
     pub identifier: ParseNode<IdentifierParseNode>,
@@ -63,7 +60,6 @@ impl Traverse for DeclarationParseNode {
     }
 }
 
-#[derive(Debug)]
 pub struct IfStatementParseNode {
     pub conditions: Vec<ParseNode<IfStatementConditionParseNode>>,
     pub else_branch: Option<ParseNode<BlockParseNode>>,
@@ -80,7 +76,6 @@ impl Traverse for IfStatementParseNode {
     }
 }
 
-#[derive(Debug)]
 pub struct IfStatementConditionParseNode {
     pub predicate: ParseNode<ExpressionParseNode>,
     pub body: ParseNode<BlockParseNode>,
@@ -94,7 +89,6 @@ impl Traverse for IfStatementConditionParseNode {
     }
 }
 
-#[derive(Debug)]
 pub struct WhileLoopParseNode {
     pub predicate: ParseNode<ExpressionParseNode>,
     pub body: ParseNode<BlockParseNode>,

@@ -2,7 +2,6 @@ use crate::parser::{
     BinaryOperator, BlockParseNode, ParseNode, PostfixOperator, PrefixOperator, TokenSpan, Traverse,
 };
 
-#[derive(Debug)]
 pub enum ExpressionParseNode {
     PrefixOp(PrefixOpExpressionParseNode),
     BinaryOp(BinaryOpExpressionParseNode),
@@ -32,7 +31,6 @@ impl Traverse for ParseNode<Box<ExpressionParseNode>> {
     }
 }
 
-#[derive(Debug)]
 pub struct PrefixOpExpressionParseNode {
     pub operator: ParseNode<PrefixOperator>,
     pub expression: ParseNode<Box<ExpressionParseNode>>,
@@ -45,7 +43,6 @@ impl Traverse for PrefixOpExpressionParseNode {
     }
 }
 
-#[derive(Debug)]
 pub struct BinaryOpExpressionParseNode {
     pub left: ParseNode<Box<ExpressionParseNode>>,
     pub operator: ParseNode<BinaryOperator>,
@@ -60,7 +57,6 @@ impl Traverse for BinaryOpExpressionParseNode {
     }
 }
 
-#[derive(Debug)]
 pub struct PostfixOpExpressionParseNode {
     pub expression: ParseNode<Box<ExpressionParseNode>>,
     pub operator: ParseNode<PostfixOperator>,

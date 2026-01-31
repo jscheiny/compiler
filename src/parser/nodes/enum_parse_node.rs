@@ -3,7 +3,6 @@ use crate::parser::{
     TypeParseNode,
 };
 
-#[derive(Debug)]
 pub struct EnumParseNode {
     pub identifier: ParseNode<IdentifierParseNode>,
     pub variants: ParseNodeVec<EnumVariantParseNode>,
@@ -26,7 +25,6 @@ impl Traverse for EnumParseNode {
     }
 }
 
-#[derive(Debug)]
 pub struct EnumVariantParseNode {
     pub identifier: ParseNode<IdentifierParseNode>,
     pub type_def: Option<ParseNode<TypeParseNode>>,

@@ -3,7 +3,6 @@ use crate::parser::{
     TypeParseNode,
 };
 
-#[derive(Debug)]
 pub struct InterfaceDefinitionParseNode {
     pub identifier: ParseNode<IdentifierParseNode>,
     pub method_signatures: ParseNodeVec<MethodSignatureParseNode>,
@@ -19,7 +18,6 @@ impl Traverse for InterfaceDefinitionParseNode {
     }
 }
 
-#[derive(Debug)]
 pub struct MethodSignatureParseNode {
     pub identifier: ParseNode<IdentifierParseNode>,
     pub parameters: ParseNodeVec<ParameterParseNode>,

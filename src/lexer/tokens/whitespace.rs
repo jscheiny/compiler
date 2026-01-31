@@ -1,6 +1,6 @@
 use crate::lexer::{IgnoredToken, Token, TokenWidth, TryTokenizeResult};
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct WhitespaceToken {
     pub new_lines: usize,
     pub columns_since_last_new_line: usize,
