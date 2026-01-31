@@ -62,6 +62,19 @@ impl TokenStream {
         })
     }
 
+    pub fn located_with<P: Debug, Arg, E>(
+        &mut self,
+        parse: impl Fn(&mut TokenStream, Arg) -> Result<P, E>,
+        arg: Arg,
+    ) -> Result<ParseNode<P>, E> {
+        let start_index = self.index;
+        let value = parse(self, arg)?;
+        Ok(ParseNode {
+            value,
+            span: self.span(start_index),
+        })
+    }
+
     pub fn maybe_located<P: Debug, E>(
         &mut self,
         parse: impl Fn(&mut TokenStream) -> Result<Option<P>, E>,
