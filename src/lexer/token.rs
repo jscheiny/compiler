@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use crate::lexer::{
-    CharacterSpan, IdentifierToken, IgnoredToken, IntegerLiteralToken, KeywordToken, OperatorToken,
+    CharacterSpan, IdentifierToken, IntegerLiteralToken, KeywordToken, OperatorToken,
     StringLiteralToken,
 };
 
@@ -24,7 +24,6 @@ pub enum Token {
     StringLiteral(StringLiteralToken),
     Operator(OperatorToken),
     Keyword(KeywordToken),
-    Ignored(IgnoredToken),
     EndOfFile,
 }
 
@@ -36,7 +35,6 @@ impl Display for Token {
             Self::StringLiteral(string_literal) => write!(f, "String:{}", string_literal),
             Self::Operator(operator) => write!(f, "Operator:{}", operator),
             Self::Keyword(keyword) => write!(f, "Keyword:{}", keyword),
-            Self::Ignored(_) => write!(f, "[Ignored]"),
             Self::EndOfFile => write!(f, "[EOF]"),
         }
     }

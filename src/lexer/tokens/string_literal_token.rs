@@ -45,7 +45,7 @@ pub fn try_tokenize_string_literal(text: &str) -> Option<TryTokenizeResult> {
     let string = text[1..width.bytes].to_string();
     width.add_char(DOUBLE_QUOTE);
     Some(TryTokenizeResult {
-        token: Token::StringLiteral(StringLiteralToken(string)),
+        token: Some(Token::StringLiteral(StringLiteralToken(string))),
         width,
     })
 }

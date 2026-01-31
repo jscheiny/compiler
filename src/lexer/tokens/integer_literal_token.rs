@@ -27,7 +27,7 @@ pub fn try_tokenize_integer_literal(text: &str) -> Option<TryTokenizeResult> {
 
     let maybe_value = &text[0..width.bytes].parse::<i64>().ok();
     maybe_value.as_ref().map(|value| TryTokenizeResult {
-        token: Token::IntegerLiteral(IntegerLiteralToken(*value)),
+        token: Some(Token::IntegerLiteral(IntegerLiteralToken(*value))),
         width,
     })
 }

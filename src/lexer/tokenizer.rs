@@ -12,26 +12,14 @@ pub fn tokenize(mut text: &str) -> Vec<LocatedToken> {
         column: 0,
         byte: 0,
     };
-    while let Some(NextToken { token, width, next }) = next_token(text) {
-        let end: CharacterLocation = match token {
-            Token::Ignored(token) => {
-                if token.new_lines == 0 {
-                    start.add_columns(width)
-                } else {
-                    start.add_lines(token, width.bytes)
-                }
-            }
-            token => {
-                let end = CharacterLocation {
-                    line: start.line,
-                    column: start.column + width.characters,
-                    byte: start.byte + width.bytes,
-                };
-                let span = CharacterSpan { start, end };
-                tokens.push(LocatedToken { token, span });
-                end
-            }
-        };
+    while let Some(token) = next_token(text) {
+        println!("{:?}", token.width);
+        let NextToken { token, width, next } = token;
+        let end = start.add(width);
+        if let Some(token) = token {
+            let span = CharacterSpan { start, end };
+            tokens.push(LocatedToken { token, span });
+        }
         start = end;
         text = next;
     }
@@ -50,12 +38,12 @@ pub fn tokenize(mut text: &str) -> Vec<LocatedToken> {
 }
 
 pub struct TryTokenizeResult {
-    pub token: Token,
+    pub token: Option<Token>,
     pub width: TokenWidth,
 }
 
 struct NextToken<'a> {
-    pub token: Token,
+    pub token: Option<Token>,
     pub width: TokenWidth,
     pub next: &'a str,
 }

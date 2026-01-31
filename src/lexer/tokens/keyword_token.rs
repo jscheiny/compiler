@@ -72,7 +72,7 @@ pub fn try_tokenize_keyword(text: &str) -> Option<TryTokenizeResult> {
         let keyword_str = keyword.as_str();
         if text.starts_with(keyword_str) {
             return Some(TryTokenizeResult {
-                token: Token::Keyword(keyword),
+                token: Some(Token::Keyword(keyword)),
                 width: TokenWidth::from(keyword_str),
             });
         }

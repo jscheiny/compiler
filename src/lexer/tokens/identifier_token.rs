@@ -33,7 +33,7 @@ pub fn try_tokenize_identifier(text: &str) -> Option<TryTokenizeResult> {
     }
 
     Some(TryTokenizeResult {
-        token: Token::Identifier(IdentifierToken(identifier)),
+        token: Some(Token::Identifier(IdentifierToken(identifier))),
         width,
     })
 }

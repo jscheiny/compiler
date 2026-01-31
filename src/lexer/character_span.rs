@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::lexer::{IgnoredToken, TokenWidth};
+use crate::lexer::TokenWidth;
 
 #[derive(Clone, Copy)]
 pub struct CharacterSpan {
@@ -22,11 +22,19 @@ pub struct CharacterLocation {
 }
 
 impl CharacterLocation {
-    pub fn add_columns(&self, width: TokenWidth) -> Self {
-        CharacterLocation {
-            line: self.line,
-            column: self.column + width.characters,
-            byte: self.byte + width.bytes,
+    pub fn add(&self, width: TokenWidth) -> Self {
+        if width.new_lines == 0 {
+            CharacterLocation {
+                line: self.line,
+                column: self.column + width.characters,
+                byte: self.byte + width.bytes,
+            }
+        } else {
+            CharacterLocation {
+                line: self.line + width.new_lines,
+                column: width.columns_since_last_new_line,
+                byte: self.byte + width.bytes,
+            }
         }
     }
 
@@ -35,14 +43,6 @@ impl CharacterLocation {
             line: self.line,
             column: self.column + 1,
             byte: self.byte + 1,
-        }
-    }
-
-    pub fn add_lines(&self, token: IgnoredToken, bytes: usize) -> Self {
-        CharacterLocation {
-            line: self.line + token.new_lines,
-            column: token.columns_since_last_new_line,
-            byte: self.byte + bytes,
         }
     }
 }

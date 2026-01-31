@@ -1,1 +1,4 @@
-enum Test()
+struct Test(test: while) {
+    while(while: while) -> x;
+    pub if() -> y;
+}

@@ -100,7 +100,7 @@ pub fn try_tokenize_operator(text: &str) -> Option<TryTokenizeResult> {
         let operator_str = operator.as_str();
         if text.starts_with(operator_str) {
             return Some(TryTokenizeResult {
-                token: Token::Operator(operator),
+                token: Some(Token::Operator(operator)),
                 width: TokenWidth::from(operator_str),
             });
         }

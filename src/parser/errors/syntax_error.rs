@@ -33,7 +33,6 @@ impl SyntaxError {
             Token::Operator(operator) => print!("operator: '{}'", operator.to_string()),
             Token::Keyword(keyword) => print!("keyword: '{}'", keyword.as_str()),
             Token::EndOfFile => print!("end of file"),
-            Token::Ignored(_) => panic!("Ignored token in stream"),
         }
     }
 }
