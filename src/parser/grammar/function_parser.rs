@@ -2,7 +2,7 @@ use crate::{
     lexer::{KeywordToken, OperatorToken, TokenMatch},
     parser::{
         FunctionBodyParseNode, FunctionDefintionParseNode, MethodParseNode, ParameterParseNode,
-        ParseNode, ParseResult, TokenStream,
+        ParseNode, ParseResult, SyntaxErrorType, TokenStream,
         grammar::{block, comma_separated_list, expression, identifier, type_definition},
     },
 };
@@ -15,7 +15,8 @@ pub fn methods(
     } else if tokens.accept(&OperatorToken::EndStatement) {
         Ok(None)
     } else {
-        Err(())
+        tokens.push_error(SyntaxErrorType::ExpectedMethods);
+        Ok(None)
     }
 }
 
@@ -73,7 +74,7 @@ fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyParseNode>
     } else if OperatorToken::OpenBrace.matches(tokens.peek()) {
         Ok(FunctionBodyParseNode::Block(block(tokens)?))
     } else {
-        Err(())
+        Err(tokens.make_error(SyntaxErrorType::Unimplemented))
     }
 }
 

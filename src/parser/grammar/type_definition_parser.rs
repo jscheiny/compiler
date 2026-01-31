@@ -1,8 +1,9 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token},
     parser::{
-        ParseNode, ParseResult, TokenStream, TypeParseNode, UserDefinedTypeParseNode,
-        grammar::{comma_separated_list, identifier},
+        ParseNode, ParseResult, SyntaxError, SyntaxErrorType, TokenStream, TypeParseNode,
+        UserDefinedTypeParseNode,
+        grammar::{comma_separated_list, identifier_parser::identifier_fail},
     },
 };
 
@@ -18,15 +19,18 @@ fn primitive_type(tokens: &mut TokenStream) -> ParseResult<TypeParseNode> {
                 tokens.next();
                 Ok(TypeParseNode::Primitive(keyword))
             }
-            _ => Err(()),
+            _ => Err(tokens.make_error(SyntaxErrorType::ExpectedType)),
         }
     } else {
-        Err(())
+        Err(tokens.make_error(SyntaxErrorType::ExpectedType))
     }
 }
 
 fn user_defined_type(tokens: &mut TokenStream) -> ParseResult<TypeParseNode> {
-    let identifier = tokens.located(identifier)?;
+    let identifier = tokens.located(identifier_fail).map_err(|err| SyntaxError {
+        kind: SyntaxErrorType::ExpectedType,
+        ..err
+    })?;
     let generic_params = tokens.maybe_located(generic_type_params)?;
 
     Ok(TypeParseNode::UserDefined(UserDefinedTypeParseNode {

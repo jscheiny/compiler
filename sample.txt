@@ -1,4 +1,5 @@
-enum Test();
-enum Test() {}
-struct Test();
-struct Test() {}
+enum enum()
+
+struct Test() {
+    test(f: while) -> x;
+}

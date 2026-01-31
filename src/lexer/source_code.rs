@@ -53,12 +53,10 @@ impl SourceCode {
         let suffix = self.span_suffix(end_byte);
 
         println!(
-            "  {} {}:{} -> {}:{}",
+            "  {} {}:{}",
             "-->".cyan().bold(),
             self.path,
             start_character,
-            self.path,
-            end_character,
         );
 
         let lines = body.split('\n').collect::<Vec<_>>();
