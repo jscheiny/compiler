@@ -12,21 +12,43 @@ pub fn tokenize(mut text: &str) -> Vec<LocatedToken> {
         column: 0,
         byte: 0,
     };
-    while let Some(token) = next_token(text) {
-        println!("{:?}", token.width);
-        let NextToken { token, width, next } = token;
-        let end = start.add(width);
-        if let Some(token) = token {
-            let span = CharacterSpan { start, end };
-            tokens.push(LocatedToken { token, span });
+
+    while !text.is_empty() {
+        while let Some(token) = next_token(text) {
+            let NextToken { token, width, next } = token;
+            let end = start.add(width);
+            if let Some(token) = token {
+                let span = CharacterSpan { start, end };
+                tokens.push(LocatedToken { token, span });
+            }
+            start = end;
+            text = next;
         }
-        start = end;
-        text = next;
+
+        let mut bad_token_start = 0;
+        loop {
+            let slice = &text[bad_token_start..];
+            if slice.is_empty() {
+                break;
+            }
+            let token = next_token(slice);
+            if token.is_some() {
+                break;
+            }
+            bad_token_start += 1;
+        }
+
+        let bad_token = &text[..bad_token_start];
+        start = start.add(TokenWidth::from(bad_token));
+        text = &text[bad_token_start..];
+        // TODO produce error with this
     }
+
     if !text.is_empty() {
         println!("{}", text);
         panic!("Tokenizer error");
     }
+
     tokens.push(LocatedToken {
         token: Token::EndOfFile,
         span: CharacterSpan {
