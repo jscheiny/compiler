@@ -5,7 +5,13 @@ use crate::lexer::{
     try_tokenize_whitespace,
 };
 
-pub fn tokenize(mut text: &str) -> Vec<LocatedToken> {
+pub struct TokenizerResult {
+    pub tokens: Vec<LocatedToken>,
+    pub errors: Vec<CharacterSpan>,
+}
+
+pub fn tokenize(mut text: &str) -> TokenizerResult {
+    let mut errors = vec![];
     let mut tokens = vec![];
     let mut start: CharacterLocation = CharacterLocation {
         line: 0,
@@ -39,14 +45,12 @@ pub fn tokenize(mut text: &str) -> Vec<LocatedToken> {
         }
 
         let bad_token = &text[..bad_token_start];
-        start = start.add(TokenWidth::from(bad_token));
-        text = &text[bad_token_start..];
-        // TODO produce error with this
-    }
-
-    if !text.is_empty() {
-        println!("{}", text);
-        panic!("Tokenizer error");
+        if !bad_token.is_empty() {
+            let end = start.add(TokenWidth::from(bad_token));
+            errors.push(CharacterSpan { start, end });
+            start = end;
+            text = &text[bad_token_start..];
+        }
     }
 
     tokens.push(LocatedToken {
@@ -56,7 +60,7 @@ pub fn tokenize(mut text: &str) -> Vec<LocatedToken> {
             end: start.add_byte(),
         },
     });
-    tokens
+    TokenizerResult { tokens, errors }
 }
 
 pub struct TryTokenizeResult {

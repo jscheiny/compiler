@@ -23,20 +23,29 @@ fn main() {
     if let Err(syntax_err) = result {
         tokens.errors.push(syntax_err);
     }
+
+    let error_count = tokens.errors.len() + source.tokenizer_errors.len();
     println!(
         "Found {} {}\n",
-        tokens.errors.len().to_string().cyan().red(),
+        error_count.to_string().cyan().red(),
         if tokens.errors.len() == 1 {
             "error"
         } else {
             "errors"
         },
     );
+
+    for error in source.tokenizer_errors.iter() {
+        println!("{} unexpected token", "Error:".red().bold());
+        source.print_character_span(*error, '^', "unexpected token", Severity::Error);
+        println!();
+    }
+
     for error in tokens.errors {
         print!("{} ", "Error:".red().bold());
         error.print(source.tokens.as_ref());
         println!();
-        source.print_span(
+        source.print_token_span(
             error.span,
             '^',
             error.kind.to_string().as_str(),

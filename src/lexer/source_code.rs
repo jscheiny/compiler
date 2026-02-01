@@ -2,13 +2,14 @@ use colored::{ColoredString, Colorize};
 use std::{cmp::min, error::Error, fs::read_to_string, rc::Rc};
 
 use crate::{
-    lexer::{LocatedToken, tokenize},
+    lexer::{CharacterSpan, LocatedToken, TokenizerResult, tokenize},
     parser::{TokenSpan, TokenStream},
 };
 
 pub struct SourceCode {
     pub path: String,
     pub tokens: Rc<Vec<LocatedToken>>,
+    pub tokenizer_errors: Vec<CharacterSpan>,
     pub source: String,
 }
 
@@ -22,11 +23,12 @@ pub enum Severity {
 impl SourceCode {
     pub fn read(path: &str) -> Result<Self, Box<dyn Error>> {
         let source = read_to_string(path)?;
-        let tokens = Rc::new(tokenize(&source));
+        let TokenizerResult { tokens, errors } = tokenize(&source);
         let path = path.to_owned();
         Ok(SourceCode {
             path,
-            tokens,
+            tokens: Rc::new(tokens),
+            tokenizer_errors: errors,
             source,
         })
     }
@@ -41,11 +43,31 @@ impl SourceCode {
         start_line == end_line
     }
 
-    pub fn print_span(&self, span: TokenSpan, underline: char, message: &str, severity: Severity) {
-        let start_character = &self.tokens[span.start_index].span.start;
-        let start_byte = start_character.byte;
+    pub fn print_token_span(
+        &self,
+        span: TokenSpan,
+        underline: char,
+        message: &str,
+        severity: Severity,
+    ) {
+        let start = self.tokens[span.start_index].span.start;
+        let end = self.tokens[span.end_index].span.end;
+        let character_span = CharacterSpan { start, end };
+        self.print_character_span(character_span, underline, message, severity);
+    }
 
-        let end_character = &self.tokens[span.end_index].span.end;
+    pub fn print_character_span(
+        &self,
+        span: CharacterSpan,
+        underline: char,
+        message: &str,
+        severity: Severity,
+    ) {
+        let CharacterSpan {
+            start: start_character,
+            end: end_character,
+        } = span;
+        let start_byte = start_character.byte;
         let end_byte = end_character.byte;
         let end_byte_clamped = min(end_byte, self.source.len());
 
@@ -106,7 +128,7 @@ impl SourceCode {
             ""
         } else {
             let suffix = &self.source[end_byte..];
-            let end_line_byte = suffix.find('\n').unwrap_or(suffix.len() - 1);
+            let end_line_byte = suffix.find('\n').unwrap_or(suffix.len());
             &suffix[..end_line_byte]
         }
     }
