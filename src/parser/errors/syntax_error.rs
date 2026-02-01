@@ -13,10 +13,8 @@ pub struct SyntaxError {
 impl SyntaxError {
     pub fn print(&self, tokens: &Vec<LocatedToken>) {
         match self.kind {
-            SyntaxErrorType::ExpectedIdentifier
-            | SyntaxErrorType::ExpectedMethods
-            | SyntaxErrorType::ExpectedType => {
-                print!("{}", self.kind);
+            SyntaxErrorType::Expected(expected) => {
+                print!("{}", expected);
                 self.print_found_token(tokens);
             }
             SyntaxErrorType::Unimplemented => print!("Unimplemented syntax error type"),
@@ -39,23 +37,36 @@ impl SyntaxError {
 
 #[derive(Clone, Copy)]
 pub enum SyntaxErrorType {
-    ExpectedIdentifier,
-    ExpectedMethods,
-    ExpectedType,
+    Expected(ExpectedSyntax),
     Unimplemented,
 }
 
 impl Display for SyntaxErrorType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::ExpectedIdentifier => write!(f, "expected identifier"),
-            Self::ExpectedMethods => write!(
+            Self::Expected(expected) => write!(f, "{}", expected),
+            Self::Unimplemented => write!(f, "Unimplemented syntax error type"),
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+pub enum ExpectedSyntax {
+    Identifier,
+    Methods,
+    Type,
+}
+
+impl Display for ExpectedSyntax {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Identifier => write!(f, "expected identifier"),
+            Self::Methods => write!(
                 f,
                 "expected methods block or `{}`",
                 OperatorToken::EndStatement,
             ),
-            Self::ExpectedType => write!(f, "expected type"),
-            Self::Unimplemented => write!(f, "Unimplemented syntax error type"),
+            Self::Type => write!(f, "expected type"),
         }
     }
 }

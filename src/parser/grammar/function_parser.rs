@@ -1,8 +1,8 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, TokenMatch},
     parser::{
-        FunctionBodyParseNode, FunctionDefintionParseNode, MethodParseNode, ParameterParseNode,
-        ParseNode, ParseResult, SyntaxErrorType, TokenStream,
+        ExpectedSyntax, FunctionBodyParseNode, FunctionDefintionParseNode, MethodParseNode,
+        ParameterParseNode, ParseNode, ParseResult, SyntaxErrorType, TokenStream,
         grammar::{block, comma_separated_list, expression, identifier, type_definition},
     },
 };
@@ -15,7 +15,7 @@ pub fn methods(
     } else if tokens.accept(&OperatorToken::EndStatement) {
         Ok(None)
     } else {
-        tokens.push_error(SyntaxErrorType::ExpectedMethods);
+        tokens.push_error(SyntaxErrorType::Expected(ExpectedSyntax::Methods));
         Ok(None)
     }
 }

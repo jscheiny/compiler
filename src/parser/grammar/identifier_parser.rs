@@ -1,10 +1,13 @@
 use crate::{
     lexer::{IdentifierToken, Token},
-    parser::{IdentifierParseNode, ParseResult, SyntaxErrorType, TokenStream},
+    parser::{ExpectedSyntax, IdentifierParseNode, ParseResult, SyntaxErrorType, TokenStream},
 };
 
 pub fn identifier(tokens: &mut TokenStream) -> ParseResult<IdentifierParseNode> {
-    identifier_with(tokens, SyntaxErrorType::ExpectedIdentifier)
+    identifier_with(
+        tokens,
+        SyntaxErrorType::Expected(ExpectedSyntax::Identifier),
+    )
 }
 
 pub fn identifier_with(
