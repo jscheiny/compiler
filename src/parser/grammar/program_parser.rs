@@ -1,7 +1,7 @@
 use crate::{
     lexer::{KeywordToken, Token},
     parser::{
-        ModuleTopLevelDefinition, ParseResult, ProgramParseNode, SyntaxErrorType, TokenStream,
+        ModuleTopLevelDefinition, ParseResult, ProgramParseNode, SyntaxError, TokenStream,
         TopLevelDefinition,
         grammar::{enumeration, interface, structure, top_level_function, tuple},
     },
@@ -31,9 +31,9 @@ fn top_level_definition(tokens: &mut TokenStream) -> ParseResult<TopLevelDefinit
             K::Enum => Ok(TopLevelDefinition::Enum(enumeration(tokens)?)),
             K::Interface => Ok(TopLevelDefinition::Interface(interface(tokens)?)),
             K::Fn => Ok(TopLevelDefinition::Function(top_level_function(tokens)?)),
-            _ => Err(tokens.make_error(SyntaxErrorType::Unimplemented)),
+            _ => Err(tokens.make_error(SyntaxError::Unimplemented)),
         }
     } else {
-        Err(tokens.make_error(SyntaxErrorType::Unimplemented))
+        Err(tokens.make_error(SyntaxError::Unimplemented))
     }
 }

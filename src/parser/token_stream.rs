@@ -2,13 +2,13 @@ use std::rc::Rc;
 
 use crate::{
     lexer::{LocatedToken, Token, TokenMatch},
-    parser::{ParseNode, SyntaxError, SyntaxErrorType, TokenSpan},
+    parser::{LocatedSyntaxError, ParseNode, ParseResult, SyntaxError, TokenSpan},
 };
 
 pub struct TokenStream {
     tokens: Rc<Vec<LocatedToken>>,
     index: usize,
-    pub errors: Vec<SyntaxError>,
+    pub errors: Vec<LocatedSyntaxError>,
 }
 
 impl TokenStream {
@@ -29,11 +29,11 @@ impl TokenStream {
         }
     }
 
-    pub fn expect(&mut self, predicate: &impl TokenMatch) -> Result<(), SyntaxError> {
+    pub fn expect(&mut self, predicate: &impl TokenMatch) -> ParseResult<()> {
         if self.accept(predicate) {
             Ok(())
         } else {
-            Err(self.make_error(SyntaxErrorType::Unimplemented))
+            Err(self.make_error(SyntaxError::Unimplemented))
         }
     }
 
@@ -101,14 +101,14 @@ impl TokenStream {
         }
     }
 
-    pub fn push_error(&mut self, kind: SyntaxErrorType) {
+    pub fn push_error(&mut self, kind: SyntaxError) {
         self.errors.push(self.make_error(kind));
     }
 
-    pub fn make_error(&self, kind: SyntaxErrorType) -> SyntaxError {
-        SyntaxError {
+    pub fn make_error(&self, kind: SyntaxError) -> LocatedSyntaxError {
+        LocatedSyntaxError {
             span: self.current_span(),
-            kind,
+            error: kind,
         }
     }
 }

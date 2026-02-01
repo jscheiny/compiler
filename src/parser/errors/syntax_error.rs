@@ -5,19 +5,19 @@ use crate::{
     parser::TokenSpan,
 };
 
-pub struct SyntaxError {
+pub struct LocatedSyntaxError {
     pub span: TokenSpan,
-    pub kind: SyntaxErrorType,
+    pub error: SyntaxError,
 }
 
-impl SyntaxError {
+impl LocatedSyntaxError {
     pub fn print(&self, tokens: &Vec<LocatedToken>) {
-        match self.kind {
-            SyntaxErrorType::Expected(expected) => {
+        match self.error {
+            SyntaxError::Expected(expected) => {
                 print!("{}", expected);
                 self.print_found_token(tokens);
             }
-            SyntaxErrorType::Unimplemented => print!("Unimplemented syntax error type"),
+            SyntaxError::Unimplemented => print!("Unimplemented syntax error type"),
         }
     }
 
@@ -36,12 +36,12 @@ impl SyntaxError {
 }
 
 #[derive(Clone, Copy)]
-pub enum SyntaxErrorType {
+pub enum SyntaxError {
     Expected(ExpectedSyntax),
     Unimplemented,
 }
 
-impl Display for SyntaxErrorType {
+impl Display for SyntaxError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Expected(expected) => write!(f, "{}", expected),

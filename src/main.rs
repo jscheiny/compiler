@@ -48,7 +48,7 @@ fn main() {
         source.print_token_span(
             error.span,
             '^',
-            error.kind.to_string().as_str(),
+            error.error.to_string().as_str(),
             Severity::Error,
         );
         println!();

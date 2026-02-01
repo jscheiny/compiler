@@ -1,3 +1,3 @@
-use crate::parser::SyntaxError;
+use crate::parser::LocatedSyntaxError;
 
-pub type ParseResult<T> = Result<T, SyntaxError>;
+pub type ParseResult<T> = Result<T, LocatedSyntaxError>;
