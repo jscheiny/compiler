@@ -52,6 +52,7 @@ impl Display for SyntaxError {
 
 #[derive(Clone, Copy)]
 pub enum ExpectedSyntax {
+    CloseParen,
     FunctionBody,
     Identifier,
     Members,
@@ -65,6 +66,7 @@ impl Display for ExpectedSyntax {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         use OperatorToken as O;
         match self {
+            Self::CloseParen => write!(f, "closing parenthesis"),
             Self::FunctionBody => write!(
                 f,
                 "function body with `{}` or `{}`",

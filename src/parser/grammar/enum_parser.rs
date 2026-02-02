@@ -37,7 +37,10 @@ fn enum_variant(tokens: &mut TokenStream) -> ParseResult<EnumVariantParseNode> {
     let identifier = tokens.located(identifier)?;
     let type_def = if tokens.accept(&OperatorToken::OpenParen) {
         let type_def = tokens.located(type_definition)?;
-        tokens.expect(&OperatorToken::CloseParen, SyntaxError::Unimplemented)?;
+        tokens.expect(
+            &OperatorToken::CloseParen,
+            SyntaxError::Expected(ExpectedSyntax::CloseParen),
+        )?;
         Some(type_def)
     } else {
         None

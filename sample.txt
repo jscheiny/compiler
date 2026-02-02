@@ -1,3 +1,7 @@
-enum X {
+enum X(
+    Test(x,
+    Test(y
+
+) {
     while() {}
 }
