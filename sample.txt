@@ -1,7 +1,3 @@
-enum X(
-    Test(x,
-    Test(y
+fn test() -> x
 
-) {
-    while() {}
-}
+fn program() -> x

@@ -53,6 +53,7 @@ impl Display for SyntaxError {
 #[derive(Clone, Copy)]
 pub enum ExpectedSyntax {
     CloseParen,
+    EndStatement,
     FunctionBody,
     Identifier,
     Members,
@@ -67,6 +68,7 @@ impl Display for ExpectedSyntax {
         use OperatorToken as O;
         match self {
             Self::CloseParen => write!(f, "closing parenthesis"),
+            Self::EndStatement => write!(f, "`{}`", O::EndStatement),
             Self::FunctionBody => write!(
                 f,
                 "function body with `{}` or `{}`",

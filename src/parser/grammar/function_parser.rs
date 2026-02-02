@@ -69,7 +69,11 @@ fn function(
 fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyParseNode> {
     if tokens.accept(&OperatorToken::FunctionDefinition) {
         let expression = expression(tokens)?;
-        tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
+        if OperatorToken::EndStatement.matches(tokens.peek()) {
+            tokens.next();
+        } else {
+            tokens.push_error(SyntaxError::Expected(ExpectedSyntax::EndStatement));
+        }
         Ok(FunctionBodyParseNode::Expression(expression))
     } else if OperatorToken::OpenBrace.matches(tokens.peek()) {
         Ok(FunctionBodyParseNode::Block(block(tokens)?))
