@@ -3,3 +3,5 @@ interface Test {
     invalid(a);
     if(b: T);
 }
+
+fn test () -> while;

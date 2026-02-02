@@ -54,6 +54,7 @@ impl Display for SyntaxError {
 pub enum ExpectedSyntax {
     CloseParen,
     EndStatement,
+    Expression,
     FunctionBody,
     Identifier,
     Members,
@@ -72,6 +73,7 @@ impl Display for ExpectedSyntax {
         match self {
             Self::CloseParen => write!(f, "closing parenthesis"),
             Self::EndStatement => write!(f, "`{}`", O::EndStatement),
+            Self::Expression => write!(f, "expression"),
             Self::FunctionBody => write!(
                 f,
                 "function body with `{}` or `{}`",
