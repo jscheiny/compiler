@@ -1,8 +1,8 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token, TokenMatch},
     parser::{
-        DeclarationParseNode, ExpressionParseNode, IfStatementConditionParseNode,
-        IfStatementParseNode, ParseResult, StatementParseNode, SyntaxError, TokenStream,
+        DeclarationParseNode, ExpectedSyntax, ExpressionParseNode, IfStatementConditionParseNode,
+        IfStatementParseNode, ParseNode, ParseResult, StatementParseNode, SyntaxError, TokenStream,
         WhileLoopParseNode,
         grammar::{block, expression, identifier, type_definition},
     },
@@ -38,15 +38,29 @@ fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<Statement
         None
     };
 
-    tokens.expect(&OperatorToken::Assign, SyntaxError::Unimplemented)?;
-    let expression = tokens.located(expression)?;
+    let initializer = initializer(tokens)?;
     tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
     Ok(StatementParseNode::Declaration(DeclarationParseNode {
         mutable,
         identifier,
         type_def,
-        expression,
+        initializer,
     }))
+}
+
+fn initializer(tokens: &mut TokenStream) -> ParseResult<Option<ParseNode<ExpressionParseNode>>> {
+    let error = SyntaxError::Expected(ExpectedSyntax::Initializer);
+    match tokens.peek() {
+        Token::Operator(OperatorToken::Assign) => {
+            tokens.next();
+            Ok(Some(tokens.located(expression)?))
+        }
+        Token::Operator(OperatorToken::EndStatement) => {
+            tokens.push_error(error);
+            Ok(None)
+        }
+        _ => Err(tokens.make_error(error)),
+    }
 }
 
 fn function_return(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {

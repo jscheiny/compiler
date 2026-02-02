@@ -58,6 +58,7 @@ pub enum ExpectedSyntax {
     Expression,
     FunctionBody,
     Identifier,
+    Initializer,
     Members,
     Methods,
     MethodSignatures,
@@ -82,8 +83,9 @@ impl Display for ExpectedSyntax {
                 O::FunctionDefinition,
                 O::OpenBrace
             ),
-            Self::Members => write!(f, "members"),
             Self::Identifier => write!(f, "identifier"),
+            Self::Initializer => write!(f, "initializer with `{}`", O::Assign),
+            Self::Members => write!(f, "members"),
             Self::Methods => write!(f, "methods block or `{}`", O::EndStatement),
             Self::MethodSignatures => write!(f, "method signatures block"),
             Self::Parameters => write!(f, "function parameters with `{}`", O::OpenParen),

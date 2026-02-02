@@ -1,3 +1,7 @@
 fn test () {
-    while x;
+    let x while;
+}
+
+fn while() {
+
 }

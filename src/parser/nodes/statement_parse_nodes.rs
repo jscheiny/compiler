@@ -47,7 +47,7 @@ pub struct DeclarationParseNode {
     pub mutable: bool,
     pub identifier: ParseNode<IdentifierParseNode>,
     pub type_def: Option<ParseNode<TypeParseNode>>,
-    pub expression: ParseNode<ExpressionParseNode>,
+    pub initializer: Option<ParseNode<ExpressionParseNode>>,
 }
 
 impl Traverse for DeclarationParseNode {
@@ -56,7 +56,9 @@ impl Traverse for DeclarationParseNode {
         if let Some(type_def) = self.type_def.as_ref() {
             type_def.traverse("Declaration.type", visit);
         }
-        self.expression.traverse("Declaration.expression", visit);
+        if let Some(expression) = self.initializer.as_ref() {
+            expression.traverse("Declaration.expression", visit);
+        }
     }
 }
 
