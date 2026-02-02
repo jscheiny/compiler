@@ -1,4 +1,8 @@
-struct Test(test: while) {
-    while(while: while) -> x;
-    pub if() -> y;
-}!!!struct S(){ test fn()}
+struct S() {
+    pub test(): test;
+}
+
+enum Neat() {
+    pub test();
+    test();
+}

@@ -1,8 +1,8 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, TokenMatch},
     parser::{
-        ExpectedSyntax, FunctionBodyParseNode, FunctionDefintionParseNode, MethodParseNode,
-        ParameterParseNode, ParseNode, ParseResult, SyntaxError, TokenStream,
+        ExpectedSyntax, ExpressionParseNode, FunctionBodyParseNode, FunctionDefintionParseNode,
+        MethodParseNode, ParameterParseNode, ParseNode, ParseResult, SyntaxError, TokenStream,
         grammar::{block, comma_separated_list, expression, identifier, type_definition},
     },
 };
@@ -73,8 +73,14 @@ fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyParseNode>
         Ok(FunctionBodyParseNode::Expression(expression))
     } else if OperatorToken::OpenBrace.matches(tokens.peek()) {
         Ok(FunctionBodyParseNode::Block(block(tokens)?))
+    } else if OperatorToken::EndStatement.matches(tokens.peek()) {
+        tokens.push_error(SyntaxError::Expected(ExpectedSyntax::FunctionBody));
+        tokens.next();
+        Ok(FunctionBodyParseNode::Expression(
+            ExpressionParseNode::Error,
+        ))
     } else {
-        Err(tokens.make_error(SyntaxError::Unimplemented))
+        Err(tokens.make_error(SyntaxError::Expected(ExpectedSyntax::FunctionBody)))
     }
 }
 

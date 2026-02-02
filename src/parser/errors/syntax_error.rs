@@ -13,8 +13,8 @@ pub struct LocatedSyntaxError {
 impl LocatedSyntaxError {
     pub fn print(&self, tokens: &Vec<LocatedToken>) {
         match self.error {
-            SyntaxError::Expected(expected) => {
-                print!("{}", expected);
+            SyntaxError::Expected(_) => {
+                print!("{}", self.error);
                 self.print_found_token(tokens);
             }
             SyntaxError::Unimplemented => print!("Unimplemented syntax error type"),
@@ -44,7 +44,7 @@ pub enum SyntaxError {
 impl Display for SyntaxError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Expected(expected) => write!(f, "{}", expected),
+            Self::Expected(expected) => write!(f, "expected {}", expected),
             Self::Unimplemented => write!(f, "Unimplemented syntax error type"),
         }
     }
@@ -55,18 +55,22 @@ pub enum ExpectedSyntax {
     Identifier,
     Methods,
     Type,
+    FunctionBody,
 }
 
 impl Display for ExpectedSyntax {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        use OperatorToken as O;
         match self {
-            Self::Identifier => write!(f, "expected identifier"),
-            Self::Methods => write!(
+            Self::Identifier => write!(f, "identifier"),
+            Self::Methods => write!(f, "methods block or `{}`", O::EndStatement),
+            Self::FunctionBody => write!(
                 f,
-                "expected methods block or `{}`",
-                OperatorToken::EndStatement,
+                "function body with `{}` or `{}`",
+                O::FunctionDefinition,
+                O::OpenBrace
             ),
-            Self::Type => write!(f, "expected type"),
+            Self::Type => write!(f, "type"),
         }
     }
 }

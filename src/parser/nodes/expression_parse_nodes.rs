@@ -10,6 +10,7 @@ pub enum ExpressionParseNode {
     IntegerLiteral(i64),
     Block(BlockParseNode),
     Identifier(String),
+    Error,
 }
 
 impl Traverse for ExpressionParseNode {
@@ -19,7 +20,10 @@ impl Traverse for ExpressionParseNode {
             Self::BinaryOp(node) => node.traverse(visit),
             Self::PostfixOp(node) => node.traverse(visit),
             Self::Block(node) => node.traverse(visit),
-            Self::StringLiteral(_) | Self::IntegerLiteral(_) | Self::Identifier(_) => {}
+            Self::StringLiteral(_)
+            | Self::IntegerLiteral(_)
+            | Self::Identifier(_)
+            | Self::Error => {}
         }
     }
 }
