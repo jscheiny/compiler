@@ -50,7 +50,10 @@ fn members(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<RecordMemberPa
 fn member(tokens: &mut TokenStream) -> ParseResult<RecordMemberParseNode> {
     let public = tokens.accept(&KeywordToken::Pub);
     let identifier = tokens.located(identifier)?;
-    tokens.expect(&OperatorToken::Type, SyntaxError::Unimplemented)?;
+    tokens.expect(
+        &OperatorToken::Type,
+        SyntaxError::Expected(ExpectedSyntax::Type),
+    )?;
     let type_def = tokens.located(type_definition)?;
     Ok(RecordMemberParseNode {
         public,
