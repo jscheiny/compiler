@@ -52,6 +52,7 @@ impl Display for SyntaxError {
 
 #[derive(Clone, Copy)]
 pub enum ExpectedSyntax {
+    Block,
     CloseParen,
     EndStatement,
     Expression,
@@ -71,6 +72,7 @@ impl Display for ExpectedSyntax {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         use OperatorToken as O;
         match self {
+            Self::Block => write!(f, "`{}`", O::OpenBrace),
             Self::CloseParen => write!(f, "closing parenthesis"),
             Self::EndStatement => write!(f, "`{}`", O::EndStatement),
             Self::Expression => write!(f, "expression"),

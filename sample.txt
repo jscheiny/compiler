@@ -1,7 +1,3 @@
-interface Test {
-    valid(): T
-    invalid(a): int
-    if(b: T)
+fn test () {
+    while x;
 }
-
-fn test () -> while;
