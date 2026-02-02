@@ -107,11 +107,23 @@ pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<Paramet
 
 fn parameter(tokens: &mut TokenStream) -> ParseResult<ParameterParseNode> {
     let identifier = tokens.located(identifier)?;
-    tokens.expect(&OperatorToken::Type, SyntaxError::Unimplemented)?;
-    let type_def = tokens.located(type_definition)?;
-
-    Ok(ParameterParseNode {
-        identifier,
-        type_def,
-    })
+    let error = SyntaxError::Expected(ExpectedSyntax::Type);
+    match tokens.peek() {
+        Token::Operator(OperatorToken::Type) => {
+            tokens.next();
+            let type_def = Some(tokens.located(type_definition)?);
+            Ok(ParameterParseNode {
+                identifier,
+                type_def,
+            })
+        }
+        Token::Operator(OperatorToken::Comma) | Token::Operator(OperatorToken::CloseParen) => {
+            tokens.push_error(error);
+            Ok(ParameterParseNode {
+                identifier,
+                type_def: None,
+            })
+        }
+        _ => Err(tokens.make_error(error)),
+    }
 }

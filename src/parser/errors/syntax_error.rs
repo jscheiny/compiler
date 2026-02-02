@@ -25,11 +25,11 @@ impl LocatedSyntaxError {
         let LocatedToken { token, .. } = &tokens[self.span.start_index];
         print!(", found ");
         match token {
-            Token::Identifier(identifier) => print!("identifier '{}'", identifier),
-            Token::IntegerLiteral(literal) => print!("integer literal '{}'", literal),
+            Token::Identifier(identifier) => print!("identifier `{}`", identifier),
+            Token::IntegerLiteral(literal) => print!("integer literal `{}`", literal),
             Token::StringLiteral(literal) => print!("string literal {}", literal),
-            Token::Operator(operator) => print!("operator: '{}'", operator.to_string()),
-            Token::Keyword(keyword) => print!("keyword: '{}'", keyword.as_str()),
+            Token::Operator(operator) => print!("operator: `{}`", operator.to_string()),
+            Token::Keyword(keyword) => print!("keyword: `{}`", keyword.as_str()),
             Token::EndOfFile => print!("end of file"),
         }
     }

@@ -1,3 +1,5 @@
-struct Test(a, b, c) {
-    fn() x;
+fn test(a,b,c){
+    while while {
+        
+    }
 }
