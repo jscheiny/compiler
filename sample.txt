@@ -1,3 +1,7 @@
-fn test() -> x
+fn test -> x
 
-fn program() -> x
+fn program {
+    while while {
+
+    }
+}

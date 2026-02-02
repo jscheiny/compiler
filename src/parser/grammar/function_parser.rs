@@ -1,5 +1,5 @@
 use crate::{
-    lexer::{KeywordToken, OperatorToken, TokenMatch},
+    lexer::{KeywordToken, OperatorToken, Token, TokenMatch},
     parser::{
         ExpectedSyntax, ExpressionParseNode, FunctionBodyParseNode, FunctionDefintionParseNode,
         MethodParseNode, ParameterParseNode, ParseNode, ParseResult, SyntaxError, TokenStream,
@@ -89,9 +89,20 @@ fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyParseNode>
 }
 
 pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<ParameterParseNode>>> {
-    tokens.expect(&OperatorToken::OpenParen, SyntaxError::Unimplemented)?;
-    let list = comma_separated_list(tokens, OperatorToken::CloseParen, parameter)?;
-    Ok(list)
+    let error = SyntaxError::Expected(ExpectedSyntax::Parameters);
+    use OperatorToken as O;
+    match tokens.peek() {
+        Token::Operator(O::OpenParen) => {
+            tokens.next();
+            let list = comma_separated_list(tokens, O::CloseParen, parameter)?;
+            Ok(list)
+        }
+        Token::Operator(O::FunctionDefinition) | Token::Operator(O::OpenBrace) => {
+            tokens.push_error(error);
+            Ok(vec![])
+        }
+        _ => Err(tokens.make_error(error)),
+    }
 }
 
 fn parameter(tokens: &mut TokenStream) -> ParseResult<ParameterParseNode> {
