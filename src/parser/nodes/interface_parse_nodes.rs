@@ -21,7 +21,7 @@ impl Traverse for InterfaceDefinitionParseNode {
 pub struct MethodSignatureParseNode {
     pub identifier: ParseNode<IdentifierParseNode>,
     pub parameters: ParseNodeVec<ParameterParseNode>,
-    pub return_type: ParseNode<TypeParseNode>,
+    pub return_type: Option<ParseNode<TypeParseNode>>,
 }
 
 impl Traverse for MethodSignatureParseNode {
@@ -31,6 +31,8 @@ impl Traverse for MethodSignatureParseNode {
         for parameter in self.parameters.value.iter() {
             parameter.traverse("MethodSignature.parameter", visit);
         }
-        self.return_type.traverse("MethodSignature.return", visit);
+        if let Some(return_type) = self.return_type.as_ref() {
+            return_type.traverse("MethodSignature.return", visit);
+        }
     }
 }

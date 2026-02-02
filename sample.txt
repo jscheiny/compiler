@@ -1,5 +1,5 @@
-interface Test;
-
-fn test(a) {
-    
+interface Test {
+    valid();
+    invalid(a);
+    if(b: T);
 }

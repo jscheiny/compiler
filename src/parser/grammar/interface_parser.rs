@@ -2,7 +2,7 @@ use crate::{
     lexer::{OperatorToken, Token},
     parser::{
         ExpectedSyntax, InterfaceDefinitionParseNode, MethodSignatureParseNode, ParseNode,
-        ParseResult, SyntaxError, TokenStream,
+        ParseResult, SyntaxError, TokenStream, TypeParseNode,
         grammar::{identifier, parameters, type_definition},
     },
 };
@@ -42,12 +42,26 @@ fn method_signatures(
 fn method_signature(tokens: &mut TokenStream) -> ParseResult<MethodSignatureParseNode> {
     let identifier = tokens.located(identifier)?;
     let parameters = tokens.located(parameters)?;
-    tokens.expect(&OperatorToken::Type, SyntaxError::Unimplemented)?;
-    let return_type = tokens.located(type_definition)?;
+    let return_type = return_type(tokens)?;
     tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
     Ok(MethodSignatureParseNode {
         identifier,
         parameters,
         return_type,
     })
+}
+
+fn return_type(tokens: &mut TokenStream) -> ParseResult<Option<ParseNode<TypeParseNode>>> {
+    let error = SyntaxError::Expected(ExpectedSyntax::ReturnType);
+    match tokens.peek() {
+        Token::Operator(OperatorToken::Type) => {
+            tokens.next();
+            Ok(Some(tokens.located(type_definition)?))
+        }
+        Token::Operator(OperatorToken::EndStatement) => {
+            tokens.push_error(error);
+            Ok(None)
+        }
+        _ => Err(tokens.make_error(error)),
+    }
 }
