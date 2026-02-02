@@ -71,7 +71,7 @@ impl Display for ExpectedSyntax {
             ),
             Self::Identifier => write!(f, "identifier"),
             Self::Methods => write!(f, "methods block or `{}`", O::EndStatement),
-            Self::TopLevelDefinition => write!(f, "struct, tuple, enum or function"),
+            Self::TopLevelDefinition => write!(f, "struct, tuple, enum, or function"),
             Self::Type => write!(f, "type"),
         }
     }

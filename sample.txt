@@ -6,3 +6,5 @@ enum Neat() {
     pub test();
     test();
 }
+
+neato
