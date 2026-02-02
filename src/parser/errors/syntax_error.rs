@@ -54,6 +54,7 @@ impl Display for SyntaxError {
 pub enum ExpectedSyntax {
     FunctionBody,
     Identifier,
+    Members,
     Methods,
     TopLevelDefinition,
     Type,
@@ -69,6 +70,7 @@ impl Display for ExpectedSyntax {
                 O::FunctionDefinition,
                 O::OpenBrace
             ),
+            Self::Members => write!(f, "members"),
             Self::Identifier => write!(f, "identifier"),
             Self::Methods => write!(f, "methods block or `{}`", O::EndStatement),
             Self::TopLevelDefinition => write!(f, "struct, tuple, enum, or function"),
