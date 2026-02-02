@@ -50,14 +50,25 @@ fn members(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<RecordMemberPa
 fn member(tokens: &mut TokenStream) -> ParseResult<RecordMemberParseNode> {
     let public = tokens.accept(&KeywordToken::Pub);
     let identifier = tokens.located(identifier)?;
-    tokens.expect(
-        &OperatorToken::Type,
-        SyntaxError::Expected(ExpectedSyntax::Type),
-    )?;
-    let type_def = tokens.located(type_definition)?;
-    Ok(RecordMemberParseNode {
-        public,
-        identifier,
-        type_def,
-    })
+    let error = SyntaxError::Expected(ExpectedSyntax::Type);
+    match tokens.peek() {
+        Token::Operator(OperatorToken::Type) => {
+            tokens.next();
+            let type_def = Some(tokens.located(type_definition)?);
+            Ok(RecordMemberParseNode {
+                public,
+                identifier,
+                type_def,
+            })
+        }
+        Token::Operator(OperatorToken::Comma) | Token::Operator(OperatorToken::CloseParen) => {
+            tokens.push_error(error);
+            Ok(RecordMemberParseNode {
+                public,
+                identifier,
+                type_def: None,
+            })
+        }
+        _ => Err(tokens.make_error(error)),
+    }
 }
