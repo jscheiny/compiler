@@ -52,24 +52,26 @@ impl Display for SyntaxError {
 
 #[derive(Clone, Copy)]
 pub enum ExpectedSyntax {
+    FunctionBody,
     Identifier,
     Methods,
+    TopLevelDefinition,
     Type,
-    FunctionBody,
 }
 
 impl Display for ExpectedSyntax {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         use OperatorToken as O;
         match self {
-            Self::Identifier => write!(f, "identifier"),
-            Self::Methods => write!(f, "methods block or `{}`", O::EndStatement),
             Self::FunctionBody => write!(
                 f,
                 "function body with `{}` or `{}`",
                 O::FunctionDefinition,
                 O::OpenBrace
             ),
+            Self::Identifier => write!(f, "identifier"),
+            Self::Methods => write!(f, "methods block or `{}`", O::EndStatement),
+            Self::TopLevelDefinition => write!(f, "struct, tuple, enum or function"),
             Self::Type => write!(f, "type"),
         }
     }
