@@ -1,7 +1,7 @@
 interface Test {
-    valid();
-    invalid(a);
-    if(b: T);
+    valid(): T
+    invalid(a): int
+    if(b: T)
 }
 
 fn test () -> while;

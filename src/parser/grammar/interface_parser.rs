@@ -43,7 +43,9 @@ fn method_signature(tokens: &mut TokenStream) -> ParseResult<MethodSignaturePars
     let identifier = tokens.located(identifier)?;
     let parameters = tokens.located(parameters)?;
     let return_type = return_type(tokens)?;
-    tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
+    if !tokens.accept(&OperatorToken::EndStatement) {
+        tokens.push_error(SyntaxError::Expected(ExpectedSyntax::EndStatement));
+    }
     Ok(MethodSignatureParseNode {
         identifier,
         parameters,
