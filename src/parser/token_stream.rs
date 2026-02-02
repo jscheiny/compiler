@@ -29,11 +29,11 @@ impl TokenStream {
         }
     }
 
-    pub fn expect(&mut self, predicate: &impl TokenMatch) -> ParseResult<()> {
+    pub fn expect(&mut self, predicate: &impl TokenMatch, error: SyntaxError) -> ParseResult<()> {
         if self.accept(predicate) {
             Ok(())
         } else {
-            Err(self.make_error(SyntaxError::Unimplemented))
+            Err(self.make_error(error))
         }
     }
 

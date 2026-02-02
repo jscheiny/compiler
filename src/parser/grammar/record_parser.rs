@@ -2,7 +2,7 @@ use crate::{
     lexer::{KeywordToken, OperatorToken},
     parser::{
         ParseNode, ParseResult, RecordDefinitionParseNode, RecordMemberParseNode, RecordType,
-        TokenStream,
+        SyntaxError, TokenStream,
         grammar::{comma_separated_list, identifier, methods, type_definition},
     },
 };
@@ -34,14 +34,14 @@ fn record(
 }
 
 fn members(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<RecordMemberParseNode>>> {
-    tokens.expect(&OperatorToken::OpenParen)?;
+    tokens.expect(&OperatorToken::OpenParen, SyntaxError::Unimplemented)?;
     comma_separated_list(tokens, OperatorToken::CloseParen, member)
 }
 
 fn member(tokens: &mut TokenStream) -> ParseResult<RecordMemberParseNode> {
     let public = tokens.accept(&KeywordToken::Pub);
     let identifier = tokens.located(identifier)?;
-    tokens.expect(&OperatorToken::Type)?;
+    tokens.expect(&OperatorToken::Type, SyntaxError::Unimplemented)?;
     let type_def = tokens.located(type_definition)?;
     Ok(RecordMemberParseNode {
         public,

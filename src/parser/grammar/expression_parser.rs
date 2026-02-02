@@ -32,7 +32,7 @@ pub fn expression(tokens: &mut TokenStream) -> ParseResult<ExpressionParseNode> 
 }
 
 pub fn block(tokens: &mut TokenStream) -> ParseResult<BlockParseNode> {
-    tokens.expect(&OperatorToken::OpenBrace)?;
+    tokens.expect(&OperatorToken::OpenBrace, SyntaxError::Unimplemented)?;
     let mut statements = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {
         statements.push(tokens.located(statement)?);

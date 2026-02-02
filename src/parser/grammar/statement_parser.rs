@@ -2,7 +2,8 @@ use crate::{
     lexer::{KeywordToken, OperatorToken, Token, TokenMatch},
     parser::{
         DeclarationParseNode, ExpressionParseNode, IfStatementConditionParseNode,
-        IfStatementParseNode, ParseResult, StatementParseNode, TokenStream, WhileLoopParseNode,
+        IfStatementParseNode, ParseResult, StatementParseNode, SyntaxError, TokenStream,
+        WhileLoopParseNode,
         grammar::{block, expression, identifier, type_definition},
     },
 };
@@ -37,9 +38,9 @@ fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<Statement
         None
     };
 
-    tokens.expect(&OperatorToken::Assign)?;
+    tokens.expect(&OperatorToken::Assign, SyntaxError::Unimplemented)?;
     let expression = tokens.located(expression)?;
-    tokens.expect(&OperatorToken::EndStatement)?;
+    tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
     Ok(StatementParseNode::Declaration(DeclarationParseNode {
         mutable,
         identifier,
@@ -54,20 +55,20 @@ fn function_return(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> 
         Ok(StatementParseNode::FunctionReturn(None))
     } else {
         let expression = tokens.located(expression)?;
-        tokens.expect(&OperatorToken::EndStatement)?;
+        tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
         Ok(StatementParseNode::FunctionReturn(Some(expression)))
     }
 }
 
 fn break_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
     tokens.next();
-    tokens.expect(&OperatorToken::EndStatement)?;
+    tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
     Ok(StatementParseNode::Break())
 }
 
 fn continue_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
     tokens.next();
-    tokens.expect(&OperatorToken::EndStatement)?;
+    tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
     Ok(StatementParseNode::Break())
 }
 
@@ -114,12 +115,12 @@ fn block_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> 
 fn block_return(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
     tokens.next();
     let expression = tokens.located(expression)?;
-    tokens.expect(&OperatorToken::EndStatement)?;
+    tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
     Ok(StatementParseNode::BlockReturn(expression))
 }
 
 fn expression_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
     let expression = tokens.located(expression)?;
-    tokens.expect(&OperatorToken::EndStatement)?;
+    tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
     Ok(StatementParseNode::Expression(expression.value))
 }

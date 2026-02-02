@@ -69,7 +69,7 @@ fn function(
 fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyParseNode> {
     if tokens.accept(&OperatorToken::FunctionDefinition) {
         let expression = expression(tokens)?;
-        tokens.expect(&OperatorToken::EndStatement)?;
+        tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
         Ok(FunctionBodyParseNode::Expression(expression))
     } else if OperatorToken::OpenBrace.matches(tokens.peek()) {
         Ok(FunctionBodyParseNode::Block(block(tokens)?))
@@ -85,14 +85,14 @@ fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyParseNode>
 }
 
 pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<ParameterParseNode>>> {
-    tokens.expect(&OperatorToken::OpenParen)?;
+    tokens.expect(&OperatorToken::OpenParen, SyntaxError::Unimplemented)?;
     let list = comma_separated_list(tokens, OperatorToken::CloseParen, parameter)?;
     Ok(list)
 }
 
 fn parameter(tokens: &mut TokenStream) -> ParseResult<ParameterParseNode> {
     let identifier = tokens.located(identifier)?;
-    tokens.expect(&OperatorToken::Type)?;
+    tokens.expect(&OperatorToken::Type, SyntaxError::Unimplemented)?;
     let type_def = tokens.located(type_definition)?;
 
     Ok(ParameterParseNode {
