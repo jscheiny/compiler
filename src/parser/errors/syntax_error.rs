@@ -58,6 +58,7 @@ pub enum ExpectedSyntax {
     Methods,
     TopLevelDefinition,
     Type,
+    Variants,
 }
 
 impl Display for ExpectedSyntax {
@@ -75,6 +76,7 @@ impl Display for ExpectedSyntax {
             Self::Methods => write!(f, "methods block or `{}`", O::EndStatement),
             Self::TopLevelDefinition => write!(f, "struct, tuple, enum, or function"),
             Self::Type => write!(f, "type"),
+            Self::Variants => write!(f, "enum variants"),
         }
     }
 }

@@ -1,7 +1,3 @@
-struct S(value) {
-    fn() -> x;
-}
-
-tuple T {
+enum X {
     while() {}
 }

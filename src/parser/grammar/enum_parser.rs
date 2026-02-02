@@ -1,7 +1,8 @@
 use crate::{
-    lexer::OperatorToken,
+    lexer::{OperatorToken, Token},
     parser::{
-        EnumParseNode, EnumVariantParseNode, ParseNode, ParseResult, SyntaxError, TokenStream,
+        EnumParseNode, EnumVariantParseNode, ExpectedSyntax, ParseNode, ParseResult, SyntaxError,
+        TokenStream,
         grammar::{comma_separated_list, identifier, methods, type_definition},
     },
 };
@@ -19,8 +20,17 @@ pub fn enumeration(tokens: &mut TokenStream) -> ParseResult<EnumParseNode> {
 }
 
 fn enum_variants(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<EnumVariantParseNode>>> {
-    tokens.expect(&OperatorToken::OpenParen, SyntaxError::Unimplemented)?;
-    comma_separated_list(tokens, OperatorToken::CloseParen, enum_variant)
+    match tokens.peek() {
+        Token::Operator(OperatorToken::OpenParen) => {
+            tokens.next();
+            comma_separated_list(tokens, OperatorToken::CloseParen, enum_variant)
+        }
+        Token::Operator(OperatorToken::OpenBrace) => {
+            tokens.push_error(SyntaxError::Expected(ExpectedSyntax::Variants));
+            Ok(vec![])
+        }
+        _ => Err(tokens.make_error(SyntaxError::Expected(ExpectedSyntax::Variants))),
+    }
 }
 
 fn enum_variant(tokens: &mut TokenStream) -> ParseResult<EnumVariantParseNode> {
