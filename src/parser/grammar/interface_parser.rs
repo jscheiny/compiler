@@ -1,8 +1,8 @@
 use crate::{
-    lexer::OperatorToken,
+    lexer::{OperatorToken, Token},
     parser::{
-        InterfaceDefinitionParseNode, MethodSignatureParseNode, ParseNode, ParseResult,
-        SyntaxError, TokenStream,
+        ExpectedSyntax, InterfaceDefinitionParseNode, MethodSignatureParseNode, ParseNode,
+        ParseResult, SyntaxError, TokenStream,
         grammar::{identifier, parameters, type_definition},
     },
 };
@@ -21,12 +21,22 @@ pub fn interface(tokens: &mut TokenStream) -> ParseResult<InterfaceDefinitionPar
 fn method_signatures(
     tokens: &mut TokenStream,
 ) -> ParseResult<Vec<ParseNode<MethodSignatureParseNode>>> {
-    tokens.expect(&OperatorToken::OpenBrace, SyntaxError::Unimplemented)?;
-    let mut methods = vec![];
-    while !tokens.accept(&OperatorToken::CloseBrace) {
-        methods.push(tokens.located(method_signature)?);
+    match tokens.peek() {
+        Token::Operator(OperatorToken::OpenBrace) => {
+            tokens.next();
+            let mut methods = vec![];
+            while !tokens.accept(&OperatorToken::CloseBrace) {
+                methods.push(tokens.located(method_signature)?);
+            }
+            Ok(methods)
+        }
+        Token::Operator(OperatorToken::EndStatement) => {
+            tokens.push_error(SyntaxError::Expected(ExpectedSyntax::MethodSignatures));
+            tokens.next();
+            Ok(vec![])
+        }
+        _ => Err(tokens.make_error(SyntaxError::Expected(ExpectedSyntax::MethodSignatures))),
     }
-    Ok(methods)
 }
 
 fn method_signature(tokens: &mut TokenStream) -> ParseResult<MethodSignatureParseNode> {
