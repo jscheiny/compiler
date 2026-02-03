@@ -2,7 +2,10 @@ use std::rc::Rc;
 
 use crate::{
     lexer::{LocatedToken, Token, TokenMatch},
-    parser::{LocatedSyntaxError, ParseNode, ParseResult, SyntaxError, TokenSpan},
+    parser::{
+        IdentifierParseNode, IdentifierType, LocatedSyntaxError, ParseNode, ParseResult,
+        SyntaxError, TokenSpan, grammar::identifier,
+    },
 };
 
 pub struct TokenStream {
@@ -50,29 +53,22 @@ impl TokenStream {
         self.index >= self.tokens.len() - 1
     }
 
+    pub fn identifier(
+        &mut self,
+        id_type: IdentifierType,
+    ) -> ParseResult<ParseNode<IdentifierParseNode>> {
+        let start_index = self.index;
+        let value = identifier(self, id_type)?;
+        Ok(self.close(value, start_index))
+    }
+
     pub fn located<P, E>(
         &mut self,
         parse: impl Fn(&mut TokenStream) -> Result<P, E>,
     ) -> Result<ParseNode<P>, E> {
         let start_index = self.index;
         let value = parse(self)?;
-        Ok(ParseNode {
-            value,
-            span: self.span(start_index),
-        })
-    }
-
-    pub fn located_with<P, Arg, E>(
-        &mut self,
-        parse: impl Fn(&mut TokenStream, Arg) -> Result<P, E>,
-        arg: Arg,
-    ) -> Result<ParseNode<P>, E> {
-        let start_index = self.index;
-        let value = parse(self, arg)?;
-        Ok(ParseNode {
-            value,
-            span: self.span(start_index),
-        })
+        Ok(self.close(value, start_index))
     }
 
     pub fn maybe_located<P, E>(
@@ -81,16 +77,16 @@ impl TokenStream {
     ) -> Result<Option<ParseNode<P>>, E> {
         let start_index = self.index;
         let result = parse(self)?;
-        Ok(result.map(|value| ParseNode {
-            value,
-            span: self.span(start_index),
-        }))
+        Ok(result.map(|value| self.close(value, start_index)))
     }
 
-    fn span(&self, start_index: usize) -> TokenSpan {
-        TokenSpan {
-            start_index,
-            end_index: self.index - 1,
+    fn close<P>(&self, value: P, start_index: usize) -> ParseNode<P> {
+        ParseNode {
+            value,
+            span: TokenSpan {
+                start_index,
+                end_index: self.index - 1,
+            },
         }
     }
 

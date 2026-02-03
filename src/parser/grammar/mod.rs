@@ -12,11 +12,11 @@ mod utils;
 use enum_parser::*;
 use expression_parser::*;
 use function_parser::*;
-use identifier_parser::*;
 use interface_parser::*;
 use record_parser::*;
 use statement_parser::*;
 use type_definition_parser::*;
 use utils::*;
 
+pub use identifier_parser::*;
 pub use program_parser::*;

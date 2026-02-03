@@ -3,13 +3,13 @@ use crate::{
     parser::{
         IdentifierType, InterfaceDefinitionParseNode, MethodSignatureParseNode, ParseNode,
         ParseResult, SyntaxError, TokenStream, TypeParseNode,
-        grammar::{end_statement, identifier, parameters, type_definition},
+        grammar::{end_statement, parameters, type_definition},
     },
 };
 
 pub fn interface(tokens: &mut TokenStream) -> ParseResult<InterfaceDefinitionParseNode> {
     tokens.next();
-    let identifier = tokens.located_with(identifier, IdentifierType::Interface)?;
+    let identifier = tokens.identifier(IdentifierType::Interface)?;
     let method_signatures = tokens.located(method_signatures)?;
 
     Ok(InterfaceDefinitionParseNode {
@@ -40,7 +40,7 @@ fn method_signatures(
 }
 
 fn method_signature(tokens: &mut TokenStream) -> ParseResult<MethodSignatureParseNode> {
-    let identifier = tokens.located_with(identifier, IdentifierType::Method)?;
+    let identifier = tokens.identifier(IdentifierType::Method)?;
     let parameters = tokens.located(parameters)?;
     let return_type = return_type(tokens)?;
     end_statement(tokens);
