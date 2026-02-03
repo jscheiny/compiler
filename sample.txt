@@ -1,7 +1,14 @@
-fn test () {
-    let x while;
+fn test() -> x
+
+interface I {
+    test(): X
 }
 
-fn while() {
-
+fn correct() {
+    let x = 1
+    return x
+    break
+    continue
+    -> x
+    x
 }

@@ -39,7 +39,7 @@ fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<Statement
     };
 
     let initializer = initializer(tokens)?;
-    tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
+    end_statement(tokens);
     Ok(StatementParseNode::Declaration(DeclarationParseNode {
         mutable,
         identifier,
@@ -69,20 +69,20 @@ fn function_return(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> 
         Ok(StatementParseNode::FunctionReturn(None))
     } else {
         let expression = tokens.located(expression)?;
-        tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
+        end_statement(tokens);
         Ok(StatementParseNode::FunctionReturn(Some(expression)))
     }
 }
 
 fn break_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
     tokens.next();
-    tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
+    end_statement(tokens);
     Ok(StatementParseNode::Break())
 }
 
 fn continue_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
     tokens.next();
-    tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
+    end_statement(tokens);
     Ok(StatementParseNode::Break())
 }
 
@@ -129,12 +129,18 @@ fn block_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> 
 fn block_return(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
     tokens.next();
     let expression = tokens.located(expression)?;
-    tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
+    end_statement(tokens);
     Ok(StatementParseNode::BlockReturn(expression))
 }
 
 fn expression_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
     let expression = tokens.located(expression)?;
-    tokens.expect(&OperatorToken::EndStatement, SyntaxError::Unimplemented)?;
+    end_statement(tokens);
     Ok(StatementParseNode::Expression(expression.value))
+}
+
+pub fn end_statement(tokens: &mut TokenStream) {
+    if !tokens.accept(&OperatorToken::EndStatement) {
+        tokens.push_error(SyntaxError::Expected(ExpectedSyntax::EndStatement));
+    }
 }

@@ -3,7 +3,9 @@ use crate::{
     parser::{
         ExpectedSyntax, ExpressionParseNode, FunctionBodyParseNode, FunctionDefintionParseNode,
         MethodParseNode, ParameterParseNode, ParseNode, ParseResult, SyntaxError, TokenStream,
-        grammar::{block, comma_separated_list, expression, identifier, type_definition},
+        grammar::{
+            block, comma_separated_list, end_statement, expression, identifier, type_definition,
+        },
     },
 };
 
@@ -69,11 +71,7 @@ fn function(
 fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyParseNode> {
     if tokens.accept(&OperatorToken::FunctionDefinition) {
         let expression = expression(tokens)?;
-        if OperatorToken::EndStatement.matches(tokens.peek()) {
-            tokens.next();
-        } else {
-            tokens.push_error(SyntaxError::Expected(ExpectedSyntax::EndStatement));
-        }
+        end_statement(tokens);
         Ok(FunctionBodyParseNode::Expression(expression))
     } else if OperatorToken::OpenBrace.matches(tokens.peek()) {
         Ok(FunctionBodyParseNode::Block(block(tokens)?))

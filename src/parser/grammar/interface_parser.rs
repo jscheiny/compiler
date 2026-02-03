@@ -3,7 +3,7 @@ use crate::{
     parser::{
         ExpectedSyntax, InterfaceDefinitionParseNode, MethodSignatureParseNode, ParseNode,
         ParseResult, SyntaxError, TokenStream, TypeParseNode,
-        grammar::{identifier, parameters, type_definition},
+        grammar::{identifier, parameters, statement_parser::end_statement, type_definition},
     },
 };
 
@@ -43,9 +43,7 @@ fn method_signature(tokens: &mut TokenStream) -> ParseResult<MethodSignaturePars
     let identifier = tokens.located(identifier)?;
     let parameters = tokens.located(parameters)?;
     let return_type = return_type(tokens)?;
-    if !tokens.accept(&OperatorToken::EndStatement) {
-        tokens.push_error(SyntaxError::Expected(ExpectedSyntax::EndStatement));
-    }
+    end_statement(tokens);
     Ok(MethodSignatureParseNode {
         identifier,
         parameters,
