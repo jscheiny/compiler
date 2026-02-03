@@ -109,7 +109,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             T::IntegerLiteral(literal) => write!(f, "integer literal `{}`", literal),
             T::StringLiteral(literal) => write!(f, "string literal {}", literal),
             T::Operator(operator) => write!(f, "`{}`", operator),
-            T::Keyword(keyword) => write!(f, "keyword: `{}`", keyword),
+            T::Keyword(keyword) => write!(f, "keyword `{}`", keyword),
             T::EndOfFile => write!(f, "end of file"),
         }
     }
@@ -130,7 +130,7 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
             E::ExpectedEndStatement => fmt_op(f, O::EndStatement),
             E::ExpectedExpression => write!(f, "expression"),
             E::ExpectedFunctionBody => fmt_ops(f, O::FunctionDefinition, O::OpenBrace),
-            E::ExpectedIdentifier(_) => write!(f, "identifier"), // TODO switch on type
+            E::ExpectedIdentifier(id_type) => write!(f, "{}", id_type),
             E::ExpectedInitializer => fmt_op(f, O::Assign),
             E::ExpectedMembers => fmt_op(f, O::OpenParen),
             E::ExpectedMethods => fmt_ops(f, O::OpenBrace, O::EndStatement),
