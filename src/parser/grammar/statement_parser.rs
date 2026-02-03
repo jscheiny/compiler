@@ -31,7 +31,7 @@ pub fn statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
 
 fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<StatementParseNode> {
     tokens.next();
-    let identifier = tokens.located_with(identifier, IdentifierType::BAD)?;
+    let identifier = tokens.located_with(identifier, IdentifierType::Variable)?;
     let type_def = if tokens.accept(&OperatorToken::Type) {
         Some(tokens.located(type_definition)?)
     } else {

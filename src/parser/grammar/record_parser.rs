@@ -21,7 +21,11 @@ fn record(
 ) -> ParseResult<RecordDefinitionParseNode> {
     tokens.next();
 
-    let identifier = tokens.located_with(identifier, IdentifierType::BAD)?;
+    let identifier_type = match record_type {
+        RecordType::Structure => IdentifierType::Struct,
+        RecordType::Tuple => IdentifierType::Tuple,
+    };
+    let identifier = tokens.located_with(identifier, identifier_type)?;
     let members = tokens.located(members)?;
 
     let methods = methods(tokens)?;
@@ -49,7 +53,7 @@ fn members(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<RecordMemberPa
 
 fn member(tokens: &mut TokenStream) -> ParseResult<RecordMemberParseNode> {
     let public = tokens.accept(&KeywordToken::Pub);
-    let identifier = tokens.located_with(identifier, IdentifierType::BAD)?;
+    let identifier = tokens.located_with(identifier, IdentifierType::Member)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {
         Token::Operator(OperatorToken::Type) => {

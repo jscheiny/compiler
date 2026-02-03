@@ -26,9 +26,16 @@ pub enum SyntaxError {
 
 #[derive(Clone, Copy)]
 pub enum IdentifierType {
+    Function,
+    Interface,
+    Method,
+    Member,
+    Parameter,
+    Struct,
+    Tuple,
     Type,
+    Variable,
     Variant,
-    BAD,
 }
 
 pub struct LocatedSyntaxError {

@@ -9,7 +9,7 @@ use crate::{
 
 pub fn interface(tokens: &mut TokenStream) -> ParseResult<InterfaceDefinitionParseNode> {
     tokens.next();
-    let identifier = tokens.located_with(identifier, IdentifierType::BAD)?;
+    let identifier = tokens.located_with(identifier, IdentifierType::Interface)?;
     let method_signatures = tokens.located(method_signatures)?;
 
     Ok(InterfaceDefinitionParseNode {
@@ -40,7 +40,7 @@ fn method_signatures(
 }
 
 fn method_signature(tokens: &mut TokenStream) -> ParseResult<MethodSignatureParseNode> {
-    let identifier = tokens.located_with(identifier, IdentifierType::BAD)?;
+    let identifier = tokens.located_with(identifier, IdentifierType::Method)?;
     let parameters = tokens.located(parameters)?;
     let return_type = return_type(tokens)?;
     end_statement(tokens);

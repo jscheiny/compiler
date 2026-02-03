@@ -52,7 +52,12 @@ fn function(
     if has_keyword {
         tokens.next();
     }
-    let identifier = tokens.located_with(identifier, IdentifierType::BAD)?;
+    let identifier_type = if has_keyword {
+        IdentifierType::Function
+    } else {
+        IdentifierType::Method
+    };
+    let identifier = tokens.located_with(identifier, identifier_type)?;
     let parameters = tokens.located(parameters)?;
     let return_type = if tokens.accept(&OperatorToken::Type) {
         Some(tokens.located(type_definition)?)
@@ -104,7 +109,7 @@ pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<Paramet
 }
 
 fn parameter(tokens: &mut TokenStream) -> ParseResult<ParameterParseNode> {
-    let identifier = tokens.located_with(identifier, IdentifierType::BAD)?;
+    let identifier = tokens.located_with(identifier, IdentifierType::Parameter)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {
         Token::Operator(OperatorToken::Type) => {
