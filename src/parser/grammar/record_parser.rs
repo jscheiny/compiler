@@ -3,7 +3,7 @@ use crate::{
     parser::{
         IdentifierType, ParseNode, ParseResult, RecordDefinitionParseNode, RecordMemberParseNode,
         RecordType, SyntaxError, TokenStream,
-        grammar::{comma_separated_list, identifier_with, methods, type_definition},
+        grammar::{comma_separated_list, identifier, methods, type_definition},
     },
 };
 
@@ -21,7 +21,7 @@ fn record(
 ) -> ParseResult<RecordDefinitionParseNode> {
     tokens.next();
 
-    let identifier = tokens.located_with(identifier_with, IdentifierType::BAD)?;
+    let identifier = tokens.located_with(identifier, IdentifierType::BAD)?;
     let members = tokens.located(members)?;
 
     let methods = methods(tokens)?;
@@ -49,7 +49,7 @@ fn members(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<RecordMemberPa
 
 fn member(tokens: &mut TokenStream) -> ParseResult<RecordMemberParseNode> {
     let public = tokens.accept(&KeywordToken::Pub);
-    let identifier = tokens.located_with(identifier_with, IdentifierType::BAD)?;
+    let identifier = tokens.located_with(identifier, IdentifierType::BAD)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {
         Token::Operator(OperatorToken::Type) => {

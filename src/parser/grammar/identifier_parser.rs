@@ -3,11 +3,7 @@ use crate::{
     parser::{IdentifierParseNode, IdentifierType, ParseResult, SyntaxError, TokenStream},
 };
 
-pub fn identifier(tokens: &mut TokenStream) -> ParseResult<IdentifierParseNode> {
-    identifier_with(tokens, IdentifierType::BAD)
-}
-
-pub fn identifier_with(
+pub fn identifier(
     tokens: &mut TokenStream,
     identifier_type: IdentifierType,
 ) -> ParseResult<IdentifierParseNode> {

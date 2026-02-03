@@ -3,7 +3,7 @@ use crate::{
     parser::{
         IdentifierType, ParseNode, ParseResult, SyntaxError, TokenStream, TypeParseNode,
         UserDefinedTypeParseNode,
-        grammar::{comma_separated_list, identifier_parser::identifier_with},
+        grammar::{comma_separated_list, identifier_parser::identifier},
     },
 };
 
@@ -24,7 +24,7 @@ pub fn type_definition(tokens: &mut TokenStream) -> ParseResult<TypeParseNode> {
 }
 
 fn user_defined_type(tokens: &mut TokenStream) -> ParseResult<TypeParseNode> {
-    let identifier = tokens.located_with(identifier_with, IdentifierType::Type)?;
+    let identifier = tokens.located_with(identifier, IdentifierType::Type)?;
     let generic_params = tokens.maybe_located(generic_type_params)?;
 
     Ok(TypeParseNode::UserDefined(UserDefinedTypeParseNode {
