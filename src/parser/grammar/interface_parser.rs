@@ -1,15 +1,15 @@
 use crate::{
     lexer::{OperatorToken, Token},
     parser::{
-        InterfaceDefinitionParseNode, MethodSignatureParseNode, ParseNode, ParseResult,
-        SyntaxError, TokenStream, TypeParseNode,
-        grammar::{identifier, parameters, statement_parser::end_statement, type_definition},
+        IdentifierType, InterfaceDefinitionParseNode, MethodSignatureParseNode, ParseNode,
+        ParseResult, SyntaxError, TokenStream, TypeParseNode,
+        grammar::{end_statement, identifier_with, parameters, type_definition},
     },
 };
 
 pub fn interface(tokens: &mut TokenStream) -> ParseResult<InterfaceDefinitionParseNode> {
     tokens.next();
-    let identifier = tokens.located(identifier)?;
+    let identifier = tokens.located_with(identifier_with, IdentifierType::BAD)?;
     let method_signatures = tokens.located(method_signatures)?;
 
     Ok(InterfaceDefinitionParseNode {
@@ -40,7 +40,7 @@ fn method_signatures(
 }
 
 fn method_signature(tokens: &mut TokenStream) -> ParseResult<MethodSignatureParseNode> {
-    let identifier = tokens.located(identifier)?;
+    let identifier = tokens.located_with(identifier_with, IdentifierType::BAD)?;
     let parameters = tokens.located(parameters)?;
     let return_type = return_type(tokens)?;
     end_statement(tokens);

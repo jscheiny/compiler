@@ -1,10 +1,11 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token, TokenMatch},
     parser::{
-        ExpressionParseNode, FunctionBodyParseNode, FunctionDefintionParseNode, MethodParseNode,
-        ParameterParseNode, ParseNode, ParseResult, SyntaxError, TokenStream,
+        ExpressionParseNode, FunctionBodyParseNode, FunctionDefintionParseNode, IdentifierType,
+        MethodParseNode, ParameterParseNode, ParseNode, ParseResult, SyntaxError, TokenStream,
         grammar::{
-            block, comma_separated_list, end_statement, expression, identifier, type_definition,
+            block, comma_separated_list, end_statement, expression, identifier_with,
+            type_definition,
         },
     },
 };
@@ -52,7 +53,7 @@ fn function(
     if has_keyword {
         tokens.next();
     }
-    let identifier = tokens.located(identifier)?;
+    let identifier = tokens.located_with(identifier_with, IdentifierType::BAD)?;
     let parameters = tokens.located(parameters)?;
     let return_type = if tokens.accept(&OperatorToken::Type) {
         Some(tokens.located(type_definition)?)
@@ -104,7 +105,7 @@ pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<Paramet
 }
 
 fn parameter(tokens: &mut TokenStream) -> ParseResult<ParameterParseNode> {
-    let identifier = tokens.located(identifier)?;
+    let identifier = tokens.located_with(identifier_with, IdentifierType::BAD)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {
         Token::Operator(OperatorToken::Type) => {

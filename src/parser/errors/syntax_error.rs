@@ -12,7 +12,7 @@ pub enum SyntaxError {
     ExpectedEndStatement,
     ExpectedExpression,
     ExpectedFunctionBody,
-    ExpectedIdentifier,
+    ExpectedIdentifier(IdentifierType),
     ExpectedInitializer,
     ExpectedMembers,
     ExpectedMethods,
@@ -22,6 +22,13 @@ pub enum SyntaxError {
     ExpectedTopLevelDefinition,
     ExpectedType,
     ExpectedVariants,
+}
+
+#[derive(Clone, Copy)]
+pub enum IdentifierType {
+    Type,
+    Variant,
+    BAD,
 }
 
 pub struct LocatedSyntaxError {
@@ -57,7 +64,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             E::ExpectedEndStatement => "end of statement",
             E::ExpectedExpression => "expression",
             E::ExpectedFunctionBody => "function body",
-            E::ExpectedIdentifier => "identifier",
+            E::ExpectedIdentifier(_) => "identifier", // TODO switch on type
             E::ExpectedInitializer => "initializer",
             E::ExpectedMembers => "member variables",
             E::ExpectedMethods => "methods block",
@@ -98,7 +105,7 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
             E::ExpectedEndStatement => fmt_op(f, O::EndStatement),
             E::ExpectedExpression => write!(f, "expression"),
             E::ExpectedFunctionBody => fmt_ops(f, O::FunctionDefinition, O::OpenBrace),
-            E::ExpectedIdentifier => write!(f, "identifier"),
+            E::ExpectedIdentifier(_) => write!(f, "identifier"), // TODO switch on type
             E::ExpectedInitializer => fmt_op(f, O::Assign),
             E::ExpectedMembers => fmt_op(f, O::OpenParen),
             E::ExpectedMethods => fmt_ops(f, O::OpenBrace, O::EndStatement),

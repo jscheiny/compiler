@@ -1,15 +1,15 @@
 use crate::{
     lexer::{IdentifierToken, Token},
-    parser::{IdentifierParseNode, ParseResult, SyntaxError, TokenStream},
+    parser::{IdentifierParseNode, IdentifierType, ParseResult, SyntaxError, TokenStream},
 };
 
 pub fn identifier(tokens: &mut TokenStream) -> ParseResult<IdentifierParseNode> {
-    identifier_with(tokens, SyntaxError::ExpectedIdentifier)
+    identifier_with(tokens, IdentifierType::BAD)
 }
 
 pub fn identifier_with(
     tokens: &mut TokenStream,
-    error: SyntaxError,
+    identifier_type: IdentifierType,
 ) -> ParseResult<IdentifierParseNode> {
     let token = tokens.peek();
     match token {
@@ -20,10 +20,10 @@ pub fn identifier_with(
         }
         Token::Keyword(keyword) => {
             let identifier = keyword.as_str().to_owned();
-            tokens.push_error(error);
+            tokens.push_error(SyntaxError::ExpectedIdentifier(identifier_type));
             tokens.next();
             Ok(IdentifierParseNode(identifier))
         }
-        _ => Err(tokens.make_error(error)),
+        _ => Err(tokens.make_error(SyntaxError::ExpectedIdentifier(identifier_type))),
     }
 }

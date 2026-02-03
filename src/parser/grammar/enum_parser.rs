@@ -1,14 +1,15 @@
 use crate::{
     lexer::{OperatorToken, Token},
     parser::{
-        EnumParseNode, EnumVariantParseNode, ParseNode, ParseResult, SyntaxError, TokenStream,
-        grammar::{comma_separated_list, identifier, methods, type_definition},
+        EnumParseNode, EnumVariantParseNode, IdentifierType, ParseNode, ParseResult, SyntaxError,
+        TokenStream,
+        grammar::{comma_separated_list, identifier_with, methods, type_definition},
     },
 };
 
 pub fn enumeration(tokens: &mut TokenStream) -> ParseResult<EnumParseNode> {
     tokens.next();
-    let identifier = tokens.located(identifier)?;
+    let identifier = tokens.located_with(identifier_with, IdentifierType::Variant)?;
     let variants = tokens.located(enum_variants)?;
     let methods = methods(tokens)?;
     Ok(EnumParseNode {
@@ -33,7 +34,7 @@ fn enum_variants(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<EnumVari
 }
 
 fn enum_variant(tokens: &mut TokenStream) -> ParseResult<EnumVariantParseNode> {
-    let identifier = tokens.located(identifier)?;
+    let identifier = tokens.located_with(identifier_with, IdentifierType::BAD)?;
     let type_def = if tokens.accept(&OperatorToken::OpenParen) {
         let type_def = tokens.located(type_definition)?;
         tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
