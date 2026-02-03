@@ -38,6 +38,24 @@ pub enum IdentifierType {
     Variant,
 }
 
+impl Display for IdentifierType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let message = match self {
+            Self::Function => "function name",
+            Self::Interface => "interface name",
+            Self::Method => "method name",
+            Self::Member => "member name",
+            Self::Parameter => "parameter name",
+            Self::Struct => "struct name",
+            Self::Tuple => "tuple name",
+            Self::Type => "type name",
+            Self::Variable => "variable name",
+            Self::Variant => "variant name",
+        };
+        write!(f, "{}", message)
+    }
+}
+
 pub struct LocatedSyntaxError {
     pub span: TokenSpan,
     pub error: SyntaxError,
@@ -63,26 +81,26 @@ pub struct SyntaxErrorMessage<'a> {
 
 impl<'a> Display for SyntaxErrorMessage<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "expected ")?;
         use SyntaxError as E;
-        let message = match self.error.error {
-            E::ExpectedBlock => "statement block",
-            E::ExpectedCloseParen => "close parenthesis",
-            E::ExpectedEndStatement => "end of statement",
-            E::ExpectedExpression => "expression",
-            E::ExpectedFunctionBody => "function body",
-            E::ExpectedIdentifier(_) => "identifier", // TODO switch on type
-            E::ExpectedInitializer => "initializer",
-            E::ExpectedMembers => "member variables",
-            E::ExpectedMethods => "methods block",
-            E::ExpectedMethodSignatures => "method signatures block",
-            E::ExpectedParameters => "parameters",
-            E::ExpectedReturnType => "return type",
-            E::ExpectedTopLevelDefinition => "struct, tuple, enum, or function",
-            E::ExpectedType => "type name",
-            E::ExpectedVariants => "enum variants",
-        };
-        write!(f, "{}, found ", message)?;
+        write!(f, "expected ")?;
+        match self.error.error {
+            E::ExpectedBlock => write!(f, "statement block"),
+            E::ExpectedCloseParen => write!(f, "close parenthesis"),
+            E::ExpectedEndStatement => write!(f, "end of statement"),
+            E::ExpectedExpression => write!(f, "expression"),
+            E::ExpectedFunctionBody => write!(f, "function body"),
+            E::ExpectedIdentifier(id_type) => write!(f, "{}", id_type),
+            E::ExpectedInitializer => write!(f, "initializer"),
+            E::ExpectedMembers => write!(f, "member variables"),
+            E::ExpectedMethods => write!(f, "methods block"),
+            E::ExpectedMethodSignatures => write!(f, "method signatures block"),
+            E::ExpectedParameters => write!(f, "parameters"),
+            E::ExpectedReturnType => write!(f, "return type"),
+            E::ExpectedTopLevelDefinition => write!(f, "struct, tuple, enum, or function"),
+            E::ExpectedType => write!(f, "type name"),
+            E::ExpectedVariants => write!(f, "enum variants"),
+        }?;
+        write!(f, ", found ")?;
 
         let LocatedToken { token, .. } = &self.tokens[self.error.span.start_index];
         use Token as T;
