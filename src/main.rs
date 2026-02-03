@@ -36,13 +36,13 @@ fn main() {
     );
 
     for error in source.tokenizer_errors.iter() {
-        println!("{} unexpected token", "Error:".red().bold());
+        println!("{} unexpected token", "Lexer error:".red().bold());
         source.print_character_span(*error, '^', "unexpected token", Severity::Error);
         println!();
     }
 
     for error in tokens.errors {
-        print!("{} ", "Error:".red().bold());
+        print!("{} ", "Syntax error:".red().bold());
         error.print(source.tokens.as_ref());
         println!();
         source.print_token_span(
