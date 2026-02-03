@@ -1,34 +1,9 @@
-use std::fmt::Display;
+use std::{fmt::Display, rc::Rc};
 
 use crate::{
     lexer::{LocatedToken, OperatorToken, Token},
     parser::TokenSpan,
 };
-
-pub struct LocatedSyntaxError {
-    pub span: TokenSpan,
-    pub error: SyntaxError,
-}
-
-impl LocatedSyntaxError {
-    pub fn print(&self, tokens: &Vec<LocatedToken>) {
-        print!("{}", self.error);
-        self.print_found_token(tokens);
-    }
-
-    pub fn print_found_token(&self, tokens: &Vec<LocatedToken>) {
-        let LocatedToken { token, .. } = &tokens[self.span.start_index];
-        print!(", found ");
-        match token {
-            Token::Identifier(identifier) => print!("identifier `{}`", identifier),
-            Token::IntegerLiteral(literal) => print!("integer literal `{}`", literal),
-            Token::StringLiteral(literal) => print!("string literal {}", literal),
-            Token::Operator(operator) => print!("operator: `{}`", operator.to_string()),
-            Token::Keyword(keyword) => print!("keyword: `{}`", keyword.as_str()),
-            Token::EndOfFile => print!("end of file"),
-        }
-    }
-}
 
 #[derive(Clone, Copy)]
 pub enum SyntaxError {
@@ -49,34 +24,102 @@ pub enum SyntaxError {
     ExpectedVariants,
 }
 
-impl Display for SyntaxError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use OperatorToken as O;
-        match self {
-            Self::ExpectedBlock => write!(f, "expected`{}`", O::OpenBrace),
-            Self::ExpectedCloseParen => write!(f, "expectedclosing parenthesis"),
-            Self::ExpectedEndStatement => write!(f, "expected`{}`", O::EndStatement),
-            Self::ExpectedExpression => write!(f, "expectedexpression"),
-            Self::ExpectedFunctionBody => write!(
-                f,
-                "expected function body with `{}` or `{}`",
-                O::FunctionDefinition,
-                O::OpenBrace
-            ),
-            Self::ExpectedIdentifier => write!(f, "expectedidentifier"),
-            Self::ExpectedInitializer => write!(f, "expectedinitializer with `{}`", O::Assign),
-            Self::ExpectedMembers => write!(f, "expectedmembers"),
-            Self::ExpectedMethods => write!(f, "expectedmethods block or `{}`", O::EndStatement),
-            Self::ExpectedMethodSignatures => write!(f, "expectedmethod signatures block"),
-            Self::ExpectedParameters => {
-                write!(f, "expectedfunction parameters with `{}`", O::OpenParen)
-            }
-            Self::ExpectedReturnType => write!(f, "expectedreturn type"),
-            Self::ExpectedTopLevelDefinition => {
-                write!(f, "expectedstruct, tuple, enum, or function")
-            }
-            Self::ExpectedType => write!(f, "expectedtype"),
-            Self::ExpectedVariants => write!(f, "expectedenum variants"),
+pub struct LocatedSyntaxError {
+    pub span: TokenSpan,
+    pub error: SyntaxError,
+}
+
+impl LocatedSyntaxError {
+    pub fn message(&self, tokens: Rc<Vec<LocatedToken>>) -> SyntaxErrorMessage<'_> {
+        SyntaxErrorMessage {
+            error: self,
+            tokens,
         }
     }
+
+    pub fn inline_message(&self) -> SyntaxErrorInlineMessage<'_> {
+        SyntaxErrorInlineMessage { error: self }
+    }
+}
+
+pub struct SyntaxErrorMessage<'a> {
+    error: &'a LocatedSyntaxError,
+    tokens: Rc<Vec<LocatedToken>>,
+}
+
+impl<'a> Display for SyntaxErrorMessage<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "expected ")?;
+        use SyntaxError as E;
+        let message = match self.error.error {
+            E::ExpectedBlock => "statement block",
+            E::ExpectedCloseParen => "close parenthesis",
+            E::ExpectedEndStatement => "end of statement",
+            E::ExpectedExpression => "expression",
+            E::ExpectedFunctionBody => "function body",
+            E::ExpectedIdentifier => "identifier",
+            E::ExpectedInitializer => "initializer",
+            E::ExpectedMembers => "member variables",
+            E::ExpectedMethods => "methods block",
+            E::ExpectedMethodSignatures => "method signatures block",
+            E::ExpectedParameters => "parameters",
+            E::ExpectedReturnType => "return type",
+            E::ExpectedTopLevelDefinition => "struct, tuple, enum, or function",
+            E::ExpectedType => "type name",
+            E::ExpectedVariants => "enum variants",
+        };
+        write!(f, "{}, found ", message)?;
+
+        let LocatedToken { token, .. } = &self.tokens[self.error.span.start_index];
+        use Token as T;
+        match token {
+            T::Identifier(identifier) => write!(f, "identifier `{}`", identifier),
+            T::IntegerLiteral(literal) => write!(f, "integer literal `{}`", literal),
+            T::StringLiteral(literal) => write!(f, "string literal {}", literal),
+            T::Operator(operator) => write!(f, "`{}`", operator),
+            T::Keyword(keyword) => write!(f, "keyword: `{}`", keyword),
+            T::EndOfFile => write!(f, "end of file"),
+        }
+    }
+}
+
+pub struct SyntaxErrorInlineMessage<'a> {
+    error: &'a LocatedSyntaxError,
+}
+
+impl<'a> Display for SyntaxErrorInlineMessage<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "expected ")?;
+        use OperatorToken as O;
+        use SyntaxError as E;
+        match self.error.error {
+            E::ExpectedBlock => fmt_op(f, O::OpenParen),
+            E::ExpectedCloseParen => fmt_op(f, O::CloseParen),
+            E::ExpectedEndStatement => fmt_op(f, O::EndStatement),
+            E::ExpectedExpression => write!(f, "expression"),
+            E::ExpectedFunctionBody => fmt_ops(f, O::FunctionDefinition, O::OpenBrace),
+            E::ExpectedIdentifier => write!(f, "identifier"),
+            E::ExpectedInitializer => fmt_op(f, O::Assign),
+            E::ExpectedMembers => fmt_op(f, O::OpenParen),
+            E::ExpectedMethods => fmt_ops(f, O::OpenBrace, O::EndStatement),
+            E::ExpectedMethodSignatures => fmt_op(f, O::OpenBrace),
+            E::ExpectedParameters => fmt_op(f, O::OpenParen),
+            E::ExpectedReturnType => fmt_op(f, O::Type),
+            E::ExpectedTopLevelDefinition => write!(f, "struct, tuple, enum, or function"),
+            E::ExpectedType => write!(f, "type name"),
+            E::ExpectedVariants => fmt_op(f, O::OpenParen),
+        }
+    }
+}
+
+fn fmt_op(f: &mut std::fmt::Formatter<'_>, operator: OperatorToken) -> std::fmt::Result {
+    write!(f, "`{}`", operator)
+}
+
+fn fmt_ops(
+    f: &mut std::fmt::Formatter<'_>,
+    op1: OperatorToken,
+    op2: OperatorToken,
+) -> std::fmt::Result {
+    write!(f, "`{}` or `{}`", op1, op2)
 }

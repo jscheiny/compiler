@@ -42,13 +42,16 @@ fn main() {
     }
 
     for error in tokens.errors {
-        print!("{} ", "Syntax error:".red().bold());
-        error.print(source.tokens.as_ref());
+        print!(
+            "{} {}",
+            "Syntax error:".red().bold(),
+            error.message(source.tokens.clone())
+        );
         println!();
         source.print_token_span(
             error.span,
             '^',
-            error.error.to_string().as_str(),
+            error.inline_message().to_string().as_str(),
             Severity::Error,
         );
         println!();

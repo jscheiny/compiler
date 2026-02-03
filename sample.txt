@@ -12,3 +12,5 @@ fn correct() {
     -> x
     x
 }
+
+fn test();
