@@ -8,7 +8,7 @@ use crate::{
 };
 
 pub fn structure(tokens: &mut TokenStream) -> ParseResult<RecordDefinitionParseNode> {
-    record(tokens, RecordType::Structure)
+    record(tokens, RecordType::Struct)
 }
 
 pub fn tuple(tokens: &mut TokenStream) -> ParseResult<RecordDefinitionParseNode> {
@@ -22,7 +22,7 @@ fn record(
     tokens.next();
 
     let identifier_type = match record_type {
-        RecordType::Structure => IdentifierType::Struct,
+        RecordType::Struct => IdentifierType::Struct,
         RecordType::Tuple => IdentifierType::Tuple,
     };
     let identifier = tokens.located_with(identifier, identifier_type)?;

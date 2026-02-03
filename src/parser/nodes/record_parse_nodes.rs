@@ -27,7 +27,7 @@ impl Traverse for RecordDefinitionParseNode {
 }
 
 pub enum RecordType {
-    Structure,
+    Struct,
     Tuple,
 }
 
