@@ -17,7 +17,6 @@ impl LocatedSyntaxError {
                 print!("{}", self.error);
                 self.print_found_token(tokens);
             }
-            SyntaxError::Unimplemented => print!("Unimplemented syntax error type"),
         }
     }
 
@@ -38,14 +37,12 @@ impl LocatedSyntaxError {
 #[derive(Clone, Copy)]
 pub enum SyntaxError {
     Expected(ExpectedSyntax),
-    Unimplemented,
 }
 
 impl Display for SyntaxError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Expected(expected) => write!(f, "expected {}", expected),
-            Self::Unimplemented => write!(f, "Unimplemented syntax error type"),
         }
     }
 }
