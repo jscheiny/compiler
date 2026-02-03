@@ -1,8 +1,7 @@
 use crate::{
     lexer::{OperatorToken, Token},
     parser::{
-        EnumParseNode, EnumVariantParseNode, ExpectedSyntax, ParseNode, ParseResult, SyntaxError,
-        TokenStream,
+        EnumParseNode, EnumVariantParseNode, ParseNode, ParseResult, SyntaxError, TokenStream,
         grammar::{comma_separated_list, identifier, methods, type_definition},
     },
 };
@@ -26,10 +25,10 @@ fn enum_variants(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<EnumVari
             comma_separated_list(tokens, OperatorToken::CloseParen, enum_variant)
         }
         Token::Operator(OperatorToken::OpenBrace) => {
-            tokens.push_error(SyntaxError::Expected(ExpectedSyntax::Variants));
+            tokens.push_error(SyntaxError::ExpectedVariants);
             Ok(vec![])
         }
-        _ => Err(tokens.make_error(SyntaxError::Expected(ExpectedSyntax::Variants))),
+        _ => Err(tokens.make_error(SyntaxError::ExpectedVariants)),
     }
 }
 
@@ -37,10 +36,7 @@ fn enum_variant(tokens: &mut TokenStream) -> ParseResult<EnumVariantParseNode> {
     let identifier = tokens.located(identifier)?;
     let type_def = if tokens.accept(&OperatorToken::OpenParen) {
         let type_def = tokens.located(type_definition)?;
-        tokens.expect(
-            &OperatorToken::CloseParen,
-            SyntaxError::Expected(ExpectedSyntax::CloseParen),
-        )?;
+        tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
         Some(type_def)
     } else {
         None

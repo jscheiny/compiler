@@ -1,8 +1,8 @@
 use crate::{
     lexer::{KeywordToken, Token},
     parser::{
-        ExpectedSyntax, ModuleTopLevelDefinition, ParseResult, ProgramParseNode, SyntaxError,
-        TokenStream, TopLevelDefinition,
+        ModuleTopLevelDefinition, ParseResult, ProgramParseNode, SyntaxError, TokenStream,
+        TopLevelDefinition,
         grammar::{enumeration, interface, structure, top_level_function, tuple},
     },
 };
@@ -31,9 +31,9 @@ fn top_level_definition(tokens: &mut TokenStream) -> ParseResult<TopLevelDefinit
             K::Enum => Ok(TopLevelDefinition::Enum(enumeration(tokens)?)),
             K::Interface => Ok(TopLevelDefinition::Interface(interface(tokens)?)),
             K::Fn => Ok(TopLevelDefinition::Function(top_level_function(tokens)?)),
-            _ => Err(tokens.make_error(SyntaxError::Expected(ExpectedSyntax::TopLevelDefinition))),
+            _ => Err(tokens.make_error(SyntaxError::ExpectedTopLevelDefinition)),
         }
     } else {
-        Err(tokens.make_error(SyntaxError::Expected(ExpectedSyntax::TopLevelDefinition)))
+        Err(tokens.make_error(SyntaxError::ExpectedTopLevelDefinition))
     }
 }

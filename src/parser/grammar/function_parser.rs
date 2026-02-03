@@ -1,8 +1,8 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token, TokenMatch},
     parser::{
-        ExpectedSyntax, ExpressionParseNode, FunctionBodyParseNode, FunctionDefintionParseNode,
-        MethodParseNode, ParameterParseNode, ParseNode, ParseResult, SyntaxError, TokenStream,
+        ExpressionParseNode, FunctionBodyParseNode, FunctionDefintionParseNode, MethodParseNode,
+        ParameterParseNode, ParseNode, ParseResult, SyntaxError, TokenStream,
         grammar::{
             block, comma_separated_list, end_statement, expression, identifier, type_definition,
         },
@@ -17,7 +17,7 @@ pub fn methods(
     } else if tokens.accept(&OperatorToken::EndStatement) {
         Ok(None)
     } else {
-        tokens.push_error(SyntaxError::Expected(ExpectedSyntax::Methods));
+        tokens.push_error(SyntaxError::ExpectedMethods);
         Ok(None)
     }
 }
@@ -76,18 +76,18 @@ fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyParseNode>
     } else if OperatorToken::OpenBrace.matches(tokens.peek()) {
         Ok(FunctionBodyParseNode::Block(block(tokens)?))
     } else if OperatorToken::EndStatement.matches(tokens.peek()) {
-        tokens.push_error(SyntaxError::Expected(ExpectedSyntax::FunctionBody));
+        tokens.push_error(SyntaxError::ExpectedFunctionBody);
         tokens.next();
         Ok(FunctionBodyParseNode::Expression(
             ExpressionParseNode::Error,
         ))
     } else {
-        Err(tokens.make_error(SyntaxError::Expected(ExpectedSyntax::FunctionBody)))
+        Err(tokens.make_error(SyntaxError::ExpectedFunctionBody))
     }
 }
 
 pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<ParameterParseNode>>> {
-    let error = SyntaxError::Expected(ExpectedSyntax::Parameters);
+    let error = SyntaxError::ExpectedParameters;
     use OperatorToken as O;
     match tokens.peek() {
         Token::Operator(O::OpenParen) => {
@@ -105,7 +105,7 @@ pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<Paramet
 
 fn parameter(tokens: &mut TokenStream) -> ParseResult<ParameterParseNode> {
     let identifier = tokens.located(identifier)?;
-    let error = SyntaxError::Expected(ExpectedSyntax::Type);
+    let error = SyntaxError::ExpectedType;
     match tokens.peek() {
         Token::Operator(OperatorToken::Type) => {
             tokens.next();

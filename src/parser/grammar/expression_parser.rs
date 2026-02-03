@@ -1,7 +1,7 @@
 use crate::{
     lexer::{IdentifierToken, IntegerLiteralToken, OperatorToken, StringLiteralToken, Token},
     parser::{
-        BlockParseNode, ExpectedSyntax, ExpressionParseNode, ParseResult, SyntaxError, TokenStream,
+        BlockParseNode, ExpressionParseNode, ParseResult, SyntaxError, TokenStream,
         grammar::statement,
     },
 };
@@ -27,15 +27,12 @@ pub fn expression(tokens: &mut TokenStream) -> ParseResult<ExpressionParseNode> 
             let block = block(tokens)?;
             Ok(ExpressionParseNode::Block(block))
         }
-        _ => Err(tokens.make_error(SyntaxError::Expected(ExpectedSyntax::Expression))),
+        _ => Err(tokens.make_error(SyntaxError::ExpectedExpression)),
     }
 }
 
 pub fn block(tokens: &mut TokenStream) -> ParseResult<BlockParseNode> {
-    tokens.expect(
-        &OperatorToken::OpenBrace,
-        SyntaxError::Expected(ExpectedSyntax::Block),
-    )?;
+    tokens.expect(&OperatorToken::OpenBrace, SyntaxError::ExpectedBlock)?;
     let mut statements = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {
         statements.push(tokens.located(statement)?);

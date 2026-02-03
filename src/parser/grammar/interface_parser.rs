@@ -1,8 +1,8 @@
 use crate::{
     lexer::{OperatorToken, Token},
     parser::{
-        ExpectedSyntax, InterfaceDefinitionParseNode, MethodSignatureParseNode, ParseNode,
-        ParseResult, SyntaxError, TokenStream, TypeParseNode,
+        InterfaceDefinitionParseNode, MethodSignatureParseNode, ParseNode, ParseResult,
+        SyntaxError, TokenStream, TypeParseNode,
         grammar::{identifier, parameters, statement_parser::end_statement, type_definition},
     },
 };
@@ -31,11 +31,11 @@ fn method_signatures(
             Ok(methods)
         }
         Token::Operator(OperatorToken::EndStatement) => {
-            tokens.push_error(SyntaxError::Expected(ExpectedSyntax::MethodSignatures));
+            tokens.push_error(SyntaxError::ExpectedMethodSignatures);
             tokens.next();
             Ok(vec![])
         }
-        _ => Err(tokens.make_error(SyntaxError::Expected(ExpectedSyntax::MethodSignatures))),
+        _ => Err(tokens.make_error(SyntaxError::ExpectedMethodSignatures)),
     }
 }
 
@@ -52,7 +52,7 @@ fn method_signature(tokens: &mut TokenStream) -> ParseResult<MethodSignaturePars
 }
 
 fn return_type(tokens: &mut TokenStream) -> ParseResult<Option<ParseNode<TypeParseNode>>> {
-    let error = SyntaxError::Expected(ExpectedSyntax::ReturnType);
+    let error = SyntaxError::ExpectedReturnType;
     match tokens.peek() {
         Token::Operator(OperatorToken::Type) => {
             tokens.next();

@@ -1,7 +1,7 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token, TokenMatch},
     parser::{
-        DeclarationParseNode, ExpectedSyntax, ExpressionParseNode, IfStatementConditionParseNode,
+        DeclarationParseNode, ExpressionParseNode, IfStatementConditionParseNode,
         IfStatementParseNode, ParseNode, ParseResult, StatementParseNode, SyntaxError, TokenStream,
         WhileLoopParseNode,
         grammar::{block, expression, identifier, type_definition},
@@ -49,7 +49,7 @@ fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<Statement
 }
 
 fn initializer(tokens: &mut TokenStream) -> ParseResult<Option<ParseNode<ExpressionParseNode>>> {
-    let error = SyntaxError::Expected(ExpectedSyntax::Initializer);
+    let error = SyntaxError::ExpectedInitializer;
     match tokens.peek() {
         Token::Operator(OperatorToken::Assign) => {
             tokens.next();
@@ -141,6 +141,6 @@ fn expression_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseN
 
 pub fn end_statement(tokens: &mut TokenStream) {
     if !tokens.accept(&OperatorToken::EndStatement) {
-        tokens.push_error(SyntaxError::Expected(ExpectedSyntax::EndStatement));
+        tokens.push_error(SyntaxError::ExpectedEndStatement);
     }
 }

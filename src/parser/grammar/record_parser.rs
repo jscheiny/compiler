@@ -1,8 +1,8 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token},
     parser::{
-        ExpectedSyntax, ParseNode, ParseResult, RecordDefinitionParseNode, RecordMemberParseNode,
-        RecordType, SyntaxError, TokenStream,
+        ParseNode, ParseResult, RecordDefinitionParseNode, RecordMemberParseNode, RecordType,
+        SyntaxError, TokenStream,
         grammar::{comma_separated_list, identifier, methods, type_definition},
     },
 };
@@ -40,17 +40,17 @@ fn members(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<RecordMemberPa
             comma_separated_list(tokens, OperatorToken::CloseParen, member)
         }
         Token::Operator(OperatorToken::OpenBrace) => {
-            tokens.push_error(SyntaxError::Expected(ExpectedSyntax::Members));
+            tokens.push_error(SyntaxError::ExpectedMembers);
             Ok(vec![])
         }
-        _ => Err(tokens.make_error(SyntaxError::Expected(ExpectedSyntax::Members))),
+        _ => Err(tokens.make_error(SyntaxError::ExpectedMembers)),
     }
 }
 
 fn member(tokens: &mut TokenStream) -> ParseResult<RecordMemberParseNode> {
     let public = tokens.accept(&KeywordToken::Pub);
     let identifier = tokens.located(identifier)?;
-    let error = SyntaxError::Expected(ExpectedSyntax::Type);
+    let error = SyntaxError::ExpectedType;
     match tokens.peek() {
         Token::Operator(OperatorToken::Type) => {
             tokens.next();

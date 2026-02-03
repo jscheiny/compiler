@@ -12,12 +12,8 @@ pub struct LocatedSyntaxError {
 
 impl LocatedSyntaxError {
     pub fn print(&self, tokens: &Vec<LocatedToken>) {
-        match self.error {
-            SyntaxError::Expected(_) => {
-                print!("{}", self.error);
-                self.print_found_token(tokens);
-            }
-        }
+        print!("{}", self.error);
+        self.print_found_token(tokens);
     }
 
     pub fn print_found_token(&self, tokens: &Vec<LocatedToken>) {
@@ -36,60 +32,51 @@ impl LocatedSyntaxError {
 
 #[derive(Clone, Copy)]
 pub enum SyntaxError {
-    Expected(ExpectedSyntax),
+    ExpectedBlock,
+    ExpectedCloseParen,
+    ExpectedEndStatement,
+    ExpectedExpression,
+    ExpectedFunctionBody,
+    ExpectedIdentifier,
+    ExpectedInitializer,
+    ExpectedMembers,
+    ExpectedMethods,
+    ExpectedMethodSignatures,
+    ExpectedParameters,
+    ExpectedReturnType,
+    ExpectedTopLevelDefinition,
+    ExpectedType,
+    ExpectedVariants,
 }
 
 impl Display for SyntaxError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Expected(expected) => write!(f, "expected {}", expected),
-        }
-    }
-}
-
-#[derive(Clone, Copy)]
-pub enum ExpectedSyntax {
-    Block,
-    CloseParen,
-    EndStatement,
-    Expression,
-    FunctionBody,
-    Identifier,
-    Initializer,
-    Members,
-    Methods,
-    MethodSignatures,
-    Parameters,
-    ReturnType,
-    TopLevelDefinition,
-    Type,
-    Variants,
-}
-
-impl Display for ExpectedSyntax {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         use OperatorToken as O;
         match self {
-            Self::Block => write!(f, "`{}`", O::OpenBrace),
-            Self::CloseParen => write!(f, "closing parenthesis"),
-            Self::EndStatement => write!(f, "`{}`", O::EndStatement),
-            Self::Expression => write!(f, "expression"),
-            Self::FunctionBody => write!(
+            Self::ExpectedBlock => write!(f, "expected`{}`", O::OpenBrace),
+            Self::ExpectedCloseParen => write!(f, "expectedclosing parenthesis"),
+            Self::ExpectedEndStatement => write!(f, "expected`{}`", O::EndStatement),
+            Self::ExpectedExpression => write!(f, "expectedexpression"),
+            Self::ExpectedFunctionBody => write!(
                 f,
-                "function body with `{}` or `{}`",
+                "expected function body with `{}` or `{}`",
                 O::FunctionDefinition,
                 O::OpenBrace
             ),
-            Self::Identifier => write!(f, "identifier"),
-            Self::Initializer => write!(f, "initializer with `{}`", O::Assign),
-            Self::Members => write!(f, "members"),
-            Self::Methods => write!(f, "methods block or `{}`", O::EndStatement),
-            Self::MethodSignatures => write!(f, "method signatures block"),
-            Self::Parameters => write!(f, "function parameters with `{}`", O::OpenParen),
-            Self::ReturnType => write!(f, "return type"),
-            Self::TopLevelDefinition => write!(f, "struct, tuple, enum, or function"),
-            Self::Type => write!(f, "type"),
-            Self::Variants => write!(f, "enum variants"),
+            Self::ExpectedIdentifier => write!(f, "expectedidentifier"),
+            Self::ExpectedInitializer => write!(f, "expectedinitializer with `{}`", O::Assign),
+            Self::ExpectedMembers => write!(f, "expectedmembers"),
+            Self::ExpectedMethods => write!(f, "expectedmethods block or `{}`", O::EndStatement),
+            Self::ExpectedMethodSignatures => write!(f, "expectedmethod signatures block"),
+            Self::ExpectedParameters => {
+                write!(f, "expectedfunction parameters with `{}`", O::OpenParen)
+            }
+            Self::ExpectedReturnType => write!(f, "expectedreturn type"),
+            Self::ExpectedTopLevelDefinition => {
+                write!(f, "expectedstruct, tuple, enum, or function")
+            }
+            Self::ExpectedType => write!(f, "expectedtype"),
+            Self::ExpectedVariants => write!(f, "expectedenum variants"),
         }
     }
 }
