@@ -1,12 +1,45 @@
 use crate::{
     lexer::{IdentifierToken, IntegerLiteralToken, OperatorToken, StringLiteralToken, Token},
     parser::{
-        BlockParseNode, ExpressionParseNode, ParseResult, SyntaxError, TokenStream,
+        BinaryOpExpressionParseNode, BlockParseNode, ExpressionParseNode, ParseResult, SyntaxError,
+        TokenStream,
         grammar::statement,
+        operator::{BinaryOperator, Operator},
     },
 };
 
 pub fn expression(tokens: &mut TokenStream) -> ParseResult<ExpressionParseNode> {
+    sub_expression(tokens, 1)
+}
+
+fn sub_expression(
+    tokens: &mut TokenStream,
+    min_precedence: i32,
+) -> ParseResult<ExpressionParseNode> {
+    let mut left = expression_atom(tokens)?;
+    loop {
+        let token = tokens.peek();
+        let binary_operator = BinaryOperator::from_token(token);
+        if let Some(operator) = binary_operator {
+            if operator.precedence() < min_precedence {
+                break;
+            }
+            tokens.next();
+            let right = sub_expression(tokens, operator.precedence())?;
+            left = ExpressionParseNode::BinaryOp(BinaryOpExpressionParseNode {
+                left: Box::new(left),
+                operator,
+                right: Box::new(right),
+            });
+        } else {
+            break;
+        }
+    }
+
+    Ok(left)
+}
+
+fn expression_atom(tokens: &mut TokenStream) -> ParseResult<ExpressionParseNode> {
     match tokens.peek() {
         Token::Identifier(IdentifierToken(identifier)) => {
             let identifier = identifier.clone();
@@ -26,6 +59,12 @@ pub fn expression(tokens: &mut TokenStream) -> ParseResult<ExpressionParseNode> 
         Token::Operator(OperatorToken::OpenBrace) => {
             let block = block(tokens)?;
             Ok(ExpressionParseNode::Block(block))
+        }
+        Token::Operator(OperatorToken::OpenParen) => {
+            tokens.next();
+            let expression = sub_expression(tokens, 1)?;
+            tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
+            Ok(expression)
         }
         _ => Err(tokens.make_error(SyntaxError::ExpectedExpression)),
     }

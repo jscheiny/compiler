@@ -1,16 +1,3 @@
-fn test() -> x
-
-interface I {
-    test(): X
+fn test() {
+    a . b *= c / d or y and g;
 }
-
-fn while() {
-    let x = 1
-    return x
-    break
-    continue
-    -> x
-    x
-}
-
-fn test();

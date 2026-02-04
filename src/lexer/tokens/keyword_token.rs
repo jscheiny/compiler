@@ -5,7 +5,7 @@ use strum_macros::EnumIter;
 
 use crate::lexer::{Token, TokenMatch, TokenWidth, TryTokenizeResult};
 
-#[derive(Clone, Copy, EnumIter, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, EnumIter, PartialEq, Eq)]
 pub enum KeywordToken {
     Interface,
     Continue,
@@ -18,13 +18,16 @@ pub enum KeywordToken {
     Bool,
     Else,
     Enum,
+    And,
     Int,
     Let,
     Mut,
+    Not,
     Pub,
     For,
     Fn,
     If,
+    Or,
 }
 
 impl KeywordToken {
@@ -41,13 +44,16 @@ impl KeywordToken {
             Self::Bool => "bool",
             Self::Else => "else",
             Self::Enum => "enum",
+            Self::And => "and",
             Self::Int => "int",
             Self::Let => "let",
             Self::Mut => "mut",
+            Self::Not => "not",
             Self::For => "for",
             Self::Pub => "pub",
             Self::Fn => "fn",
             Self::If => "if",
+            Self::Or => "or",
         }
     }
 }

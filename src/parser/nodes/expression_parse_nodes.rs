@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::parser::{
     BinaryOperator, BlockParseNode, ParseNode, PostfixOperator, PrefixOperator, TokenSpan, Traverse,
 };
@@ -11,6 +13,27 @@ pub enum ExpressionParseNode {
     Block(BlockParseNode),
     Identifier(String),
     Error,
+}
+
+impl Display for ExpressionParseNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ExpressionParseNode::PrefixOp(node) => {
+                write!(f, "{:?}({})", node.operator.value, node.expression.value)
+            }
+            ExpressionParseNode::BinaryOp(node) => {
+                write!(f, "{:?}({}, {})", node.operator, node.left, node.right)
+            }
+            ExpressionParseNode::PostfixOp(node) => {
+                write!(f, "{:?}({})", node.operator.value, node.expression.value)
+            }
+            ExpressionParseNode::StringLiteral(literal) => write!(f, "[{}]", literal),
+            ExpressionParseNode::IntegerLiteral(literal) => write!(f, "[{}]", literal),
+            ExpressionParseNode::Block(_) => write!(f, "[BLOCK]"),
+            ExpressionParseNode::Identifier(identifier) => write!(f, "{}", identifier),
+            ExpressionParseNode::Error => write!(f, "[ERROR]"),
+        }
+    }
 }
 
 impl Traverse for ExpressionParseNode {
@@ -47,16 +70,17 @@ impl Traverse for PrefixOpExpressionParseNode {
     }
 }
 
+// TODO add back locations
 pub struct BinaryOpExpressionParseNode {
-    pub left: ParseNode<Box<ExpressionParseNode>>,
-    pub operator: ParseNode<BinaryOperator>,
-    pub right: ParseNode<Box<ExpressionParseNode>>,
+    pub left: Box<ExpressionParseNode>,
+    pub operator: BinaryOperator,
+    pub right: Box<ExpressionParseNode>,
 }
 
 impl Traverse for BinaryOpExpressionParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         self.left.traverse(visit);
-        visit("BinaryOpExpression.operator", self.operator.span);
+        // visit("BinaryOpExpression.operator", self.operator.span);
         self.right.traverse(visit);
     }
 }
