@@ -22,7 +22,7 @@ impl Operator for PostfixOperator {
     }
 
     fn precedence(&self) -> i32 {
-        10
+        8
     }
 }
 
@@ -139,6 +139,21 @@ impl Operator for BinaryOperator {
             | Self::Assign => 1,
             // Where does this go???
             Self::FunctionApplication => todo!(),
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+pub enum Associativity {
+    Left,
+    Right,
+}
+
+impl BinaryOperator {
+    pub fn associativity(&self) -> Associativity {
+        match self {
+            Self::Access => Associativity::Right,
+            _ => Associativity::Left,
         }
     }
 }

@@ -25,7 +25,7 @@ impl Display for ExpressionParseNode {
                 write!(f, "{:?}({}, {})", node.operator, node.left, node.right)
             }
             ExpressionParseNode::PostfixOp(node) => {
-                write!(f, "{:?}({})", node.operator.value, node.expression.value)
+                write!(f, "{:?}({})", node.operator, node.expression)
             }
             ExpressionParseNode::StringLiteral(literal) => write!(f, "[{}]", literal),
             ExpressionParseNode::IntegerLiteral(literal) => write!(f, "[{}]", literal),
@@ -86,13 +86,13 @@ impl Traverse for BinaryOpExpressionParseNode {
 }
 
 pub struct PostfixOpExpressionParseNode {
-    pub expression: ParseNode<Box<ExpressionParseNode>>,
-    pub operator: ParseNode<PostfixOperator>,
+    pub expression: Box<ExpressionParseNode>,
+    pub operator: PostfixOperator,
 }
 
 impl Traverse for PostfixOpExpressionParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         self.expression.traverse(visit);
-        visit("PostfixOpExpression.operator", self.operator.span);
+        // visit("PostfixOpExpression.operator", self.operator.span);
     }
 }

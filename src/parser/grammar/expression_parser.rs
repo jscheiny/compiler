@@ -2,9 +2,9 @@ use crate::{
     lexer::{IdentifierToken, IntegerLiteralToken, OperatorToken, StringLiteralToken, Token},
     parser::{
         BinaryOpExpressionParseNode, BlockParseNode, ExpressionParseNode, ParseResult,
-        PrefixOpExpressionParseNode, SyntaxError, TokenStream,
+        PostfixOpExpressionParseNode, PrefixOpExpressionParseNode, SyntaxError, TokenStream,
         grammar::statement,
-        operator::{BinaryOperator, Operator, PrefixOperator},
+        operator::{Associativity, BinaryOperator, Operator, PostfixOperator, PrefixOperator},
     },
 };
 
@@ -19,13 +19,28 @@ fn sub_expression(
     let mut left = expression_atom(tokens)?;
     loop {
         let token = tokens.peek();
-        let binary_operator = BinaryOperator::from_token(token);
-        if let Some(operator) = binary_operator {
+        if let Some(operator) = PostfixOperator::from_token(token) {
             if operator.precedence() < min_precedence {
                 break;
             }
+
             tokens.next();
-            let right = sub_expression(tokens, operator.precedence())?;
+            left = ExpressionParseNode::PostfixOp(PostfixOpExpressionParseNode {
+                expression: Box::new(left),
+                operator,
+            });
+        } else if let Some(operator) = BinaryOperator::from_token(token) {
+            if operator.precedence() < min_precedence {
+                break;
+            }
+
+            let next_min_precedence = operator.precedence()
+                + match operator.associativity() {
+                    Associativity::Left => 0,
+                    Associativity::Right => 1,
+                };
+            tokens.next();
+            let right = sub_expression(tokens, next_min_precedence)?;
             left = ExpressionParseNode::BinaryOp(BinaryOpExpressionParseNode {
                 left: Box::new(left),
                 operator,
