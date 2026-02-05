@@ -4,7 +4,7 @@ use colored::Colorize;
 
 use crate::{
     lexer::{Severity, SourceCode},
-    parser::program,
+    parser::{Traverse, program},
 };
 
 pub mod lexer;
@@ -20,6 +20,14 @@ fn main() {
     let source = SourceCode::read(args[1].as_str()).unwrap();
     let mut tokens = source.token_stream();
     let result = program(&mut tokens);
+    if let Ok(program) = result.as_ref() {
+        program.traverse(&|message, span| {
+            if source.is_single_line(span) {
+                source.print_token_span(span, '-', message, Severity::Note);
+            }
+        });
+        println!();
+    }
     if let Err(syntax_err) = result {
         tokens.errors.push(syntax_err);
     }

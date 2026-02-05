@@ -66,13 +66,14 @@ fn sub_expression(
                 break;
             }
 
+            let arguments_span = TokenSpan::singleton(tokens);
             tokens.next();
 
             let right = tokens.located(expression)?;
-            let arguments_span = right.span;
             let arguments = flatten_arguments(right);
 
             tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
+            let arguments_span = arguments_span.expand_to(tokens);
             let span = left.span.expand_to(tokens);
 
             left = span.wrap(ExpressionParseNode::FunctionCall(
