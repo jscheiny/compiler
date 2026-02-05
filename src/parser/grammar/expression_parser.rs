@@ -13,7 +13,7 @@ use crate::{
 };
 
 pub fn expression(tokens: &mut TokenStream) -> ParseResult<ExpressionParseNode> {
-    sub_expression(tokens, 1)
+    sub_expression(tokens, 0)
 }
 
 fn sub_expression(
@@ -43,16 +43,24 @@ fn sub_expression(
                 break;
             }
 
-            let next_min_precedence = operator.precedence()
-                + match operator.associativity() {
-                    Associativity::Left => 0,
-                    Associativity::Right => 1,
-                };
+            let is_function_call = operator == BinaryOperator::FunctionCall;
+            let next_min_precedence = if is_function_call {
+                0
+            } else {
+                operator.precedence()
+                    + match operator.associativity() {
+                        Associativity::Left => 0,
+                        Associativity::Right => 1,
+                    }
+            };
 
             let operator = TokenSpan::singleton(tokens).wrap(operator);
             tokens.next();
 
             let right = tokens.located_with(sub_expression, next_min_precedence)?;
+            if is_function_call {
+                tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
+            }
             let span = left.span.expand_to(tokens);
             left = span.wrap(ExpressionParseNode::BinaryOp(BinaryOpExpressionParseNode {
                 left: Box::new(left),

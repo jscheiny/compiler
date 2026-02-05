@@ -50,7 +50,7 @@ impl Operator for PrefixOperator {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BinaryOperator {
     Add,                 // +
     AddAssign,           // +=
@@ -70,7 +70,9 @@ pub enum BinaryOperator {
     GreaterThan,         // >
     GreaterThanOrEqual,  // >=
     Access,              // .
+    FunctionCall,        // (
     FunctionApplication, // =>
+    Comma,               // ,
     LogicalAnd,          // and
     LogicalOr,           // or
 }
@@ -88,13 +90,15 @@ impl Operator for BinaryOperator {
                 O::PercentEqual => Some(Self::ModAssign),
                 O::DoubleEqual => Some(Self::Equal),
                 O::NotEqual => Some(Self::NotEqual),
+                O::LessThan => Some(Self::LessThan),
                 O::LessThanEqual => Some(Self::LessThanOrEqual),
+                O::GreaterThan => Some(Self::GreaterThan),
                 O::GreaterThanEqual => Some(Self::GreaterThanOrEqual),
                 O::Dot => Some(Self::Access),
+                O::OpenParen => Some(Self::FunctionCall),
                 O::ThickArrow => Some(Self::FunctionApplication),
+                O::Comma => Some(Self::Comma),
                 O::Equal => Some(Self::Assign),
-                O::LessThan => Some(Self::LessThan),
-                O::GreaterThan => Some(Self::GreaterThan),
                 O::Plus => Some(Self::Add),
                 O::Minus => Some(Self::Subtract),
                 O::Times => Some(Self::Multiply),
@@ -113,8 +117,8 @@ impl Operator for BinaryOperator {
 
     fn precedence(&self) -> i32 {
         match self {
-            // Access
-            Self::Access => 8,
+            // Function call / Access
+            Self::FunctionCall | Self::Access => 8,
             // Multiplicative
             Self::Multiply | Self::Divide | Self::Mod => 7,
             // Additive
@@ -137,6 +141,8 @@ impl Operator for BinaryOperator {
             | Self::DivideAssign
             | Self::ModAssign
             | Self::Assign => 1,
+            // Comma
+            Self::Comma => 0,
             // Where does this go???
             Self::FunctionApplication => todo!(),
         }
