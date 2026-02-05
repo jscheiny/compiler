@@ -30,7 +30,7 @@ fn method_signatures(
             }
             Ok(methods)
         }
-        Token::Operator(OperatorToken::EndStatement) => {
+        Token::Operator(OperatorToken::Semicolon) => {
             tokens.push_error(SyntaxError::ExpectedMethodSignatures);
             tokens.next();
             Ok(vec![])
@@ -54,11 +54,11 @@ fn method_signature(tokens: &mut TokenStream) -> ParseResult<MethodSignaturePars
 fn return_type(tokens: &mut TokenStream) -> ParseResult<Option<ParseNode<TypeParseNode>>> {
     let error = SyntaxError::ExpectedReturnType;
     match tokens.peek() {
-        Token::Operator(OperatorToken::Type) => {
+        Token::Operator(OperatorToken::Colon) => {
             tokens.next();
             Ok(Some(tokens.located(type_definition)?))
         }
-        Token::Operator(OperatorToken::EndStatement) => {
+        Token::Operator(OperatorToken::Semicolon) => {
             tokens.push_error(error);
             Ok(None)
         }

@@ -16,7 +16,7 @@ pub enum PostfixOperator {
 impl Operator for PostfixOperator {
     fn from_token(token: &Token) -> Option<PostfixOperator> {
         match token {
-            Token::Operator(OperatorToken::NullShortCircuit) => Some(Self::NullShortCircuit),
+            Token::Operator(OperatorToken::QuestionMark) => Some(Self::NullShortCircuit),
             _ => None,
         }
     }
@@ -37,9 +37,9 @@ pub enum PrefixOperator {
 impl Operator for PrefixOperator {
     fn from_token(token: &Token) -> Option<PrefixOperator> {
         match token {
-            Token::Operator(OperatorToken::Access) => Some(Self::Closure),
-            Token::Operator(OperatorToken::Subtract) => Some(Self::Negative),
-            Token::Operator(OperatorToken::SelfRef) => Some(Self::SelfRef),
+            Token::Operator(OperatorToken::Dot) => Some(Self::Closure),
+            Token::Operator(OperatorToken::Minus) => Some(Self::Negative),
+            Token::Operator(OperatorToken::At) => Some(Self::SelfRef),
             Token::Keyword(KeywordToken::Not) => Some(Self::LogicalNot),
             _ => None,
         }
@@ -81,25 +81,25 @@ impl Operator for BinaryOperator {
         use OperatorToken as O;
         match token {
             Token::Operator(operator) => match operator {
-                O::AddAssign => Some(Self::AddAssign),
-                O::SubtractAssign => Some(Self::SubtractAssign),
-                O::MultiplyAssign => Some(Self::MultiplyAssign),
-                O::DivideAssign => Some(Self::DivideAssign),
-                O::ModAssign => Some(Self::ModAssign),
-                O::Equal => Some(Self::Equal),
+                O::PlusEqual => Some(Self::AddAssign),
+                O::MinusEqual => Some(Self::SubtractAssign),
+                O::TimesEqual => Some(Self::MultiplyAssign),
+                O::SlashEqual => Some(Self::DivideAssign),
+                O::PercentEqual => Some(Self::ModAssign),
+                O::DoubleEqual => Some(Self::Equal),
                 O::NotEqual => Some(Self::NotEqual),
-                O::LessThanOrEqual => Some(Self::LessThanOrEqual),
-                O::GreaterThanOrEqual => Some(Self::GreaterThanOrEqual),
-                O::Access => Some(Self::Access),
-                O::FunctionApplication => Some(Self::FunctionApplication),
-                O::Assign => Some(Self::Assign),
+                O::LessThanEqual => Some(Self::LessThanOrEqual),
+                O::GreaterThanEqual => Some(Self::GreaterThanOrEqual),
+                O::Dot => Some(Self::Access),
+                O::ThickArrow => Some(Self::FunctionApplication),
+                O::Equal => Some(Self::Assign),
                 O::LessThan => Some(Self::LessThan),
                 O::GreaterThan => Some(Self::GreaterThan),
-                O::Add => Some(Self::Add),
-                O::Subtract => Some(Self::Subtract),
-                O::Multiply => Some(Self::Multiply),
-                O::Divide => Some(Self::Divide),
-                O::Mod => Some(Self::Mod),
+                O::Plus => Some(Self::Add),
+                O::Minus => Some(Self::Subtract),
+                O::Times => Some(Self::Multiply),
+                O::Slash => Some(Self::Divide),
+                O::Percent => Some(Self::Mod),
                 _ => None,
             },
             Token::Keyword(keyword) => match keyword {

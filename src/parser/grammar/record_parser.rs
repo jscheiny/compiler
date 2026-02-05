@@ -56,7 +56,7 @@ fn member(tokens: &mut TokenStream) -> ParseResult<RecordMemberParseNode> {
     let identifier = tokens.identifier(IdentifierType::Member)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {
-        Token::Operator(OperatorToken::Type) => {
+        Token::Operator(OperatorToken::Colon) => {
             tokens.next();
             let type_def = Some(tokens.located(type_definition)?);
             Ok(RecordMemberParseNode {

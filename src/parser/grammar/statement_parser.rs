@@ -22,7 +22,7 @@ pub fn statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
         },
         Token::Operator(operator) => match operator {
             OperatorToken::OpenBrace => block_statement(tokens),
-            OperatorToken::FunctionDefinition => block_return(tokens),
+            OperatorToken::SkinnyArrow => block_return(tokens),
             _ => expression_statement(tokens),
         },
         _ => expression_statement(tokens),
@@ -32,7 +32,7 @@ pub fn statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
 fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<StatementParseNode> {
     tokens.next();
     let identifier = tokens.identifier(IdentifierType::Variable)?;
-    let type_def = if tokens.accept(&OperatorToken::Type) {
+    let type_def = if tokens.accept(&OperatorToken::Colon) {
         Some(tokens.located(type_definition)?)
     } else {
         None
@@ -51,11 +51,11 @@ fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<Statement
 fn initializer(tokens: &mut TokenStream) -> ParseResult<Option<ParseNode<ExpressionParseNode>>> {
     let error = SyntaxError::ExpectedInitializer;
     match tokens.peek() {
-        Token::Operator(OperatorToken::Assign) => {
+        Token::Operator(OperatorToken::Equal) => {
             tokens.next();
             Ok(Some(tokens.located(expression)?))
         }
-        Token::Operator(OperatorToken::EndStatement) => {
+        Token::Operator(OperatorToken::Semicolon) => {
             tokens.push_error(error);
             Ok(None)
         }
@@ -65,7 +65,7 @@ fn initializer(tokens: &mut TokenStream) -> ParseResult<Option<ParseNode<Express
 
 fn function_return(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
     tokens.next();
-    if tokens.accept(&OperatorToken::EndStatement) {
+    if tokens.accept(&OperatorToken::Semicolon) {
         Ok(StatementParseNode::FunctionReturn(None))
     } else {
         let expression = tokens.located(expression)?;
@@ -141,7 +141,7 @@ fn expression_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseN
 }
 
 pub fn end_statement(tokens: &mut TokenStream) {
-    if !tokens.accept(&OperatorToken::EndStatement) {
+    if !tokens.accept(&OperatorToken::Semicolon) {
         tokens.push_error(SyntaxError::ExpectedEndStatement);
     }
 }
