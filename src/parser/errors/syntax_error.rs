@@ -36,6 +36,7 @@ pub enum IdentifierType {
     Struct,
     Tuple,
     Type,
+    TypeAlias,
     Variable,
     Variant,
 }
@@ -43,18 +44,19 @@ pub enum IdentifierType {
 impl Display for IdentifierType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
-            Self::Function => "function name",
-            Self::Interface => "interface name",
-            Self::Method => "method name",
-            Self::Member => "member name",
-            Self::Parameter => "parameter name",
-            Self::Struct => "struct name",
-            Self::Tuple => "tuple name",
-            Self::Type => "type name",
-            Self::Variable => "variable name",
-            Self::Variant => "variant name",
+            Self::Function => "function",
+            Self::Interface => "interface",
+            Self::Method => "method",
+            Self::Member => "member",
+            Self::Parameter => "parameter",
+            Self::Struct => "struct",
+            Self::Tuple => "tuple",
+            Self::Type => "type",
+            Self::TypeAlias => "type alias",
+            Self::Variable => "variable",
+            Self::Variant => "variant",
         };
-        write!(f, "{}", message)
+        write!(f, "{} name", message)
     }
 }
 

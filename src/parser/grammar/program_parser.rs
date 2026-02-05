@@ -3,7 +3,7 @@ use crate::{
     parser::{
         ModuleTopLevelDefinition, ParseResult, ProgramParseNode, SyntaxError, TokenStream,
         TopLevelDefinition,
-        grammar::{enumeration, interface, structure, top_level_function, tuple},
+        grammar::{enumeration, interface, structure, top_level_function, tuple, type_alias},
     },
 };
 
@@ -31,6 +31,7 @@ fn top_level_definition(tokens: &mut TokenStream) -> ParseResult<TopLevelDefinit
             K::Enum => Ok(TopLevelDefinition::Enum(enumeration(tokens)?)),
             K::Interface => Ok(TopLevelDefinition::Interface(interface(tokens)?)),
             K::Fn => Ok(TopLevelDefinition::Function(top_level_function(tokens)?)),
+            K::Type => Ok(TopLevelDefinition::TypeAlias(type_alias(tokens)?)),
             _ => Err(tokens.make_error(SyntaxError::ExpectedTopLevelDefinition)),
         }
     } else {

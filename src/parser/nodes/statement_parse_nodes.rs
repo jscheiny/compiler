@@ -1,5 +1,6 @@
 use crate::parser::{
-    ExpressionParseNode, IdentifierParseNode, ParseNode, TokenSpan, Traverse, TypeParseNode,
+    ExpressionParseNode, IdentifierParseNode, ParseNode, TokenSpan, Traverse, TypeAliasParseNode,
+    TypeParseNode,
 };
 
 pub enum StatementParseNode {
@@ -7,6 +8,7 @@ pub enum StatementParseNode {
     Break(),
     Continue(),
     Declaration(DeclarationParseNode),
+    TypeAlias(TypeAliasParseNode),
     Expression(ExpressionParseNode),
     FunctionReturn(Option<ParseNode<ExpressionParseNode>>),
     If(IfStatementParseNode),
@@ -18,6 +20,7 @@ impl Traverse for StatementParseNode {
         match self {
             Self::BlockReturn(node) => node.traverse("Statement::BlockReturn", visit),
             Self::Declaration(node) => node.traverse(visit),
+            Self::TypeAlias(node) => node.traverse(visit),
             Self::Expression(node) => node.traverse(visit),
             Self::If(node) => node.traverse(visit),
             Self::WhileLoop(node) => node.traverse(visit),

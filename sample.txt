@@ -1,3 +1,5 @@
-fn test(x: (A, B), y: (A, B) -> C) {
+pub type T = (A, B) -> C;
 
+fn test() {
+    type T = int;
 }

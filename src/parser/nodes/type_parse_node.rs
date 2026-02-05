@@ -1,6 +1,6 @@
 use crate::{
     lexer::KeywordToken,
-    parser::{ParseNode, ParseNodeVec, TokenSpan, Traverse},
+    parser::{IdentifierParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse},
 };
 
 pub enum TypeParseNode {
@@ -44,5 +44,17 @@ impl Traverse for TupleTypeParseNode {
         for member in self.members.iter() {
             member.traverse("TupleType.member", visit);
         }
+    }
+}
+
+pub struct TypeAliasParseNode {
+    pub identifier: ParseNode<IdentifierParseNode>,
+    pub type_def: ParseNode<TypeParseNode>,
+}
+
+impl Traverse for TypeAliasParseNode {
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        visit("TypeAlias.identifier", self.identifier.span);
+        self.type_def.traverse("TypeAlias.type", visit);
     }
 }

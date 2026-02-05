@@ -1,6 +1,6 @@
 use crate::parser::{
     EnumParseNode, FunctionDefintionParseNode, InterfaceDefinitionParseNode, ParseNode,
-    RecordDefinitionParseNode, TokenSpan, Traverse,
+    RecordDefinitionParseNode, TokenSpan, Traverse, TypeAliasParseNode,
 };
 
 pub struct ProgramParseNode {
@@ -31,6 +31,7 @@ pub enum TopLevelDefinition {
     Enum(EnumParseNode),
     Interface(InterfaceDefinitionParseNode),
     Function(FunctionDefintionParseNode),
+    TypeAlias(TypeAliasParseNode),
 }
 
 impl Traverse for TopLevelDefinition {
@@ -40,6 +41,7 @@ impl Traverse for TopLevelDefinition {
             Self::Enum(node) => node.traverse(visit),
             Self::Interface(node) => node.traverse(visit),
             Self::Function(node) => node.traverse(visit),
+            Self::TypeAlias(node) => node.traverse(visit),
         }
     }
 }
