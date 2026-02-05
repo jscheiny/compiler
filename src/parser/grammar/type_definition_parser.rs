@@ -1,44 +1,24 @@
 use crate::{
-    lexer::{KeywordToken, OperatorToken, Token},
-    parser::{
-        IdentifierType, ParseNode, ParseResult, SyntaxError, TokenStream, TypeParseNode,
-        UserDefinedTypeParseNode, grammar::comma_separated_list,
-    },
+    lexer::{IdentifierToken, KeywordToken, Token},
+    parser::{ParseResult, SyntaxError, TokenStream, TypeParseNode},
 };
 
 pub fn type_definition(tokens: &mut TokenStream) -> ParseResult<TypeParseNode> {
     let token = tokens.peek();
     match token {
-        Token::Identifier(_) => user_defined_type(tokens),
+        Token::Identifier(IdentifierToken(identifier)) => {
+            let identifier = identifier.clone();
+            tokens.next();
+            Ok(TypeParseNode::UserDefined(identifier))
+        }
         Token::Keyword(keyword) => match keyword {
             KeywordToken::Bool | KeywordToken::Int | KeywordToken::Float => {
                 let keyword = *keyword;
                 tokens.next();
                 Ok(TypeParseNode::Primitive(keyword))
             }
-            _ => user_defined_type(tokens),
+            _ => Err(tokens.make_error(SyntaxError::ExpectedType)),
         },
         _ => Err(tokens.make_error(SyntaxError::ExpectedType)),
-    }
-}
-
-fn user_defined_type(tokens: &mut TokenStream) -> ParseResult<TypeParseNode> {
-    let identifier = tokens.identifier(IdentifierType::Type)?;
-    let generic_params = tokens.maybe_located(generic_type_params)?;
-
-    Ok(TypeParseNode::UserDefined(UserDefinedTypeParseNode {
-        identifier,
-        generic_params,
-    }))
-}
-
-fn generic_type_params(
-    tokens: &mut TokenStream,
-) -> ParseResult<Option<Vec<ParseNode<TypeParseNode>>>> {
-    if tokens.accept(&OperatorToken::OpenBracket) {
-        let params = comma_separated_list(tokens, OperatorToken::CloseBracket, type_definition)?;
-        Ok(Some(params))
-    } else {
-        Ok(None)
     }
 }

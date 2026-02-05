@@ -1,35 +1,34 @@
 use crate::{
     lexer::KeywordToken,
-    parser::{IdentifierParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse},
+    parser::{ParseNode, ParseNodeVec, TokenSpan, Traverse},
 };
 
 pub enum TypeParseNode {
-    Primitive(KeywordToken),
-    UserDefined(UserDefinedTypeParseNode),
+    Primitive(KeywordToken), // TODO make a primitive type enum
+    UserDefined(String),
+    Function(FunctionTypeParseNode),
 }
 
 impl Traverse for TypeParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         match self {
-            Self::Primitive(_) => {}
-            Self::UserDefined(node) => node.traverse(visit),
+            Self::Primitive(_) | Self::UserDefined(_) => {}
+            Self::Function(node) => node.traverse(visit),
         }
     }
 }
 
-pub struct UserDefinedTypeParseNode {
-    pub identifier: ParseNode<IdentifierParseNode>,
-    pub generic_params: Option<ParseNodeVec<TypeParseNode>>,
+pub struct FunctionTypeParseNode {
+    parameters: Box<ParseNodeVec<TypeParseNode>>,
+    return_type: Box<ParseNode<TypeParseNode>>,
 }
 
-impl Traverse for UserDefinedTypeParseNode {
+impl Traverse for FunctionTypeParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        visit("UserDefinedType.identifier", self.identifier.span);
-        if let Some(generics) = self.generic_params.as_ref() {
-            visit("UserDefinedType.generics", generics.span);
-            for generic in generics.value.iter() {
-                generic.traverse("UserDefinedType.generic", visit);
-            }
+        visit("FunctionType.parameters", self.parameters.span);
+        for parameter in self.parameters.value.iter() {
+            parameter.traverse("FunctionType.parameter", visit);
         }
+        self.return_type.traverse("FunctionType.return_type", visit);
     }
 }

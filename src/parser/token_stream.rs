@@ -81,15 +81,6 @@ impl TokenStream {
         Ok(self.close(value, start_index))
     }
 
-    pub fn maybe_located<P, E>(
-        &mut self,
-        parse: impl Fn(&mut TokenStream) -> Result<Option<P>, E>,
-    ) -> Result<Option<ParseNode<P>>, E> {
-        let start_index = self.index;
-        let result = parse(self)?;
-        Ok(result.map(|value| self.close(value, start_index)))
-    }
-
     pub fn index(&self) -> usize {
         self.index
     }
