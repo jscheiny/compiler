@@ -4,12 +4,11 @@ use crate::{
         Token, TokenMatch,
     },
     parser::{
-        BinaryOpExpressionParseNode, BlockParseNode, ExpressionParseNode,
-        FunctionCallExpressionParseNode, IfExpressionParseNode, ParseNode, ParseResult,
-        PostfixOpExpressionParseNode, PrefixOpExpressionParseNode, SyntaxError, TokenSpan,
-        TokenStream,
+        Associativity, BinaryOpExpressionParseNode, BinaryOperator, BlockParseNode,
+        ExpressionParseNode, FunctionCallExpressionParseNode, IfExpressionParseNode, Operator,
+        ParseNode, ParseResult, PostfixOpExpressionParseNode, PostfixOperator,
+        PrefixOpExpressionParseNode, PrefixOperator, SyntaxError, TokenSpan, TokenStream,
         grammar::statement,
-        operator::{Associativity, BinaryOperator, Operator, PostfixOperator, PrefixOperator},
     },
 };
 

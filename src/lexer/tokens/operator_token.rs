@@ -68,7 +68,7 @@ impl OperatorToken {
             Self::Slash => "/",
             Self::Percent => "%",
             Self::Colon => ":",
-            Self::At => "^",
+            Self::At => "@",
             Self::OpenParen => "(",
             Self::CloseParen => ")",
             Self::OpenBracket => "[",
