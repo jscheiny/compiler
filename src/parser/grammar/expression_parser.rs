@@ -1,10 +1,10 @@
 use crate::{
     lexer::{IdentifierToken, IntegerLiteralToken, OperatorToken, StringLiteralToken, Token},
     parser::{
-        BinaryOpExpressionParseNode, BlockParseNode, ExpressionParseNode, ParseResult, SyntaxError,
-        TokenStream,
+        BinaryOpExpressionParseNode, BlockParseNode, ExpressionParseNode, ParseResult,
+        PrefixOpExpressionParseNode, SyntaxError, TokenStream,
         grammar::statement,
-        operator::{BinaryOperator, Operator},
+        operator::{BinaryOperator, Operator, PrefixOperator},
     },
 };
 
@@ -40,6 +40,15 @@ fn sub_expression(
 }
 
 fn expression_atom(tokens: &mut TokenStream) -> ParseResult<ExpressionParseNode> {
+    let operator = PrefixOperator::from_token(tokens.peek());
+    if let Some(operator) = operator {
+        tokens.next();
+        let expression = sub_expression(tokens, operator.precedence())?;
+        return Ok(ExpressionParseNode::PrefixOp(PrefixOpExpressionParseNode {
+            operator,
+            expression: Box::new(expression),
+        }));
+    }
     match tokens.peek() {
         Token::Identifier(IdentifierToken(identifier)) => {
             let identifier = identifier.clone();

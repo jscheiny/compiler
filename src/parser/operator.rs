@@ -28,6 +28,7 @@ impl Operator for PostfixOperator {
 
 #[derive(Clone, Copy, Debug)]
 pub enum PrefixOperator {
+    Closure,    // .
     LogicalNot, // not
     Negative,   // -
     SelfRef,    // @
@@ -36,6 +37,7 @@ pub enum PrefixOperator {
 impl Operator for PrefixOperator {
     fn from_token(token: &Token) -> Option<PrefixOperator> {
         match token {
+            Token::Operator(OperatorToken::Access) => Some(Self::Closure),
             Token::Operator(OperatorToken::Subtract) => Some(Self::Negative),
             Token::Operator(OperatorToken::SelfRef) => Some(Self::SelfRef),
             Token::Keyword(KeywordToken::Not) => Some(Self::LogicalNot),

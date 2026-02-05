@@ -19,7 +19,7 @@ impl Display for ExpressionParseNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ExpressionParseNode::PrefixOp(node) => {
-                write!(f, "{:?}({})", node.operator.value, node.expression.value)
+                write!(f, "{:?}({})", node.operator, node.expression)
             }
             ExpressionParseNode::BinaryOp(node) => {
                 write!(f, "{:?}({}, {})", node.operator, node.left, node.right)
@@ -59,13 +59,13 @@ impl Traverse for ParseNode<Box<ExpressionParseNode>> {
 }
 
 pub struct PrefixOpExpressionParseNode {
-    pub operator: ParseNode<PrefixOperator>,
-    pub expression: ParseNode<Box<ExpressionParseNode>>,
+    pub operator: PrefixOperator,
+    pub expression: Box<ExpressionParseNode>,
 }
 
 impl Traverse for PrefixOpExpressionParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        visit("PrefixOpExpression.operator", self.operator.span);
+        // visit("PrefixOpExpression.operator", self.operator.span);
         self.expression.traverse(visit);
     }
 }
