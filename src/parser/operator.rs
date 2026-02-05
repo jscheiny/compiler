@@ -158,7 +158,12 @@ pub enum Associativity {
 impl BinaryOperator {
     pub fn associativity(&self) -> Associativity {
         match self {
-            Self::Access => Associativity::Right,
+            Self::AddAssign
+            | Self::SubtractAssign
+            | Self::MultiplyAssign
+            | Self::DivideAssign
+            | Self::ModAssign
+            | Self::Assign => Associativity::Right,
             _ => Associativity::Left,
         }
     }

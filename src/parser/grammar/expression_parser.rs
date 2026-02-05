@@ -49,8 +49,8 @@ fn sub_expression(
             } else {
                 operator.precedence()
                     + match operator.associativity() {
-                        Associativity::Left => 0,
-                        Associativity::Right => 1,
+                        Associativity::Left => 1,
+                        Associativity::Right => 0,
                     }
             };
 

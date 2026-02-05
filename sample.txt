@@ -1,3 +1,4 @@
 fn test() {
-    f(a, b, c + 5);
+    a = b = ^c;
+    ^a?.b.c;
 }
