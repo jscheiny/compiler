@@ -1,13 +1,15 @@
 use std::fmt::Display;
 
 use crate::parser::{
-    BinaryOperator, BlockParseNode, ParseNode, PostfixOperator, PrefixOperator, TokenSpan, Traverse,
+    BinaryOperator, BlockParseNode, ParseNode, ParseNodeVec, PostfixOperator, PrefixOperator,
+    TokenSpan, Traverse,
 };
 
 pub enum ExpressionParseNode {
     PrefixOp(PrefixOpExpressionParseNode),
     BinaryOp(BinaryOpExpressionParseNode),
     PostfixOp(PostfixOpExpressionParseNode),
+    FunctionCall(FunctionCallExpressionParseNode),
     IfExpression(IfExpressionParseNode),
     StringLiteral(String),
     IntegerLiteral(i64),
@@ -32,6 +34,16 @@ impl Display for ExpressionParseNode {
             ExpressionParseNode::PostfixOp(node) => {
                 write!(f, "{:?}({})", node.operator.value, node.expression.value)
             }
+            ExpressionParseNode::FunctionCall(node) => {
+                write!(f, "Call({}, (", node.function.value)?;
+                for (index, arg) in node.arguments.value.iter().enumerate() {
+                    write!(f, "{}", arg.value)?;
+                    if index != node.arguments.value.len() - 1 {
+                        write!(f, ", ")?;
+                    }
+                }
+                write!(f, "))")
+            }
             ExpressionParseNode::IfExpression(node) => {
                 write!(
                     f,
@@ -54,8 +66,9 @@ impl Traverse for ExpressionParseNode {
             Self::PrefixOp(node) => node.traverse(visit),
             Self::BinaryOp(node) => node.traverse(visit),
             Self::PostfixOp(node) => node.traverse(visit),
-            Self::Block(node) => node.traverse(visit),
+            Self::FunctionCall(node) => node.traverse(visit),
             Self::IfExpression(node) => node.traverse(visit),
+            Self::Block(node) => node.traverse(visit),
             Self::StringLiteral(_)
             | Self::IntegerLiteral(_)
             | Self::Identifier(_)
@@ -108,6 +121,21 @@ impl Traverse for PostfixOpExpressionParseNode {
         self.expression
             .traverse("PostfixOpExpression.expression", visit);
         visit("PostfixOpExpression.operator", self.operator.span);
+    }
+}
+
+pub struct FunctionCallExpressionParseNode {
+    pub function: Box<ParseNode<ExpressionParseNode>>,
+    pub arguments: ParseNodeVec<ExpressionParseNode>,
+}
+
+impl Traverse for FunctionCallExpressionParseNode {
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        self.function.traverse("FunctionCall.function", visit);
+        visit("FunctionCall.arguments", self.arguments.span);
+        for argument in self.arguments.value.iter() {
+            argument.traverse("FunctionCall.argument", visit);
+        }
     }
 }
 

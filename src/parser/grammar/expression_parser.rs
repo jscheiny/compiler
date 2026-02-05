@@ -1,12 +1,13 @@
 use crate::{
     lexer::{
         IdentifierToken, IntegerLiteralToken, KeywordToken, OperatorToken, StringLiteralToken,
-        Token,
+        Token, TokenMatch,
     },
     parser::{
-        BinaryOpExpressionParseNode, BlockParseNode, ExpressionParseNode, IfExpressionParseNode,
-        ParseResult, PostfixOpExpressionParseNode, PrefixOpExpressionParseNode, SyntaxError,
-        TokenSpan, TokenStream,
+        BinaryOpExpressionParseNode, BlockParseNode, ExpressionParseNode,
+        FunctionCallExpressionParseNode, IfExpressionParseNode, ParseNode, ParseResult,
+        PostfixOpExpressionParseNode, PrefixOpExpressionParseNode, SyntaxError, TokenSpan,
+        TokenStream,
         grammar::statement,
         operator::{Associativity, BinaryOperator, Operator, PostfixOperator, PrefixOperator},
     },
@@ -43,36 +44,76 @@ fn sub_expression(
                 break;
             }
 
-            let is_function_call = operator == BinaryOperator::FunctionCall;
-            let next_min_precedence = if is_function_call {
-                0
-            } else {
-                operator.precedence()
-                    + match operator.associativity() {
-                        Associativity::Left => 1,
-                        Associativity::Right => 0,
-                    }
-            };
+            let next_min_precedence = operator.precedence()
+                + match operator.associativity() {
+                    Associativity::Left => 1,
+                    Associativity::Right => 0,
+                };
 
             let operator = TokenSpan::singleton(tokens).wrap(operator);
             tokens.next();
 
             let right = tokens.located_with(sub_expression, next_min_precedence)?;
-            if is_function_call {
-                tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
-            }
             let span = left.span.expand_to(tokens);
             left = span.wrap(ExpressionParseNode::BinaryOp(BinaryOpExpressionParseNode {
                 left: Box::new(left),
                 operator,
                 right: Box::new(right),
             }));
+        } else if OperatorToken::OpenParen.matches(token) {
+            let precedence = BinaryOperator::Access.precedence();
+            if precedence < min_precedence {
+                break;
+            }
+
+            tokens.next();
+
+            let right = tokens.located(expression)?;
+            let arguments_span = right.span;
+            let arguments = flatten_arguments(right);
+
+            tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
+            let span = left.span.expand_to(tokens);
+
+            left = span.wrap(ExpressionParseNode::FunctionCall(
+                FunctionCallExpressionParseNode {
+                    function: Box::new(left),
+                    arguments: arguments_span.wrap(arguments),
+                },
+            ))
         } else {
             break;
         }
     }
 
     Ok(left.value)
+}
+
+fn flatten_arguments(
+    expression: ParseNode<ExpressionParseNode>,
+) -> Vec<ParseNode<ExpressionParseNode>> {
+    let mut arguments = vec![];
+    let mut current = expression;
+    loop {
+        if let ExpressionParseNode::BinaryOp(BinaryOpExpressionParseNode {
+            left,
+            operator,
+            right,
+        }) = current.value
+        {
+            if operator.value != BinaryOperator::Comma {
+                arguments.push(*right);
+                break;
+            }
+            arguments.push(*left);
+            current = *right;
+        } else {
+            arguments.push(current);
+            break;
+        }
+    }
+
+    arguments
 }
 
 fn expression_atom(tokens: &mut TokenStream) -> ParseResult<ExpressionParseNode> {

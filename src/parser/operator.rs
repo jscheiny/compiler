@@ -70,7 +70,6 @@ pub enum BinaryOperator {
     GreaterThan,         // >
     GreaterThanOrEqual,  // >=
     Access,              // .
-    FunctionCall,        // (
     FunctionApplication, // =>
     Comma,               // ,
     LogicalAnd,          // and
@@ -95,7 +94,6 @@ impl Operator for BinaryOperator {
                 O::GreaterThan => Some(Self::GreaterThan),
                 O::GreaterThanEqual => Some(Self::GreaterThanOrEqual),
                 O::Dot => Some(Self::Access),
-                O::OpenParen => Some(Self::FunctionCall),
                 O::ThickArrow => Some(Self::FunctionApplication),
                 O::Comma => Some(Self::Comma),
                 O::Equal => Some(Self::Assign),
@@ -117,8 +115,8 @@ impl Operator for BinaryOperator {
 
     fn precedence(&self) -> i32 {
         match self {
-            // Function call / Access
-            Self::FunctionCall | Self::Access => 8,
+            // Access
+            Self::Access => 8,
             // Multiplicative
             Self::Multiply | Self::Divide | Self::Mod => 7,
             // Additive
@@ -163,7 +161,8 @@ impl BinaryOperator {
             | Self::MultiplyAssign
             | Self::DivideAssign
             | Self::ModAssign
-            | Self::Assign => Associativity::Right,
+            | Self::Assign
+            | Self::Comma => Associativity::Right,
             _ => Associativity::Left,
         }
     }
