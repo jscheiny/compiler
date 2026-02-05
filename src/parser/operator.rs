@@ -115,8 +115,8 @@ impl Operator for BinaryOperator {
 
     fn precedence(&self) -> i32 {
         match self {
-            // Access
-            Self::Access => 8,
+            // Functions / Access
+            Self::FunctionApplication | Self::Access => 8,
             // Multiplicative
             Self::Multiply | Self::Divide | Self::Mod => 7,
             // Additive
@@ -141,8 +141,6 @@ impl Operator for BinaryOperator {
             | Self::Assign => 1,
             // Comma
             Self::Comma => 0,
-            // Where does this go???
-            Self::FunctionApplication => todo!(),
         }
     }
 }
