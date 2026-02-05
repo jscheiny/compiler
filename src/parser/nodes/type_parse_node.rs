@@ -7,20 +7,22 @@ pub enum TypeParseNode {
     Primitive(KeywordToken), // TODO make a primitive type enum
     UserDefined(String),
     Function(FunctionTypeParseNode),
+    Tuple(TupleTypeParseNode),
 }
 
 impl Traverse for TypeParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         match self {
-            Self::Primitive(_) | Self::UserDefined(_) => {}
             Self::Function(node) => node.traverse(visit),
+            Self::Tuple(node) => node.traverse(visit),
+            Self::Primitive(_) | Self::UserDefined(_) => {}
         }
     }
 }
 
 pub struct FunctionTypeParseNode {
-    parameters: Box<ParseNodeVec<TypeParseNode>>,
-    return_type: Box<ParseNode<TypeParseNode>>,
+    pub parameters: ParseNodeVec<TypeParseNode>,
+    pub return_type: Box<ParseNode<TypeParseNode>>,
 }
 
 impl Traverse for FunctionTypeParseNode {
@@ -30,5 +32,17 @@ impl Traverse for FunctionTypeParseNode {
             parameter.traverse("FunctionType.parameter", visit);
         }
         self.return_type.traverse("FunctionType.return_type", visit);
+    }
+}
+
+pub struct TupleTypeParseNode {
+    pub members: Vec<ParseNode<TypeParseNode>>,
+}
+
+impl Traverse for TupleTypeParseNode {
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        for member in self.members.iter() {
+            member.traverse("TupleType.member", visit);
+        }
     }
 }
