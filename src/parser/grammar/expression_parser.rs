@@ -2,7 +2,8 @@ use crate::{
     lexer::{IdentifierToken, IntegerLiteralToken, OperatorToken, StringLiteralToken, Token},
     parser::{
         BinaryOpExpressionParseNode, BlockParseNode, ExpressionParseNode, ParseResult,
-        PostfixOpExpressionParseNode, PrefixOpExpressionParseNode, SyntaxError, TokenStream,
+        PostfixOpExpressionParseNode, PrefixOpExpressionParseNode, SyntaxError, TokenSpan,
+        TokenStream,
         grammar::statement,
         operator::{Associativity, BinaryOperator, Operator, PostfixOperator, PrefixOperator},
     },
@@ -16,7 +17,7 @@ fn sub_expression(
     tokens: &mut TokenStream,
     min_precedence: i32,
 ) -> ParseResult<ExpressionParseNode> {
-    let mut left = expression_atom(tokens)?;
+    let mut left = tokens.located(expression_atom)?;
     loop {
         let token = tokens.peek();
         if let Some(operator) = PostfixOperator::from_token(token) {
@@ -24,11 +25,16 @@ fn sub_expression(
                 break;
             }
 
+            let operator = TokenSpan::singleton(tokens).wrap(operator);
             tokens.next();
-            left = ExpressionParseNode::PostfixOp(PostfixOpExpressionParseNode {
-                expression: Box::new(left),
-                operator,
-            });
+
+            let span = left.span.expand_to(tokens);
+            left = span.wrap(ExpressionParseNode::PostfixOp(
+                PostfixOpExpressionParseNode {
+                    expression: Box::new(left),
+                    operator,
+                },
+            ));
         } else if let Some(operator) = BinaryOperator::from_token(token) {
             if operator.precedence() < min_precedence {
                 break;
@@ -39,26 +45,32 @@ fn sub_expression(
                     Associativity::Left => 0,
                     Associativity::Right => 1,
                 };
+
+            let operator = TokenSpan::singleton(tokens).wrap(operator);
             tokens.next();
-            let right = sub_expression(tokens, next_min_precedence)?;
-            left = ExpressionParseNode::BinaryOp(BinaryOpExpressionParseNode {
+
+            let right = tokens.located_with(sub_expression, next_min_precedence)?;
+            let span = left.span.expand_to(tokens);
+            left = span.wrap(ExpressionParseNode::BinaryOp(BinaryOpExpressionParseNode {
                 left: Box::new(left),
                 operator,
                 right: Box::new(right),
-            });
+            }));
         } else {
             break;
         }
     }
 
-    Ok(left)
+    Ok(left.value)
 }
 
 fn expression_atom(tokens: &mut TokenStream) -> ParseResult<ExpressionParseNode> {
     let operator = PrefixOperator::from_token(tokens.peek());
     if let Some(operator) = operator {
+        let precedence = operator.precedence();
+        let operator = TokenSpan::singleton(tokens).wrap(operator);
         tokens.next();
-        let expression = sub_expression(tokens, operator.precedence())?;
+        let expression = tokens.located_with(sub_expression, precedence)?;
         return Ok(ExpressionParseNode::PrefixOp(PrefixOpExpressionParseNode {
             operator,
             expression: Box::new(expression),

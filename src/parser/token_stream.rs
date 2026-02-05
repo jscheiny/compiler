@@ -4,7 +4,7 @@ use crate::{
     lexer::{LocatedToken, Token, TokenMatch},
     parser::{
         IdentifierParseNode, IdentifierType, LocatedSyntaxError, ParseNode, ParseResult,
-        SyntaxError, TokenSpan, grammar::identifier,
+        SyntaxError, TokenSpan, identifier,
     },
 };
 
@@ -71,6 +71,16 @@ impl TokenStream {
         Ok(self.close(value, start_index))
     }
 
+    pub fn located_with<P, Arg, E>(
+        &mut self,
+        parse: impl Fn(&mut TokenStream, Arg) -> Result<P, E>,
+        arg: Arg,
+    ) -> Result<ParseNode<P>, E> {
+        let start_index = self.index;
+        let value = parse(self, arg)?;
+        Ok(self.close(value, start_index))
+    }
+
     pub fn maybe_located<P, E>(
         &mut self,
         parse: impl Fn(&mut TokenStream) -> Result<Option<P>, E>,
@@ -78,6 +88,10 @@ impl TokenStream {
         let start_index = self.index;
         let result = parse(self)?;
         Ok(result.map(|value| self.close(value, start_index)))
+    }
+
+    pub fn index(&self) -> usize {
+        self.index
     }
 
     fn close<P>(&self, value: P, start_index: usize) -> ParseNode<P> {

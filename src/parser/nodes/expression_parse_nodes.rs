@@ -19,13 +19,17 @@ impl Display for ExpressionParseNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ExpressionParseNode::PrefixOp(node) => {
-                write!(f, "{:?}({})", node.operator, node.expression)
+                write!(f, "{:?}({})", node.operator.value, node.expression.value)
             }
             ExpressionParseNode::BinaryOp(node) => {
-                write!(f, "{:?}({}, {})", node.operator, node.left, node.right)
+                write!(
+                    f,
+                    "{:?}({}, {})",
+                    node.operator.value, node.left.value, node.right.value
+                )
             }
             ExpressionParseNode::PostfixOp(node) => {
-                write!(f, "{:?}({})", node.operator, node.expression)
+                write!(f, "{:?}({})", node.operator.value, node.expression.value)
             }
             ExpressionParseNode::StringLiteral(literal) => write!(f, "[{}]", literal),
             ExpressionParseNode::IntegerLiteral(literal) => write!(f, "[{}]", literal),
@@ -59,40 +63,41 @@ impl Traverse for ParseNode<Box<ExpressionParseNode>> {
 }
 
 pub struct PrefixOpExpressionParseNode {
-    pub operator: PrefixOperator,
-    pub expression: Box<ExpressionParseNode>,
+    pub operator: ParseNode<PrefixOperator>,
+    pub expression: Box<ParseNode<ExpressionParseNode>>,
 }
 
 impl Traverse for PrefixOpExpressionParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        // visit("PrefixOpExpression.operator", self.operator.span);
-        self.expression.traverse(visit);
+        visit("PrefixOpExpression.operator", self.operator.span);
+        self.expression
+            .traverse("PrefixOpExpression.expression", visit);
     }
 }
 
-// TODO add back locations
 pub struct BinaryOpExpressionParseNode {
-    pub left: Box<ExpressionParseNode>,
-    pub operator: BinaryOperator,
-    pub right: Box<ExpressionParseNode>,
+    pub left: Box<ParseNode<ExpressionParseNode>>,
+    pub operator: ParseNode<BinaryOperator>,
+    pub right: Box<ParseNode<ExpressionParseNode>>,
 }
 
 impl Traverse for BinaryOpExpressionParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        self.left.traverse(visit);
-        // visit("BinaryOpExpression.operator", self.operator.span);
-        self.right.traverse(visit);
+        self.left.traverse("BinaryOpExpression.left", visit);
+        visit("BinaryOpExpression.operator", self.operator.span);
+        self.right.traverse("BinaryOpExpression.right", visit);
     }
 }
 
 pub struct PostfixOpExpressionParseNode {
-    pub expression: Box<ExpressionParseNode>,
-    pub operator: PostfixOperator,
+    pub expression: Box<ParseNode<ExpressionParseNode>>,
+    pub operator: ParseNode<PostfixOperator>,
 }
 
 impl Traverse for PostfixOpExpressionParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        self.expression.traverse(visit);
-        // visit("PostfixOpExpression.operator", self.operator.span);
+        self.expression
+            .traverse("PostfixOpExpression.expression", visit);
+        visit("PostfixOpExpression.operator", self.operator.span);
     }
 }
