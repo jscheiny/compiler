@@ -9,6 +9,7 @@ mod parse_result;
 mod program_parse_nodes;
 mod record_parse_nodes;
 mod statement_parse_nodes;
+mod syntax_error;
 mod type_parse_node;
 
 pub use enum_parse_node::*;
@@ -22,4 +23,5 @@ pub use parse_result::*;
 pub use program_parse_nodes::*;
 pub use record_parse_nodes::*;
 pub use statement_parse_nodes::*;
+pub use syntax_error::*;
 pub use type_parse_node::*;
