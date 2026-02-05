@@ -1,9 +1,12 @@
 use crate::{
-    lexer::{IdentifierToken, IntegerLiteralToken, OperatorToken, StringLiteralToken, Token},
+    lexer::{
+        IdentifierToken, IntegerLiteralToken, KeywordToken, OperatorToken, StringLiteralToken,
+        Token,
+    },
     parser::{
-        BinaryOpExpressionParseNode, BlockParseNode, ExpressionParseNode, ParseResult,
-        PostfixOpExpressionParseNode, PrefixOpExpressionParseNode, SyntaxError, TokenSpan,
-        TokenStream,
+        BinaryOpExpressionParseNode, BlockParseNode, ExpressionParseNode, IfExpressionParseNode,
+        ParseResult, PostfixOpExpressionParseNode, PrefixOpExpressionParseNode, SyntaxError,
+        TokenSpan, TokenStream,
         grammar::statement,
         operator::{Associativity, BinaryOperator, Operator, PostfixOperator, PrefixOperator},
     },
@@ -98,9 +101,22 @@ fn expression_atom(tokens: &mut TokenStream) -> ParseResult<ExpressionParseNode>
         }
         Token::Operator(OperatorToken::OpenParen) => {
             tokens.next();
-            let expression = sub_expression(tokens, 1)?;
+            let expression = expression(tokens)?;
             tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
             Ok(expression)
+        }
+        Token::Keyword(KeywordToken::If) => {
+            tokens.next();
+            let predicate = tokens.located(expression)?;
+            tokens.expect(&KeywordToken::Then, SyntaxError::ExpectedThen)?;
+            let if_true = tokens.located(expression)?;
+            tokens.expect(&KeywordToken::Else, SyntaxError::ExpectedElse)?;
+            let if_false = tokens.located(expression)?;
+            Ok(ExpressionParseNode::IfExpression(IfExpressionParseNode {
+                predicate: Box::new(predicate),
+                if_true: Box::new(if_true),
+                if_false: Box::new(if_false),
+            }))
         }
         _ => Err(tokens.make_error(SyntaxError::ExpectedExpression)),
     }

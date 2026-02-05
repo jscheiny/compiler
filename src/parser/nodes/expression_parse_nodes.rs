@@ -8,6 +8,7 @@ pub enum ExpressionParseNode {
     PrefixOp(PrefixOpExpressionParseNode),
     BinaryOp(BinaryOpExpressionParseNode),
     PostfixOp(PostfixOpExpressionParseNode),
+    IfExpression(IfExpressionParseNode),
     StringLiteral(String),
     IntegerLiteral(i64),
     Block(BlockParseNode),
@@ -31,8 +32,15 @@ impl Display for ExpressionParseNode {
             ExpressionParseNode::PostfixOp(node) => {
                 write!(f, "{:?}({})", node.operator.value, node.expression.value)
             }
-            ExpressionParseNode::StringLiteral(literal) => write!(f, "[{}]", literal),
-            ExpressionParseNode::IntegerLiteral(literal) => write!(f, "[{}]", literal),
+            ExpressionParseNode::IfExpression(node) => {
+                write!(
+                    f,
+                    "If({})Then({})Else({})",
+                    node.predicate.value, node.if_true.value, node.if_false.value
+                )
+            }
+            ExpressionParseNode::StringLiteral(literal) => write!(f, "{}", literal),
+            ExpressionParseNode::IntegerLiteral(literal) => write!(f, "{}", literal),
             ExpressionParseNode::Block(_) => write!(f, "[BLOCK]"),
             ExpressionParseNode::Identifier(identifier) => write!(f, "{}", identifier),
             ExpressionParseNode::Error => write!(f, "[ERROR]"),
@@ -47,6 +55,7 @@ impl Traverse for ExpressionParseNode {
             Self::BinaryOp(node) => node.traverse(visit),
             Self::PostfixOp(node) => node.traverse(visit),
             Self::Block(node) => node.traverse(visit),
+            Self::IfExpression(node) => node.traverse(visit),
             Self::StringLiteral(_)
             | Self::IntegerLiteral(_)
             | Self::Identifier(_)
@@ -99,5 +108,19 @@ impl Traverse for PostfixOpExpressionParseNode {
         self.expression
             .traverse("PostfixOpExpression.expression", visit);
         visit("PostfixOpExpression.operator", self.operator.span);
+    }
+}
+
+pub struct IfExpressionParseNode {
+    pub predicate: Box<ParseNode<ExpressionParseNode>>,
+    pub if_true: Box<ParseNode<ExpressionParseNode>>,
+    pub if_false: Box<ParseNode<ExpressionParseNode>>,
+}
+
+impl Traverse for IfExpressionParseNode {
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        self.predicate.traverse("IfExpression.predicate", visit);
+        self.if_true.traverse("IfExpression.if_true", visit);
+        self.if_false.traverse("IfExpression.if_false", visit);
     }
 }
