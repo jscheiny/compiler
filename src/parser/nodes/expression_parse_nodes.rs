@@ -1,7 +1,8 @@
 use std::fmt::Display;
 
 use crate::parser::{
-    BinaryOperator, BlockParseNode, ParseNode, ParseNodeVec, PostfixOperator, PrefixOperator,
+    BinaryOpExpressionParseNode, BlockParseNode, FunctionCallExpressionParseNode,
+    IfExpressionParseNode, ParseNode, PostfixOpExpressionParseNode, PrefixOpExpressionParseNode,
     TokenSpan, Traverse,
 };
 
@@ -81,74 +82,5 @@ impl Traverse for ParseNode<Box<ExpressionParseNode>> {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         visit("ExpressionParseNode.self", self.span);
         self.value.traverse(visit);
-    }
-}
-
-pub struct PrefixOpExpressionParseNode {
-    pub operator: ParseNode<PrefixOperator>,
-    pub expression: Box<ParseNode<ExpressionParseNode>>,
-}
-
-impl Traverse for PrefixOpExpressionParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        visit("PrefixOpExpression.operator", self.operator.span);
-        self.expression
-            .traverse("PrefixOpExpression.expression", visit);
-    }
-}
-
-pub struct BinaryOpExpressionParseNode {
-    pub left: Box<ParseNode<ExpressionParseNode>>,
-    pub operator: ParseNode<BinaryOperator>,
-    pub right: Box<ParseNode<ExpressionParseNode>>,
-}
-
-impl Traverse for BinaryOpExpressionParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        self.left.traverse("BinaryOpExpression.left", visit);
-        visit("BinaryOpExpression.operator", self.operator.span);
-        self.right.traverse("BinaryOpExpression.right", visit);
-    }
-}
-
-pub struct PostfixOpExpressionParseNode {
-    pub expression: Box<ParseNode<ExpressionParseNode>>,
-    pub operator: ParseNode<PostfixOperator>,
-}
-
-impl Traverse for PostfixOpExpressionParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        self.expression
-            .traverse("PostfixOpExpression.expression", visit);
-        visit("PostfixOpExpression.operator", self.operator.span);
-    }
-}
-
-pub struct FunctionCallExpressionParseNode {
-    pub function: Box<ParseNode<ExpressionParseNode>>,
-    pub arguments: ParseNodeVec<ExpressionParseNode>,
-}
-
-impl Traverse for FunctionCallExpressionParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        self.function.traverse("FunctionCall.function", visit);
-        visit("FunctionCall.arguments", self.arguments.span);
-        for argument in self.arguments.value.iter() {
-            argument.traverse("FunctionCall.argument", visit);
-        }
-    }
-}
-
-pub struct IfExpressionParseNode {
-    pub predicate: Box<ParseNode<ExpressionParseNode>>,
-    pub if_true: Box<ParseNode<ExpressionParseNode>>,
-    pub if_false: Box<ParseNode<ExpressionParseNode>>,
-}
-
-impl Traverse for IfExpressionParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        self.predicate.traverse("IfExpression.predicate", visit);
-        self.if_true.traverse("IfExpression.if_true", visit);
-        self.if_false.traverse("IfExpression.if_false", visit);
     }
 }
