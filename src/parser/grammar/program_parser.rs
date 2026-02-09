@@ -3,7 +3,7 @@ use crate::{
     parser::{
         ExportableModuleDefinition, ModuleDefinition, ParseResult, ProgramParseNode, SyntaxError,
         TokenStream,
-        grammar::{enumeration, interface, structure, top_level_function, tuple, type_alias},
+        grammar::{enumeration, structure, top_level_function, tuple, type_alias},
     },
 };
 
@@ -31,7 +31,6 @@ fn module_definition(tokens: &mut TokenStream) -> ParseResult<ModuleDefinition> 
             K::Tuple => Ok(ModuleDefinition::Record(tuple(tokens)?)),
             K::Struct => Ok(ModuleDefinition::Record(structure(tokens)?)),
             K::Enum => Ok(ModuleDefinition::Enum(enumeration(tokens)?)),
-            K::Interface => Ok(ModuleDefinition::Interface(interface(tokens)?)),
             K::Fn => Ok(ModuleDefinition::Function(top_level_function(tokens)?)),
             K::Type => Ok(ModuleDefinition::TypeAlias(type_alias(tokens)?)),
             _ => Err(tokens.make_error(SyntaxError::ExpectedTopLevelDefinition)),

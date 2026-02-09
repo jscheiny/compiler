@@ -29,7 +29,6 @@ pub enum SyntaxError {
 #[derive(Clone, Copy)]
 pub enum IdentifierType {
     Function,
-    Interface,
     Method,
     Member,
     Parameter,
@@ -45,7 +44,6 @@ impl Display for IdentifierType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
             Self::Function => "function",
-            Self::Interface => "interface",
             Self::Method => "method",
             Self::Member => "member",
             Self::Parameter => "parameter",

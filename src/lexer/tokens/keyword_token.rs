@@ -7,7 +7,6 @@ use crate::lexer::{Token, TokenMatch, TokenWidth, TryTokenizeResult};
 
 #[derive(Clone, Copy, Debug, EnumIter, PartialEq, Eq)]
 pub enum KeywordToken {
-    Interface,
     Continue,
     Return,
     Struct,
@@ -35,7 +34,6 @@ pub enum KeywordToken {
 impl KeywordToken {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::Interface => "interface",
             Self::Continue => "continue",
             Self::Return => "return",
             Self::Struct => "struct",
