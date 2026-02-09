@@ -1,7 +1,7 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token, TokenMatch},
     parser::{
-        ExpressionParseNode, FunctionBodyParseNode, FunctionDefintionParseNode, IdentifierType,
+        ExpressionParseNode, FunctionBodyParseNode, FunctionParseNode, IdentifierType,
         MethodParseNode, ParameterParseNode, ParseNode, ParseResult, SyntaxError, TokenStream,
         grammar::{block, comma_separated_list, end_statement, expression, type_definition},
     },
@@ -35,18 +35,15 @@ fn method(tokens: &mut TokenStream) -> ParseResult<MethodParseNode> {
     Ok(MethodParseNode { public, function })
 }
 
-pub fn top_level_function(tokens: &mut TokenStream) -> ParseResult<FunctionDefintionParseNode> {
+pub fn top_level_function(tokens: &mut TokenStream) -> ParseResult<FunctionParseNode> {
     function(tokens, true)
 }
 
-fn nested_function(tokens: &mut TokenStream) -> ParseResult<FunctionDefintionParseNode> {
+fn nested_function(tokens: &mut TokenStream) -> ParseResult<FunctionParseNode> {
     function(tokens, false)
 }
 
-fn function(
-    tokens: &mut TokenStream,
-    has_keyword: bool,
-) -> ParseResult<FunctionDefintionParseNode> {
+fn function(tokens: &mut TokenStream, has_keyword: bool) -> ParseResult<FunctionParseNode> {
     if has_keyword {
         tokens.next();
     }
@@ -63,7 +60,7 @@ fn function(
         None
     };
     let body = tokens.located(function_body)?;
-    Ok(FunctionDefintionParseNode {
+    Ok(FunctionParseNode {
         identifier,
         parameters,
         return_type,

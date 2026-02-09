@@ -1,5 +1,5 @@
 use crate::parser::{
-    EnumParseNode, FunctionDefintionParseNode, InterfaceDefinitionParseNode, ParseNode,
+    EnumParseNode, FunctionParseNode, InterfaceDefinitionParseNode, ParseNode,
     RecordDefinitionParseNode, TokenSpan, Traverse, TypeAliasParseNode,
 };
 
@@ -30,7 +30,7 @@ pub enum TopLevelDefinition {
     Record(RecordDefinitionParseNode),
     Enum(EnumParseNode),
     Interface(InterfaceDefinitionParseNode),
-    Function(FunctionDefintionParseNode),
+    Function(FunctionParseNode),
     TypeAlias(TypeAliasParseNode),
 }
 

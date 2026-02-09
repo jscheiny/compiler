@@ -1,27 +1,16 @@
 use crate::parser::{
-    BlockParseNode, ExpressionParseNode, IdentifierParseNode, ParseNode, ParseNodeVec, TokenSpan,
-    Traverse, TypeParseNode,
+    FunctionBodyParseNode, IdentifierParseNode, ParameterParseNode, ParseNode, ParseNodeVec,
+    TokenSpan, Traverse, TypeParseNode,
 };
 
-pub struct MethodParseNode {
-    pub public: bool,
-    pub function: ParseNode<FunctionDefintionParseNode>,
-}
-
-impl Traverse for MethodParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        self.function.traverse("Method.function", visit);
-    }
-}
-
-pub struct FunctionDefintionParseNode {
+pub struct FunctionParseNode {
     pub identifier: ParseNode<IdentifierParseNode>,
     pub parameters: ParseNodeVec<ParameterParseNode>,
     pub return_type: Option<ParseNode<TypeParseNode>>,
     pub body: ParseNode<FunctionBodyParseNode>,
 }
 
-impl Traverse for FunctionDefintionParseNode {
+impl Traverse for FunctionParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         visit("FunctionDefinition.identifier", self.identifier.span);
         visit("FunctionDefinition.parameters", self.parameters.span);
@@ -32,33 +21,5 @@ impl Traverse for FunctionDefintionParseNode {
             return_type.traverse("FunctionDefinition.return", visit);
         }
         self.body.traverse("FunctionDefinition.body", visit);
-    }
-}
-
-pub enum FunctionBodyParseNode {
-    Expression(ExpressionParseNode),
-    Block(BlockParseNode),
-}
-
-impl Traverse for FunctionBodyParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        match self {
-            Self::Expression(node) => node.traverse(visit),
-            Self::Block(node) => node.traverse(visit),
-        }
-    }
-}
-
-pub struct ParameterParseNode {
-    pub identifier: ParseNode<IdentifierParseNode>,
-    pub type_def: Option<ParseNode<TypeParseNode>>,
-}
-
-impl Traverse for ParameterParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        visit("Parameter.identifier", self.identifier.span);
-        if let Some(type_def) = self.type_def.as_ref() {
-            type_def.traverse("Parameter.type", visit);
-        }
     }
 }
