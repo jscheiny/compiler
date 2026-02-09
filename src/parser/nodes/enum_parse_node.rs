@@ -1,6 +1,6 @@
 use crate::parser::{
-    IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, TokenSpan, Traverse,
-    TypeParseNode,
+    EnumVariantParseNode, IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, TokenSpan,
+    Traverse,
 };
 
 pub struct EnumParseNode {
@@ -21,20 +21,6 @@ impl Traverse for EnumParseNode {
             for method in methods.value.iter() {
                 method.traverse("Enum.method", visit);
             }
-        }
-    }
-}
-
-pub struct EnumVariantParseNode {
-    pub identifier: ParseNode<IdentifierParseNode>,
-    pub type_def: Option<ParseNode<TypeParseNode>>,
-}
-
-impl Traverse for EnumVariantParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        visit("EnumVariant.identifier", self.identifier.span);
-        if let Some(type_def) = self.type_def.as_ref() {
-            type_def.traverse("EnumVariant.type", visit);
         }
     }
 }
