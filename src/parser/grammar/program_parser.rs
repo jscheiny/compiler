@@ -1,8 +1,8 @@
 use crate::{
     lexer::{KeywordToken, Token},
     parser::{
-        ExportableModuleDefinition, ModuleDefinition, ParseResult, ProgramParseNode, SyntaxError,
-        TokenStream,
+        ExportableModuleDefinitionParseNode, ModuleDefinitionParseNode, ParseResult,
+        ProgramParseNode, SyntaxError, TokenStream,
         grammar::{enumeration, structure, top_level_function, tuple, type_alias},
     },
 };
@@ -18,21 +18,23 @@ pub fn program(tokens: &mut TokenStream) -> ParseResult<ProgramParseNode> {
 
 fn exportable_module_definition(
     tokens: &mut TokenStream,
-) -> ParseResult<ExportableModuleDefinition> {
+) -> ParseResult<ExportableModuleDefinitionParseNode> {
     let public = tokens.accept(&KeywordToken::Pub);
     let definition = module_definition(tokens)?;
-    Ok(ExportableModuleDefinition { public, definition })
+    Ok(ExportableModuleDefinitionParseNode { public, definition })
 }
 
-fn module_definition(tokens: &mut TokenStream) -> ParseResult<ModuleDefinition> {
+fn module_definition(tokens: &mut TokenStream) -> ParseResult<ModuleDefinitionParseNode> {
     if let Token::Keyword(keyword) = tokens.peek() {
         use KeywordToken as K;
         match keyword {
-            K::Tuple => Ok(ModuleDefinition::Record(tuple(tokens)?)),
-            K::Struct => Ok(ModuleDefinition::Record(structure(tokens)?)),
-            K::Enum => Ok(ModuleDefinition::Enum(enumeration(tokens)?)),
-            K::Fn => Ok(ModuleDefinition::Function(top_level_function(tokens)?)),
-            K::Type => Ok(ModuleDefinition::TypeAlias(type_alias(tokens)?)),
+            K::Tuple => Ok(ModuleDefinitionParseNode::Record(tuple(tokens)?)),
+            K::Struct => Ok(ModuleDefinitionParseNode::Record(structure(tokens)?)),
+            K::Enum => Ok(ModuleDefinitionParseNode::Enum(enumeration(tokens)?)),
+            K::Fn => Ok(ModuleDefinitionParseNode::Function(top_level_function(
+                tokens,
+            )?)),
+            K::Type => Ok(ModuleDefinitionParseNode::TypeAlias(type_alias(tokens)?)),
             _ => Err(tokens.make_error(SyntaxError::ExpectedTopLevelDefinition)),
         }
     } else {

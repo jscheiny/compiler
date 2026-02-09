@@ -3,14 +3,25 @@ use crate::parser::{
     TypeAliasParseNode,
 };
 
-pub enum ModuleDefinition {
+pub struct ExportableModuleDefinitionParseNode {
+    pub public: bool,
+    pub definition: ModuleDefinitionParseNode,
+}
+
+impl Traverse for ExportableModuleDefinitionParseNode {
+    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
+        self.definition.traverse(visit);
+    }
+}
+
+pub enum ModuleDefinitionParseNode {
     Record(RecordDefinitionParseNode),
     Enum(EnumParseNode),
     Function(FunctionParseNode),
     TypeAlias(TypeAliasParseNode),
 }
 
-impl Traverse for ModuleDefinition {
+impl Traverse for ModuleDefinitionParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         match self {
             Self::Record(node) => node.traverse(visit),

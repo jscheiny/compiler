@@ -1,7 +1,7 @@
-use crate::parser::{ModuleDefinition, ParseNode, TokenSpan, Traverse};
+use crate::parser::{ExportableModuleDefinitionParseNode, ParseNode, TokenSpan, Traverse};
 
 pub struct ProgramParseNode {
-    pub definitions: Vec<ParseNode<ExportableModuleDefinition>>,
+    pub definitions: Vec<ParseNode<ExportableModuleDefinitionParseNode>>,
 }
 
 impl Traverse for ProgramParseNode {
@@ -9,16 +9,5 @@ impl Traverse for ProgramParseNode {
         for definition in self.definitions.iter() {
             definition.traverse("Program.definition", visit);
         }
-    }
-}
-
-pub struct ExportableModuleDefinition {
-    pub public: bool,
-    pub definition: ModuleDefinition,
-}
-
-impl Traverse for ExportableModuleDefinition {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        self.definition.traverse(visit);
     }
 }
