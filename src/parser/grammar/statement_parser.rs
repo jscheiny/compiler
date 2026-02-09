@@ -136,7 +136,6 @@ fn block_return(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
 
 fn expression_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
     let expression = tokens.located(expression)?;
-    println!("Expression = {}", expression.value);
     end_statement(tokens);
     Ok(StatementParseNode::Expression(expression.value))
 }
