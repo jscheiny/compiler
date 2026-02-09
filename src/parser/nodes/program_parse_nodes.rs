@@ -1,10 +1,7 @@
-use crate::parser::{
-    EnumParseNode, FunctionParseNode, InterfaceDefinitionParseNode, ParseNode,
-    RecordDefinitionParseNode, TokenSpan, Traverse, TypeAliasParseNode,
-};
+use crate::parser::{ModuleDefinition, ParseNode, TokenSpan, Traverse};
 
 pub struct ProgramParseNode {
-    pub definitions: Vec<ParseNode<ModuleTopLevelDefinition>>,
+    pub definitions: Vec<ParseNode<ExportableModuleDefinition>>,
 }
 
 impl Traverse for ProgramParseNode {
@@ -15,33 +12,13 @@ impl Traverse for ProgramParseNode {
     }
 }
 
-pub struct ModuleTopLevelDefinition {
+pub struct ExportableModuleDefinition {
     pub public: bool,
-    pub definition: TopLevelDefinition,
+    pub definition: ModuleDefinition,
 }
 
-impl Traverse for ModuleTopLevelDefinition {
+impl Traverse for ExportableModuleDefinition {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         self.definition.traverse(visit);
-    }
-}
-
-pub enum TopLevelDefinition {
-    Record(RecordDefinitionParseNode),
-    Enum(EnumParseNode),
-    Interface(InterfaceDefinitionParseNode),
-    Function(FunctionParseNode),
-    TypeAlias(TypeAliasParseNode),
-}
-
-impl Traverse for TopLevelDefinition {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        match self {
-            Self::Record(node) => node.traverse(visit),
-            Self::Enum(node) => node.traverse(visit),
-            Self::Interface(node) => node.traverse(visit),
-            Self::Function(node) => node.traverse(visit),
-            Self::TypeAlias(node) => node.traverse(visit),
-        }
     }
 }
