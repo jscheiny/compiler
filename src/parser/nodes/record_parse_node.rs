@@ -41,69 +41,23 @@ impl Traverse for RecordDefinitionParseNode {
 
 impl RecordDefinitionParseNode {
     pub fn register_type(&self, types: &mut TypeResolver) {
-        let mut members = HashMap::new();
+        let container_name = &self.identifier.value.0;
+        let mut struct_type = StructType::new();
 
         for field in self.fields.value.iter() {
-            let RecordFieldParseNode {
-                identifier,
-                type_def,
-                public,
-            } = &field.value;
-            let member_type = match type_def {
-                Some(type_def) => type_def.value.resolve_type(types),
-                None => Type::Error,
-            };
-
-            let identifier = &identifier.value.0;
-            if members.contains_key(identifier) {
-                types.push_error(self.create_duplicate_member_error(identifier));
-                continue;
-            }
-
-            members.insert(
-                identifier.clone(),
-                StructMember {
-                    public: *public,
-                    member_type: StructMemberType::Field(member_type),
-                },
-            );
+            let member = field.value.resolve_type(types);
+            let identifier = &field.value.identifier.value.0;
+            struct_type.add_member(identifier, container_name, member, types);
         }
 
         if let Some(methods) = self.methods.as_ref() {
             for method in methods.value.iter() {
-                let MethodParseNode { public, function } = &method.value;
-                let function_type = function.value.resolve_type(types);
-
-                let identifier = &function.value.identifier.value.0;
-                if members.contains_key(identifier) {
-                    types.push_error(self.create_duplicate_member_error(identifier));
-                    continue;
-                }
-
-                members.insert(
-                    identifier.clone(),
-                    StructMember {
-                        public: *public,
-                        member_type: StructMemberType::Method(function_type),
-                    },
-                );
+                let identifier = &method.value.function.value.identifier.value.0;
+                let member = method.value.resolve_type(types);
+                struct_type.add_member(identifier, container_name, member, types);
             }
         }
 
-        types.insert(
-            &self.identifier.value.0,
-            Type::Struct(StructType { members }),
-        )
-    }
-
-    fn create_duplicate_member_error(&self, member_name: &str) -> TypeError {
-        TypeError::DuplicateMemberName(DuplicateMemberName {
-            member_name: member_name.to_owned(),
-            container_name: self.identifier.value.0.clone(),
-            container_type: match self.record_type {
-                RecordType::Struct => String::from("struct"),
-                RecordType::Tuple => String::from("tuple"),
-            },
-        })
+        types.insert(&self.identifier.value.0, Type::Struct(struct_type))
     }
 }

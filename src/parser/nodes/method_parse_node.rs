@@ -1,4 +1,7 @@
-use crate::parser::{FunctionParseNode, ParseNode, TokenSpan, Traverse};
+use crate::{
+    checker::{StructMember, StructMemberType, TypeResolver},
+    parser::{FunctionParseNode, ParseNode, TokenSpan, Traverse},
+};
 
 pub struct MethodParseNode {
     pub public: bool,
@@ -8,5 +11,15 @@ pub struct MethodParseNode {
 impl Traverse for MethodParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         self.function.traverse("Method.function", visit);
+    }
+}
+
+impl MethodParseNode {
+    pub fn resolve_type(&self, types: &TypeResolver) -> StructMember {
+        let function_type = self.function.value.resolve_type(types);
+        StructMember {
+            public: self.public,
+            member_type: StructMemberType::Method(function_type),
+        }
     }
 }

@@ -1,4 +1,7 @@
-use crate::parser::{IdentifierParseNode, ParseNode, TokenSpan, Traverse, TypeParseNode};
+use crate::{
+    checker::{StructMember, StructMemberType, Type, TypeResolver},
+    parser::{IdentifierParseNode, ParseNode, TokenSpan, Traverse, TypeParseNode},
+};
 
 pub struct RecordFieldParseNode {
     pub public: bool,
@@ -11,6 +14,20 @@ impl Traverse for RecordFieldParseNode {
         visit("RecordField.identifier", self.identifier.span);
         if let Some(type_def) = self.type_def.as_ref() {
             type_def.traverse("RecordField.type", visit);
+        }
+    }
+}
+
+impl RecordFieldParseNode {
+    pub fn resolve_type(&self, types: &TypeResolver) -> StructMember {
+        let member_type = match self.type_def.as_ref() {
+            Some(type_def) => type_def.value.resolve_type(types),
+            None => Type::Error,
+        };
+
+        StructMember {
+            public: self.public,
+            member_type: StructMemberType::Field(member_type),
         }
     }
 }
