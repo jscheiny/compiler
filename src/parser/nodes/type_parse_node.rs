@@ -1,11 +1,10 @@
 use crate::{
     checker::{Type, TypeResolver},
-    lexer::KeywordToken,
-    parser::{FunctionTypeParseNode, TokenSpan, Traverse, TupleTypeParseNode},
+    parser::{FunctionTypeParseNode, PrimitiveType, TokenSpan, Traverse, TupleTypeParseNode},
 };
 
 pub enum TypeParseNode {
-    Primitive(KeywordToken), // TODO make a primitive type enum
+    Primitive(PrimitiveType),
     UserDefined(String),
     Function(FunctionTypeParseNode),
     Tuple(TupleTypeParseNode),

@@ -1,7 +1,7 @@
 use crate::{
-    lexer::{IdentifierToken, KeywordToken, OperatorToken, Token},
+    lexer::{IdentifierToken, OperatorToken, Token},
     parser::{
-        FunctionTypeParseNode, ParseNode, ParseResult, SyntaxError, TokenStream,
+        FunctionTypeParseNode, ParseNode, ParseResult, PrimitiveType, SyntaxError, TokenStream,
         TupleTypeParseNode, TypeParseNode, grammar::comma_separated_list,
     },
 };
@@ -14,13 +14,9 @@ pub fn type_definition(tokens: &mut TokenStream) -> ParseResult<TypeParseNode> {
             tokens.next();
             Ok(TypeParseNode::UserDefined(identifier))
         }
-        Token::Keyword(keyword) => match keyword {
-            KeywordToken::Bool | KeywordToken::Int | KeywordToken::Float => {
-                let keyword = *keyword;
-                tokens.next();
-                Ok(TypeParseNode::Primitive(keyword))
-            }
-            _ => Err(tokens.make_error(SyntaxError::ExpectedType)),
+        Token::Keyword(keyword) => match PrimitiveType::from_token(*keyword) {
+            Some(primitive_type) => Ok(TypeParseNode::Primitive(primitive_type)),
+            None => Err(tokens.make_error(SyntaxError::ExpectedType)),
         },
         Token::Operator(OperatorToken::OpenParen) => function_or_tuple_type(tokens),
         _ => Err(tokens.make_error(SyntaxError::ExpectedType)),
