@@ -1,5 +1,5 @@
 use crate::{
-    checker::{TypeResolver, ResolveType, Type},
+    checker::{ResolveType, Type, TypeResolver},
     lexer::KeywordToken,
     parser::{FunctionTypeParseNode, TokenSpan, Traverse, TupleTypeParseNode},
 };
