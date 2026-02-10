@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use crate::{
     checker::{
-        DuplicateMemberName, ResolveType, StructDeclaration, StructDeclarationType, StructType,
-        Type, TypeError, TypeResolver,
+        DuplicateMemberName, StructDeclaration, StructDeclarationType, StructType, Type, TypeError,
+        TypeResolver,
     },
     parser::{
         IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, RecordFieldParseNode,

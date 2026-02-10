@@ -1,5 +1,5 @@
 use crate::{
-    checker::{FunctionType, ResolveType, Type, TypeResolver},
+    checker::{FunctionType, Type, TypeResolver},
     parser::{ParseNode, ParseNodeVec, TokenSpan, Traverse, TypeParseNode},
 };
 
@@ -18,8 +18,8 @@ impl Traverse for FunctionTypeParseNode {
     }
 }
 
-impl ResolveType for FunctionTypeParseNode {
-    fn resolve_type(&self, types: &TypeResolver) -> Type {
+impl FunctionTypeParseNode {
+    pub fn resolve_type(&self, types: &TypeResolver) -> Type {
         let parameters = self
             .parameters
             .value

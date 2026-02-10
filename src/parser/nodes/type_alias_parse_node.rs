@@ -1,5 +1,5 @@
 use crate::{
-    checker::{ResolveType, TypeResolver},
+    checker::TypeResolver,
     parser::{IdentifierParseNode, ParseNode, TokenSpan, Traverse, TypeParseNode},
 };
 

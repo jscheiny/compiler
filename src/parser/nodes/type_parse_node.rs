@@ -1,5 +1,5 @@
 use crate::{
-    checker::{ResolveType, Type, TypeResolver},
+    checker::{Type, TypeResolver},
     lexer::KeywordToken,
     parser::{FunctionTypeParseNode, TokenSpan, Traverse, TupleTypeParseNode},
 };
@@ -21,8 +21,8 @@ impl Traverse for TypeParseNode {
     }
 }
 
-impl ResolveType for TypeParseNode {
-    fn resolve_type(&self, types: &TypeResolver) -> Type {
+impl TypeParseNode {
+    pub fn resolve_type(&self, types: &TypeResolver) -> Type {
         match self {
             TypeParseNode::Primitive(primitive) => {
                 todo!("Primitive type resolution not implemented")

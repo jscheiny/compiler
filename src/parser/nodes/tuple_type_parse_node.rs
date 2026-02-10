@@ -1,5 +1,5 @@
 use crate::{
-    checker::{ResolveType, Type, TypeResolver},
+    checker::{Type, TypeResolver},
     parser::{ParseNode, TokenSpan, Traverse, TypeParseNode},
 };
 
@@ -15,8 +15,8 @@ impl Traverse for TupleTypeParseNode {
     }
 }
 
-impl ResolveType for TupleTypeParseNode {
-    fn resolve_type(&self, types: &TypeResolver) -> Type {
+impl TupleTypeParseNode {
+    pub fn resolve_type(&self, types: &TypeResolver) -> Type {
         let fields = self
             .fields
             .iter()

@@ -1,11 +1,5 @@
 use std::collections::HashMap;
 
-use crate::checker::TypeResolver;
-
-pub trait ResolveType {
-    fn resolve_type(&self, types: &TypeResolver) -> Type;
-}
-
 #[derive(Clone, Copy)]
 pub enum TypeReference {
     Resolved(usize),
