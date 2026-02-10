@@ -38,7 +38,7 @@ fn function_or_tuple_type(tokens: &mut TokenStream) -> ParseResult<TypeParseNode
         }))
     } else {
         Ok(TypeParseNode::Tuple(TupleTypeParseNode {
-            members: parameters.value,
+            fields: parameters.value,
         }))
     }
 }

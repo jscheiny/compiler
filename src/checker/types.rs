@@ -32,7 +32,7 @@ pub struct StructDeclaration {
 }
 
 pub enum StructDeclarationType {
-    Member(Type),
+    Field(Type),
     Method(Type),
 }
 

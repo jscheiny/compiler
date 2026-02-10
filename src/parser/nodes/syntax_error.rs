@@ -12,10 +12,10 @@ pub enum SyntaxError {
     ExpectedElse,
     ExpectedEndStatement,
     ExpectedExpression,
+    ExpectedFields,
     ExpectedFunctionBody,
     ExpectedIdentifier(IdentifierType),
     ExpectedInitializer,
-    ExpectedMembers,
     ExpectedMethods,
     ExpectedParameters,
     ExpectedReturnType,
@@ -27,9 +27,9 @@ pub enum SyntaxError {
 
 #[derive(Clone, Copy)]
 pub enum IdentifierType {
+    Field,
     Function,
     Method,
-    Member,
     Parameter,
     Struct,
     Tuple,
@@ -42,9 +42,9 @@ pub enum IdentifierType {
 impl Display for IdentifierType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
+            Self::Field => "field",
             Self::Function => "function",
             Self::Method => "method",
-            Self::Member => "member",
             Self::Parameter => "parameter",
             Self::Struct => "struct",
             Self::Tuple => "tuple",
@@ -94,10 +94,10 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             ),
             E::ExpectedEndStatement => write!(f, "end of statement"),
             E::ExpectedExpression => write!(f, "expression"),
+            E::ExpectedFields => write!(f, "fields"),
             E::ExpectedFunctionBody => write!(f, "function body"),
             E::ExpectedIdentifier(id_type) => write!(f, "{}", id_type),
             E::ExpectedInitializer => write!(f, "initializer"),
-            E::ExpectedMembers => write!(f, "member variables"),
             E::ExpectedMethods => write!(f, "methods block"),
             E::ExpectedParameters => write!(f, "parameters"),
             E::ExpectedReturnType => write!(f, "return type"),
@@ -139,7 +139,7 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
             E::ExpectedFunctionBody => fmt_ops(f, O::SkinnyArrow, O::OpenBrace),
             E::ExpectedIdentifier(id_type) => write!(f, "{}", id_type),
             E::ExpectedInitializer => fmt_op(f, O::Equal),
-            E::ExpectedMembers => fmt_op(f, O::OpenParen),
+            E::ExpectedFields => fmt_op(f, O::OpenParen),
             E::ExpectedMethods => fmt_ops(f, O::OpenBrace, O::Semicolon),
             E::ExpectedParameters => fmt_op(f, O::OpenParen),
             E::ExpectedReturnType => fmt_op(f, O::Colon),

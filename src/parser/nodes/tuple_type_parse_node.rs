@@ -1,28 +1,28 @@
 use crate::{
-    checker::{TypeResolver, ResolveType, Type},
+    checker::{ResolveType, Type, TypeResolver},
     parser::{ParseNode, TokenSpan, Traverse, TypeParseNode},
 };
 
 pub struct TupleTypeParseNode {
-    pub members: Vec<ParseNode<TypeParseNode>>,
+    pub fields: Vec<ParseNode<TypeParseNode>>,
 }
 
 impl Traverse for TupleTypeParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        for member in self.members.iter() {
-            member.traverse("TupleType.member", visit);
+        for field in self.fields.iter() {
+            field.traverse("TupleType.field", visit);
         }
     }
 }
 
 impl ResolveType for TupleTypeParseNode {
     fn resolve_types(&self, types: &TypeResolver) -> Type {
-        let members = self
-            .members
+        let fields = self
+            .fields
             .iter()
             .map(|p| p.value.resolve_types(types))
             .collect();
 
-        Type::Tuple(members)
+        Type::Tuple(fields)
     }
 }

@@ -6,7 +6,7 @@ use crate::{
         Type, TypeError, TypeResolver,
     },
     parser::{
-        IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, RecordMemberParseNode,
+        IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, RecordFieldParseNode,
         TokenSpan, Traverse,
     },
 };
@@ -19,16 +19,16 @@ pub enum RecordType {
 pub struct RecordDefinitionParseNode {
     pub record_type: RecordType,
     pub identifier: ParseNode<IdentifierParseNode>,
-    pub members: ParseNodeVec<RecordMemberParseNode>,
+    pub fields: ParseNodeVec<RecordFieldParseNode>,
     pub methods: Option<ParseNodeVec<MethodParseNode>>,
 }
 
 impl Traverse for RecordDefinitionParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
         visit("Record.identifier", self.identifier.span);
-        visit("Record.members", self.members.span);
-        for member in self.members.value.iter() {
-            member.traverse("Record.member", visit);
+        visit("Record.fields", self.fields.span);
+        for field in self.fields.value.iter() {
+            field.traverse("Record.field", visit);
         }
         if let Some(methods) = self.methods.as_ref() {
             visit("Record.methods", methods.span);
@@ -45,12 +45,12 @@ impl RecordDefinitionParseNode {
             declarations: HashMap::new(),
         };
 
-        for member in self.members.value.iter() {
-            let RecordMemberParseNode {
+        for field in self.fields.value.iter() {
+            let RecordFieldParseNode {
                 identifier,
                 type_def,
                 public,
-            } = &member.value;
+            } = &field.value;
             let declaration_type = match type_def {
                 Some(type_def) => type_def.value.resolve_types(types),
                 None => Type::Error,
@@ -66,7 +66,7 @@ impl RecordDefinitionParseNode {
                 identifier.clone(),
                 StructDeclaration {
                     public: *public,
-                    declaration_type: StructDeclarationType::Member(declaration_type),
+                    declaration_type: StructDeclarationType::Field(declaration_type),
                 },
             );
         }

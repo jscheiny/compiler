@@ -1,7 +1,7 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token},
     parser::{
-        IdentifierType, ParseNode, ParseResult, RecordDefinitionParseNode, RecordMemberParseNode,
+        IdentifierType, ParseNode, ParseResult, RecordDefinitionParseNode, RecordFieldParseNode,
         RecordType, SyntaxError, TokenStream,
         grammar::{comma_separated_list, methods, type_definition},
     },
@@ -26,40 +26,40 @@ fn record(
         RecordType::Tuple => IdentifierType::Tuple,
     };
     let identifier = tokens.identifier(identifier_type)?;
-    let members = tokens.located(members)?;
+    let fields = tokens.located(fields)?;
 
     let methods = methods(tokens)?;
     Ok(RecordDefinitionParseNode {
         record_type,
         identifier,
-        members,
+        fields,
         methods,
     })
 }
 
-fn members(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<RecordMemberParseNode>>> {
+fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<RecordFieldParseNode>>> {
     match tokens.peek() {
         Token::Operator(OperatorToken::OpenParen) => {
             tokens.next();
-            comma_separated_list(tokens, OperatorToken::CloseParen, member)
+            comma_separated_list(tokens, OperatorToken::CloseParen, field)
         }
         Token::Operator(OperatorToken::OpenBrace) => {
-            tokens.push_error(SyntaxError::ExpectedMembers);
+            tokens.push_error(SyntaxError::ExpectedFields);
             Ok(vec![])
         }
-        _ => Err(tokens.make_error(SyntaxError::ExpectedMembers)),
+        _ => Err(tokens.make_error(SyntaxError::ExpectedFields)),
     }
 }
 
-fn member(tokens: &mut TokenStream) -> ParseResult<RecordMemberParseNode> {
+fn field(tokens: &mut TokenStream) -> ParseResult<RecordFieldParseNode> {
     let public = tokens.accept(&KeywordToken::Pub);
-    let identifier = tokens.identifier(IdentifierType::Member)?;
+    let identifier = tokens.identifier(IdentifierType::Field)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {
         Token::Operator(OperatorToken::Colon) => {
             tokens.next();
             let type_def = Some(tokens.located(type_definition)?);
-            Ok(RecordMemberParseNode {
+            Ok(RecordFieldParseNode {
                 public,
                 identifier,
                 type_def,
@@ -67,7 +67,7 @@ fn member(tokens: &mut TokenStream) -> ParseResult<RecordMemberParseNode> {
         }
         Token::Operator(OperatorToken::Comma) | Token::Operator(OperatorToken::CloseParen) => {
             tokens.push_error(error);
-            Ok(RecordMemberParseNode {
+            Ok(RecordFieldParseNode {
                 public,
                 identifier,
                 type_def: None,
