@@ -1,5 +1,5 @@
 use crate::{
-    checker::{FunctionType, Type, TypeResolver},
+    checker::{FunctionType, Scope, Type, TypeResolver},
     parser::{
         FunctionBodyParseNode, IdentifierParseNode, ParameterParseNode, ParseNode, ParseNodeVec,
         TokenSpan, Traverse, TypeParseNode,
@@ -49,4 +49,6 @@ impl FunctionParseNode {
             return_type,
         }
     }
+
+    pub fn check(&self, types: &TypeResolver, scope: &Scope) {}
 }

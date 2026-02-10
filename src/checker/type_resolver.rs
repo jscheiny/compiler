@@ -1,17 +1,22 @@
 use std::collections::HashMap;
 
-use crate::checker::{DuplicateType, Type, TypeError};
+use crate::checker::{DuplicateType, Scope, Type, TypeError};
 
 #[derive(Default)]
 pub struct TypeResolver {
     types: Vec<Option<Type>>,
     lookup: HashMap<String, usize>,
+    scopes: Vec<Scope>,
     errors: Vec<TypeError>,
 }
 
 impl TypeResolver {
     pub fn new() -> Self {
         Default::default()
+    }
+
+    pub fn make_scope(&mut self) -> &mut Scope {
+        Scope::new(index)
     }
 
     pub fn declare(&mut self, identifier: &String) {
