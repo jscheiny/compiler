@@ -3,7 +3,7 @@ use crate::{
     parser::{
         ExportableModuleDefinitionParseNode, ModuleDefinitionParseNode, ParseResult,
         ProgramParseNode, SyntaxError, TokenStream,
-        grammar::{enumeration, structure, top_level_function, tuple, type_alias},
+        grammar::{enumeration, structure, top_level_function, type_alias},
     },
 };
 
@@ -28,7 +28,6 @@ fn module_definition(tokens: &mut TokenStream) -> ParseResult<ModuleDefinitionPa
     if let Token::Keyword(keyword) = tokens.peek() {
         use KeywordToken as K;
         match keyword {
-            K::Tuple => Ok(ModuleDefinitionParseNode::Record(tuple(tokens)?)),
             K::Struct => Ok(ModuleDefinitionParseNode::Record(structure(tokens)?)),
             K::Enum => Ok(ModuleDefinitionParseNode::Enum(enumeration(tokens)?)),
             K::Fn => Ok(ModuleDefinitionParseNode::Function(top_level_function(

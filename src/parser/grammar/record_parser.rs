@@ -2,35 +2,18 @@ use crate::{
     lexer::{KeywordToken, OperatorToken, Token},
     parser::{
         IdentifierType, ParseNode, ParseResult, RecordDefinitionParseNode, RecordFieldParseNode,
-        RecordType, SyntaxError, TokenStream,
+        SyntaxError, TokenStream,
         grammar::{comma_separated_list, methods, type_definition},
     },
 };
 
 pub fn structure(tokens: &mut TokenStream) -> ParseResult<RecordDefinitionParseNode> {
-    record(tokens, RecordType::Struct)
-}
-
-pub fn tuple(tokens: &mut TokenStream) -> ParseResult<RecordDefinitionParseNode> {
-    record(tokens, RecordType::Tuple)
-}
-
-fn record(
-    tokens: &mut TokenStream,
-    record_type: RecordType,
-) -> ParseResult<RecordDefinitionParseNode> {
     tokens.next();
-
-    let identifier_type = match record_type {
-        RecordType::Struct => IdentifierType::Struct,
-        RecordType::Tuple => IdentifierType::Tuple,
-    };
-    let identifier = tokens.identifier(identifier_type)?;
+    let identifier = tokens.identifier(IdentifierType::Struct)?;
     let fields = tokens.located(fields)?;
 
     let methods = methods(tokens)?;
     Ok(RecordDefinitionParseNode {
-        record_type,
         identifier,
         fields,
         methods,

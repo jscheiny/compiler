@@ -6,13 +6,7 @@ use crate::{
     },
 };
 
-pub enum RecordType {
-    Struct,
-    Tuple,
-}
-
 pub struct RecordDefinitionParseNode {
-    pub record_type: RecordType,
     pub identifier: ParseNode<IdentifierParseNode>,
     pub fields: ParseNodeVec<RecordFieldParseNode>,
     pub methods: Option<ParseNodeVec<MethodParseNode>>,

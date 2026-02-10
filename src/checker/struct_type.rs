@@ -22,7 +22,7 @@ impl StructType {
         if self.members.contains_key(identifier) {
             types.push_error(TypeError::DuplicateMemberName(DuplicateMemberName {
                 container_name: container_name.to_owned(),
-                container_type: "tuple".to_owned(),
+                container_type: "struct".to_owned(),
                 member_name: identifier.clone(),
                 member_type: "member".to_owned(),
             }));
