@@ -3,7 +3,7 @@ use std::fmt::Display;
 pub enum TypeError {
     DuplicateMemberName(DuplicateMemberName),
     DuplicateMethodName(DuplicateMethodName),
-    DuplicateType(DuplicateTypeError),
+    DuplicateType(DuplicateType),
 }
 
 impl Display for TypeError {
@@ -16,11 +16,11 @@ impl Display for TypeError {
     }
 }
 
-pub struct DuplicateTypeError {
+pub struct DuplicateType {
     pub identifier: String,
 }
 
-impl Display for DuplicateTypeError {
+impl Display for DuplicateType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "Duplicate type `{}`", self.identifier)
     }

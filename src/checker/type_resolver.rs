@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::checker::{DuplicateTypeError, Type, TypeError, TypeReference};
+use crate::checker::{DuplicateType, Type, TypeError, TypeReference};
 
 pub struct TypeResolver {
     types: Vec<Type>,
@@ -33,7 +33,7 @@ impl TypeResolver {
     pub fn insert(&mut self, identifier: &String, value: Type) {
         let index = self.types.len();
         if self.lookup.contains_key(identifier) {
-            self.push_error(TypeError::DuplicateType(DuplicateTypeError {
+            self.push_error(TypeError::DuplicateType(DuplicateType {
                 identifier: identifier.clone(),
             }));
         } else {
