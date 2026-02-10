@@ -1,5 +1,7 @@
-pub type T = (A, B) -> C;
-
 fn test() {
-    type T = int;
+
 }
+
+struct S (x: X, x: X) {}
+struct T() {}
+// enum T ();
