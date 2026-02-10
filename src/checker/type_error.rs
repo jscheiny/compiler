@@ -25,17 +25,18 @@ impl Display for DuplicateType {
 }
 
 pub struct DuplicateMemberName {
-    pub member_name: String,
     pub container_name: String,
-    pub container_type: String, // TODO change to enum
+    pub container_type: String,
+    pub member_name: String,
+    pub member_type: String,
 }
 
 impl Display for DuplicateMemberName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "Duplicate member `{}` of {} `{}`",
-            self.member_name, self.container_type, self.container_name
+            "Duplicate {} `{}` of {} `{}`",
+            self.member_type, self.member_name, self.container_type, self.container_name
         )
     }
 }

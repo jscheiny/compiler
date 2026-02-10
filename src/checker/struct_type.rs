@@ -21,9 +21,10 @@ impl StructType {
     ) {
         if self.members.contains_key(identifier) {
             types.push_error(TypeError::DuplicateMemberName(DuplicateMemberName {
-                member_name: identifier.clone(),
                 container_name: container_name.to_owned(),
                 container_type: "tuple".to_owned(),
+                member_name: identifier.clone(),
+                member_type: "member".to_owned(),
             }));
         } else {
             self.members.insert(identifier.clone(), member);

@@ -1,5 +1,5 @@
 use crate::{
-    checker::{EnumMember, EnumType, Type, TypeResolver},
+    checker::{EnumType, Type, TypeResolver},
     parser::{
         EnumVariantParseNode, IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec,
         TokenSpan, Traverse,
@@ -34,16 +34,16 @@ impl EnumParseNode {
         let mut enum_type = EnumType::new();
 
         for variant in self.variants.value.iter() {
-            let member = EnumMember::Variant(variant.value.resolve_type(types));
+            let member = variant.value.resolve_type(types);
             let identifier = &variant.value.identifier.value.0;
-            enum_type.add_member(identifier, container_name, member, types);
+            enum_type.add_variant(identifier, container_name, member, types);
         }
 
         if let Some(methods) = self.methods.as_ref() {
             for method in methods.value.iter() {
-                let member = EnumMember::Method(method.value.resolve_enum_method(types));
+                let member = method.value.resolve_enum_method(types);
                 let identifier = &method.value.function.value.identifier.value.0;
-                enum_type.add_member(identifier, container_name, member, types);
+                enum_type.add_method(identifier, container_name, member, types);
             }
         }
 

@@ -4,7 +4,8 @@ use crate::checker::{DuplicateMemberName, FunctionType, Type, TypeError, TypeRes
 
 #[derive(Default)]
 pub struct EnumType {
-    pub members: HashMap<String, EnumMember>,
+    pub variants: HashMap<String, Option<Type>>,
+    pub methods: HashMap<String, EnumMethod>,
 }
 
 impl EnumType {
@@ -12,28 +13,43 @@ impl EnumType {
         Default::default()
     }
 
-    pub fn add_member(
+    pub fn add_variant(
         &mut self,
         identifier: &String,
         container_name: &str,
-        member: EnumMember,
+        variant: Option<Type>,
         types: &mut TypeResolver,
     ) {
-        if self.members.contains_key(identifier) {
+        if self.variants.contains_key(identifier) {
             types.push_error(TypeError::DuplicateMemberName(DuplicateMemberName {
-                member_name: identifier.clone(),
                 container_name: container_name.to_owned(),
                 container_type: "enum".to_owned(),
+                member_name: identifier.clone(),
+                member_type: "variant".to_owned(),
             }));
         } else {
-            self.members.insert(identifier.clone(), member);
+            self.variants.insert(identifier.clone(), variant);
         }
     }
-}
 
-pub enum EnumMember {
-    Variant(Option<Type>),
-    Method(EnumMethod),
+    pub fn add_method(
+        &mut self,
+        identifier: &String,
+        container_name: &str,
+        method: EnumMethod,
+        types: &mut TypeResolver,
+    ) {
+        if self.methods.contains_key(identifier) {
+            types.push_error(TypeError::DuplicateMemberName(DuplicateMemberName {
+                container_name: container_name.to_owned(),
+                container_type: "enum".to_owned(),
+                member_name: identifier.clone(),
+                member_type: "method".to_owned(),
+            }));
+        } else {
+            self.methods.insert(identifier.clone(), method);
+        }
+    }
 }
 
 pub struct EnumMethod {
