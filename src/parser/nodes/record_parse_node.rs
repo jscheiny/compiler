@@ -1,10 +1,5 @@
-use std::collections::HashMap;
-
 use crate::{
-    checker::{
-        DuplicateMemberName, StructMember, StructMemberType, StructType, Type, TypeError,
-        TypeResolver,
-    },
+    checker::{StructType, Type, TypeResolver},
     parser::{
         IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, RecordFieldParseNode,
         TokenSpan, Traverse,
@@ -53,7 +48,7 @@ impl RecordDefinitionParseNode {
         if let Some(methods) = self.methods.as_ref() {
             for method in methods.value.iter() {
                 let identifier = &method.value.function.value.identifier.value.0;
-                let member = method.value.resolve_type(types);
+                let member = method.value.resolve_struct_method(types);
                 struct_type.add_member(identifier, container_name, member, types);
             }
         }

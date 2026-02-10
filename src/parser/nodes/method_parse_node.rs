@@ -1,5 +1,5 @@
 use crate::{
-    checker::{StructMember, StructMemberType, TypeResolver},
+    checker::{EnumMethod, StructMember, StructMemberType, TypeResolver},
     parser::{FunctionParseNode, ParseNode, TokenSpan, Traverse},
 };
 
@@ -15,11 +15,19 @@ impl Traverse for MethodParseNode {
 }
 
 impl MethodParseNode {
-    pub fn resolve_type(&self, types: &TypeResolver) -> StructMember {
+    pub fn resolve_struct_method(&self, types: &TypeResolver) -> StructMember {
         let function_type = self.function.value.resolve_type(types);
         StructMember {
             public: self.public,
             member_type: StructMemberType::Method(function_type),
+        }
+    }
+
+    pub fn resolve_enum_method(&self, types: &TypeResolver) -> EnumMethod {
+        let function_type = self.function.value.resolve_type(types);
+        EnumMethod {
+            public: self.public,
+            function_type,
         }
     }
 }

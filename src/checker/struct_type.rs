@@ -19,16 +19,15 @@ impl StructType {
         member: StructMember,
         types: &mut TypeResolver,
     ) {
-        if !self.members.contains_key(identifier) {
+        if self.members.contains_key(identifier) {
+            types.push_error(TypeError::DuplicateMemberName(DuplicateMemberName {
+                member_name: identifier.clone(),
+                container_name: container_name.to_owned(),
+                container_type: "tuple".to_owned(),
+            }));
+        } else {
             self.members.insert(identifier.clone(), member);
-            return;
         }
-
-        types.push_error(TypeError::DuplicateMemberName(DuplicateMemberName {
-            member_name: identifier.clone(),
-            container_name: container_name.to_owned(),
-            container_type: "tuple".to_owned(),
-        }));
     }
 }
 

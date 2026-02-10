@@ -1,7 +1,5 @@
-use std::collections::HashMap;
-
 use crate::{
-    checker::{DuplicateMemberName, EnumMember, EnumType, Type, TypeError, TypeResolver},
+    checker::{EnumMember, EnumType, Type, TypeResolver},
     parser::{
         EnumVariantParseNode, IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec,
         TokenSpan, Traverse,
@@ -32,47 +30,23 @@ impl Traverse for EnumParseNode {
 
 impl EnumParseNode {
     pub fn register_type(&self, types: &mut TypeResolver) {
-        let mut members = HashMap::new();
+        let container_name = &self.identifier.value.0;
+        let mut enum_type = EnumType::new();
 
         for variant in self.variants.value.iter() {
-            let EnumVariantParseNode {
-                identifier,
-                type_def,
-            } = &variant.value;
-            let type_def = type_def.as_ref().map(|t| t.value.resolve_type(types));
-
-            let identifier = &identifier.value.0;
-            if members.contains_key(identifier) {
-                types.push_error(self.create_duplicate_member_error(identifier));
-                continue;
-            }
-
-            members.insert(identifier.clone(), EnumMember::Variant(type_def));
+            let member = EnumMember::Variant(variant.value.resolve_type(types));
+            let identifier = &variant.value.identifier.value.0;
+            enum_type.add_member(identifier, container_name, member, types);
         }
 
         if let Some(methods) = self.methods.as_ref() {
             for method in methods.value.iter() {
-                let MethodParseNode { function, .. } = &method.value;
-                let function_type = function.value.resolve_type(types);
-
-                let identifier = &function.value.identifier.value.0;
-                if members.contains_key(identifier) {
-                    types.push_error(self.create_duplicate_member_error(identifier));
-                    continue;
-                }
-
-                members.insert(identifier.clone(), EnumMember::Method(function_type));
+                let member = EnumMember::Method(method.value.resolve_enum_method(types));
+                let identifier = &method.value.function.value.identifier.value.0;
+                enum_type.add_member(identifier, container_name, member, types);
             }
         }
 
-        types.insert(&self.identifier.value.0, Type::Enum(EnumType { members }))
-    }
-
-    fn create_duplicate_member_error(&self, member_name: &str) -> TypeError {
-        TypeError::DuplicateMemberName(DuplicateMemberName {
-            member_name: member_name.to_owned(),
-            container_name: self.identifier.value.0.clone(),
-            container_type: String::from("enum"),
-        })
+        types.insert(&self.identifier.value.0, Type::Enum(enum_type))
     }
 }
