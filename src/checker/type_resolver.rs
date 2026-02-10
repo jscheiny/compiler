@@ -31,6 +31,10 @@ impl TypeResolver {
         self.lookup[identifier]
     }
 
+    pub fn get_type_ref(&self, identifier: &String) -> Type {
+        Type::Reference(self.get_ref(identifier))
+    }
+
     pub fn resolve(&mut self, identifier: &String, value: Type) {
         let index = self.get_ref(identifier);
         if self.types[index].is_none() {
