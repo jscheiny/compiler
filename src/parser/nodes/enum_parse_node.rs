@@ -68,9 +68,9 @@ impl EnumParseNode {
         types.insert(&self.identifier.value.0, Type::Enum(EnumType { members }))
     }
 
-    fn create_duplicate_member_error(&self, member_name: &String) -> TypeError {
+    fn create_duplicate_member_error(&self, member_name: &str) -> TypeError {
         TypeError::DuplicateMemberName(DuplicateMemberName {
-            member_name: member_name.clone(),
+            member_name: member_name.to_owned(),
             container_name: self.identifier.value.0.clone(),
             container_type: String::from("enum"),
         })
