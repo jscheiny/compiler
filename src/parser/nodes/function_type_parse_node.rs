@@ -1,5 +1,5 @@
 use crate::{
-    checker::{FunctionType, TypeResolver, ResolveType, Type},
+    checker::{FunctionType, ResolveType, Type, TypeResolver},
     parser::{ParseNode, ParseNodeVec, TokenSpan, Traverse, TypeParseNode},
 };
 
@@ -27,7 +27,7 @@ impl ResolveType for FunctionTypeParseNode {
             .map(|p| p.value.resolve_types(types))
             .collect();
 
-        let return_type = Box::new(self.return_type.value.resolve_types(types));
+        let return_type = Some(Box::new(self.return_type.value.resolve_types(types)));
 
         Type::Function(FunctionType {
             parameters,

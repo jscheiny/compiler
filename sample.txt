@@ -1,7 +1,6 @@
-fn test() {
-
+struct S(
+    x: X,
+    y: X,
+) {
+    pub x() -> x;
 }
-
-struct S (x: X, x: X) {}
-struct T() {}
-// enum T ();

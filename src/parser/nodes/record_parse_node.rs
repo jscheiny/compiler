@@ -55,17 +55,10 @@ impl RecordDefinitionParseNode {
                 Some(type_def) => type_def.value.resolve_types(types),
                 None => Type::Error,
             };
-            let identifier = &identifier.value.0;
 
+            let identifier = &identifier.value.0;
             if result.declarations.contains_key(identifier) {
-                types.push_error(TypeError::DuplicateMemberName(DuplicateMemberName {
-                    member_name: identifier.clone(),
-                    container_name: self.identifier.value.0.clone(),
-                    container_type: match self.record_type {
-                        RecordType::Struct => String::from("struct"),
-                        RecordType::Tuple => String::from("tuple"),
-                    },
-                }));
+                types.push_error(self.create_duplicate_member_error(identifier));
                 continue;
             }
 
@@ -78,10 +71,38 @@ impl RecordDefinitionParseNode {
             );
         }
 
-        // for method in self.methods.iter() {
-        //     todo!()
-        // }
+        if let Some(methods) = self.methods.as_ref() {
+            for method in methods.value.iter() {
+                let MethodParseNode { public, function } = &method.value;
+                let function_type = function.value.resolve_types(types);
+
+                let identifier = &function.value.identifier.value.0;
+                if result.declarations.contains_key(identifier) {
+                    types.push_error(self.create_duplicate_member_error(identifier));
+                    continue;
+                }
+
+                result.declarations.insert(
+                    identifier.clone(),
+                    StructDeclaration {
+                        public: *public,
+                        declaration_type: StructDeclarationType::Method(function_type),
+                    },
+                );
+            }
+        }
 
         types.insert(&self.identifier.value.0, Type::Struct(result))
+    }
+
+    fn create_duplicate_member_error(&self, member_name: &String) -> TypeError {
+        TypeError::DuplicateMemberName(DuplicateMemberName {
+            member_name: member_name.clone(),
+            container_name: self.identifier.value.0.clone(),
+            container_type: match self.record_type {
+                RecordType::Struct => String::from("struct"),
+                RecordType::Tuple => String::from("tuple"),
+            },
+        })
     }
 }

@@ -33,12 +33,12 @@ pub struct StructDeclaration {
 
 pub enum StructDeclarationType {
     Member(Type),
-    Method(FunctionType),
+    Method(Type),
 }
 
 pub struct FunctionType {
     pub parameters: Vec<Type>,
-    pub return_type: Box<Type>,
+    pub return_type: Option<Box<Type>>,
 }
 
 pub struct EnumType {
