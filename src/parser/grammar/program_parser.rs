@@ -28,7 +28,7 @@ fn module_definition(tokens: &mut TokenStream) -> ParseResult<ModuleDefinitionPa
     if let Token::Keyword(keyword) = tokens.peek() {
         use KeywordToken as K;
         match keyword {
-            K::Struct => Ok(ModuleDefinitionParseNode::Record(structure(tokens)?)),
+            K::Struct => Ok(ModuleDefinitionParseNode::Struct(structure(tokens)?)),
             K::Enum => Ok(ModuleDefinitionParseNode::Enum(enumeration(tokens)?)),
             K::Fn => Ok(ModuleDefinitionParseNode::Function(top_level_function(
                 tokens,

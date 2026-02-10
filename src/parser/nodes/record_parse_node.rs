@@ -1,34 +1,34 @@
 use crate::{
     checker::{StructType, Type, TypeResolver},
     parser::{
-        IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, RecordFieldParseNode,
+        IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, StructFieldParseNode,
         TokenSpan, Traverse,
     },
 };
 
-pub struct RecordDefinitionParseNode {
+pub struct StructParseNode {
     pub identifier: ParseNode<IdentifierParseNode>,
-    pub fields: ParseNodeVec<RecordFieldParseNode>,
+    pub fields: ParseNodeVec<StructFieldParseNode>,
     pub methods: Option<ParseNodeVec<MethodParseNode>>,
 }
 
-impl Traverse for RecordDefinitionParseNode {
+impl Traverse for StructParseNode {
     fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        visit("Record.identifier", self.identifier.span);
-        visit("Record.fields", self.fields.span);
+        visit("Struct.identifier", self.identifier.span);
+        visit("Struct.fields", self.fields.span);
         for field in self.fields.value.iter() {
-            field.traverse("Record.field", visit);
+            field.traverse("Struct.field", visit);
         }
         if let Some(methods) = self.methods.as_ref() {
-            visit("Record.methods", methods.span);
+            visit("Struct.methods", methods.span);
             for method in methods.value.iter() {
-                method.traverse("Record.method", visit);
+                method.traverse("Struct.method", visit);
             }
         }
     }
 }
 
-impl RecordDefinitionParseNode {
+impl StructParseNode {
     pub fn register_type(&self, types: &mut TypeResolver) {
         let container_name = &self.identifier.value.0;
         let mut struct_type = StructType::new();

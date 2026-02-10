@@ -1,26 +1,26 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token},
     parser::{
-        IdentifierType, ParseNode, ParseResult, RecordDefinitionParseNode, RecordFieldParseNode,
-        SyntaxError, TokenStream,
+        IdentifierType, ParseNode, ParseResult, StructFieldParseNode, StructParseNode, SyntaxError,
+        TokenStream,
         grammar::{comma_separated_list, methods, type_definition},
     },
 };
 
-pub fn structure(tokens: &mut TokenStream) -> ParseResult<RecordDefinitionParseNode> {
+pub fn structure(tokens: &mut TokenStream) -> ParseResult<StructParseNode> {
     tokens.next();
     let identifier = tokens.identifier(IdentifierType::Struct)?;
     let fields = tokens.located(fields)?;
 
     let methods = methods(tokens)?;
-    Ok(RecordDefinitionParseNode {
+    Ok(StructParseNode {
         identifier,
         fields,
         methods,
     })
 }
 
-fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<RecordFieldParseNode>>> {
+fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<StructFieldParseNode>>> {
     match tokens.peek() {
         Token::Operator(OperatorToken::OpenParen) => {
             tokens.next();
@@ -34,7 +34,7 @@ fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<RecordFieldPars
     }
 }
 
-fn field(tokens: &mut TokenStream) -> ParseResult<RecordFieldParseNode> {
+fn field(tokens: &mut TokenStream) -> ParseResult<StructFieldParseNode> {
     let public = tokens.accept(&KeywordToken::Pub);
     let identifier = tokens.identifier(IdentifierType::Field)?;
     let error = SyntaxError::ExpectedType;
@@ -42,7 +42,7 @@ fn field(tokens: &mut TokenStream) -> ParseResult<RecordFieldParseNode> {
         Token::Operator(OperatorToken::Colon) => {
             tokens.next();
             let type_def = Some(tokens.located(type_definition)?);
-            Ok(RecordFieldParseNode {
+            Ok(StructFieldParseNode {
                 public,
                 identifier,
                 type_def,
@@ -50,7 +50,7 @@ fn field(tokens: &mut TokenStream) -> ParseResult<RecordFieldParseNode> {
         }
         Token::Operator(OperatorToken::Comma) | Token::Operator(OperatorToken::CloseParen) => {
             tokens.push_error(error);
-            Ok(RecordFieldParseNode {
+            Ok(StructFieldParseNode {
                 public,
                 identifier,
                 type_def: None,
