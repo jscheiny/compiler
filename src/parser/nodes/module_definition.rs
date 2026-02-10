@@ -35,6 +35,15 @@ impl Traverse for ModuleDefinitionParseNode {
 }
 
 impl ModuleDefinitionParseNode {
+    pub fn identifier(&self) -> &String {
+        match self {
+            Self::Struct(node) => node.identifier(),
+            Self::Enum(node) => node.identifier(),
+            Self::TypeAlias(node) => node.identifier(),
+            Self::Function(node) => &node.identifier.value.0,
+        }
+    }
+
     pub fn declare_type(&self, types: &mut TypeResolver) {
         match self {
             Self::Struct(node) => node.declare_type(types),
