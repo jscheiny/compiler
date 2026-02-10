@@ -1,13 +1,8 @@
-struct S(
-    x: X,
-    y: X,
-) {
-    pub x() -> x;
+struct Dawg(nodes: Node);
+struct Node(dawg: Dawg);
+
+struct Pair(x: int, y: int) {
+    add(pair: Pair): Pair -> Pair(@x + pair.x, @y + pair.y);
 }
 
-enum X(
-    f(X),
-    f(G)
-) {
-    pub f() -> x;
-}
+struct Pair() {}

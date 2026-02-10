@@ -19,7 +19,10 @@ impl ProgramParseNode {
     pub fn check(&self) {
         let mut types = TypeResolver::new();
         for definition in self.definitions.iter() {
-            definition.value.definition.register_types(&mut types);
+            definition.value.definition.declare_type(&mut types);
+        }
+        for definition in self.definitions.iter() {
+            definition.value.definition.resolve_type(&mut types);
         }
         types.check();
     }

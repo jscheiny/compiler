@@ -35,11 +35,20 @@ impl Traverse for ModuleDefinitionParseNode {
 }
 
 impl ModuleDefinitionParseNode {
-    pub fn register_types(&self, types: &mut TypeResolver) {
+    pub fn declare_type(&self, types: &mut TypeResolver) {
         match self {
-            Self::Struct(node) => node.register_type(types),
-            Self::Enum(node) => node.register_type(types),
-            Self::TypeAlias(node) => node.register_type(types),
+            Self::Struct(node) => node.declare_type(types),
+            Self::Enum(node) => node.declare_type(types),
+            Self::TypeAlias(node) => node.declare_type(types),
+            Self::Function(_) => {}
+        }
+    }
+
+    pub fn resolve_type(&self, types: &mut TypeResolver) {
+        match self {
+            Self::Struct(node) => node.resolve_types(types),
+            Self::Enum(node) => node.resolve_types(types),
+            Self::TypeAlias(node) => node.resolve_types(types),
             Self::Function(_) => {}
         }
     }

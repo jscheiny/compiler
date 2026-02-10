@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
-use crate::checker::{DuplicateType, Type, TypeError, TypeReference};
+use crate::checker::{DuplicateType, Type, TypeError};
 
 #[derive(Default)]
 pub struct TypeResolver {
-    types: Vec<Type>,
+    types: Vec<Option<Type>>,
     lookup: HashMap<String, usize>,
     errors: Vec<TypeError>,
 }
@@ -14,28 +14,27 @@ impl TypeResolver {
         Default::default()
     }
 
-    pub fn get_by_id(&self, identifier: &String) -> Option<&Type> {
-        let index = self.lookup.get(identifier);
-        index.and_then(|index| self.types.get(*index))
-    }
-
-    pub fn get_reference(&self, identifier: &String) -> TypeReference {
-        let index = self.lookup.get(identifier);
-        match index {
-            Some(index) => TypeReference::Resolved(*index),
-            None => TypeReference::Unresolved,
-        }
-    }
-
-    pub fn insert(&mut self, identifier: &String, value: Type) {
-        let index = self.types.len();
+    pub fn declare(&mut self, identifier: &String) {
         if self.lookup.contains_key(identifier) {
             self.push_error(TypeError::DuplicateType(DuplicateType {
                 identifier: identifier.clone(),
             }));
-        } else {
-            self.types.push(value);
-            self.lookup.insert(identifier.clone(), index);
+            return;
+        }
+
+        let index = self.types.len();
+        self.types.push(None);
+        self.lookup.insert(identifier.clone(), index);
+    }
+
+    pub fn get_ref(&self, identifier: &String) -> usize {
+        self.lookup[identifier]
+    }
+
+    pub fn resolve(&mut self, identifier: &String, value: Type) {
+        let index = self.get_ref(identifier);
+        if self.types[index].is_none() {
+            self.types[index] = Some(value);
         }
     }
 

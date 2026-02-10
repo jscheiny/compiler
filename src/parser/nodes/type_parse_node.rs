@@ -26,9 +26,7 @@ impl TypeParseNode {
             TypeParseNode::Primitive(primitive) => Type::Primitive(*primitive),
             TypeParseNode::Function(function_type) => function_type.resolve_type(types),
             TypeParseNode::Tuple(tuple_type) => tuple_type.resolve_type(types),
-            TypeParseNode::UserDefined(identifier) => {
-                Type::Reference(types.get_reference(identifier))
-            }
+            TypeParseNode::UserDefined(identifier) => Type::Reference(types.get_ref(identifier)),
         }
     }
 }
