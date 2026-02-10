@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use crate::parser::PrimitiveType;
+
 #[derive(Clone, Copy)]
 pub enum TypeReference {
     Resolved(usize),
@@ -7,13 +9,14 @@ pub enum TypeReference {
 }
 
 pub enum Type {
-    Error,
-    Reference(TypeReference),
     Alias(Box<Type>),
-    Struct(StructType),
     Enum(EnumType),
     Function(FunctionType),
+    Primitive(PrimitiveType),
+    Reference(TypeReference),
+    Struct(StructType),
     Tuple(Vec<Type>),
+    Error,
 }
 
 pub struct StructType {

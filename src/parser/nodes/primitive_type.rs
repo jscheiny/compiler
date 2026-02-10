@@ -1,5 +1,6 @@
 use crate::lexer::KeywordToken;
 
+#[derive(Clone, Copy)]
 pub enum PrimitiveType {
     Bool,
     Float,

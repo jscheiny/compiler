@@ -4,10 +4,10 @@ use crate::{
 };
 
 pub enum TypeParseNode {
-    Primitive(PrimitiveType),
-    UserDefined(String),
     Function(FunctionTypeParseNode),
+    Primitive(PrimitiveType),
     Tuple(TupleTypeParseNode),
+    UserDefined(String),
 }
 
 impl Traverse for TypeParseNode {
@@ -23,14 +23,12 @@ impl Traverse for TypeParseNode {
 impl TypeParseNode {
     pub fn resolve_type(&self, types: &TypeResolver) -> Type {
         match self {
-            TypeParseNode::Primitive(primitive) => {
-                todo!("Primitive type resolution not implemented")
-            }
+            TypeParseNode::Primitive(primitive) => Type::Primitive(*primitive),
+            TypeParseNode::Function(function_type) => function_type.resolve_type(types),
+            TypeParseNode::Tuple(tuple_type) => tuple_type.resolve_type(types),
             TypeParseNode::UserDefined(identifier) => {
                 Type::Reference(types.get_reference(identifier))
             }
-            TypeParseNode::Function(function_type) => function_type.resolve_type(types),
-            TypeParseNode::Tuple(tuple_type) => tuple_type.resolve_type(types),
         }
     }
 }
