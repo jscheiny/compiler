@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{
     checker::{
-        DuplicateMemberName, StructDeclaration, StructDeclarationType, StructType, Type, TypeError,
+        DuplicateMemberName, StructMember, StructMemberType, StructType, Type, TypeError,
         TypeResolver,
     },
     parser::{
@@ -42,7 +42,7 @@ impl Traverse for RecordDefinitionParseNode {
 impl RecordDefinitionParseNode {
     pub fn register_type(&self, types: &mut TypeResolver) {
         let mut result = StructType {
-            declarations: HashMap::new(),
+            members: HashMap::new(),
         };
 
         for field in self.fields.value.iter() {
@@ -51,22 +51,22 @@ impl RecordDefinitionParseNode {
                 type_def,
                 public,
             } = &field.value;
-            let declaration_type = match type_def {
+            let member_type = match type_def {
                 Some(type_def) => type_def.value.resolve_type(types),
                 None => Type::Error,
             };
 
             let identifier = &identifier.value.0;
-            if result.declarations.contains_key(identifier) {
+            if result.members.contains_key(identifier) {
                 types.push_error(self.create_duplicate_member_error(identifier));
                 continue;
             }
 
-            result.declarations.insert(
+            result.members.insert(
                 identifier.clone(),
-                StructDeclaration {
+                StructMember {
                     public: *public,
-                    declaration_type: StructDeclarationType::Field(declaration_type),
+                    member_type: StructMemberType::Field(member_type),
                 },
             );
         }
@@ -77,16 +77,16 @@ impl RecordDefinitionParseNode {
                 let function_type = function.value.resolve_type(types);
 
                 let identifier = &function.value.identifier.value.0;
-                if result.declarations.contains_key(identifier) {
+                if result.members.contains_key(identifier) {
                     types.push_error(self.create_duplicate_member_error(identifier));
                     continue;
                 }
 
-                result.declarations.insert(
+                result.members.insert(
                     identifier.clone(),
-                    StructDeclaration {
+                    StructMember {
                         public: *public,
-                        declaration_type: StructDeclarationType::Method(function_type),
+                        member_type: StructMemberType::Method(function_type),
                     },
                 );
             }

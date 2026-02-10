@@ -17,17 +17,17 @@ pub enum Type {
 }
 
 pub struct StructType {
-    pub declarations: HashMap<String, StructDeclaration>,
+    pub members: HashMap<String, StructMember>,
 }
 
-pub struct StructDeclaration {
+pub struct StructMember {
     pub public: bool,
-    pub declaration_type: StructDeclarationType,
+    pub member_type: StructMemberType,
 }
 
-pub enum StructDeclarationType {
+pub enum StructMemberType {
     Field(Type),
-    Method(Type),
+    Method(FunctionType),
 }
 
 pub struct FunctionType {
