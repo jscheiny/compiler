@@ -3,6 +3,7 @@ use crate::{
     parser::PrimitiveType,
 };
 
+#[derive(Clone)]
 pub enum Type {
     Alias(Box<Type>),
     Enum(EnumType),

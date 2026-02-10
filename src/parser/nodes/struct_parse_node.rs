@@ -10,25 +10,25 @@ pub struct StructParseNode {
 }
 
 impl StructParseNode {
-    pub fn resolve_types(&self, types: &mut TypeResolver) {
-        let struct_name = self.identifier();
+    pub fn resolve_types(&mut self, types: &mut TypeResolver) {
+        let container_name = self.identifier().clone();
         let mut struct_type = StructType::new();
 
         for field in self.fields.value.iter() {
             let member = field.value.resolve_type(types);
-            let identifier = &field.value.identifier.value.0;
-            struct_type.add_member(identifier, struct_name, member, types);
+            let identifier = field.value.identifier.value.0.clone();
+            struct_type.add_member(identifier, &container_name, member, types);
         }
 
-        if let Some(methods) = self.methods.as_ref() {
-            for method in methods.value.iter() {
-                let identifier = &method.value.function.value.identifier.value.0;
+        if let Some(methods) = self.methods.as_mut() {
+            for method in methods.value.iter_mut() {
+                let identifier = method.value.function.value.identifier.value.0.clone();
                 let member = method.value.resolve_struct_method(types);
-                struct_type.add_member(identifier, struct_name, member, types);
+                struct_type.add_member(identifier, &container_name, member, types);
             }
         }
 
-        types.resolve(struct_name, Type::Struct(struct_type))
+        types.resolve(&container_name, Type::Struct(struct_type))
     }
 
     pub fn identifier(&self) -> &String {

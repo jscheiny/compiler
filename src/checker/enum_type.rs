@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::checker::{DuplicateMemberName, FunctionType, Type, TypeError, TypeResolver};
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct EnumType {
     pub variants: HashMap<String, Option<Type>>,
     pub methods: HashMap<String, EnumMethod>,
@@ -52,6 +52,7 @@ impl EnumType {
     }
 }
 
+#[derive(Clone)]
 pub struct EnumMethod {
     pub public: bool,
     pub function_type: FunctionType,

@@ -14,12 +14,26 @@ pub struct FunctionParseNode {
 }
 
 impl FunctionParseNode {
-    pub fn resolve_type(&self, types: &TypeResolver) -> FunctionType {
+    pub fn new(
+        identifier: ParseNode<IdentifierParseNode>,
+        parameters: ParseNodeVec<ParameterParseNode>,
+        return_type: Option<ParseNode<TypeParseNode>>,
+        body: ParseNode<FunctionBodyParseNode>,
+    ) -> Self {
+        Self {
+            identifier,
+            parameters,
+            return_type,
+            body,
+        }
+    }
+
+    pub fn resolve_type(&mut self, types: &TypeResolver) -> FunctionType {
         let parameters = self
             .parameters
             .value
-            .iter()
-            .map(|parameter| parameter.value.resolve_type(types))
+            .iter_mut()
+            .map(|parameter| parameter.value.get_type(types))
             .collect();
 
         let return_type = self

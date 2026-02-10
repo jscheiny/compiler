@@ -25,7 +25,7 @@ impl ModuleDefinitionParseNode {
         }
     }
 
-    pub fn resolve_type(&self, types: &mut TypeResolver) {
+    pub fn resolve_type(&mut self, types: &mut TypeResolver) {
         match self {
             Self::Struct(node) => node.resolve_types(types),
             Self::Enum(node) => node.resolve_types(types),

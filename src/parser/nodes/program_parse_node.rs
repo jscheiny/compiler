@@ -10,13 +10,13 @@ pub struct ProgramParseNode {
 }
 
 impl ProgramParseNode {
-    pub fn check(&self) {
+    pub fn check(&mut self) {
         let mut types = TypeResolver::new();
         for definition in self.definitions() {
             types.declare(definition.identifier());
         }
 
-        for definition in self.definitions() {
+        for definition in self.definitions_mut() {
             definition.resolve_type(&mut types);
         }
 
@@ -37,5 +37,11 @@ impl ProgramParseNode {
 
     fn definitions(&self) -> impl Iterator<Item = &ModuleDefinitionParseNode> {
         self.definitions.iter().map(|def| &def.value.definition)
+    }
+
+    fn definitions_mut(&mut self) -> impl Iterator<Item = &mut ModuleDefinitionParseNode> {
+        self.definitions
+            .iter_mut()
+            .map(|def| &mut def.value.definition)
     }
 }

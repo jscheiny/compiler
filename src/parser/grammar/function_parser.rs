@@ -110,17 +110,11 @@ fn parameter(tokens: &mut TokenStream) -> ParseResult<ParameterParseNode> {
         Token::Operator(OperatorToken::Colon) => {
             tokens.next();
             let type_def = Some(tokens.located(type_definition)?);
-            Ok(ParameterParseNode {
-                identifier,
-                type_def,
-            })
+            Ok(ParameterParseNode::new(identifier, type_def))
         }
         Token::Operator(OperatorToken::Comma) | Token::Operator(OperatorToken::CloseParen) => {
             tokens.push_error(error);
-            Ok(ParameterParseNode {
-                identifier,
-                type_def: None,
-            })
+            Ok(ParameterParseNode::new(identifier, None))
         }
         _ => Err(tokens.make_error(error)),
     }

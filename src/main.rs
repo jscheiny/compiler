@@ -33,7 +33,7 @@ fn main() {
     }
 
     match result {
-        Ok(program) => {
+        Ok(mut program) => {
             program.check();
         }
         Err(error) => {
