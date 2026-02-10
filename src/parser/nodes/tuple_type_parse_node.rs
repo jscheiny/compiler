@@ -16,11 +16,11 @@ impl Traverse for TupleTypeParseNode {
 }
 
 impl ResolveType for TupleTypeParseNode {
-    fn resolve_types(&self, types: &TypeResolver) -> Type {
+    fn resolve_type(&self, types: &TypeResolver) -> Type {
         let fields = self
             .fields
             .iter()
-            .map(|p| p.value.resolve_types(types))
+            .map(|p| p.value.resolve_type(types))
             .collect();
 
         Type::Tuple(fields)

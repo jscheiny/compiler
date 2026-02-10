@@ -22,7 +22,7 @@ impl Traverse for TypeParseNode {
 }
 
 impl ResolveType for TypeParseNode {
-    fn resolve_types(&self, types: &TypeResolver) -> Type {
+    fn resolve_type(&self, types: &TypeResolver) -> Type {
         match self {
             TypeParseNode::Primitive(primitive) => {
                 todo!("Primitive type resolution not implemented")
@@ -30,8 +30,8 @@ impl ResolveType for TypeParseNode {
             TypeParseNode::UserDefined(identifier) => {
                 Type::Reference(types.get_reference(identifier))
             }
-            TypeParseNode::Function(function_type) => function_type.resolve_types(types),
-            TypeParseNode::Tuple(tuple_type) => tuple_type.resolve_types(types),
+            TypeParseNode::Function(function_type) => function_type.resolve_type(types),
+            TypeParseNode::Tuple(tuple_type) => tuple_type.resolve_type(types),
         }
     }
 }

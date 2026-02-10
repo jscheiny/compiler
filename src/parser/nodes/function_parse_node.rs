@@ -28,13 +28,13 @@ impl Traverse for FunctionParseNode {
 }
 
 impl ResolveType for FunctionParseNode {
-    fn resolve_types(&self, types: &TypeResolver) -> Type {
+    fn resolve_type(&self, types: &TypeResolver) -> Type {
         let parameters = self
             .parameters
             .value
             .iter()
             .map(|parameter| match parameter.value.type_def.as_ref() {
-                Some(type_def) => type_def.value.resolve_types(types),
+                Some(type_def) => type_def.value.resolve_type(types),
                 None => Type::Error,
             })
             .collect();
@@ -42,7 +42,7 @@ impl ResolveType for FunctionParseNode {
         let return_type = self
             .return_type
             .as_ref()
-            .map(|rt| Box::new(rt.value.resolve_types(types)));
+            .map(|rt| Box::new(rt.value.resolve_type(types)));
 
         Type::Function(FunctionType {
             parameters,

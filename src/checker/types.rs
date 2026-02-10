@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::checker::TypeResolver;
 
 pub trait ResolveType {
-    fn resolve_types(&self, types: &TypeResolver) -> Type;
+    fn resolve_type(&self, types: &TypeResolver) -> Type;
 }
 
 #[derive(Clone, Copy)]

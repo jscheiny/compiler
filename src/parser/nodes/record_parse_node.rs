@@ -52,7 +52,7 @@ impl RecordDefinitionParseNode {
                 public,
             } = &field.value;
             let declaration_type = match type_def {
-                Some(type_def) => type_def.value.resolve_types(types),
+                Some(type_def) => type_def.value.resolve_type(types),
                 None => Type::Error,
             };
 
@@ -74,7 +74,7 @@ impl RecordDefinitionParseNode {
         if let Some(methods) = self.methods.as_ref() {
             for method in methods.value.iter() {
                 let MethodParseNode { public, function } = &method.value;
-                let function_type = function.value.resolve_types(types);
+                let function_type = function.value.resolve_type(types);
 
                 let identifier = &function.value.identifier.value.0;
                 if result.declarations.contains_key(identifier) {
