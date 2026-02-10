@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    checker::{Scope, Type, TypeResolver},
+    checker::{Scope, TypeResolver},
     parser::{ExportableModuleDefinitionParseNode, ModuleDefinitionParseNode, ParseNode},
 };
 
@@ -29,7 +29,7 @@ impl ProgramParseNode {
         for definition in self.definitions() {
             scope.add(
                 definition.identifier(),
-                Type::Reference(types.get_ref(definition.identifier())),
+                types.get_type_ref(definition.identifier()),
             );
         }
         Rc::new(scope)
