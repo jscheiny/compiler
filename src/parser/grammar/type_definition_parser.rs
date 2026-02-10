@@ -14,10 +14,14 @@ pub fn type_definition(tokens: &mut TokenStream) -> ParseResult<TypeParseNode> {
             tokens.next();
             Ok(TypeParseNode::UserDefined(identifier))
         }
-        Token::Keyword(keyword) => match PrimitiveType::from_token(*keyword) {
-            Some(primitive_type) => Ok(TypeParseNode::Primitive(primitive_type)),
-            None => Err(tokens.make_error(SyntaxError::ExpectedType)),
-        },
+        Token::Keyword(keyword) => {
+            let keyword = *keyword;
+            tokens.next();
+            match PrimitiveType::from_token(keyword) {
+                Some(primitive_type) => Ok(TypeParseNode::Primitive(primitive_type)),
+                None => Err(tokens.make_error(SyntaxError::ExpectedType)),
+            }
+        }
         Token::Operator(OperatorToken::OpenParen) => function_or_tuple_type(tokens),
         _ => Err(tokens.make_error(SyntaxError::ExpectedType)),
     }
