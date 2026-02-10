@@ -36,5 +36,10 @@ pub struct FunctionType {
 }
 
 pub struct EnumType {
-    pub variants: HashMap<String, Type>,
+    pub members: HashMap<String, EnumMember>,
+}
+
+pub enum EnumMember {
+    Variant(Option<Type>),
+    Method(FunctionType),
 }

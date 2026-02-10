@@ -41,9 +41,7 @@ impl Traverse for RecordDefinitionParseNode {
 
 impl RecordDefinitionParseNode {
     pub fn register_type(&self, types: &mut TypeResolver) {
-        let mut result = StructType {
-            members: HashMap::new(),
-        };
+        let mut members = HashMap::new();
 
         for field in self.fields.value.iter() {
             let RecordFieldParseNode {
@@ -57,12 +55,12 @@ impl RecordDefinitionParseNode {
             };
 
             let identifier = &identifier.value.0;
-            if result.members.contains_key(identifier) {
+            if members.contains_key(identifier) {
                 types.push_error(self.create_duplicate_member_error(identifier));
                 continue;
             }
 
-            result.members.insert(
+            members.insert(
                 identifier.clone(),
                 StructMember {
                     public: *public,
@@ -77,12 +75,12 @@ impl RecordDefinitionParseNode {
                 let function_type = function.value.resolve_type(types);
 
                 let identifier = &function.value.identifier.value.0;
-                if result.members.contains_key(identifier) {
+                if members.contains_key(identifier) {
                     types.push_error(self.create_duplicate_member_error(identifier));
                     continue;
                 }
 
-                result.members.insert(
+                members.insert(
                     identifier.clone(),
                     StructMember {
                         public: *public,
@@ -92,7 +90,10 @@ impl RecordDefinitionParseNode {
             }
         }
 
-        types.insert(&self.identifier.value.0, Type::Struct(result))
+        types.insert(
+            &self.identifier.value.0,
+            Type::Struct(StructType { members }),
+        )
     }
 
     fn create_duplicate_member_error(&self, member_name: &String) -> TypeError {

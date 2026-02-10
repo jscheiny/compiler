@@ -4,3 +4,10 @@ struct S(
 ) {
     pub x() -> x;
 }
+
+enum X(
+    f(X),
+    f(G)
+) {
+    pub f() -> x;
+}
