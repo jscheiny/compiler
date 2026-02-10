@@ -13,7 +13,7 @@ impl ProgramParseNode {
     pub fn check(&self) {
         let mut types = TypeResolver::new();
         for definition in self.definitions() {
-            definition.declare_type(&mut types);
+            types.declare(definition.identifier());
         }
 
         for definition in self.definitions() {

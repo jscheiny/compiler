@@ -10,10 +10,6 @@ pub struct StructParseNode {
 }
 
 impl StructParseNode {
-    pub fn declare_type(&self, types: &mut TypeResolver) {
-        types.declare(self.identifier());
-    }
-
     pub fn resolve_types(&self, types: &mut TypeResolver) {
         let struct_name = self.identifier();
         let mut struct_type = StructType::new();

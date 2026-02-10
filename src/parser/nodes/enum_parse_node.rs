@@ -10,10 +10,6 @@ pub struct EnumParseNode {
 }
 
 impl EnumParseNode {
-    pub fn declare_type(&self, types: &mut TypeResolver) {
-        types.declare(self.identifier());
-    }
-
     pub fn resolve_types(&self, types: &mut TypeResolver) {
         let enum_name = self.identifier();
         let mut enum_type = EnumType::new();
