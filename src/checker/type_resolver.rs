@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::checker::{DuplicateType, Type, TypeError, TypeReference};
 
+#[derive(Default)]
 pub struct TypeResolver {
     types: Vec<Type>,
     lookup: HashMap<String, usize>,
@@ -10,11 +11,7 @@ pub struct TypeResolver {
 
 impl TypeResolver {
     pub fn new() -> Self {
-        Self {
-            types: vec![],
-            lookup: HashMap::new(),
-            errors: vec![],
-        }
+        Default::default()
     }
 
     pub fn get_by_id(&self, identifier: &String) -> Option<&Type> {
