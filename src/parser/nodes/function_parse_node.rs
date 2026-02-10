@@ -2,7 +2,7 @@ use crate::{
     checker::{FunctionType, TypeResolver},
     parser::{
         FunctionBodyParseNode, IdentifierParseNode, ParameterParseNode, ParseNode, ParseNodeVec,
-        TokenSpan, Traverse, TypeParseNode,
+        TypeParseNode,
     },
 };
 
@@ -11,20 +11,6 @@ pub struct FunctionParseNode {
     pub parameters: ParseNodeVec<ParameterParseNode>,
     pub return_type: Option<ParseNode<TypeParseNode>>,
     pub body: ParseNode<FunctionBodyParseNode>,
-}
-
-impl Traverse for FunctionParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        visit("FunctionDefinition.identifier", self.identifier.span);
-        visit("FunctionDefinition.parameters", self.parameters.span);
-        for parameter in self.parameters.value.iter() {
-            parameter.traverse("FunctionDefintion.parameter", visit);
-        }
-        if let Some(return_type) = self.return_type.as_ref() {
-            return_type.traverse("FunctionDefinition.return", visit);
-        }
-        self.body.traverse("FunctionDefinition.body", visit);
-    }
 }
 
 impl FunctionParseNode {

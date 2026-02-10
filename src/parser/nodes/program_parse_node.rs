@@ -2,22 +2,11 @@ use std::rc::Rc;
 
 use crate::{
     checker::{Scope, Type, TypeResolver},
-    parser::{
-        ExportableModuleDefinitionParseNode, ModuleDefinitionParseNode, ParseNode, TokenSpan,
-        Traverse,
-    },
+    parser::{ExportableModuleDefinitionParseNode, ModuleDefinitionParseNode, ParseNode},
 };
 
 pub struct ProgramParseNode {
     pub definitions: Vec<ParseNode<ExportableModuleDefinitionParseNode>>,
-}
-
-impl Traverse for ProgramParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        for definition in self.definitions.iter() {
-            definition.traverse("Program.definition", visit);
-        }
-    }
 }
 
 impl ProgramParseNode {

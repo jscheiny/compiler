@@ -1,18 +1,10 @@
 use crate::{
     checker::{Type, TypeResolver},
-    parser::{ParseNode, TokenSpan, Traverse, TypeParseNode},
+    parser::{ParseNode, TypeParseNode},
 };
 
 pub struct TupleTypeParseNode {
     pub fields: Vec<ParseNode<TypeParseNode>>,
-}
-
-impl Traverse for TupleTypeParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        for field in self.fields.iter() {
-            field.traverse("TupleType.field", visit);
-        }
-    }
 }
 
 impl TupleTypeParseNode {

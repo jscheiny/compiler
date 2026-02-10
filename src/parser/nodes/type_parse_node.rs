@@ -1,6 +1,6 @@
 use crate::{
     checker::{Type, TypeResolver},
-    parser::{FunctionTypeParseNode, PrimitiveType, TokenSpan, Traverse, TupleTypeParseNode},
+    parser::{FunctionTypeParseNode, PrimitiveType, TupleTypeParseNode},
 };
 
 pub enum TypeParseNode {
@@ -8,16 +8,6 @@ pub enum TypeParseNode {
     Primitive(PrimitiveType),
     Tuple(TupleTypeParseNode),
     UserDefined(String),
-}
-
-impl Traverse for TypeParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        match self {
-            Self::Function(node) => node.traverse(visit),
-            Self::Tuple(node) => node.traverse(visit),
-            Self::Primitive(_) | Self::UserDefined(_) => {}
-        }
-    }
 }
 
 impl TypeParseNode {

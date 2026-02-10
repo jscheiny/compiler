@@ -1,31 +1,12 @@
 use crate::{
     checker::{StructType, Type, TypeResolver},
-    parser::{
-        IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, StructFieldParseNode,
-        TokenSpan, Traverse,
-    },
+    parser::{IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, StructFieldParseNode},
 };
 
 pub struct StructParseNode {
     pub identifier: ParseNode<IdentifierParseNode>,
     pub fields: ParseNodeVec<StructFieldParseNode>,
     pub methods: Option<ParseNodeVec<MethodParseNode>>,
-}
-
-impl Traverse for StructParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        visit("Struct.identifier", self.identifier.span);
-        visit("Struct.fields", self.fields.span);
-        for field in self.fields.value.iter() {
-            field.traverse("Struct.field", visit);
-        }
-        if let Some(methods) = self.methods.as_ref() {
-            visit("Struct.methods", methods.span);
-            for method in methods.value.iter() {
-                method.traverse("Struct.method", visit);
-            }
-        }
-    }
 }
 
 impl StructParseNode {

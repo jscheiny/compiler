@@ -2,8 +2,7 @@ use std::fmt::Display;
 
 use crate::parser::{
     BinaryOpExpressionParseNode, BlockParseNode, FunctionCallExpressionParseNode,
-    IfExpressionParseNode, ParseNode, PostfixOpExpressionParseNode, PrefixOpExpressionParseNode,
-    TokenSpan, Traverse,
+    IfExpressionParseNode, PostfixOpExpressionParseNode, PrefixOpExpressionParseNode,
 };
 
 pub enum ExpressionParseNode {
@@ -58,29 +57,5 @@ impl Display for ExpressionParseNode {
             ExpressionParseNode::Identifier(identifier) => write!(f, "{}", identifier),
             ExpressionParseNode::Error => write!(f, "[ERROR]"),
         }
-    }
-}
-
-impl Traverse for ExpressionParseNode {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        match self {
-            Self::PrefixOp(node) => node.traverse(visit),
-            Self::BinaryOp(node) => node.traverse(visit),
-            Self::PostfixOp(node) => node.traverse(visit),
-            Self::FunctionCall(node) => node.traverse(visit),
-            Self::IfExpression(node) => node.traverse(visit),
-            Self::Block(node) => node.traverse(visit),
-            Self::StringLiteral(_)
-            | Self::IntegerLiteral(_)
-            | Self::Identifier(_)
-            | Self::Error => {}
-        }
-    }
-}
-
-impl Traverse for ParseNode<Box<ExpressionParseNode>> {
-    fn traverse(&self, visit: &impl Fn(&str, TokenSpan)) {
-        visit("ExpressionParseNode.self", self.span);
-        self.value.traverse(visit);
     }
 }
