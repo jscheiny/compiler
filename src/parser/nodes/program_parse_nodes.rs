@@ -1,4 +1,7 @@
-use crate::parser::{ExportableModuleDefinitionParseNode, ParseNode, TokenSpan, Traverse};
+use crate::{
+    checker::TypeResolver,
+    parser::{ExportableModuleDefinitionParseNode, ParseNode, TokenSpan, Traverse},
+};
 
 pub struct ProgramParseNode {
     pub definitions: Vec<ParseNode<ExportableModuleDefinitionParseNode>>,
@@ -9,5 +12,15 @@ impl Traverse for ProgramParseNode {
         for definition in self.definitions.iter() {
             definition.traverse("Program.definition", visit);
         }
+    }
+}
+
+impl ProgramParseNode {
+    pub fn check(&self) {
+        let mut types = TypeResolver::new();
+        for definition in self.definitions.iter() {
+            definition.value.definition.register_types(&mut types);
+        }
+        types.check();
     }
 }

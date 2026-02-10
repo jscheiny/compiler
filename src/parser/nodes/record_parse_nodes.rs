@@ -1,7 +1,20 @@
-use crate::parser::{
-    IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, RecordMemberParseNode,
-    TokenSpan, Traverse,
+use std::collections::HashMap;
+
+use crate::{
+    checker::{
+        DuplicateMemberName, ResolveType, StructDeclaration, StructDeclarationType, StructType,
+        Type, TypeError, TypeResolver,
+    },
+    parser::{
+        IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, RecordMemberParseNode,
+        TokenSpan, Traverse,
+    },
 };
+
+pub enum RecordType {
+    Struct,
+    Tuple,
+}
 
 pub struct RecordDefinitionParseNode {
     pub record_type: RecordType,
@@ -26,7 +39,49 @@ impl Traverse for RecordDefinitionParseNode {
     }
 }
 
-pub enum RecordType {
-    Struct,
-    Tuple,
+impl RecordDefinitionParseNode {
+    pub fn register_type(&self, types: &mut TypeResolver) {
+        let mut result = StructType {
+            declarations: HashMap::new(),
+        };
+
+        for member in self.members.value.iter() {
+            let RecordMemberParseNode {
+                identifier,
+                type_def,
+                public,
+            } = &member.value;
+            let declaration_type = match type_def {
+                Some(type_def) => type_def.value.resolve_types(types),
+                None => Type::Error,
+            };
+            let identifier = &identifier.value.0;
+
+            if result.declarations.contains_key(identifier) {
+                types.push_error(TypeError::DuplicateMemberName(DuplicateMemberName {
+                    member_name: identifier.clone(),
+                    container_name: self.identifier.value.0.clone(),
+                    container_type: match self.record_type {
+                        RecordType::Struct => String::from("struct"),
+                        RecordType::Tuple => String::from("tuple"),
+                    },
+                }));
+                continue;
+            }
+
+            result.declarations.insert(
+                identifier.clone(),
+                StructDeclaration {
+                    public: *public,
+                    declaration_type: StructDeclarationType::Member(declaration_type),
+                },
+            );
+        }
+
+        // for method in self.methods.iter() {
+        //     todo!()
+        // }
+
+        types.insert(&self.identifier.value.0, Type::Struct(result))
+    }
 }

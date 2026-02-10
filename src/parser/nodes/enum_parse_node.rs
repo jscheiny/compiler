@@ -1,6 +1,9 @@
-use crate::parser::{
-    EnumVariantParseNode, IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, TokenSpan,
-    Traverse,
+use crate::{
+    checker::TypeResolver,
+    parser::{
+        EnumVariantParseNode, IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec,
+        TokenSpan, Traverse,
+    },
 };
 
 pub struct EnumParseNode {
@@ -22,5 +25,11 @@ impl Traverse for EnumParseNode {
                 method.traverse("Enum.method", visit);
             }
         }
+    }
+}
+
+impl EnumParseNode {
+    pub fn register_type(&self, types: &mut TypeResolver) {
+        todo!("Enum type registration not implemented")
     }
 }

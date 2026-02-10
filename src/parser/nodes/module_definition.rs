@@ -1,6 +1,9 @@
-use crate::parser::{
-    EnumParseNode, FunctionParseNode, RecordDefinitionParseNode, TokenSpan, Traverse,
-    TypeAliasParseNode,
+use crate::{
+    checker::TypeResolver,
+    parser::{
+        EnumParseNode, FunctionParseNode, RecordDefinitionParseNode, TokenSpan, Traverse,
+        TypeAliasParseNode,
+    },
 };
 
 pub struct ExportableModuleDefinitionParseNode {
@@ -28,6 +31,17 @@ impl Traverse for ModuleDefinitionParseNode {
             Self::Enum(node) => node.traverse(visit),
             Self::Function(node) => node.traverse(visit),
             Self::TypeAlias(node) => node.traverse(visit),
+        }
+    }
+}
+
+impl ModuleDefinitionParseNode {
+    pub fn register_types(&self, types: &mut TypeResolver) {
+        match self {
+            Self::Record(node) => node.register_type(types),
+            Self::Enum(node) => node.register_type(types),
+            Self::TypeAlias(node) => node.register_type(types),
+            Self::Function(_) => {}
         }
     }
 }

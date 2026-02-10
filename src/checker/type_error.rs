@@ -1,0 +1,59 @@
+use std::fmt::Display;
+
+pub enum TypeError {
+    DuplicateMemberName(DuplicateMemberName),
+    DuplicateMethodName(DuplicateMethodName),
+    DuplicateType(DuplicateTypeError),
+}
+
+impl Display for TypeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TypeError::DuplicateMemberName(error) => write!(f, "{}", error),
+            TypeError::DuplicateMethodName(error) => write!(f, "{}", error),
+            TypeError::DuplicateType(error) => write!(f, "{}", error),
+        }
+    }
+}
+
+pub struct DuplicateTypeError {
+    pub identifier: String,
+}
+
+impl Display for DuplicateTypeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Duplicate type `{}`", self.identifier)
+    }
+}
+
+pub struct DuplicateMemberName {
+    pub member_name: String,
+    pub container_name: String,
+    pub container_type: String, // TODO change to enum
+}
+
+impl Display for DuplicateMemberName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Duplicate member `{}` of {} `{}`",
+            self.member_name, self.container_type, self.container_name
+        )
+    }
+}
+
+pub struct DuplicateMethodName {
+    pub method_name: String,
+    pub container_name: String,
+    pub container_type: String, // TODO change to enum
+}
+
+impl Display for DuplicateMethodName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Duplicate method `{}` of {} `{}`",
+            self.method_name, self.container_type, self.container_name
+        )
+    }
+}

@@ -4,9 +4,10 @@ use colored::Colorize;
 
 use crate::{
     lexer::{Severity, SourceCode},
-    parser::{LocatedSyntaxError, Traverse, program},
+    parser::{LocatedSyntaxError, program},
 };
 
+pub mod checker;
 pub mod lexer;
 pub mod parser;
 
@@ -33,11 +34,7 @@ fn main() {
 
     match result {
         Ok(program) => {
-            program.traverse(&|message, span| {
-                if source.is_single_line(span) {
-                    source.print_token_span(span, '-', message, Severity::Note);
-                }
-            });
+            program.check();
         }
         Err(error) => {
             print_err(&source, &error);
