@@ -1,5 +1,5 @@
 use crate::{
-    checker::{FunctionType, Type, TypeResolver},
+    checker::{FunctionType, TypeResolver},
     parser::{
         FunctionBodyParseNode, IdentifierParseNode, ParameterParseNode, ParseNode, ParseNodeVec,
         TokenSpan, Traverse, TypeParseNode,
@@ -33,10 +33,7 @@ impl FunctionParseNode {
             .parameters
             .value
             .iter()
-            .map(|parameter| match parameter.value.type_def.as_ref() {
-                Some(type_def) => type_def.value.resolve_type(types),
-                None => Type::Error,
-            })
+            .map(|parameter| parameter.value.resolve_type(types))
             .collect();
 
         let return_type = self
