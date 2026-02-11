@@ -1,6 +1,7 @@
 type T = neat;
 type neat = int;
 
-fn test(x: T): T {
-    let x = x;
+fn test(x: T) {
+    let x: int = 5;
+    return;
 }
