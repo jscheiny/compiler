@@ -20,12 +20,6 @@ impl ParameterNode {
         }
     }
 
-    pub fn check(&self, types: &TypeResolver) {
-        if let Some(type_def) = self.type_def.as_ref() {
-            type_def.check(types);
-        }
-    }
-
     pub fn get_type(&self, types: &TypeResolver) -> &Type {
         self.resolved_type.get_or_init(|| self.get_type_impl(types))
     }

@@ -31,11 +31,11 @@ impl FunctionNode {
         }
     }
 
-    pub fn check(&self, types: &mut TypeResolver) {
-        self.check_params(types);
+    pub fn check(&self) {
+        self.check_params();
     }
 
-    fn check_params(&self, types: &TypeResolver) {
+    fn check_params(&self) {
         let mut param_names = HashSet::new();
         for param in self.parameters.iter() {
             if param_names.contains(param.id()) {
@@ -46,7 +46,6 @@ impl FunctionNode {
                 );
             }
             param_names.insert(param.id().clone());
-            param.check(types)
         }
     }
 

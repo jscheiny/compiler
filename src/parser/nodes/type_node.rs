@@ -11,15 +11,6 @@ pub enum TypeNode {
 }
 
 impl TypeNode {
-    pub fn check(&self, types: &TypeResolver) {
-        match self {
-            Self::Function(node) => node.check(types),
-            Self::Tuple(node) => node.check(types),
-            Self::Primitive(_) => {}   // Primitive types are always valid
-            Self::UserDefined(_) => {} // This should already be checked by get_type
-        }
-    }
-
     pub fn get_type(&self, types: &TypeResolver) -> Type {
         match self {
             Self::Primitive(primitive) => Type::Primitive(*primitive),

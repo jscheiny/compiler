@@ -20,13 +20,6 @@ impl FunctionTypeNode {
         }
     }
 
-    pub fn check(&self, types: &TypeResolver) {
-        for parameter in self.parameters.iter() {
-            parameter.check(types);
-        }
-        self.return_type.check(types);
-    }
-
     pub fn get_type(&self, types: &TypeResolver) -> &FunctionType {
         self.resolved_type.get_or_init(|| self.get_type_impl(types))
     }

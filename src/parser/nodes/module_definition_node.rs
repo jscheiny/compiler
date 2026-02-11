@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::{
     checker::{Scope, Type, TypeResolver},
     parser::{EnumNode, FunctionNode, Identified, StructNode, TypeAliasNode},
@@ -22,8 +20,8 @@ impl ModuleDefinitionNode {
         match self {
             Self::Struct(node) => todo!("Struct type checking not implemented"),
             Self::Enum(node) => todo!("Enum type checking not implemented"),
-            Self::Function(node) => node.check(types),
-            Self::TypeAlias(node) => node.check(types),
+            Self::Function(node) => node.check(),
+            Self::TypeAlias(node) => node.check(),
         }
     }
 
