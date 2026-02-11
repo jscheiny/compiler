@@ -5,7 +5,7 @@ use crate::{
     },
     parser::{
         Associativity, BinaryOpExpressionNode, BinaryOperator, BlockNode, ExpressionNode,
-        FunctionCallExpressionNode, IfExpressionNode, Operator, ParseNode, ParseResult,
+        FunctionCallExpressionNode, IfExpressionNode, Node, Operator, ParseResult,
         PostfixOpExpressionNode, PostfixOperator, PrefixOpExpressionNode, PrefixOperator,
         SyntaxError, TokenSpan, TokenStream, grammar::statement,
     },
@@ -81,7 +81,7 @@ fn sub_expression(tokens: &mut TokenStream, min_precedence: i32) -> ParseResult<
     Ok(left.value)
 }
 
-fn flatten_arguments(expression: ParseNode<ExpressionNode>) -> Vec<ParseNode<ExpressionNode>> {
+fn flatten_arguments(expression: Node<ExpressionNode>) -> Vec<Node<ExpressionNode>> {
     let mut arguments = vec![];
     let mut current = expression;
     loop {

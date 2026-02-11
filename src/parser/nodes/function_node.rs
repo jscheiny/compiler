@@ -3,25 +3,24 @@ use std::{cell::OnceCell, collections::HashSet};
 use crate::{
     checker::{FunctionType, TypeResolver},
     parser::{
-        FunctionBodyNode, Identified, IdentifierNode, ParameterNode, ParseNode, ParseNodeVec,
-        TypeNode,
+        FunctionBodyNode, Identified, IdentifierNode, Node, NodeVec, ParameterNode, TypeNode,
     },
 };
 
 pub struct FunctionNode {
-    identifier: ParseNode<IdentifierNode>,
-    parameters: ParseNodeVec<ParameterNode>,
-    return_type: Option<ParseNode<TypeNode>>,
-    body: ParseNode<FunctionBodyNode>,
+    identifier: Node<IdentifierNode>,
+    parameters: NodeVec<ParameterNode>,
+    return_type: Option<Node<TypeNode>>,
+    body: Node<FunctionBodyNode>,
     resolved_type: OnceCell<FunctionType>,
 }
 
 impl FunctionNode {
     pub fn new(
-        identifier: ParseNode<IdentifierNode>,
-        parameters: ParseNodeVec<ParameterNode>,
-        return_type: Option<ParseNode<TypeNode>>,
-        body: ParseNode<FunctionBodyNode>,
+        identifier: Node<IdentifierNode>,
+        parameters: NodeVec<ParameterNode>,
+        return_type: Option<Node<TypeNode>>,
+        body: Node<FunctionBodyNode>,
     ) -> Self {
         Self {
             identifier,

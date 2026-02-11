@@ -2,7 +2,7 @@ use crate::{
     lexer::{KeywordToken, OperatorToken, Token, TokenMatch},
     parser::{
         DeclarationNode, ExpressionNode, IdentifierType, IfStatementConditionNode, IfStatementNode,
-        ParseNode, ParseResult, StatementNode, SyntaxError, TokenStream, WhileLoopNode,
+        Node, ParseResult, StatementNode, SyntaxError, TokenStream, WhileLoopNode,
         grammar::{block, expression, type_alias, type_definition},
     },
 };
@@ -48,7 +48,7 @@ fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<Statement
     }))
 }
 
-fn initializer(tokens: &mut TokenStream) -> ParseResult<Option<ParseNode<ExpressionNode>>> {
+fn initializer(tokens: &mut TokenStream) -> ParseResult<Option<Node<ExpressionNode>>> {
     let error = SyntaxError::ExpectedInitializer;
     match tokens.peek() {
         Token::Operator(OperatorToken::Equal) => {

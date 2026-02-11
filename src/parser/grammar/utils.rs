@@ -1,13 +1,13 @@
 use crate::{
     lexer::OperatorToken,
-    parser::{ParseNode, ParseResult, TokenStream},
+    parser::{Node, ParseResult, TokenStream},
 };
 
 pub fn comma_separated_list<T>(
     tokens: &mut TokenStream,
     close_symbol: OperatorToken,
     parse_entry: impl Fn(&mut TokenStream) -> ParseResult<T>,
-) -> ParseResult<Vec<ParseNode<T>>> {
+) -> ParseResult<Vec<Node<T>>> {
     // TODO this could use better errors
     let mut entries = vec![];
     while !tokens.accept(&close_symbol) {

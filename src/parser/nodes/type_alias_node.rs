@@ -2,17 +2,17 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{Type, TypeResolver},
-    parser::{Identified, IdentifierNode, ParseNode, TypeNode},
+    parser::{Identified, IdentifierNode, Node, TypeNode},
 };
 
 pub struct TypeAliasNode {
-    identifier: ParseNode<IdentifierNode>,
-    type_def: ParseNode<TypeNode>,
+    identifier: Node<IdentifierNode>,
+    type_def: Node<TypeNode>,
     resolved_type: OnceCell<Type>,
 }
 
 impl TypeAliasNode {
-    pub fn new(identifier: ParseNode<IdentifierNode>, type_def: ParseNode<TypeNode>) -> Self {
+    pub fn new(identifier: Node<IdentifierNode>, type_def: Node<TypeNode>) -> Self {
         Self {
             identifier,
             type_def,

@@ -1,7 +1,7 @@
 use crate::{
     lexer::{IdentifierToken, OperatorToken, Token},
     parser::{
-        FunctionTypeNode, ParseNode, ParseResult, PrimitiveType, SyntaxError, TokenStream,
+        FunctionTypeNode, Node, ParseResult, PrimitiveType, SyntaxError, TokenStream,
         TupleTypeNode, TypeNode, grammar::comma_separated_list,
     },
 };
@@ -41,6 +41,6 @@ fn function_or_tuple_type(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
     }
 }
 
-fn type_list(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<TypeNode>>> {
+fn type_list(tokens: &mut TokenStream) -> ParseResult<Vec<Node<TypeNode>>> {
     comma_separated_list(tokens, OperatorToken::CloseParen, type_definition)
 }

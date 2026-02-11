@@ -1,15 +1,13 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token, TokenMatch},
     parser::{
-        ExpressionNode, FunctionBodyNode, FunctionNode, IdentifierType, MethodNode, ParameterNode,
-        ParseNode, ParseResult, SyntaxError, TokenStream,
+        ExpressionNode, FunctionBodyNode, FunctionNode, IdentifierType, MethodNode, Node,
+        ParameterNode, ParseResult, SyntaxError, TokenStream,
         grammar::{block, comma_separated_list, end_statement, expression, type_definition},
     },
 };
 
-pub fn methods(
-    tokens: &mut TokenStream,
-) -> ParseResult<Option<ParseNode<Vec<ParseNode<MethodNode>>>>> {
+pub fn methods(tokens: &mut TokenStream) -> ParseResult<Option<Node<Vec<Node<MethodNode>>>>> {
     if OperatorToken::OpenBrace.matches(tokens.peek()) {
         Ok(Some(tokens.located(methods_impl)?))
     } else if tokens.accept(&OperatorToken::Semicolon) {
@@ -20,7 +18,7 @@ pub fn methods(
     }
 }
 
-fn methods_impl(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<MethodNode>>> {
+fn methods_impl(tokens: &mut TokenStream) -> ParseResult<Vec<Node<MethodNode>>> {
     tokens.next();
     let mut methods = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {
@@ -79,7 +77,7 @@ fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyNode> {
     }
 }
 
-pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<ParameterNode>>> {
+pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<Node<ParameterNode>>> {
     let error = SyntaxError::ExpectedParameters;
     use OperatorToken as O;
     match tokens.peek() {

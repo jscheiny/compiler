@@ -1,7 +1,7 @@
-use crate::parser::{BinaryOperator, ExpressionNode, ParseNode};
+use crate::parser::{BinaryOperator, ExpressionNode, Node};
 
 pub struct BinaryOpExpressionNode {
-    pub left: Box<ParseNode<ExpressionNode>>,
-    pub operator: ParseNode<BinaryOperator>,
-    pub right: Box<ParseNode<ExpressionNode>>,
+    pub left: Box<Node<ExpressionNode>>,
+    pub operator: Node<BinaryOperator>,
+    pub right: Box<Node<ExpressionNode>>,
 }

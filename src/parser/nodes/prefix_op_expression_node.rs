@@ -1,6 +1,6 @@
-use crate::parser::{ExpressionNode, ParseNode, PrefixOperator};
+use crate::parser::{ExpressionNode, Node, PrefixOperator};
 
 pub struct PrefixOpExpressionNode {
-    pub operator: ParseNode<PrefixOperator>,
-    pub expression: Box<ParseNode<ExpressionNode>>,
+    pub operator: Node<PrefixOperator>,
+    pub expression: Box<Node<ExpressionNode>>,
 }

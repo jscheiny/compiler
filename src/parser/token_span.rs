@@ -1,4 +1,4 @@
-use crate::parser::{ParseNode, TokenStream};
+use crate::parser::{Node, TokenStream};
 
 #[derive(Clone, Copy)]
 pub struct TokenSpan {
@@ -21,7 +21,7 @@ impl TokenSpan {
         }
     }
 
-    pub fn wrap<T>(self, value: T) -> ParseNode<T> {
-        ParseNode { value, span: self }
+    pub fn wrap<T>(self, value: T) -> Node<T> {
+        Node { value, span: self }
     }
 }

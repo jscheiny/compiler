@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::{
     lexer::{LocatedToken, Token, TokenMatch},
     parser::{
-        IdentifierNode, IdentifierType, LocatedSyntaxError, ParseNode, ParseResult, SyntaxError,
+        IdentifierNode, IdentifierType, LocatedSyntaxError, Node, ParseResult, SyntaxError,
         TokenSpan, identifier,
     },
 };
@@ -53,10 +53,7 @@ impl TokenStream {
         self.index >= self.tokens.len() - 1
     }
 
-    pub fn identifier(
-        &mut self,
-        id_type: IdentifierType,
-    ) -> ParseResult<ParseNode<IdentifierNode>> {
+    pub fn identifier(&mut self, id_type: IdentifierType) -> ParseResult<Node<IdentifierNode>> {
         let start_index = self.index;
         let value = identifier(self, id_type)?;
         Ok(self.close(value, start_index))
@@ -65,7 +62,7 @@ impl TokenStream {
     pub fn located<P, E>(
         &mut self,
         parse: impl Fn(&mut TokenStream) -> Result<P, E>,
-    ) -> Result<ParseNode<P>, E> {
+    ) -> Result<Node<P>, E> {
         let start_index = self.index;
         let value = parse(self)?;
         Ok(self.close(value, start_index))
@@ -75,7 +72,7 @@ impl TokenStream {
         &mut self,
         parse: impl Fn(&mut TokenStream, Arg) -> Result<P, E>,
         arg: Arg,
-    ) -> Result<ParseNode<P>, E> {
+    ) -> Result<Node<P>, E> {
         let start_index = self.index;
         let value = parse(self, arg)?;
         Ok(self.close(value, start_index))
@@ -85,8 +82,8 @@ impl TokenStream {
         self.index
     }
 
-    fn close<P>(&self, value: P, start_index: usize) -> ParseNode<P> {
-        ParseNode {
+    fn close<P>(&self, value: P, start_index: usize) -> Node<P> {
+        Node {
             value,
             span: TokenSpan {
                 start_index,

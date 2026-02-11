@@ -2,17 +2,17 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{FunctionType, TypeResolver},
-    parser::{ParseNode, ParseNodeVec, TypeNode},
+    parser::{Node, NodeVec, TypeNode},
 };
 
 pub struct FunctionTypeNode {
-    parameters: ParseNodeVec<TypeNode>,
-    return_type: Box<ParseNode<TypeNode>>,
+    parameters: NodeVec<TypeNode>,
+    return_type: Box<Node<TypeNode>>,
     resolved_type: OnceCell<FunctionType>,
 }
 
 impl FunctionTypeNode {
-    pub fn new(parameters: ParseNodeVec<TypeNode>, return_type: Box<ParseNode<TypeNode>>) -> Self {
+    pub fn new(parameters: NodeVec<TypeNode>, return_type: Box<Node<TypeNode>>) -> Self {
         Self {
             parameters,
             return_type,

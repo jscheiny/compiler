@@ -2,21 +2,21 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{EnumType, TypeResolver},
-    parser::{EnumVariantNode, Identified, IdentifierNode, MethodNode, ParseNode, ParseNodeVec},
+    parser::{EnumVariantNode, Identified, IdentifierNode, MethodNode, Node, NodeVec},
 };
 
 pub struct EnumNode {
-    identifier: ParseNode<IdentifierNode>,
-    variants: ParseNodeVec<EnumVariantNode>,
-    methods: Option<ParseNodeVec<MethodNode>>,
+    identifier: Node<IdentifierNode>,
+    variants: NodeVec<EnumVariantNode>,
+    methods: Option<NodeVec<MethodNode>>,
     resolved_type: OnceCell<EnumType>,
 }
 
 impl EnumNode {
     pub fn new(
-        identifier: ParseNode<IdentifierNode>,
-        variants: ParseNodeVec<EnumVariantNode>,
-        methods: Option<ParseNodeVec<MethodNode>>,
+        identifier: Node<IdentifierNode>,
+        variants: NodeVec<EnumVariantNode>,
+        methods: Option<NodeVec<MethodNode>>,
     ) -> Self {
         Self {
             identifier,

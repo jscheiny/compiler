@@ -2,11 +2,11 @@ use std::rc::Rc;
 
 use crate::{
     checker::{Scope, TypeResolver},
-    parser::{ExportableModuleDefinitionNode, Identified, ModuleDefinitionNode, ParseNode},
+    parser::{ExportableModuleDefinitionNode, Identified, ModuleDefinitionNode, Node},
 };
 
 pub struct ProgramNode {
-    pub definitions: Vec<ParseNode<ExportableModuleDefinitionNode>>,
+    pub definitions: Vec<Node<ExportableModuleDefinitionNode>>,
 }
 
 impl ProgramNode {

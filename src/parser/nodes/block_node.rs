@@ -1,5 +1,5 @@
-use crate::parser::{ParseNode, StatementNode};
+use crate::parser::{Node, StatementNode};
 
 pub struct BlockNode {
-    pub statements: Vec<ParseNode<StatementNode>>,
+    pub statements: Vec<Node<StatementNode>>,
 }

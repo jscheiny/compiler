@@ -1,11 +1,11 @@
 use crate::{
     checker::{EnumMethod, StructMember, StructMemberType, TypeResolver},
-    parser::{FunctionNode, Identified, ParseNode},
+    parser::{FunctionNode, Identified, Node},
 };
 
 pub struct MethodNode {
     pub public: bool,
-    pub function: ParseNode<FunctionNode>,
+    pub function: Node<FunctionNode>,
 }
 
 impl MethodNode {

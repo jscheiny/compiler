@@ -1,12 +1,12 @@
 use crate::{
     checker::{StructMember, StructMemberType, Type, TypeResolver},
-    parser::{Identified, IdentifierNode, ParseNode, TypeNode},
+    parser::{Identified, IdentifierNode, Node, TypeNode},
 };
 
 pub struct StructFieldNode {
     pub public: bool,
-    pub identifier: ParseNode<IdentifierNode>,
-    pub type_def: Option<ParseNode<TypeNode>>,
+    pub identifier: Node<IdentifierNode>,
+    pub type_def: Option<Node<TypeNode>>,
 }
 
 impl StructFieldNode {

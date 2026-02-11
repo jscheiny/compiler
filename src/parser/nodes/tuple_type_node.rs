@@ -2,16 +2,16 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{Type, TypeResolver},
-    parser::{ParseNode, TypeNode},
+    parser::{Node, TypeNode},
 };
 
 pub struct TupleTypeNode {
-    fields: Vec<ParseNode<TypeNode>>,
+    fields: Vec<Node<TypeNode>>,
     resolved_type: OnceCell<Type>,
 }
 
 impl TupleTypeNode {
-    pub fn new(fields: Vec<ParseNode<TypeNode>>) -> Self {
+    pub fn new(fields: Vec<Node<TypeNode>>) -> Self {
         Self {
             fields,
             resolved_type: OnceCell::new(),

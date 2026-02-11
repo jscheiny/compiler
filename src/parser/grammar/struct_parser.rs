@@ -1,8 +1,7 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token},
     parser::{
-        IdentifierType, ParseNode, ParseResult, StructFieldNode, StructNode, SyntaxError,
-        TokenStream,
+        IdentifierType, Node, ParseResult, StructFieldNode, StructNode, SyntaxError, TokenStream,
         grammar::{comma_separated_list, methods, type_definition},
     },
 };
@@ -16,7 +15,7 @@ pub fn structure(tokens: &mut TokenStream) -> ParseResult<StructNode> {
     Ok(StructNode::new(identifier, fields, methods))
 }
 
-fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<StructFieldNode>>> {
+fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<Node<StructFieldNode>>> {
     match tokens.peek() {
         Token::Operator(OperatorToken::OpenParen) => {
             tokens.next();
