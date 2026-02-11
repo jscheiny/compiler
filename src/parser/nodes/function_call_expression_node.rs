@@ -67,7 +67,10 @@ impl FunctionCallExpressionNode {
                 self.get_function_type(resolved_type, types, scope)
             }
             Type::Struct(_struct_type) => todo!("Implement call operator for structs"),
-            Type::Tuple(_tuple_type) => todo!("Implement call operator for tuple"),
+            Type::Tuple(_) => {
+                println!("No call operator for tuple");
+                (scope, None)
+            }
             Type::Error => (scope, None),
         }
     }
