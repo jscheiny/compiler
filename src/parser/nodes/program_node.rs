@@ -35,7 +35,6 @@ impl ProgramNode {
         for definition in self.definitions() {
             definition.add_to_scope(types, &mut scope);
         }
-        dbg!(&scope);
         scope
     }
 

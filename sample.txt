@@ -1,8 +1,8 @@
-type T = neat;
-type neat = int;
+fn test(x: int, y: int): bool -> y;
 
-fn test(a: T) {
-    let x = true;
-    if x {} else {}
-    while false {}
+fn main() {
+    let x = 5;
+    while test(x, x) {
+
+    }
 }

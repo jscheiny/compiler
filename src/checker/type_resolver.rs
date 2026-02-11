@@ -39,6 +39,10 @@ impl TypeResolver {
         self.get_ref(identifier).map(|index| Type::Reference(index))
     }
 
+    pub fn get_type(&self, index: usize) -> Option<Type> {
+        self.types[index].clone()
+    }
+
     pub fn resolve(&mut self, identifier: &String, value: Type) {
         let index = self.get_ref(identifier);
         if let Some(index) = index {
