@@ -25,17 +25,11 @@ pub enum ExpressionNode {
 impl ExpressionNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
         match self {
-            Self::PrefixOp(_node) => todo!("Implement type checking for ExpressionNode::PrefixOp"),
-            Self::BinaryOp(_node) => todo!("Implement type checking for ExpressionNode::BinaryOp"),
-            Self::PostfixOp(_node) => {
-                todo!("Implement type checking for ExpressionNode::PostfixOp")
-            }
-            Self::FunctionCall(_node) => {
-                todo!("Implement type checking for ExpressionNode::FunctionCall")
-            }
-            Self::IfExpression(_node) => {
-                todo!("Implement type checking for ExpressionNode::IfExpression")
-            }
+            Self::PrefixOp(node) => node.check(types, scope),
+            Self::BinaryOp(node) => node.check(types, scope),
+            Self::PostfixOp(node) => node.check(types, scope),
+            Self::FunctionCall(node) => node.check(types, scope),
+            Self::IfExpression(node) => node.check(types, scope),
             Self::BooleanLiteral(_) => (scope, Type::Primitive(PrimitiveType::Bool)),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
             Self::StringLiteral(_) => {
