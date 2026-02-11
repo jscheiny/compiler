@@ -1,5 +1,5 @@
 use crate::{
-    checker::{EnumMethod, StructMember, StructMemberType, TypeResolver},
+    checker::{EnumMethod, Scope, StructMember, StructMemberType, TypeResolver},
     parser::{FunctionNode, Identified, Node},
 };
 
@@ -9,6 +9,10 @@ pub struct MethodNode {
 }
 
 impl MethodNode {
+    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
+        self.function.check(types, scope)
+    }
+
     pub fn resolve_struct_method(&self, types: &TypeResolver) -> StructMember {
         let function_type = self.function.get_type(types).clone();
         StructMember {

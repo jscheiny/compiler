@@ -8,6 +8,7 @@ pub enum ScopeType {
     Function,
     Block,
     Loop,
+    Struct,
 }
 
 impl Default for ScopeType {
@@ -21,7 +22,6 @@ pub struct Scope {
     scope_type: ScopeType,
     parent: Option<Box<Scope>>,
     values: HashMap<String, Type>,
-    // self_values: Option<HashMap<String, Type>>,
 }
 
 impl Scope {
@@ -50,16 +50,20 @@ impl Scope {
         self.parent.unwrap()
     }
 
-    pub fn add(&mut self, symbol: &String, value: Type) {
-        self.values.insert(symbol.clone(), value);
+    pub fn add(&mut self, identifier: &String, value: Type) {
+        self.values.insert(identifier.clone(), value);
     }
 
-    pub fn contains(&self, symbol: &String) -> bool {
-        self.values.contains_key(symbol)
+    pub fn add_without_shadow(&mut self, identifier: &String, value: Type) {
+        self.values.entry(identifier.clone()).or_insert(value);
+    }
+
+    pub fn contains(&self, identifier: &String) -> bool {
+        self.values.contains_key(identifier)
             || self
                 .parent
                 .as_ref()
-                .map(|parent| parent.contains(symbol))
+                .map(|parent| parent.contains(identifier))
                 .unwrap_or(false)
     }
 

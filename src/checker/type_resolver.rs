@@ -27,11 +27,7 @@ impl TypeResolver {
         self.lookup.insert(identifier.clone(), index);
     }
 
-    pub fn contains(&self, identifier: &String) -> bool {
-        self.lookup.contains_key(identifier)
-    }
-
-    pub fn get_ref(&self, identifier: &String) -> Option<usize> {
+    fn get_ref(&self, identifier: &String) -> Option<usize> {
         self.lookup.get(identifier).copied()
     }
 

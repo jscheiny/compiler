@@ -1,7 +1,7 @@
 use std::cell::OnceCell;
 
 use crate::{
-    checker::{StructType, TypeResolver},
+    checker::{Scope, ScopeType, StructType, Type, TypeResolver},
     parser::{Identified, IdentifierNode, MethodNode, Node, NodeVec, StructFieldNode},
 };
 
@@ -24,6 +24,26 @@ impl StructNode {
             methods,
             resolved_type: OnceCell::new(),
         }
+    }
+
+    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
+        let mut scope = scope.derive(ScopeType::Struct);
+        for field in self.fields.iter() {
+            let resolved_type = field
+                .type_def
+                .as_ref()
+                .map(|type_def| type_def.get_type(types))
+                .unwrap_or(Type::Error);
+            scope.add_without_shadow(field.id(), resolved_type);
+        }
+
+        if let Some(methods) = self.methods.as_ref() {
+            for method in methods.iter() {
+                scope = method.check(types, scope)
+            }
+        }
+
+        scope.parent()
     }
 
     pub fn get_type(&self, types: &mut TypeResolver) -> &StructType {

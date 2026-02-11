@@ -7,6 +7,7 @@ pub struct StructFieldNode {
     pub public: bool,
     pub identifier: Node<IdentifierNode>,
     pub type_def: Option<Node<TypeNode>>,
+    // TODO this should probably be memoized
 }
 
 impl StructFieldNode {

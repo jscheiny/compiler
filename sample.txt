@@ -1,8 +1,11 @@
-fn test(x: int, y: int): bool -> y;
+struct S(
+    pub f: T,
+    pub y: (int) -> bool
+) {
+    pub test(y: (int) -> bool, f: int) {
+        let x = y(f, g);
+        while x {
 
-fn main() {
-    let x = 5;
-    while test(x, x) {
-
+        }
     }
 }
