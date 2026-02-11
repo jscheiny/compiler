@@ -1,3 +1,5 @@
+use std::cell::OnceCell;
+
 use crate::{
     checker::{Type, TypeResolver},
     parser::{Identified, IdentifierParseNode, ParseNode, TypeParseNode},
@@ -6,7 +8,7 @@ use crate::{
 pub struct ParameterParseNode {
     identifier: ParseNode<IdentifierParseNode>,
     type_def: Option<ParseNode<TypeParseNode>>,
-    resolved_type: Option<Type>,
+    resolved_type: OnceCell<Type>,
 }
 
 impl ParameterParseNode {
@@ -17,20 +19,12 @@ impl ParameterParseNode {
         Self {
             identifier,
             type_def,
-            resolved_type: None,
+            resolved_type: OnceCell::new(),
         }
     }
 
-    pub fn get_type(&mut self, types: &TypeResolver) -> Type {
-        match self.resolved_type.as_ref() {
-            Some(resolved_type) => resolved_type.clone(),
-            None => {
-                let resolved_type = self.resolve_type(types);
-                let result = resolved_type.clone();
-                self.resolved_type = Some(resolved_type);
-                result
-            }
-        }
+    pub fn get_type(&self, types: &TypeResolver) -> &Type {
+        self.resolved_type.get_or_init(|| self.resolve_type(types))
     }
 
     fn resolve_type(&self, types: &TypeResolver) -> Type {

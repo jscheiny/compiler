@@ -1,3 +1,5 @@
+use std::cell::OnceCell;
+
 use crate::{
     checker::{FunctionType, TypeResolver},
     parser::{
@@ -11,7 +13,7 @@ pub struct FunctionParseNode {
     parameters: ParseNodeVec<ParameterParseNode>,
     return_type: Option<ParseNode<TypeParseNode>>,
     body: ParseNode<FunctionBodyParseNode>,
-    resolved_type: Option<FunctionType>,
+    resolved_type: OnceCell<FunctionType>,
 }
 
 impl FunctionParseNode {
@@ -26,34 +28,27 @@ impl FunctionParseNode {
             parameters,
             return_type,
             body,
-            resolved_type: None,
+            resolved_type: OnceCell::new(),
         }
     }
 
-    pub fn get_type(&mut self, types: &TypeResolver) -> FunctionType {
-        match self.resolved_type.as_ref() {
-            Some(resolved_type) => resolved_type.clone(),
-            None => {
-                let resolved_type = self.resolve_type(types);
-                let result = resolved_type.clone();
-                self.resolved_type = Some(resolved_type);
-                result
-            }
-        }
+    pub fn get_type(&self, types: &TypeResolver) -> &FunctionType {
+        self.resolved_type.get_or_init(|| self.resolve_type(types))
     }
 
-    fn resolve_type(&mut self, types: &TypeResolver) -> FunctionType {
+    fn resolve_type(&self, types: &TypeResolver) -> FunctionType {
         let parameters = self
             .parameters
             .value
-            .iter_mut()
-            .map(|parameter| parameter.value.get_type(types))
+            .iter()
+            .map(|parameter| parameter.get_type(types))
+            .cloned()
             .collect();
 
         let return_type = self
             .return_type
             .as_ref()
-            .map(|rt| Box::new(rt.value.resolve_type(types)));
+            .map(|rt| Box::new(rt.resolve_type(types)));
 
         FunctionType {
             parameters,
