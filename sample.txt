@@ -1,6 +1,12 @@
 fn test() {
-    let y = if 5 then true else 6;
-    while y {
+    let x = true;
+    let y = 5;
+    while y or x {
+
+    }
+
+    let x = 5;
+    while not x {
 
     }
 }

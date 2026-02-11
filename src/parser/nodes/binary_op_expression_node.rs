@@ -1,6 +1,6 @@
 use crate::{
     checker::{Scope, Type, TypeResolver},
-    parser::{BinaryOperator, ExpressionNode, Node},
+    parser::{BinaryOperator, ExpressionNode, Node, PrimitiveType},
 };
 
 pub struct BinaryOpExpressionNode {
@@ -10,7 +10,7 @@ pub struct BinaryOpExpressionNode {
 }
 
 impl BinaryOpExpressionNode {
-    pub fn check(&self, _types: &TypeResolver, _scope: Box<Scope>) -> (Box<Scope>, Type) {
+    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
         use BinaryOperator as O;
         match *self.operator {
             O::Add => todo!("Implement type checking for binary op Add"),
@@ -37,8 +37,27 @@ impl BinaryOpExpressionNode {
                 todo!("Implement type checking for binary op FunctionApplication")
             }
             O::Comma => todo!("Implement type checking for binary op Comma"),
-            O::LogicalAnd => todo!("Implement type checking for binary op LogicalAnd"),
-            O::LogicalOr => todo!("Implement type checking for binary op LogicalOr"),
+            O::LogicalAnd => self.check_logical_op(types, scope),
+            O::LogicalOr => self.check_logical_op(types, scope),
         }
+    }
+
+    fn check_logical_op(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        let (scope, left_type) = self.left.check(types, scope);
+        if !left_type.is_primitive(PrimitiveType::Bool) {
+            println!(
+                "Type error: Left hand side of op `{:?}` should be of type bool",
+                self.operator.value
+            );
+        }
+        let (scope, right_type) = self.right.check(types, scope);
+        if !right_type.is_primitive(PrimitiveType::Bool) {
+            println!(
+                "Type error: Right hand side of op `{:?}` should be of type bool",
+                self.operator.value
+            );
+        }
+
+        (scope, Type::Primitive(PrimitiveType::Bool))
     }
 }
