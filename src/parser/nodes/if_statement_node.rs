@@ -1,6 +1,6 @@
-use crate::parser::{BlockParseNode, IfStatementConditionParseNode, ParseNode};
+use crate::parser::{BlockNode, IfStatementConditionNode, ParseNode};
 
-pub struct IfStatementParseNode {
-    pub conditions: Vec<ParseNode<IfStatementConditionParseNode>>,
-    pub else_branch: Option<ParseNode<BlockParseNode>>,
+pub struct IfStatementNode {
+    pub conditions: Vec<ParseNode<IfStatementConditionNode>>,
+    pub else_branch: Option<ParseNode<BlockNode>>,
 }

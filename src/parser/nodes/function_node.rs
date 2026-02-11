@@ -3,25 +3,25 @@ use std::{cell::OnceCell, collections::HashSet};
 use crate::{
     checker::{FunctionType, TypeResolver},
     parser::{
-        FunctionBodyParseNode, Identified, IdentifierParseNode, ParameterParseNode, ParseNode,
-        ParseNodeVec, TypeParseNode,
+        FunctionBodyNode, Identified, IdentifierNode, ParameterNode, ParseNode, ParseNodeVec,
+        TypeNode,
     },
 };
 
-pub struct FunctionParseNode {
-    identifier: ParseNode<IdentifierParseNode>,
-    parameters: ParseNodeVec<ParameterParseNode>,
-    return_type: Option<ParseNode<TypeParseNode>>,
-    body: ParseNode<FunctionBodyParseNode>,
+pub struct FunctionNode {
+    identifier: ParseNode<IdentifierNode>,
+    parameters: ParseNodeVec<ParameterNode>,
+    return_type: Option<ParseNode<TypeNode>>,
+    body: ParseNode<FunctionBodyNode>,
     resolved_type: OnceCell<FunctionType>,
 }
 
-impl FunctionParseNode {
+impl FunctionNode {
     pub fn new(
-        identifier: ParseNode<IdentifierParseNode>,
-        parameters: ParseNodeVec<ParameterParseNode>,
-        return_type: Option<ParseNode<TypeParseNode>>,
-        body: ParseNode<FunctionBodyParseNode>,
+        identifier: ParseNode<IdentifierNode>,
+        parameters: ParseNodeVec<ParameterNode>,
+        return_type: Option<ParseNode<TypeNode>>,
+        body: ParseNode<FunctionBodyNode>,
     ) -> Self {
         Self {
             identifier,
@@ -76,7 +76,7 @@ impl FunctionParseNode {
     }
 }
 
-impl Identified for FunctionParseNode {
+impl Identified for FunctionNode {
     fn id(&self) -> &String {
         &self.identifier.id()
     }

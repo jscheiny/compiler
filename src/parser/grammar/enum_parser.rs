@@ -1,21 +1,21 @@
 use crate::{
     lexer::{OperatorToken, Token},
     parser::{
-        EnumParseNode, EnumVariantParseNode, IdentifierType, ParseNode, ParseResult, SyntaxError,
+        EnumNode, EnumVariantNode, IdentifierType, ParseNode, ParseResult, SyntaxError,
         TokenStream,
         grammar::{comma_separated_list, methods, type_definition},
     },
 };
 
-pub fn enumeration(tokens: &mut TokenStream) -> ParseResult<EnumParseNode> {
+pub fn enumeration(tokens: &mut TokenStream) -> ParseResult<EnumNode> {
     tokens.next();
     let identifier = tokens.identifier(IdentifierType::Variant)?;
     let variants = tokens.located(enum_variants)?;
     let methods = methods(tokens)?;
-    Ok(EnumParseNode::new(identifier, variants, methods))
+    Ok(EnumNode::new(identifier, variants, methods))
 }
 
-fn enum_variants(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<EnumVariantParseNode>>> {
+fn enum_variants(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<EnumVariantNode>>> {
     match tokens.peek() {
         Token::Operator(OperatorToken::OpenParen) => {
             tokens.next();
@@ -29,7 +29,7 @@ fn enum_variants(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<EnumVari
     }
 }
 
-fn enum_variant(tokens: &mut TokenStream) -> ParseResult<EnumVariantParseNode> {
+fn enum_variant(tokens: &mut TokenStream) -> ParseResult<EnumVariantNode> {
     let identifier = tokens.identifier(IdentifierType::Variant)?;
     let type_def = if tokens.accept(&OperatorToken::OpenParen) {
         let type_def = tokens.located(type_definition)?;
@@ -38,5 +38,5 @@ fn enum_variant(tokens: &mut TokenStream) -> ParseResult<EnumVariantParseNode> {
     } else {
         None
     };
-    Ok(EnumVariantParseNode::new(identifier, type_def))
+    Ok(EnumVariantNode::new(identifier, type_def))
 }

@@ -1,6 +1,6 @@
-use crate::parser::{ExpressionParseNode, ParseNode, ParseNodeVec};
+use crate::parser::{ExpressionNode, ParseNode, ParseNodeVec};
 
-pub struct FunctionCallExpressionParseNode {
-    pub function: Box<ParseNode<ExpressionParseNode>>,
-    pub arguments: ParseNodeVec<ExpressionParseNode>,
+pub struct FunctionCallExpressionNode {
+    pub function: Box<ParseNode<ExpressionNode>>,
+    pub arguments: ParseNodeVec<ExpressionNode>,
 }

@@ -1,8 +1,8 @@
-use crate::parser::{ExpressionParseNode, IdentifierParseNode, ParseNode, TypeParseNode};
+use crate::parser::{ExpressionNode, IdentifierNode, ParseNode, TypeNode};
 
-pub struct DeclarationParseNode {
+pub struct DeclarationNode {
     pub mutable: bool,
-    pub identifier: ParseNode<IdentifierParseNode>,
-    pub type_def: Option<ParseNode<TypeParseNode>>,
-    pub initializer: Option<ParseNode<ExpressionParseNode>>,
+    pub identifier: ParseNode<IdentifierNode>,
+    pub type_def: Option<ParseNode<TypeNode>>,
+    pub initializer: Option<ParseNode<ExpressionNode>>,
 }

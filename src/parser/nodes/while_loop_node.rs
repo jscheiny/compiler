@@ -1,6 +1,6 @@
-use crate::parser::{BlockParseNode, ExpressionParseNode, ParseNode};
+use crate::parser::{BlockNode, ExpressionNode, ParseNode};
 
-pub struct WhileLoopParseNode {
-    pub predicate: ParseNode<ExpressionParseNode>,
-    pub body: ParseNode<BlockParseNode>,
+pub struct WhileLoopNode {
+    pub predicate: ParseNode<ExpressionNode>,
+    pub body: ParseNode<BlockNode>,
 }

@@ -2,16 +2,14 @@ use std::rc::Rc;
 
 use crate::{
     checker::{Scope, TypeResolver},
-    parser::{
-        ExportableModuleDefinitionParseNode, Identified, ModuleDefinitionParseNode, ParseNode,
-    },
+    parser::{ExportableModuleDefinitionNode, Identified, ModuleDefinitionNode, ParseNode},
 };
 
-pub struct ProgramParseNode {
-    pub definitions: Vec<ParseNode<ExportableModuleDefinitionParseNode>>,
+pub struct ProgramNode {
+    pub definitions: Vec<ParseNode<ExportableModuleDefinitionNode>>,
 }
 
-impl ProgramParseNode {
+impl ProgramNode {
     pub fn check(&mut self) {
         let mut types = TypeResolver::new();
         for definition in self.definitions() {
@@ -37,11 +35,11 @@ impl ProgramParseNode {
         Rc::new(scope)
     }
 
-    fn definitions(&self) -> impl Iterator<Item = &ModuleDefinitionParseNode> {
+    fn definitions(&self) -> impl Iterator<Item = &ModuleDefinitionNode> {
         self.definitions.iter().map(|def| &def.definition)
     }
 
-    fn definitions_mut(&mut self) -> impl Iterator<Item = &mut ModuleDefinitionParseNode> {
+    fn definitions_mut(&mut self) -> impl Iterator<Item = &mut ModuleDefinitionNode> {
         self.definitions.iter_mut().map(|def| &mut def.definition)
     }
 }

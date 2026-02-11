@@ -1,16 +1,16 @@
 use crate::{
     checker::{Type, TypeResolver},
-    parser::{FunctionTypeParseNode, PrimitiveType, TupleTypeParseNode},
+    parser::{FunctionTypeNode, PrimitiveType, TupleTypeNode},
 };
 
-pub enum TypeParseNode {
-    Function(FunctionTypeParseNode),
+pub enum TypeNode {
+    Function(FunctionTypeNode),
     Primitive(PrimitiveType),
-    Tuple(TupleTypeParseNode),
+    Tuple(TupleTypeNode),
     UserDefined(String),
 }
 
-impl TypeParseNode {
+impl TypeNode {
     pub fn check(&self, types: &TypeResolver) {
         match self {
             Self::Function(node) => node.check(types),

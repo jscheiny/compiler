@@ -2,24 +2,21 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{StructType, TypeResolver},
-    parser::{
-        Identified, IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec,
-        StructFieldParseNode,
-    },
+    parser::{Identified, IdentifierNode, MethodNode, ParseNode, ParseNodeVec, StructFieldNode},
 };
 
-pub struct StructParseNode {
-    identifier: ParseNode<IdentifierParseNode>,
-    fields: ParseNodeVec<StructFieldParseNode>,
-    methods: Option<ParseNodeVec<MethodParseNode>>,
+pub struct StructNode {
+    identifier: ParseNode<IdentifierNode>,
+    fields: ParseNodeVec<StructFieldNode>,
+    methods: Option<ParseNodeVec<MethodNode>>,
     resolved_type: OnceCell<StructType>,
 }
 
-impl StructParseNode {
+impl StructNode {
     pub fn new(
-        identifier: ParseNode<IdentifierParseNode>,
-        fields: ParseNodeVec<StructFieldParseNode>,
-        methods: Option<ParseNodeVec<MethodParseNode>>,
+        identifier: ParseNode<IdentifierNode>,
+        fields: ParseNodeVec<StructFieldNode>,
+        methods: Option<ParseNodeVec<MethodNode>>,
     ) -> Self {
         Self {
             identifier,
@@ -55,7 +52,7 @@ impl StructParseNode {
     }
 }
 
-impl Identified for StructParseNode {
+impl Identified for StructNode {
     fn id(&self) -> &String {
         self.identifier.id()
     }

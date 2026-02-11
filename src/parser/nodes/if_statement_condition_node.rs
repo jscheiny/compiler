@@ -1,6 +1,6 @@
-use crate::parser::{BlockParseNode, ExpressionParseNode, ParseNode};
+use crate::parser::{BlockNode, ExpressionNode, ParseNode};
 
-pub struct IfStatementConditionParseNode {
-    pub predicate: ParseNode<ExpressionParseNode>,
-    pub body: ParseNode<BlockParseNode>,
+pub struct IfStatementConditionNode {
+    pub predicate: ParseNode<ExpressionNode>,
+    pub body: ParseNode<BlockNode>,
 }

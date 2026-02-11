@@ -1,14 +1,13 @@
 use crate::{
     lexer::{KeywordToken, OperatorToken, Token, TokenMatch},
     parser::{
-        DeclarationParseNode, ExpressionParseNode, IdentifierType, IfStatementConditionParseNode,
-        IfStatementParseNode, ParseNode, ParseResult, StatementParseNode, SyntaxError, TokenStream,
-        WhileLoopParseNode,
+        DeclarationNode, ExpressionNode, IdentifierType, IfStatementConditionNode, IfStatementNode,
+        ParseNode, ParseResult, StatementNode, SyntaxError, TokenStream, WhileLoopNode,
         grammar::{block, expression, type_alias, type_definition},
     },
 };
 
-pub fn statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
+pub fn statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     match tokens.peek() {
         Token::Keyword(keyword) => match keyword {
             KeywordToken::Let => declaration(tokens, false),
@@ -30,7 +29,7 @@ pub fn statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
     }
 }
 
-fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<StatementParseNode> {
+fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<StatementNode> {
     tokens.next();
     let identifier = tokens.identifier(IdentifierType::Variable)?;
     let type_def = if tokens.accept(&OperatorToken::Colon) {
@@ -41,7 +40,7 @@ fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<Statement
 
     let initializer = initializer(tokens)?;
     end_statement(tokens);
-    Ok(StatementParseNode::Declaration(DeclarationParseNode {
+    Ok(StatementNode::Declaration(DeclarationNode {
         mutable,
         identifier,
         type_def,
@@ -49,7 +48,7 @@ fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<Statement
     }))
 }
 
-fn initializer(tokens: &mut TokenStream) -> ParseResult<Option<ParseNode<ExpressionParseNode>>> {
+fn initializer(tokens: &mut TokenStream) -> ParseResult<Option<ParseNode<ExpressionNode>>> {
     let error = SyntaxError::ExpectedInitializer;
     match tokens.peek() {
         Token::Operator(OperatorToken::Equal) => {
@@ -64,40 +63,37 @@ fn initializer(tokens: &mut TokenStream) -> ParseResult<Option<ParseNode<Express
     }
 }
 
-fn function_return(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
+fn function_return(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     tokens.next();
     if tokens.accept(&OperatorToken::Semicolon) {
-        Ok(StatementParseNode::FunctionReturn(None))
+        Ok(StatementNode::FunctionReturn(None))
     } else {
         let expression = tokens.located(expression)?;
         end_statement(tokens);
-        Ok(StatementParseNode::FunctionReturn(Some(expression)))
+        Ok(StatementNode::FunctionReturn(Some(expression)))
     }
 }
 
-fn break_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
+fn break_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     tokens.next();
     end_statement(tokens);
-    Ok(StatementParseNode::Break())
+    Ok(StatementNode::Break())
 }
 
-fn continue_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
+fn continue_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     tokens.next();
     end_statement(tokens);
-    Ok(StatementParseNode::Break())
+    Ok(StatementNode::Break())
 }
 
-fn while_loop(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
+fn while_loop(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     tokens.next();
     let predicate = tokens.located(expression)?;
     let body = tokens.located(block)?;
-    Ok(StatementParseNode::WhileLoop(WhileLoopParseNode {
-        predicate,
-        body,
-    }))
+    Ok(StatementNode::WhileLoop(WhileLoopNode { predicate, body }))
 }
 
-fn if_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
+fn if_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     let mut conditions = vec![tokens.located(if_condition)?];
     let mut else_branch = None;
 
@@ -109,40 +105,40 @@ fn if_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
         }
     }
 
-    Ok(StatementParseNode::If(IfStatementParseNode {
+    Ok(StatementNode::If(IfStatementNode {
         conditions,
         else_branch,
     }))
 }
 
-fn if_condition(tokens: &mut TokenStream) -> ParseResult<IfStatementConditionParseNode> {
+fn if_condition(tokens: &mut TokenStream) -> ParseResult<IfStatementConditionNode> {
     tokens.next();
     let predicate = tokens.located(expression)?;
     let body = tokens.located(block)?;
-    Ok(IfStatementConditionParseNode { predicate, body })
+    Ok(IfStatementConditionNode { predicate, body })
 }
 
-fn block_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
-    let block = ExpressionParseNode::Block(block(tokens)?);
-    Ok(StatementParseNode::Expression(block))
+fn block_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
+    let block = ExpressionNode::Block(block(tokens)?);
+    Ok(StatementNode::Expression(block))
 }
 
-fn block_return(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
+fn block_return(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     tokens.next();
     let expression = tokens.located(expression)?;
     end_statement(tokens);
-    Ok(StatementParseNode::BlockReturn(expression))
+    Ok(StatementNode::BlockReturn(expression))
 }
 
-fn expression_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
+fn expression_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     let expression = tokens.located(expression)?;
     end_statement(tokens);
-    Ok(StatementParseNode::Expression(expression.value))
+    Ok(StatementNode::Expression(expression.value))
 }
 
-fn type_alias_statement(tokens: &mut TokenStream) -> ParseResult<StatementParseNode> {
+fn type_alias_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     let type_alias = type_alias(tokens)?;
-    Ok(StatementParseNode::TypeAlias(type_alias))
+    Ok(StatementNode::TypeAlias(type_alias))
 }
 
 pub fn end_statement(tokens: &mut TokenStream) {

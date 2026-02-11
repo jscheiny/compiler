@@ -1,14 +1,14 @@
 use crate::{
     checker::{EnumMethod, StructMember, StructMemberType, TypeResolver},
-    parser::{FunctionParseNode, Identified, ParseNode},
+    parser::{FunctionNode, Identified, ParseNode},
 };
 
-pub struct MethodParseNode {
+pub struct MethodNode {
     pub public: bool,
-    pub function: ParseNode<FunctionParseNode>,
+    pub function: ParseNode<FunctionNode>,
 }
 
-impl MethodParseNode {
+impl MethodNode {
     pub fn resolve_struct_method(&self, types: &TypeResolver) -> StructMember {
         let function_type = self.function.get_type(types).clone();
         StructMember {
@@ -26,7 +26,7 @@ impl MethodParseNode {
     }
 }
 
-impl Identified for MethodParseNode {
+impl Identified for MethodNode {
     fn id(&self) -> &String {
         self.function.id()
     }

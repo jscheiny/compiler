@@ -1,16 +1,15 @@
 use crate::parser::{
-    DeclarationParseNode, ExpressionParseNode, IfStatementParseNode, ParseNode, TypeAliasParseNode,
-    WhileLoopParseNode,
+    DeclarationNode, ExpressionNode, IfStatementNode, ParseNode, TypeAliasNode, WhileLoopNode,
 };
 
-pub enum StatementParseNode {
-    BlockReturn(ParseNode<ExpressionParseNode>),
+pub enum StatementNode {
+    BlockReturn(ParseNode<ExpressionNode>),
     Break(),
     Continue(),
-    Declaration(DeclarationParseNode),
-    TypeAlias(TypeAliasParseNode),
-    Expression(ExpressionParseNode),
-    FunctionReturn(Option<ParseNode<ExpressionParseNode>>),
-    If(IfStatementParseNode),
-    WhileLoop(WhileLoopParseNode),
+    Declaration(DeclarationNode),
+    TypeAlias(TypeAliasNode),
+    Expression(ExpressionNode),
+    FunctionReturn(Option<ParseNode<ExpressionNode>>),
+    If(IfStatementNode),
+    WhileLoop(WhileLoopNode),
 }

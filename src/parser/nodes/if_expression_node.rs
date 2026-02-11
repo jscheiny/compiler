@@ -1,7 +1,7 @@
-use crate::parser::{ExpressionParseNode, ParseNode};
+use crate::parser::{ExpressionNode, ParseNode};
 
-pub struct IfExpressionParseNode {
-    pub predicate: Box<ParseNode<ExpressionParseNode>>,
-    pub if_true: Box<ParseNode<ExpressionParseNode>>,
-    pub if_false: Box<ParseNode<ExpressionParseNode>>,
+pub struct IfExpressionNode {
+    pub predicate: Box<ParseNode<ExpressionNode>>,
+    pub if_true: Box<ParseNode<ExpressionNode>>,
+    pub if_false: Box<ParseNode<ExpressionNode>>,
 }

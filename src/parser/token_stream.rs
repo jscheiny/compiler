@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::{
     lexer::{LocatedToken, Token, TokenMatch},
     parser::{
-        IdentifierParseNode, IdentifierType, LocatedSyntaxError, ParseNode, ParseResult,
+        IdentifierNode, IdentifierType, LocatedSyntaxError, ParseNode, ParseResult,
         SyntaxError, TokenSpan, identifier,
     },
 };
@@ -56,7 +56,7 @@ impl TokenStream {
     pub fn identifier(
         &mut self,
         id_type: IdentifierType,
-    ) -> ParseResult<ParseNode<IdentifierParseNode>> {
+    ) -> ParseResult<ParseNode<IdentifierNode>> {
         let start_index = self.index;
         let value = identifier(self, id_type)?;
         Ok(self.close(value, start_index))

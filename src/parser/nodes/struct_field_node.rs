@@ -1,15 +1,15 @@
 use crate::{
     checker::{StructMember, StructMemberType, Type, TypeResolver},
-    parser::{Identified, IdentifierParseNode, ParseNode, TypeParseNode},
+    parser::{Identified, IdentifierNode, ParseNode, TypeNode},
 };
 
-pub struct StructFieldParseNode {
+pub struct StructFieldNode {
     pub public: bool,
-    pub identifier: ParseNode<IdentifierParseNode>,
-    pub type_def: Option<ParseNode<TypeParseNode>>,
+    pub identifier: ParseNode<IdentifierNode>,
+    pub type_def: Option<ParseNode<TypeNode>>,
 }
 
-impl StructFieldParseNode {
+impl StructFieldNode {
     pub fn resolve_type(&self, types: &TypeResolver) -> StructMember {
         let member_type = match self.type_def.as_ref() {
             Some(type_def) => type_def.get_type(types),
@@ -23,7 +23,7 @@ impl StructFieldParseNode {
     }
 }
 
-impl Identified for StructFieldParseNode {
+impl Identified for StructFieldNode {
     fn id(&self) -> &String {
         &self.identifier.id()
     }

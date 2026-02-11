@@ -1,39 +1,37 @@
 use crate::{
     lexer::{KeywordToken, Token},
     parser::{
-        ExportableModuleDefinitionParseNode, ModuleDefinitionParseNode, ParseResult,
-        ProgramParseNode, SyntaxError, TokenStream,
+        ExportableModuleDefinitionNode, ModuleDefinitionNode, ParseResult, ProgramNode,
+        SyntaxError, TokenStream,
         grammar::{enumeration, structure, top_level_function, type_alias},
     },
 };
 
-pub fn program(tokens: &mut TokenStream) -> ParseResult<ProgramParseNode> {
+pub fn program(tokens: &mut TokenStream) -> ParseResult<ProgramNode> {
     let mut definitions = vec![];
     while !tokens.is_done() {
         let definition = tokens.located(exportable_module_definition)?;
         definitions.push(definition);
     }
-    Ok(ProgramParseNode { definitions })
+    Ok(ProgramNode { definitions })
 }
 
 fn exportable_module_definition(
     tokens: &mut TokenStream,
-) -> ParseResult<ExportableModuleDefinitionParseNode> {
+) -> ParseResult<ExportableModuleDefinitionNode> {
     let public = tokens.accept(&KeywordToken::Pub);
     let definition = module_definition(tokens)?;
-    Ok(ExportableModuleDefinitionParseNode { public, definition })
+    Ok(ExportableModuleDefinitionNode { public, definition })
 }
 
-fn module_definition(tokens: &mut TokenStream) -> ParseResult<ModuleDefinitionParseNode> {
+fn module_definition(tokens: &mut TokenStream) -> ParseResult<ModuleDefinitionNode> {
     if let Token::Keyword(keyword) = tokens.peek() {
         use KeywordToken as K;
         match keyword {
-            K::Struct => Ok(ModuleDefinitionParseNode::Struct(structure(tokens)?)),
-            K::Enum => Ok(ModuleDefinitionParseNode::Enum(enumeration(tokens)?)),
-            K::Fn => Ok(ModuleDefinitionParseNode::Function(top_level_function(
-                tokens,
-            )?)),
-            K::Type => Ok(ModuleDefinitionParseNode::TypeAlias(type_alias(tokens)?)),
+            K::Struct => Ok(ModuleDefinitionNode::Struct(structure(tokens)?)),
+            K::Enum => Ok(ModuleDefinitionNode::Enum(enumeration(tokens)?)),
+            K::Fn => Ok(ModuleDefinitionNode::Function(top_level_function(tokens)?)),
+            K::Type => Ok(ModuleDefinitionNode::TypeAlias(type_alias(tokens)?)),
             _ => Err(tokens.make_error(SyntaxError::ExpectedTopLevelDefinition)),
         }
     } else {

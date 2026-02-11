@@ -2,22 +2,22 @@ use std::rc::Rc;
 
 use crate::{
     checker::{Scope, Type, TypeResolver},
-    parser::{EnumParseNode, FunctionParseNode, Identified, StructParseNode, TypeAliasParseNode},
+    parser::{EnumNode, FunctionNode, Identified, StructNode, TypeAliasNode},
 };
 
-pub struct ExportableModuleDefinitionParseNode {
+pub struct ExportableModuleDefinitionNode {
     pub public: bool,
-    pub definition: ModuleDefinitionParseNode,
+    pub definition: ModuleDefinitionNode,
 }
 
-pub enum ModuleDefinitionParseNode {
-    Struct(StructParseNode),
-    Enum(EnumParseNode),
-    Function(FunctionParseNode),
-    TypeAlias(TypeAliasParseNode),
+pub enum ModuleDefinitionNode {
+    Struct(StructNode),
+    Enum(EnumNode),
+    Function(FunctionNode),
+    TypeAlias(TypeAliasNode),
 }
 
-impl ModuleDefinitionParseNode {
+impl ModuleDefinitionNode {
     pub fn check(&self, types: &mut TypeResolver, scope: Rc<Scope>) {
         match self {
             Self::Struct(node) => todo!(),
@@ -46,7 +46,7 @@ impl ModuleDefinitionParseNode {
     }
 }
 
-impl Identified for ModuleDefinitionParseNode {
+impl Identified for ModuleDefinitionNode {
     fn id(&self) -> &String {
         match self {
             Self::Struct(node) => node.id(),

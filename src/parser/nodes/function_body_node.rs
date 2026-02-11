@@ -1,6 +1,6 @@
-use crate::parser::{BlockParseNode, ExpressionParseNode};
+use crate::parser::{BlockNode, ExpressionNode};
 
-pub enum FunctionBodyParseNode {
-    Expression(ExpressionParseNode),
-    Block(BlockParseNode),
+pub enum FunctionBodyNode {
+    Expression(ExpressionNode),
+    Block(BlockNode),
 }
