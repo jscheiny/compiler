@@ -2,14 +2,7 @@ type T = neat;
 type neat = int;
 
 fn test(a: T) {
-    let y: int = x;
-    let x = 5;
-    if x {
-        -> x;
-    } else if y {
-        -> y;
-    } else {
-        -> x;
-    }
-    break;
+    let x = true;
+    if x {} else {}
+    while false {}
 }
