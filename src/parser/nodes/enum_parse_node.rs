@@ -1,6 +1,9 @@
 use crate::{
     checker::{EnumType, Type, TypeResolver},
-    parser::{EnumVariantParseNode, IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec},
+    parser::{
+        EnumVariantParseNode, Identified, IdentifierParseNode, MethodParseNode, ParseNode,
+        ParseNodeVec,
+    },
 };
 
 pub struct EnumParseNode {
@@ -11,12 +14,12 @@ pub struct EnumParseNode {
 
 impl EnumParseNode {
     pub fn resolve_types(&mut self, types: &mut TypeResolver) {
-        let enum_name = self.identifier().clone();
+        let enum_name = self.id().clone();
         let mut enum_type = EnumType::new();
 
         for variant in self.variants.value.iter() {
             let member = variant.value.resolve_type(types);
-            let identifier = &variant.value.identifier.value.0;
+            let identifier = variant.id();
             enum_type.add_variant(identifier, &enum_name, member, types);
         }
 
@@ -30,8 +33,10 @@ impl EnumParseNode {
 
         types.resolve(&enum_name, Type::Enum(enum_type))
     }
+}
 
-    pub fn identifier(&self) -> &String {
+impl Identified for EnumParseNode {
+    fn id(&self) -> &String {
         &self.identifier.value.0
     }
 }

@@ -1,6 +1,6 @@
 use crate::{
     checker::TypeResolver,
-    parser::{IdentifierParseNode, ParseNode, TypeParseNode},
+    parser::{Identified, IdentifierParseNode, ParseNode, TypeParseNode},
 };
 
 pub struct TypeAliasParseNode {
@@ -11,10 +11,12 @@ pub struct TypeAliasParseNode {
 impl TypeAliasParseNode {
     pub fn resolve_types(&self, types: &mut TypeResolver) {
         let resolved_type = self.type_def.value.resolve_type(types);
-        types.resolve(self.identifier(), resolved_type);
+        types.resolve(self.id(), resolved_type);
     }
+}
 
-    pub fn identifier(&self) -> &String {
+impl Identified for TypeAliasParseNode {
+    fn id(&self) -> &String {
         &self.identifier.value.0
     }
 }

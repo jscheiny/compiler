@@ -1,6 +1,9 @@
 use crate::{
     checker::{StructType, Type, TypeResolver},
-    parser::{IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec, StructFieldParseNode},
+    parser::{
+        Identified, IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec,
+        StructFieldParseNode,
+    },
 };
 
 pub struct StructParseNode {
@@ -11,7 +14,7 @@ pub struct StructParseNode {
 
 impl StructParseNode {
     pub fn resolve_types(&mut self, types: &mut TypeResolver) {
-        let container_name = self.identifier().clone();
+        let container_name = self.id().clone();
         let mut struct_type = StructType::new();
 
         for field in self.fields.value.iter() {
@@ -30,8 +33,10 @@ impl StructParseNode {
 
         types.resolve(&container_name, Type::Struct(struct_type))
     }
+}
 
-    pub fn identifier(&self) -> &String {
+impl Identified for StructParseNode {
+    fn id(&self) -> &String {
         &self.identifier.value.0
     }
 }

@@ -1,6 +1,6 @@
 use crate::{
     checker::TypeResolver,
-    parser::{EnumParseNode, FunctionParseNode, StructParseNode, TypeAliasParseNode},
+    parser::{EnumParseNode, FunctionParseNode, Identified, StructParseNode, TypeAliasParseNode},
 };
 
 pub struct ExportableModuleDefinitionParseNode {
@@ -18,9 +18,9 @@ pub enum ModuleDefinitionParseNode {
 impl ModuleDefinitionParseNode {
     pub fn identifier(&self) -> &String {
         match self {
-            Self::Struct(node) => node.identifier(),
-            Self::Enum(node) => node.identifier(),
-            Self::TypeAlias(node) => node.identifier(),
+            Self::Struct(node) => node.id(),
+            Self::Enum(node) => node.id(),
+            Self::TypeAlias(node) => node.id(),
             Self::Function(node) => &node.identifier.value.0,
         }
     }

@@ -42,8 +42,5 @@ fn enum_variant(tokens: &mut TokenStream) -> ParseResult<EnumVariantParseNode> {
     } else {
         None
     };
-    Ok(EnumVariantParseNode {
-        identifier,
-        type_def,
-    })
+    Ok(EnumVariantParseNode::new(identifier, type_def))
 }
