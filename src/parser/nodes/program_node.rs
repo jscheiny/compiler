@@ -1,7 +1,5 @@
-use std::rc::Rc;
-
 use crate::{
-    checker::{Scope, TypeResolver},
+    checker::{Scope, Type, TypeResolver},
     parser::{ExportableModuleDefinitionNode, Identified, ModuleDefinitionNode, Node},
 };
 
@@ -22,17 +20,20 @@ impl ProgramNode {
 
         let module_scope = self.get_module_scope(&types);
         for definition in self.definitions() {
-            definition.check(&mut types, module_scope.clone());
+            definition.check(&mut types, &module_scope);
         }
         types.check();
     }
 
-    pub fn get_module_scope(&self, types: &TypeResolver) -> Rc<Scope> {
+    pub fn get_module_scope(&self, types: &TypeResolver) -> Box<Scope> {
         let mut scope = Scope::new();
         for definition in self.definitions() {
-            scope.add(definition.id(), types.get_type_ref(definition.id()));
+            scope.add_type(
+                definition.id(),
+                types.get_type_ref(definition.id()).unwrap_or(Type::Error),
+            );
         }
-        Rc::new(scope)
+        Box::new(scope)
     }
 
     fn definitions(&self) -> impl Iterator<Item = &ModuleDefinitionNode> {

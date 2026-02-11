@@ -31,18 +31,22 @@ impl TypeResolver {
         self.lookup.contains_key(identifier)
     }
 
-    pub fn get_ref(&self, identifier: &String) -> usize {
-        self.lookup[identifier]
+    pub fn get_ref(&self, identifier: &String) -> Option<usize> {
+        self.lookup.get(identifier).copied()
     }
 
-    pub fn get_type_ref(&self, identifier: &String) -> Type {
-        Type::Reference(self.get_ref(identifier))
+    pub fn get_type_ref(&self, identifier: &String) -> Option<Type> {
+        self.get_ref(identifier).map(|index| Type::Reference(index))
     }
 
     pub fn resolve(&mut self, identifier: &String, value: Type) {
         let index = self.get_ref(identifier);
-        if self.types[index].is_none() {
-            self.types[index] = Some(value);
+        if let Some(index) = index {
+            if self.types[index].is_none() {
+                self.types[index] = Some(value);
+            }
+        } else {
+            panic!("Could not resolve {}", identifier);
         }
     }
 

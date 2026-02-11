@@ -3,7 +3,7 @@ use crate::{
     parser::{
         DeclarationNode, ExpressionNode, IdentifierType, IfStatementConditionNode, IfStatementNode,
         Node, ParseResult, StatementNode, SyntaxError, TokenStream, WhileLoopNode,
-        grammar::{block, expression, type_alias, type_definition},
+        grammar::{block, expression, type_definition},
     },
 };
 
@@ -17,7 +17,6 @@ pub fn statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
             KeywordToken::Continue => continue_statement(tokens),
             KeywordToken::While => while_loop(tokens),
             KeywordToken::If => if_statement(tokens),
-            KeywordToken::Type => type_alias_statement(tokens),
             _ => expression_statement(tokens),
         },
         Token::Operator(operator) => match operator {
@@ -134,11 +133,6 @@ fn expression_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> 
     let expression = tokens.located(expression)?;
     end_statement(tokens);
     Ok(StatementNode::Expression(expression.value))
-}
-
-fn type_alias_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
-    let type_alias = type_alias(tokens)?;
-    Ok(StatementNode::TypeAlias(type_alias))
 }
 
 pub fn end_statement(tokens: &mut TokenStream) {

@@ -18,12 +18,30 @@ pub enum ModuleDefinitionNode {
 }
 
 impl ModuleDefinitionNode {
-    pub fn check(&self, types: &mut TypeResolver, scope: Rc<Scope>) {
+    pub fn check(&self, types: &mut TypeResolver, scope: &Box<Scope>) {
         match self {
-            Self::Struct(node) => todo!(),
-            Self::Enum(node) => todo!(),
+            Self::Struct(node) => todo!("Struct type checking not implemented"),
+            Self::Enum(node) => todo!("Enum type checking not implemented"),
             Self::Function(node) => node.check(types),
-            Self::TypeAlias(node) => todo!(),
+            Self::TypeAlias(node) => node.check(types),
+        }
+    }
+
+    pub fn add_to_scope(&self, types: &mut TypeResolver, scope: &mut Scope) {
+        match self {
+            Self::Struct(node) => {
+                scope.add_type(node.id(), Type::Struct(node.get_type(types).clone()));
+                // TODO maybe add constructor value
+            }
+            Self::Enum(node) => {
+                scope.add_type(node.id(), Type::Enum(node.get_type(types).clone()));
+            }
+            Self::Function(node) => {
+                scope.add_value(node.id(), Type::Function(node.get_type(types).clone()));
+            }
+            Self::TypeAlias(node) => {
+                scope.add_type(node.id(), node.get_type(types).clone());
+            }
         }
     }
 

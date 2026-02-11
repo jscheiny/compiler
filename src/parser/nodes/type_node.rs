@@ -15,13 +15,8 @@ impl TypeNode {
         match self {
             Self::Function(node) => node.check(types),
             Self::Tuple(node) => node.check(types),
-            Self::Primitive(_) => {}
-            Self::UserDefined(identifier) => {
-                // TODO this should check the current scope as well
-                if !types.contains(identifier) {
-                    println!("Type error: Unknown type `{}`", identifier);
-                }
-            }
+            Self::Primitive(_) => {}   // Primitive types are always valid
+            Self::UserDefined(_) => {} // This should already be checked by get_type
         }
     }
 
@@ -30,7 +25,13 @@ impl TypeNode {
             Self::Primitive(primitive) => Type::Primitive(*primitive),
             Self::Function(function) => Type::Function(function.get_type(types).clone()),
             Self::Tuple(tuple_type) => tuple_type.get_type(types).clone(),
-            Self::UserDefined(identifier) => types.get_type_ref(identifier),
+            Self::UserDefined(identifier) => match types.get_type_ref(identifier) {
+                Some(resolved_type) => resolved_type,
+                None => {
+                    println!("Type error: Unknown type `{}`", identifier);
+                    Type::Error
+                }
+            },
         }
     }
 }

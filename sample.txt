@@ -1,3 +1,6 @@
-fn test(x: int, x: int, z) {
+type T = neat;
+// type neat = int;
+
+fn test(x: T): T {
 
 }

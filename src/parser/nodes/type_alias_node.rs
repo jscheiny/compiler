@@ -20,6 +20,11 @@ impl TypeAliasNode {
         }
     }
 
+    pub fn check(&self, types: &TypeResolver) {
+        // TODO check for recursion
+        self.type_def.check(types);
+    }
+
     pub fn get_type(&self, types: &TypeResolver) -> &Type {
         self.resolved_type
             .get_or_init(|| self.type_def.get_type(types))
