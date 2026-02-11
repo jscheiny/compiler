@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, collections::HashSet};
 
 use crate::{
-    checker::{FunctionType, Scope, TypeResolver},
+    checker::{FunctionType, Scope, Type, TypeResolver},
     parser::{
         FunctionBodyNode, Identified, IdentifierNode, Node, NodeVec, ParameterNode, TypeNode,
     },
@@ -32,18 +32,23 @@ impl FunctionNode {
     }
 
     pub fn check(&self, types: &TypeResolver, parent_scope: Box<Scope>) -> Box<Scope> {
-        let scope = self.check_params(types, parent_scope);
-        match &self.body.value {
-            FunctionBodyNode::Expression(_expression) => {
-                todo!("Implement type checking for expression function body")
+        let scope = parent_scope.derive();
+        let scope = self.check_params(types, scope);
+        let (scope, _resolved_type) = match &self.body.value {
+            FunctionBodyNode::Expression(expression) => expression.check(types, scope),
+            FunctionBodyNode::Block(block) => {
+                let (scope, resolved_type) = block.check(types, scope);
+                if resolved_type.is_none() && self.return_type.is_some() {
+                    println!("Function body does not return a type when one is required");
+                }
+                (scope, resolved_type.unwrap_or(Type::Error))
             }
-            FunctionBodyNode::Block(block) => block.check(),
         };
+        // TODO type check return type vs resolved type
         scope.parent()
     }
 
-    fn check_params(&self, types: &TypeResolver, parent_scope: Box<Scope>) -> Box<Scope> {
-        let mut scope = parent_scope.derive();
+    fn check_params(&self, types: &TypeResolver, mut scope: Box<Scope>) -> Box<Scope> {
         let mut param_names = HashSet::new();
         for param in self.parameters.iter() {
             if param_names.contains(param.id()) {

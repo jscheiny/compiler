@@ -37,4 +37,12 @@ impl Scope {
                 .map(|parent| parent.contains(symbol))
                 .unwrap_or(false)
     }
+
+    pub fn lookup(&self, identifier: &String) -> Option<Type> {
+        self.values.get(identifier).cloned().or_else(|| {
+            self.parent
+                .as_ref()
+                .and_then(|parent| parent.lookup(identifier))
+        })
+    }
 }

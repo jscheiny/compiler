@@ -1,8 +1,11 @@
 use std::fmt::Display;
 
-use crate::parser::{
-    BinaryOpExpressionNode, BlockNode, FunctionCallExpressionNode, IfExpressionNode,
-    PostfixOpExpressionNode, PrefixOpExpressionNode,
+use crate::{
+    checker::{Scope, Type, TypeResolver},
+    parser::{
+        BinaryOpExpressionNode, BlockNode, FunctionCallExpressionNode, IfExpressionNode,
+        PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType,
+    },
 };
 
 pub enum ExpressionNode {
@@ -16,6 +19,41 @@ pub enum ExpressionNode {
     Block(BlockNode),
     Identifier(String),
     Error,
+}
+
+impl ExpressionNode {
+    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        match self {
+            Self::PrefixOp(_node) => todo!("Implement type checking for ExpressionNode::PrefixOp"),
+            Self::BinaryOp(_node) => todo!("Implement type checking for ExpressionNode::BinaryOp"),
+            Self::PostfixOp(_node) => {
+                todo!("Implement type checking for ExpressionNode::PostfixOp")
+            }
+            Self::FunctionCall(_node) => {
+                todo!("Implement type checking for ExpressionNode::FunctionCall")
+            }
+            Self::IfExpression(_node) => {
+                todo!("Implement type checking for ExpressionNode::IfExpression")
+            }
+            Self::StringLiteral(_) => {
+                todo!("Implement type checking for ExpressionNode::StringLiteral")
+            }
+            Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
+            Self::Block(node) => {
+                // TODO handle type checking of block results
+                let (scope, resolved_type) = node.check(types, scope);
+                (scope, resolved_type.unwrap_or(Type::Error))
+            }
+            Self::Identifier(identifier) => {
+                let resolved_type = scope.lookup(identifier);
+                if resolved_type.is_none() {
+                    println!("Type Error: Could not find symbol `{}`", identifier)
+                }
+                (scope, resolved_type.unwrap_or(Type::Error))
+            }
+            Self::Error => (scope, Type::Error),
+        }
+    }
 }
 
 impl Display for ExpressionNode {
