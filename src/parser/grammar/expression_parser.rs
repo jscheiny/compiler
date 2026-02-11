@@ -159,11 +159,11 @@ fn expression_atom(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
         }
         Token::Keyword(KeywordToken::True) => {
             tokens.next();
-            Ok(ExpressionNode::BoolLiteral(true))
+            Ok(ExpressionNode::BooleanLiteral(true))
         }
         Token::Keyword(KeywordToken::False) => {
             tokens.next();
-            Ok(ExpressionNode::BoolLiteral(false))
+            Ok(ExpressionNode::BooleanLiteral(false))
         }
         _ => Err(tokens.make_error(SyntaxError::ExpectedExpression)),
     }

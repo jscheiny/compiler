@@ -14,7 +14,7 @@ pub enum ExpressionNode {
     PostfixOp(PostfixOpExpressionNode),
     FunctionCall(FunctionCallExpressionNode),
     IfExpression(IfExpressionNode),
-    BoolLiteral(bool),
+    BooleanLiteral(bool),
     IntegerLiteral(i64),
     StringLiteral(String),
     Block(BlockNode),
@@ -36,7 +36,7 @@ impl ExpressionNode {
             Self::IfExpression(_node) => {
                 todo!("Implement type checking for ExpressionNode::IfExpression")
             }
-            Self::BoolLiteral(_) => (scope, Type::Primitive(PrimitiveType::Bool)),
+            Self::BooleanLiteral(_) => (scope, Type::Primitive(PrimitiveType::Bool)),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
             Self::StringLiteral(_) => {
                 todo!("Implement type checking for ExpressionNode::StringLiteral")
@@ -91,7 +91,7 @@ impl Display for ExpressionNode {
                     node.predicate.value, node.if_true.value, node.if_false.value
                 )
             }
-            ExpressionNode::BoolLiteral(literal) => write!(f, "{}", literal),
+            ExpressionNode::BooleanLiteral(literal) => write!(f, "{}", literal),
             ExpressionNode::StringLiteral(literal) => write!(f, "{}", literal),
             ExpressionNode::IntegerLiteral(literal) => write!(f, "{}", literal),
             ExpressionNode::Block(_) => write!(f, "[BLOCK]"),
