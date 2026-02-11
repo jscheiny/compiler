@@ -1,5 +1,7 @@
+use std::cell::OnceCell;
+
 use crate::{
-    checker::{EnumType, Type, TypeResolver},
+    checker::{EnumType, TypeResolver},
     parser::{
         EnumVariantParseNode, Identified, IdentifierParseNode, MethodParseNode, ParseNode,
         ParseNodeVec,
@@ -7,13 +9,31 @@ use crate::{
 };
 
 pub struct EnumParseNode {
-    pub identifier: ParseNode<IdentifierParseNode>,
-    pub variants: ParseNodeVec<EnumVariantParseNode>,
-    pub methods: Option<ParseNodeVec<MethodParseNode>>,
+    identifier: ParseNode<IdentifierParseNode>,
+    variants: ParseNodeVec<EnumVariantParseNode>,
+    methods: Option<ParseNodeVec<MethodParseNode>>,
+    resolved_type: OnceCell<EnumType>,
 }
 
 impl EnumParseNode {
-    pub fn resolve_type(&mut self, types: &mut TypeResolver) {
+    pub fn new(
+        identifier: ParseNode<IdentifierParseNode>,
+        variants: ParseNodeVec<EnumVariantParseNode>,
+        methods: Option<ParseNodeVec<MethodParseNode>>,
+    ) -> Self {
+        Self {
+            identifier,
+            variants,
+            methods,
+            resolved_type: OnceCell::new(),
+        }
+    }
+
+    pub fn get_type(&self, types: &mut TypeResolver) -> &EnumType {
+        self.resolved_type.get_or_init(|| self.get_type_impl(types))
+    }
+
+    pub fn get_type_impl(&self, types: &mut TypeResolver) -> EnumType {
         let enum_name = self.id().clone();
         let mut enum_type = EnumType::new();
 
@@ -22,14 +42,14 @@ impl EnumParseNode {
             enum_type.add_variant(variant.id(), &enum_name, member, types);
         }
 
-        if let Some(methods) = self.methods.as_mut() {
-            for method in methods.iter_mut() {
+        if let Some(methods) = self.methods.as_ref() {
+            for method in methods.iter() {
                 let member = method.resolve_enum_method(types);
                 enum_type.add_method(method.id(), &enum_name, member, types);
             }
         }
 
-        types.resolve(&enum_name, Type::Enum(enum_type))
+        enum_type
     }
 }
 

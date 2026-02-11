@@ -9,7 +9,7 @@ pub struct MethodParseNode {
 }
 
 impl MethodParseNode {
-    pub fn resolve_struct_method(&mut self, types: &TypeResolver) -> StructMember {
+    pub fn resolve_struct_method(&self, types: &TypeResolver) -> StructMember {
         let function_type = self.function.get_type(types).clone();
         StructMember {
             public: self.public,
@@ -17,7 +17,7 @@ impl MethodParseNode {
         }
     }
 
-    pub fn resolve_enum_method(&mut self, types: &TypeResolver) -> EnumMethod {
+    pub fn resolve_enum_method(&self, types: &TypeResolver) -> EnumMethod {
         let function_type = self.function.get_type(types).clone();
         EnumMethod {
             public: self.public,

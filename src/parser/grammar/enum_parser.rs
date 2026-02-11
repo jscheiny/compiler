@@ -12,11 +12,7 @@ pub fn enumeration(tokens: &mut TokenStream) -> ParseResult<EnumParseNode> {
     let identifier = tokens.identifier(IdentifierType::Variant)?;
     let variants = tokens.located(enum_variants)?;
     let methods = methods(tokens)?;
-    Ok(EnumParseNode {
-        identifier,
-        variants,
-        methods,
-    })
+    Ok(EnumParseNode::new(identifier, variants, methods))
 }
 
 fn enum_variants(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<EnumVariantParseNode>>> {

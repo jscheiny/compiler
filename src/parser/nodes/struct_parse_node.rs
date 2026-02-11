@@ -1,5 +1,7 @@
+use std::cell::OnceCell;
+
 use crate::{
-    checker::{StructType, Type, TypeResolver},
+    checker::{StructType, TypeResolver},
     parser::{
         Identified, IdentifierParseNode, MethodParseNode, ParseNode, ParseNodeVec,
         StructFieldParseNode,
@@ -7,13 +9,31 @@ use crate::{
 };
 
 pub struct StructParseNode {
-    pub identifier: ParseNode<IdentifierParseNode>,
-    pub fields: ParseNodeVec<StructFieldParseNode>,
-    pub methods: Option<ParseNodeVec<MethodParseNode>>,
+    identifier: ParseNode<IdentifierParseNode>,
+    fields: ParseNodeVec<StructFieldParseNode>,
+    methods: Option<ParseNodeVec<MethodParseNode>>,
+    resolved_type: OnceCell<StructType>,
 }
 
 impl StructParseNode {
-    pub fn resolve_type(&mut self, types: &mut TypeResolver) {
+    pub fn new(
+        identifier: ParseNode<IdentifierParseNode>,
+        fields: ParseNodeVec<StructFieldParseNode>,
+        methods: Option<ParseNodeVec<MethodParseNode>>,
+    ) -> Self {
+        Self {
+            identifier,
+            fields,
+            methods,
+            resolved_type: OnceCell::new(),
+        }
+    }
+
+    pub fn get_type(&self, types: &mut TypeResolver) -> &StructType {
+        self.resolved_type.get_or_init(|| self.get_type_impl(types))
+    }
+
+    pub fn get_type_impl(&self, types: &mut TypeResolver) -> StructType {
         let container_name = self.id().clone();
         let mut struct_type = StructType::new();
 
@@ -23,15 +43,15 @@ impl StructParseNode {
             struct_type.add_member(identifier, &container_name, member, types);
         }
 
-        if let Some(methods) = self.methods.as_mut() {
-            for method in methods.iter_mut() {
+        if let Some(methods) = self.methods.as_ref() {
+            for method in methods.iter() {
                 let member = method.resolve_struct_method(types);
                 let identifier = method.id().clone();
                 struct_type.add_member(identifier, &container_name, member, types);
             }
         }
 
-        types.resolve(&container_name, Type::Struct(struct_type))
+        struct_type
     }
 }
 

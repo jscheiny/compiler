@@ -1,5 +1,5 @@
 use crate::{
-    checker::TypeResolver,
+    checker::{Type, TypeResolver},
     parser::{EnumParseNode, FunctionParseNode, Identified, StructParseNode, TypeAliasParseNode},
 };
 
@@ -18,9 +18,18 @@ pub enum ModuleDefinitionParseNode {
 impl ModuleDefinitionParseNode {
     pub fn resolve_type(&mut self, types: &mut TypeResolver) {
         match self {
-            Self::Struct(node) => node.resolve_type(types),
-            Self::Enum(node) => node.resolve_type(types),
-            Self::TypeAlias(node) => types.resolve(node.id(), node.get_type(types).clone()),
+            Self::Struct(node) => {
+                let resolved_type = Type::Struct(node.get_type(types).clone());
+                types.resolve(node.id(), resolved_type);
+            }
+            Self::Enum(node) => {
+                let resolved_type = Type::Enum(node.get_type(types).clone());
+                types.resolve(node.id(), resolved_type);
+            }
+            Self::TypeAlias(node) => {
+                let resolved_type = node.get_type(types).clone();
+                types.resolve(node.id(), resolved_type);
+            }
             Self::Function(_) => {}
         }
     }

@@ -13,11 +13,7 @@ pub fn structure(tokens: &mut TokenStream) -> ParseResult<StructParseNode> {
     let fields = tokens.located(fields)?;
 
     let methods = methods(tokens)?;
-    Ok(StructParseNode {
-        identifier,
-        fields,
-        methods,
-    })
+    Ok(StructParseNode::new(identifier, fields, methods))
 }
 
 fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<ParseNode<StructFieldParseNode>>> {
