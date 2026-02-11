@@ -39,6 +39,13 @@ impl StructNode {
 
         if let Some(methods) = self.methods.as_ref() {
             for method in methods.iter() {
+                scope.add_without_shadow(
+                    method.id(),
+                    Type::Function(method.function.get_type(types).clone()),
+                );
+            }
+
+            for method in methods.iter() {
                 scope = method.check(types, scope)
             }
         }

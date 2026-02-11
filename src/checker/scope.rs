@@ -46,6 +46,18 @@ impl Scope {
                 .unwrap_or(false)
     }
 
+    pub fn find_scope(&self, scope_type: ScopeType) -> Option<&Box<Scope>> {
+        if let Some(parent) = self.parent.as_ref() {
+            if parent.scope_type == scope_type {
+                Some(parent)
+            } else {
+                parent.find_scope(scope_type)
+            }
+        } else {
+            None
+        }
+    }
+
     pub fn parent(self) -> Box<Scope> {
         self.parent.unwrap()
     }
@@ -68,10 +80,14 @@ impl Scope {
     }
 
     pub fn lookup(&self, identifier: &String) -> Option<Type> {
-        self.values.get(identifier).cloned().or_else(|| {
+        self.lookup_local(identifier).or_else(|| {
             self.parent
                 .as_ref()
                 .and_then(|parent| parent.lookup(identifier))
         })
+    }
+
+    pub fn lookup_local(&self, identifier: &String) -> Option<Type> {
+        self.values.get(identifier).cloned()
     }
 }

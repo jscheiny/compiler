@@ -1,11 +1,22 @@
 struct S(
-    pub f: T,
+    pub f: int,
     pub y: (int) -> bool
 ) {
-    pub test(y: (int) -> bool, f: int) {
-        let x = y(f, g);
-        while x {
+    pub test(x: T, y: T) {
+        @"test";
+    }
 
+    pub test(x: int) {
+        let x = @f;
+        @test(3);
+
+        while @y(@f) {
+            
         }
     }
+
+}
+
+fn test() {
+    @x;
 }
