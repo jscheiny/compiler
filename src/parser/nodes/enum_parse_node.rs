@@ -13,12 +13,12 @@ pub struct EnumParseNode {
 }
 
 impl EnumParseNode {
-    pub fn resolve_types(&mut self, types: &mut TypeResolver) {
+    pub fn resolve_type(&mut self, types: &mut TypeResolver) {
         let enum_name = self.id().clone();
         let mut enum_type = EnumType::new();
 
         for variant in self.variants.iter() {
-            let member = variant.resolve_type(types);
+            let member = variant.get_type(types).cloned();
             enum_type.add_variant(variant.id(), &enum_name, member, types);
         }
 

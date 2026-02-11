@@ -1,27 +1,45 @@
+use std::cell::OnceCell;
+
 use crate::{
-    checker::{FunctionType, Type, TypeResolver},
+    checker::{FunctionType, TypeResolver},
     parser::{ParseNode, ParseNodeVec, TypeParseNode},
 };
 
 pub struct FunctionTypeParseNode {
-    pub parameters: ParseNodeVec<TypeParseNode>,
-    pub return_type: Box<ParseNode<TypeParseNode>>,
+    parameters: ParseNodeVec<TypeParseNode>,
+    return_type: Box<ParseNode<TypeParseNode>>,
+    resolved_type: OnceCell<FunctionType>,
 }
 
 impl FunctionTypeParseNode {
-    pub fn resolve_type(&self, types: &TypeResolver) -> Type {
+    pub fn new(
+        parameters: ParseNodeVec<TypeParseNode>,
+        return_type: Box<ParseNode<TypeParseNode>>,
+    ) -> Self {
+        Self {
+            parameters,
+            return_type,
+            resolved_type: OnceCell::new(),
+        }
+    }
+
+    pub fn get_type(&self, types: &TypeResolver) -> &FunctionType {
+        self.resolved_type.get_or_init(|| self.resolve_type(types))
+    }
+
+    fn resolve_type(&self, types: &TypeResolver) -> FunctionType {
         let parameters = self
             .parameters
             .value
             .iter()
-            .map(|parameter| parameter.resolve_type(types))
+            .map(|parameter| parameter.get_type(types))
             .collect();
 
-        let return_type = Some(Box::new(self.return_type.resolve_type(types)));
+        let return_type = Some(Box::new(self.return_type.get_type(types)));
 
-        Type::Function(FunctionType {
+        FunctionType {
             parameters,
             return_type,
-        })
+        }
     }
 }

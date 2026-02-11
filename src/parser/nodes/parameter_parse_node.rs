@@ -29,7 +29,7 @@ impl ParameterParseNode {
 
     fn resolve_type(&self, types: &TypeResolver) -> Type {
         match self.type_def.as_ref() {
-            Some(type_def) => type_def.resolve_type(types),
+            Some(type_def) => type_def.get_type(types),
             None => Type::Error,
         }
     }

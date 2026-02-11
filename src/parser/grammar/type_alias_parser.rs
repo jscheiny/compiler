@@ -12,8 +12,5 @@ pub fn type_alias(tokens: &mut TokenStream) -> ParseResult<TypeAliasParseNode> {
     tokens.expect(&OperatorToken::Equal, SyntaxError::ExpectedType)?;
     let type_def = tokens.located(type_definition)?;
     end_statement(tokens);
-    Ok(TypeAliasParseNode {
-        identifier,
-        type_def,
-    })
+    Ok(TypeAliasParseNode::new(identifier, type_def))
 }

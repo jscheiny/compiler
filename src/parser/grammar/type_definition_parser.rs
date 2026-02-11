@@ -32,14 +32,14 @@ fn function_or_tuple_type(tokens: &mut TokenStream) -> ParseResult<TypeParseNode
     let parameters = tokens.located(type_list)?;
     if tokens.accept(&OperatorToken::SkinnyArrow) {
         let return_type = tokens.located(type_definition)?;
-        Ok(TypeParseNode::Function(FunctionTypeParseNode {
+        Ok(TypeParseNode::Function(FunctionTypeParseNode::new(
             parameters,
-            return_type: Box::new(return_type),
-        }))
+            Box::new(return_type),
+        )))
     } else {
-        Ok(TypeParseNode::Tuple(TupleTypeParseNode {
-            fields: parameters.value,
-        }))
+        Ok(TypeParseNode::Tuple(TupleTypeParseNode::new(
+            parameters.value,
+        )))
     }
 }
 

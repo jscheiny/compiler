@@ -48,7 +48,7 @@ impl FunctionParseNode {
         let return_type = self
             .return_type
             .as_ref()
-            .map(|rt| Box::new(rt.resolve_type(types)));
+            .map(|rt| Box::new(rt.get_type(types)));
 
         FunctionType {
             parameters,

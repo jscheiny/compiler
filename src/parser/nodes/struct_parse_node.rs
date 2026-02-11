@@ -13,7 +13,7 @@ pub struct StructParseNode {
 }
 
 impl StructParseNode {
-    pub fn resolve_types(&mut self, types: &mut TypeResolver) {
+    pub fn resolve_type(&mut self, types: &mut TypeResolver) {
         let container_name = self.id().clone();
         let mut struct_type = StructType::new();
 

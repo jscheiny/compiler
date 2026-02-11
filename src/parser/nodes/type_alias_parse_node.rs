@@ -1,17 +1,31 @@
+use std::cell::OnceCell;
+
 use crate::{
-    checker::TypeResolver,
+    checker::{Type, TypeResolver},
     parser::{Identified, IdentifierParseNode, ParseNode, TypeParseNode},
 };
 
 pub struct TypeAliasParseNode {
-    pub identifier: ParseNode<IdentifierParseNode>,
-    pub type_def: ParseNode<TypeParseNode>,
+    identifier: ParseNode<IdentifierParseNode>,
+    type_def: ParseNode<TypeParseNode>,
+    resolved_type: OnceCell<Type>,
 }
 
 impl TypeAliasParseNode {
-    pub fn resolve_types(&self, types: &mut TypeResolver) {
-        let resolved_type = self.type_def.resolve_type(types);
-        types.resolve(self.id(), resolved_type);
+    pub fn new(
+        identifier: ParseNode<IdentifierParseNode>,
+        type_def: ParseNode<TypeParseNode>,
+    ) -> Self {
+        Self {
+            identifier,
+            type_def,
+            resolved_type: OnceCell::new(),
+        }
+    }
+
+    pub fn get_type(&self, types: &TypeResolver) -> &Type {
+        self.resolved_type
+            .get_or_init(|| self.type_def.get_type(types))
     }
 }
 
