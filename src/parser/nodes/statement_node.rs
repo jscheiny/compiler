@@ -1,12 +1,13 @@
 use crate::{
-    checker::{Scope, Type, TypeResolver},
+    checker::{Scope, ScopeType, Type, TypeResolver},
+    lexer::KeywordToken,
     parser::{DeclarationNode, ExpressionNode, IfStatementNode, Node, WhileLoopNode},
 };
 
 pub enum StatementNode {
     BlockReturn(Node<ExpressionNode>),
-    Break(),
-    Continue(),
+    Break,
+    Continue,
     Declaration(DeclarationNode),
     Expression(ExpressionNode),
     FunctionReturn(Option<Node<ExpressionNode>>),
@@ -22,8 +23,8 @@ impl StatementNode {
                 let (scope, resolved_type) = node.check(types, scope);
                 (scope, Some(resolved_type))
             }
-            Self::Break() => todo!("Implement type checking for `Break`"),
-            Self::Continue() => todo!("Implement type checking for `Continue`"),
+            Self::Break => self.check_loop(scope, KeywordToken::Break),
+            Self::Continue => self.check_loop(scope, KeywordToken::Continue),
             Self::Declaration(node) => (node.check(types, scope), None),
             Self::Expression(node) => {
                 // Discard the type of raw expressions
@@ -37,7 +38,14 @@ impl StatementNode {
             }
             Self::FunctionReturn(None) => (scope, None),
             Self::If(_node) => todo!("Implement type checking for `If`"),
-            Self::WhileLoop(_node) => todo!("Implement type checking for `WhileLoop`"),
+            Self::WhileLoop(node) => (node.check(types, scope), None),
         }
+    }
+
+    fn check_loop(&self, scope: Box<Scope>, keyword: KeywordToken) -> (Box<Scope>, Option<Type>) {
+        if !scope.within(ScopeType::Loop) {
+            println!("Type error: Unexpected {} outside of loop", keyword);
+        }
+        (scope, None)
     }
 }

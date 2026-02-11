@@ -76,13 +76,13 @@ fn function_return(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
 fn break_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     tokens.next();
     end_statement(tokens);
-    Ok(StatementNode::Break())
+    Ok(StatementNode::Break)
 }
 
 fn continue_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     tokens.next();
     end_statement(tokens);
-    Ok(StatementNode::Break())
+    Ok(StatementNode::Continue)
 }
 
 fn while_loop(tokens: &mut TokenStream) -> ParseResult<StatementNode> {

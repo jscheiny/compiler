@@ -3,5 +3,11 @@ type neat = int;
 
 fn test(x: T) {
     let x: int = 5;
-    return;
+    while x {
+        {
+            continue;
+        }
+    }
+
+    break;
 }

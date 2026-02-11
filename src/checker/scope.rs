@@ -2,8 +2,23 @@ use std::collections::HashMap;
 
 use crate::checker::Type;
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum ScopeType {
+    Global,
+    Function,
+    Block,
+    Loop,
+}
+
+impl Default for ScopeType {
+    fn default() -> Self {
+        ScopeType::Global
+    }
+}
+
 #[derive(Default)]
 pub struct Scope {
+    scope_type: ScopeType,
     parent: Option<Box<Scope>>,
     values: HashMap<String, Type>,
     // self_values: Option<HashMap<String, Type>>,
@@ -14,11 +29,21 @@ impl Scope {
         Default::default()
     }
 
-    pub fn derive(self: Box<Scope>) -> Box<Scope> {
+    pub fn derive(self: Box<Scope>, scope_type: ScopeType) -> Box<Scope> {
         Box::new(Self {
+            scope_type,
             parent: Some(self),
             ..Self::new()
         })
+    }
+
+    pub fn within(&self, scope_type: ScopeType) -> bool {
+        self.scope_type == scope_type
+            || self
+                .parent
+                .as_ref()
+                .map(|parent| parent.within(scope_type))
+                .unwrap_or(false)
     }
 
     pub fn parent(self) -> Box<Scope> {

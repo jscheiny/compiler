@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, Type, TypeResolver},
+    checker::{Scope, ScopeType, Type, TypeResolver},
     parser::{Node, StatementNode},
 };
 
@@ -9,7 +9,7 @@ pub struct BlockNode {
 
 impl BlockNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Option<Type>) {
-        let mut scope = scope.derive();
+        let mut scope = scope.derive(ScopeType::Block);
         // TODO type check block results
         for statement in self.statements.iter() {
             let (new_scope, _resolved_type) = statement.check(types, scope);

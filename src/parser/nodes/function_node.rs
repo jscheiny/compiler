@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, collections::HashSet};
 
 use crate::{
-    checker::{FunctionType, Scope, Type, TypeResolver},
+    checker::{FunctionType, Scope, ScopeType, Type, TypeResolver},
     parser::{
         FunctionBodyNode, Identified, IdentifierNode, Node, NodeVec, ParameterNode, TypeNode,
     },
@@ -32,7 +32,7 @@ impl FunctionNode {
     }
 
     pub fn check(&self, types: &TypeResolver, parent_scope: Box<Scope>) -> Box<Scope> {
-        let scope = parent_scope.derive();
+        let scope = parent_scope.derive(ScopeType::Function);
         let scope = self.check_params(types, scope);
         let (scope, _resolved_type) = match &self.body.value {
             FunctionBodyNode::Expression(expression) => expression.check(types, scope),
