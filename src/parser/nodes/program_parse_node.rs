@@ -22,7 +22,10 @@ impl ProgramParseNode {
             definition.resolve_type(&mut types);
         }
 
-        let _module_scope = self.get_module_scope(&types);
+        let module_scope = self.get_module_scope(&types);
+        for definition in self.definitions() {
+            definition.check(&mut types, module_scope.clone());
+        }
         types.check();
     }
 

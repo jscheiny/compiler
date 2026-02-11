@@ -1,8 +1,3 @@
-struct Dawg(nodes: Node);
-struct Node(dawg: Dawg);
+fn test(x: int, x: int, z) {
 
-struct Pair(x: int, y: int) {
-    add(pair: Pair): Pair -> Pair(@x + pair.x, @y + pair.y);
 }
-
-struct Pair() {}

@@ -1,4 +1,4 @@
-use std::cell::OnceCell;
+use std::{cell::OnceCell, collections::HashSet};
 
 use crate::{
     checker::{FunctionType, TypeResolver},
@@ -29,6 +29,25 @@ impl FunctionParseNode {
             return_type,
             body,
             resolved_type: OnceCell::new(),
+        }
+    }
+
+    pub fn check(&self, types: &mut TypeResolver) {
+        self.check_params(types);
+    }
+
+    fn check_params(&self, types: &TypeResolver) {
+        let mut param_names = HashSet::new();
+        for param in self.parameters.iter() {
+            if param_names.contains(param.id()) {
+                println!(
+                    "Type error: Duplicate parameter named `{}` of function `{}`",
+                    param.id(),
+                    self.id()
+                );
+            }
+            param_names.insert(param.id().clone());
+            param.check(types)
         }
     }
 

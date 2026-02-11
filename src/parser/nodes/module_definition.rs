@@ -1,5 +1,7 @@
+use std::rc::Rc;
+
 use crate::{
-    checker::{Type, TypeResolver},
+    checker::{Scope, Type, TypeResolver},
     parser::{EnumParseNode, FunctionParseNode, Identified, StructParseNode, TypeAliasParseNode},
 };
 
@@ -16,12 +18,12 @@ pub enum ModuleDefinitionParseNode {
 }
 
 impl ModuleDefinitionParseNode {
-    pub fn check(&self, types: &mut TypeResolver) {
+    pub fn check(&self, types: &mut TypeResolver, scope: Rc<Scope>) {
         match self {
-            Self::Struct(struct_parse_node) => todo!(),
-            Self::Enum(enum_parse_node) => todo!(),
-            Self::Function(function_parse_node) => todo!(),
-            Self::TypeAlias(type_alias_parse_node) => todo!(),
+            Self::Struct(node) => todo!(),
+            Self::Enum(node) => todo!(),
+            Self::Function(node) => node.check(types),
+            Self::TypeAlias(node) => todo!(),
         }
     }
 

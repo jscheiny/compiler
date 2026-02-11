@@ -18,6 +18,12 @@ impl TupleTypeParseNode {
         }
     }
 
+    pub fn check(&self, types: &TypeResolver) {
+        for field in self.fields.iter() {
+            field.check(types);
+        }
+    }
+
     pub fn get_type(&self, types: &TypeResolver) -> &Type {
         self.resolved_type.get_or_init(|| self.resolve_type(types))
     }
