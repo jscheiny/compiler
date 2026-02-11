@@ -4,10 +4,9 @@ use crate::checker::Type;
 
 #[derive(Default)]
 pub struct Scope {
-    // parent: Option<&'a Box<Scope<'a>>>,
+    parent: Option<Box<Scope>>,
     values: HashMap<String, Type>,
-    types: HashMap<String, Type>,
-    self_values: Option<HashMap<String, Type>>,
+    // self_values: Option<HashMap<String, Type>>,
 }
 
 impl Scope {
@@ -15,36 +14,27 @@ impl Scope {
         Default::default()
     }
 
-    // pub fn derive<'a, 'b>(self: &'a Scope<'b>) -> Scope<'a + 'b> {
-    //     Self {
-    //         parent: Some(self),
-    //         ..Self::new()
-    //     }
-    // }
-
-    pub fn add_type(&mut self, symbol: &String, value: Type) {
-        self.types.insert(symbol.clone(), value);
+    pub fn derive(self: Box<Scope>) -> Box<Scope> {
+        Box::new(Self {
+            parent: Some(self),
+            ..Self::new()
+        })
     }
 
-    pub fn add_value(&mut self, symbol: &String, value: Type) {
+    pub fn parent(self) -> Box<Scope> {
+        self.parent.unwrap()
+    }
+
+    pub fn add(&mut self, symbol: &String, value: Type) {
         self.values.insert(symbol.clone(), value);
     }
 
-    pub fn contains_type(&self, symbol: &String) -> bool {
-        self.types.contains_key(symbol)
-        // || self
-        //     .parent
-        //     .as_ref()
-        //     .map(|parent| parent.contains_type(symbol))
-        //     .unwrap_or(false)
-    }
-
-    pub fn contains_value(&self, symbol: &String) -> bool {
+    pub fn contains(&self, symbol: &String) -> bool {
         self.values.contains_key(symbol)
-        // || self
-        //     .parent
-        //     .as_ref()
-        //     .map(|parent| parent.contains_type(symbol))
-        //     .unwrap_or(false)
+            || self
+                .parent
+                .as_ref()
+                .map(|parent| parent.contains(symbol))
+                .unwrap_or(false)
     }
 }

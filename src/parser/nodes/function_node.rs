@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, collections::HashSet};
 
 use crate::{
-    checker::{FunctionType, TypeResolver},
+    checker::{FunctionType, Scope, TypeResolver},
     parser::{
         FunctionBodyNode, Identified, IdentifierNode, Node, NodeVec, ParameterNode, TypeNode,
     },
@@ -31,11 +31,19 @@ impl FunctionNode {
         }
     }
 
-    pub fn check(&self) {
-        self.check_params();
+    pub fn check(&self, types: &TypeResolver, parent_scope: Box<Scope>) -> Box<Scope> {
+        let scope = self.check_params(types, parent_scope);
+        match &self.body.value {
+            FunctionBodyNode::Expression(_expression) => {
+                todo!("Implement type checking for expression function body")
+            }
+            FunctionBodyNode::Block(block) => block.check(),
+        };
+        scope.parent()
     }
 
-    fn check_params(&self) {
+    fn check_params(&self, types: &TypeResolver, parent_scope: Box<Scope>) -> Box<Scope> {
+        let mut scope = parent_scope.derive();
         let mut param_names = HashSet::new();
         for param in self.parameters.iter() {
             if param_names.contains(param.id()) {
@@ -44,9 +52,12 @@ impl FunctionNode {
                     param.id(),
                     self.id()
                 );
+            } else {
+                param_names.insert(param.id().clone());
+                scope.add(param.id(), param.get_type(types).clone());
             }
-            param_names.insert(param.id().clone());
         }
+        scope
     }
 
     pub fn get_type(&self, types: &TypeResolver) -> &FunctionType {

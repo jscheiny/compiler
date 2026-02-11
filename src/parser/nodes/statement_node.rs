@@ -10,3 +10,18 @@ pub enum StatementNode {
     If(IfStatementNode),
     WhileLoop(WhileLoopNode),
 }
+
+impl StatementNode {
+    pub fn check(&self) {
+        match self {
+            Self::BlockReturn(_node) => todo!("Implement type checking for `BlockReturn`"),
+            Self::Break() => todo!("Implement type checking for `Break`"),
+            Self::Continue() => todo!("Implement type checking for `Continue`"),
+            Self::Declaration(_node) => todo!("Implement type checking for `Declaration`"),
+            Self::Expression(_node) => todo!("Implement type checking for `Expression`"),
+            Self::FunctionReturn(_node) => todo!("Implement type checking for `FunctionReturn`"),
+            Self::If(_node) => todo!("Implement type checking for `If`"),
+            Self::WhileLoop(_node) => todo!("Implement type checking for `WhileLoop`"),
+        }
+    }
+}

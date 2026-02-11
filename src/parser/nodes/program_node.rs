@@ -18,22 +18,22 @@ impl ProgramNode {
             definition.resolve_type(&mut types);
         }
 
-        let module_scope = self.get_module_scope(&types);
+        let mut module_scope = Box::new(self.get_module_scope(&types));
         for definition in self.definitions() {
-            definition.check(&mut types, &module_scope);
+            module_scope = definition.check(&types, module_scope);
         }
         types.check();
     }
 
-    pub fn get_module_scope(&self, types: &TypeResolver) -> Box<Scope> {
+    pub fn get_module_scope(&self, types: &TypeResolver) -> Scope {
         let mut scope = Scope::new();
         for definition in self.definitions() {
-            scope.add_type(
+            scope.add(
                 definition.id(),
                 types.get_type_ref(definition.id()).unwrap_or(Type::Error),
             );
         }
-        Box::new(scope)
+        scope
     }
 
     fn definitions(&self) -> impl Iterator<Item = &ModuleDefinitionNode> {

@@ -2,5 +2,5 @@ type T = neat;
 type neat = int;
 
 fn test(x: T): T {
-
+    let x = x;
 }
