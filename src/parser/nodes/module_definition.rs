@@ -16,6 +16,15 @@ pub enum ModuleDefinitionParseNode {
 }
 
 impl ModuleDefinitionParseNode {
+    pub fn check(&self, types: &mut TypeResolver) {
+        match self {
+            Self::Struct(struct_parse_node) => todo!(),
+            Self::Enum(enum_parse_node) => todo!(),
+            Self::Function(function_parse_node) => todo!(),
+            Self::TypeAlias(type_alias_parse_node) => todo!(),
+        }
+    }
+
     pub fn resolve_type(&mut self, types: &mut TypeResolver) {
         match self {
             Self::Struct(node) => {
