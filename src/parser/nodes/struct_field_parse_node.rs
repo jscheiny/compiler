@@ -1,6 +1,6 @@
 use crate::{
     checker::{StructMember, StructMemberType, Type, TypeResolver},
-    parser::{IdentifierParseNode, ParseNode, TypeParseNode},
+    parser::{Identified, IdentifierParseNode, ParseNode, TypeParseNode},
 };
 
 pub struct StructFieldParseNode {
@@ -20,5 +20,11 @@ impl StructFieldParseNode {
             public: self.public,
             member_type: StructMemberType::Field(member_type),
         }
+    }
+}
+
+impl Identified for StructFieldParseNode {
+    fn id(&self) -> &String {
+        &self.identifier.value.0
     }
 }

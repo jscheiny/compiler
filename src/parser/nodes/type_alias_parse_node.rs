@@ -17,6 +17,6 @@ impl TypeAliasParseNode {
 
 impl Identified for TypeAliasParseNode {
     fn id(&self) -> &String {
-        &self.identifier.value.0
+        self.identifier.id()
     }
 }

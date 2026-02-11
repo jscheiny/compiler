@@ -28,6 +28,6 @@ impl EnumVariantParseNode {
 
 impl Identified for EnumVariantParseNode {
     fn id(&self) -> &String {
-        &self.identifier.value.0
+        self.identifier.id()
     }
 }

@@ -1,6 +1,6 @@
 use crate::{
     checker::{Type, TypeResolver},
-    parser::{IdentifierParseNode, ParseNode, TypeParseNode},
+    parser::{Identified, IdentifierParseNode, ParseNode, TypeParseNode},
 };
 
 pub struct ParameterParseNode {
@@ -39,8 +39,10 @@ impl ParameterParseNode {
             None => Type::Error,
         }
     }
+}
 
-    pub fn identifier(&self) -> &String {
-        &self.identifier.value.0
+impl Identified for ParameterParseNode {
+    fn id(&self) -> &String {
+        self.identifier.id()
     }
 }

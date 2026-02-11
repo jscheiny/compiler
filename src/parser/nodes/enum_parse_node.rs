@@ -19,15 +19,13 @@ impl EnumParseNode {
 
         for variant in self.variants.value.iter() {
             let member = variant.value.resolve_type(types);
-            let identifier = variant.id();
-            enum_type.add_variant(identifier, &enum_name, member, types);
+            enum_type.add_variant(variant.id(), &enum_name, member, types);
         }
 
         if let Some(methods) = self.methods.as_mut() {
             for method in methods.value.iter_mut() {
                 let member = method.value.resolve_enum_method(types);
-                let identifier = &method.value.function.value.identifier.value.0.clone();
-                enum_type.add_method(identifier, &enum_name, member, types);
+                enum_type.add_method(method.id(), &enum_name, member, types);
             }
         }
 
@@ -37,6 +35,6 @@ impl EnumParseNode {
 
 impl Identified for EnumParseNode {
     fn id(&self) -> &String {
-        &self.identifier.value.0
+        self.identifier.id()
     }
 }

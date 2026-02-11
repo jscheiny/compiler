@@ -1,6 +1,6 @@
 use crate::{
     checker::{EnumMethod, StructMember, StructMemberType, TypeResolver},
-    parser::{FunctionParseNode, ParseNode},
+    parser::{FunctionParseNode, Identified, ParseNode},
 };
 
 pub struct MethodParseNode {
@@ -23,5 +23,11 @@ impl MethodParseNode {
             public: self.public,
             function_type,
         }
+    }
+}
+
+impl Identified for MethodParseNode {
+    fn id(&self) -> &String {
+        self.function.id()
     }
 }

@@ -2,7 +2,9 @@ use std::rc::Rc;
 
 use crate::{
     checker::{Scope, TypeResolver},
-    parser::{ExportableModuleDefinitionParseNode, ModuleDefinitionParseNode, ParseNode},
+    parser::{
+        ExportableModuleDefinitionParseNode, Identified, ModuleDefinitionParseNode, ParseNode,
+    },
 };
 
 pub struct ProgramParseNode {
@@ -13,7 +15,7 @@ impl ProgramParseNode {
     pub fn check(&mut self) {
         let mut types = TypeResolver::new();
         for definition in self.definitions() {
-            types.declare(definition.identifier());
+            types.declare(definition.id());
         }
 
         for definition in self.definitions_mut() {
@@ -27,10 +29,7 @@ impl ProgramParseNode {
     pub fn get_module_scope(&self, types: &TypeResolver) -> Rc<Scope> {
         let mut scope = Scope::new();
         for definition in self.definitions() {
-            scope.add(
-                definition.identifier(),
-                types.get_type_ref(definition.identifier()),
-            );
+            scope.add(definition.id(), types.get_type_ref(definition.id()));
         }
         Rc::new(scope)
     }

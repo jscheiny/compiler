@@ -1,8 +1,8 @@
 use crate::{
     checker::{FunctionType, TypeResolver},
     parser::{
-        FunctionBodyParseNode, IdentifierParseNode, ParameterParseNode, ParseNode, ParseNodeVec,
-        TypeParseNode,
+        FunctionBodyParseNode, Identified, IdentifierParseNode, ParameterParseNode, ParseNode,
+        ParseNodeVec, TypeParseNode,
     },
 };
 
@@ -45,5 +45,11 @@ impl FunctionParseNode {
             parameters,
             return_type,
         }
+    }
+}
+
+impl Identified for FunctionParseNode {
+    fn id(&self) -> &String {
+        &self.identifier.value.0
     }
 }

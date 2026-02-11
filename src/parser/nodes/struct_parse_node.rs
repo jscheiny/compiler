@@ -19,14 +19,14 @@ impl StructParseNode {
 
         for field in self.fields.value.iter() {
             let member = field.value.resolve_type(types);
-            let identifier = field.value.identifier.value.0.clone();
+            let identifier = field.id().clone();
             struct_type.add_member(identifier, &container_name, member, types);
         }
 
         if let Some(methods) = self.methods.as_mut() {
             for method in methods.value.iter_mut() {
-                let identifier = method.value.function.value.identifier.value.0.clone();
                 let member = method.value.resolve_struct_method(types);
+                let identifier = method.id().clone();
                 struct_type.add_member(identifier, &container_name, member, types);
             }
         }
@@ -37,6 +37,6 @@ impl StructParseNode {
 
 impl Identified for StructParseNode {
     fn id(&self) -> &String {
-        &self.identifier.value.0
+        self.identifier.id()
     }
 }

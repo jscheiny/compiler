@@ -16,21 +16,23 @@ pub enum ModuleDefinitionParseNode {
 }
 
 impl ModuleDefinitionParseNode {
-    pub fn identifier(&self) -> &String {
-        match self {
-            Self::Struct(node) => node.id(),
-            Self::Enum(node) => node.id(),
-            Self::TypeAlias(node) => node.id(),
-            Self::Function(node) => &node.identifier.value.0,
-        }
-    }
-
     pub fn resolve_type(&mut self, types: &mut TypeResolver) {
         match self {
             Self::Struct(node) => node.resolve_types(types),
             Self::Enum(node) => node.resolve_types(types),
             Self::TypeAlias(node) => node.resolve_types(types),
             Self::Function(_) => {}
+        }
+    }
+}
+
+impl Identified for ModuleDefinitionParseNode {
+    fn id(&self) -> &String {
+        match self {
+            Self::Struct(node) => node.id(),
+            Self::Enum(node) => node.id(),
+            Self::TypeAlias(node) => node.id(),
+            Self::Function(node) => node.id(),
         }
     }
 }
