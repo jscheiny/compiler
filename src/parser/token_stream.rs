@@ -3,8 +3,8 @@ use std::rc::Rc;
 use crate::{
     lexer::{LocatedToken, Token, TokenMatch},
     parser::{
-        IdentifierNode, IdentifierType, LocatedSyntaxError, ParseNode, ParseResult,
-        SyntaxError, TokenSpan, identifier,
+        IdentifierNode, IdentifierType, LocatedSyntaxError, ParseNode, ParseResult, SyntaxError,
+        TokenSpan, identifier,
     },
 };
 
