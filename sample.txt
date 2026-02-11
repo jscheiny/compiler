@@ -1,22 +1,6 @@
-struct S(
-    pub f: int,
-    pub y: (int) -> bool
-) {
-    pub test(x: T, y: T) {
-        @"test";
-    }
-
-    pub test(x: int) {
-        let x = @f;
-        @test(3);
-
-        while @y(@f) {
-            
-        }
-    }
-
-}
-
 fn test() {
-    @x;
+    let y = if 5 then true else 6;
+    while y {
+
+    }
 }
