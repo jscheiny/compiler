@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::checker::{DuplicateMemberName, FunctionType, Type, TypeError, TypeResolver};
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub struct StructType {
     pub members: HashMap<String, StructMember>,
 }
@@ -32,13 +32,13 @@ impl StructType {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct StructMember {
     pub public: bool,
     pub member_type: StructMemberType,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum StructMemberType {
     Field(Type),
     Method(FunctionType),

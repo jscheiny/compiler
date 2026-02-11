@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::checker::Type;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum ScopeType {
     Global,
     Function,
@@ -16,7 +16,7 @@ impl Default for ScopeType {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Scope {
     scope_type: ScopeType,
     parent: Option<Box<Scope>>,

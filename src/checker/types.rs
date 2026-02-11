@@ -3,7 +3,7 @@ use crate::{
     parser::PrimitiveType,
 };
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Type {
     Alias(Box<Type>),
     Enum(EnumType),
@@ -13,4 +13,13 @@ pub enum Type {
     Struct(StructType),
     Tuple(Vec<Type>),
     Error,
+}
+
+impl Type {
+    pub fn is_primitive(&self, expected: PrimitiveType) -> bool {
+        match self {
+            Self::Primitive(primitive) => *primitive == expected,
+            _ => false,
+        }
+    }
 }
