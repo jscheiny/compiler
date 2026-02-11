@@ -1,13 +1,15 @@
 type T = neat;
 type neat = int;
 
-fn test(x: T) {
+fn test(a: T) {
+    let y: int = x;
     let x: int = 5;
-    while x {
-        {
-            continue;
-        }
+    if x {
+        -> x;
+    } else if y {
+        -> y;
+    } else {
+        -> x;
     }
-
     break;
 }

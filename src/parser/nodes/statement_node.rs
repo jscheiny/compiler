@@ -18,26 +18,26 @@ pub enum StatementNode {
 impl StatementNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Option<Type>) {
         match self {
-            Self::BlockReturn(node) => {
+            Self::BlockReturn(expression) => {
                 // TODO check that this type matches the expected expression return type
-                let (scope, resolved_type) = node.check(types, scope);
+                let (scope, resolved_type) = expression.check(types, scope);
                 (scope, Some(resolved_type))
             }
             Self::Break => self.check_loop(scope, KeywordToken::Break),
             Self::Continue => self.check_loop(scope, KeywordToken::Continue),
             Self::Declaration(node) => (node.check(types, scope), None),
-            Self::Expression(node) => {
+            Self::Expression(expression) => {
                 // Discard the type of raw expressions
-                let (scope, _) = node.check(types, scope);
+                let (scope, _) = expression.check(types, scope);
                 (scope, None)
             }
-            Self::FunctionReturn(Some(return_type)) => {
+            Self::FunctionReturn(Some(expression)) => {
                 // TODO check return type
-                let (scope, _) = return_type.check(types, scope);
+                let (scope, _) = expression.check(types, scope);
                 (scope, None)
             }
             Self::FunctionReturn(None) => (scope, None),
-            Self::If(_node) => todo!("Implement type checking for `If`"),
+            Self::If(node) => (node.check(types, scope), None),
             Self::WhileLoop(node) => (node.check(types, scope), None),
         }
     }
