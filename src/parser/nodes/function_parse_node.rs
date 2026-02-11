@@ -7,10 +7,10 @@ use crate::{
 };
 
 pub struct FunctionParseNode {
-    pub identifier: ParseNode<IdentifierParseNode>,
-    pub parameters: ParseNodeVec<ParameterParseNode>,
-    pub return_type: Option<ParseNode<TypeParseNode>>,
-    pub body: ParseNode<FunctionBodyParseNode>,
+    identifier: ParseNode<IdentifierParseNode>,
+    parameters: ParseNodeVec<ParameterParseNode>,
+    return_type: Option<ParseNode<TypeParseNode>>,
+    body: ParseNode<FunctionBodyParseNode>,
 }
 
 impl FunctionParseNode {

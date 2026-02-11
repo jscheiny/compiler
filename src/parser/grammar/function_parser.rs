@@ -60,12 +60,12 @@ fn function(tokens: &mut TokenStream, has_keyword: bool) -> ParseResult<Function
         None
     };
     let body = tokens.located(function_body)?;
-    Ok(FunctionParseNode {
+    Ok(FunctionParseNode::new(
         identifier,
         parameters,
         return_type,
         body,
-    })
+    ))
 }
 
 fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyParseNode> {
