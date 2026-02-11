@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, TypeResolver},
+    checker::{Scope, Type, TypeResolver},
     parser::{ExpressionNode, Identified, IdentifierNode, Node, TypeNode},
 };
 
@@ -11,16 +11,21 @@ pub struct DeclarationNode {
 }
 
 impl DeclarationNode {
-    pub fn check(&self, types: &TypeResolver, mut scope: Box<Scope>) -> Box<Scope> {
-        let resolved_type = match self.type_def.as_ref() {
-            Some(type_def) => type_def.get_type(types),
-            None => todo!("Declaration type inference not implemented"),
+    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
+        let expected_type = self
+            .type_def
+            .as_ref()
+            .map(|type_def| type_def.get_type(types));
+
+        let (mut scope, resolved_type) = match self.initializer.as_ref() {
+            Some(initializer) => {
+                let (new_scope, resolved_type) = initializer.check(types, scope);
+                // TODO check that resolved type matches expected type
+                (new_scope, expected_type.unwrap_or(resolved_type))
+            }
+            None => (scope, Type::Error),
         };
-        if let Some(initializer) = self.initializer.as_ref() {
-            let (new_scope, _resolved_type) = initializer.check(types, scope);
-            // TODO handle type checking
-            scope = new_scope
-        }
+
         scope.add(self.id(), resolved_type);
         scope
     }
