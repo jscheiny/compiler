@@ -25,11 +25,11 @@ impl EnumVariantParseNode {
 
     pub fn get_type(&self, types: &TypeResolver) -> Option<&Type> {
         self.resolved_type
-            .get_or_init(|| self.resolve_type(types))
+            .get_or_init(|| self.get_type_impl(types))
             .as_ref()
     }
 
-    fn resolve_type(&self, types: &TypeResolver) -> Option<Type> {
+    fn get_type_impl(&self, types: &TypeResolver) -> Option<Type> {
         self.type_def.as_ref().map(|ty| ty.get_type(types))
     }
 }

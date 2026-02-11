@@ -24,10 +24,10 @@ impl ParameterParseNode {
     }
 
     pub fn get_type(&self, types: &TypeResolver) -> &Type {
-        self.resolved_type.get_or_init(|| self.resolve_type(types))
+        self.resolved_type.get_or_init(|| self.get_type_impl(types))
     }
 
-    fn resolve_type(&self, types: &TypeResolver) -> Type {
+    fn get_type_impl(&self, types: &TypeResolver) -> Type {
         match self.type_def.as_ref() {
             Some(type_def) => type_def.get_type(types),
             None => Type::Error,

@@ -33,10 +33,10 @@ impl FunctionParseNode {
     }
 
     pub fn get_type(&self, types: &TypeResolver) -> &FunctionType {
-        self.resolved_type.get_or_init(|| self.resolve_type(types))
+        self.resolved_type.get_or_init(|| self.get_type_impl(types))
     }
 
-    fn resolve_type(&self, types: &TypeResolver) -> FunctionType {
+    fn get_type_impl(&self, types: &TypeResolver) -> FunctionType {
         let parameters = self
             .parameters
             .value
