@@ -77,6 +77,6 @@ impl FunctionNode {
 
 impl Identified for FunctionNode {
     fn id(&self) -> &String {
-        &self.identifier.id()
+        self.identifier.id()
     }
 }

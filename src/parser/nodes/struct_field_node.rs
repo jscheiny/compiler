@@ -25,6 +25,6 @@ impl StructFieldNode {
 
 impl Identified for StructFieldNode {
     fn id(&self) -> &String {
-        &self.identifier.id()
+        self.identifier.id()
     }
 }
