@@ -14,10 +14,10 @@ impl FunctionTypeParseNode {
             .parameters
             .value
             .iter()
-            .map(|p| p.value.resolve_type(types))
+            .map(|parameter| parameter.resolve_type(types))
             .collect();
 
-        let return_type = Some(Box::new(self.return_type.value.resolve_type(types)));
+        let return_type = Some(Box::new(self.return_type.resolve_type(types)));
 
         Type::Function(FunctionType {
             parameters,

@@ -35,12 +35,10 @@ impl ProgramParseNode {
     }
 
     fn definitions(&self) -> impl Iterator<Item = &ModuleDefinitionParseNode> {
-        self.definitions.iter().map(|def| &def.value.definition)
+        self.definitions.iter().map(|def| &def.definition)
     }
 
     fn definitions_mut(&mut self) -> impl Iterator<Item = &mut ModuleDefinitionParseNode> {
-        self.definitions
-            .iter_mut()
-            .map(|def| &mut def.value.definition)
+        self.definitions.iter_mut().map(|def| &mut def.definition)
     }
 }

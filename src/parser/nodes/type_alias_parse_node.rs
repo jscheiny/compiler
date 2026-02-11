@@ -10,7 +10,7 @@ pub struct TypeAliasParseNode {
 
 impl TypeAliasParseNode {
     pub fn resolve_types(&self, types: &mut TypeResolver) {
-        let resolved_type = self.type_def.value.resolve_type(types);
+        let resolved_type = self.type_def.resolve_type(types);
         types.resolve(self.id(), resolved_type);
     }
 }

@@ -36,9 +36,9 @@ impl Display for ExpressionParseNode {
             }
             ExpressionParseNode::FunctionCall(node) => {
                 write!(f, "Call({}, (", node.function.value)?;
-                for (index, arg) in node.arguments.value.iter().enumerate() {
+                for (index, arg) in node.arguments.iter().enumerate() {
                     write!(f, "{}", arg.value)?;
-                    if index != node.arguments.value.len() - 1 {
+                    if index != node.arguments.len() - 1 {
                         write!(f, ", ")?;
                     }
                 }

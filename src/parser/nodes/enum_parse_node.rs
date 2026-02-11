@@ -17,14 +17,14 @@ impl EnumParseNode {
         let enum_name = self.id().clone();
         let mut enum_type = EnumType::new();
 
-        for variant in self.variants.value.iter() {
-            let member = variant.value.resolve_type(types);
+        for variant in self.variants.iter() {
+            let member = variant.resolve_type(types);
             enum_type.add_variant(variant.id(), &enum_name, member, types);
         }
 
         if let Some(methods) = self.methods.as_mut() {
-            for method in methods.value.iter_mut() {
-                let member = method.value.resolve_enum_method(types);
+            for method in methods.iter_mut() {
+                let member = method.resolve_enum_method(types);
                 enum_type.add_method(method.id(), &enum_name, member, types);
             }
         }

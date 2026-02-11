@@ -17,15 +17,15 @@ impl StructParseNode {
         let container_name = self.id().clone();
         let mut struct_type = StructType::new();
 
-        for field in self.fields.value.iter() {
-            let member = field.value.resolve_type(types);
+        for field in self.fields.iter() {
+            let member = field.resolve_type(types);
             let identifier = field.id().clone();
             struct_type.add_member(identifier, &container_name, member, types);
         }
 
         if let Some(methods) = self.methods.as_mut() {
-            for method in methods.value.iter_mut() {
-                let member = method.value.resolve_struct_method(types);
+            for method in methods.iter_mut() {
+                let member = method.resolve_struct_method(types);
                 let identifier = method.id().clone();
                 struct_type.add_member(identifier, &container_name, member, types);
             }

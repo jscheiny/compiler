@@ -12,7 +12,7 @@ impl TupleTypeParseNode {
         let fields = self
             .fields
             .iter()
-            .map(|p| p.value.resolve_type(types))
+            .map(|field| field.resolve_type(types))
             .collect();
 
         Type::Tuple(fields)

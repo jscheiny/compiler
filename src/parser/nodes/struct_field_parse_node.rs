@@ -12,7 +12,7 @@ pub struct StructFieldParseNode {
 impl StructFieldParseNode {
     pub fn resolve_type(&self, types: &TypeResolver) -> StructMember {
         let member_type = match self.type_def.as_ref() {
-            Some(type_def) => type_def.value.resolve_type(types),
+            Some(type_def) => type_def.resolve_type(types),
             None => Type::Error,
         };
 
@@ -25,6 +25,6 @@ impl StructFieldParseNode {
 
 impl Identified for StructFieldParseNode {
     fn id(&self) -> &String {
-        &self.identifier.value.0
+        &self.identifier.id()
     }
 }

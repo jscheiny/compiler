@@ -11,6 +11,7 @@ pub struct FunctionParseNode {
     parameters: ParseNodeVec<ParameterParseNode>,
     return_type: Option<ParseNode<TypeParseNode>>,
     body: ParseNode<FunctionBodyParseNode>,
+    resolved_type: Option<FunctionType>,
 }
 
 impl FunctionParseNode {
@@ -25,10 +26,23 @@ impl FunctionParseNode {
             parameters,
             return_type,
             body,
+            resolved_type: None,
         }
     }
 
-    pub fn resolve_type(&mut self, types: &TypeResolver) -> FunctionType {
+    pub fn get_type(&mut self, types: &TypeResolver) -> FunctionType {
+        match self.resolved_type.as_ref() {
+            Some(resolved_type) => resolved_type.clone(),
+            None => {
+                let resolved_type = self.resolve_type(types);
+                let result = resolved_type.clone();
+                self.resolved_type = Some(resolved_type);
+                result
+            }
+        }
+    }
+
+    fn resolve_type(&mut self, types: &TypeResolver) -> FunctionType {
         let parameters = self
             .parameters
             .value
@@ -50,6 +64,6 @@ impl FunctionParseNode {
 
 impl Identified for FunctionParseNode {
     fn id(&self) -> &String {
-        &self.identifier.value.0
+        &self.identifier.id()
     }
 }

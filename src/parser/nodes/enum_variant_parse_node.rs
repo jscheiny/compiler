@@ -20,9 +20,7 @@ impl EnumVariantParseNode {
     }
 
     pub fn resolve_type(&self, types: &TypeResolver) -> Option<Type> {
-        self.type_def
-            .as_ref()
-            .map(|ty| ty.value.resolve_type(types))
+        self.type_def.as_ref().map(|ty| ty.resolve_type(types))
     }
 }
 
