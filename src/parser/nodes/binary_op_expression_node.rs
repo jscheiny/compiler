@@ -1,6 +1,6 @@
 use crate::{
     checker::{Scope, Type, TypeResolver},
-    parser::{BinaryOperator, ExpressionNode, Node, PrimitiveType},
+    parser::{BinaryOperator, ExpressionNode, Node, PrimitiveType, get_function_type},
 };
 
 pub struct BinaryOpExpressionNode {
@@ -33,12 +33,33 @@ impl BinaryOpExpressionNode {
                 todo!("Implement type checking for binary op GreaterThanOrEqual")
             }
             O::Access => todo!("Implement type checking for binary op Access"),
-            O::FunctionApplication => {
-                todo!("Implement type checking for binary op FunctionApplication")
-            }
+            O::FunctionApplication => self.check_function_application(types, scope),
             O::Comma => todo!("Implement type checking for binary op Comma"),
             O::LogicalAnd => self.check_logical_op(types, scope),
             O::LogicalOr => self.check_logical_op(types, scope),
+        }
+    }
+
+    fn check_function_application(
+        &self,
+        types: &TypeResolver,
+        scope: Box<Scope>,
+    ) -> (Box<Scope>, Type) {
+        let (scope, _left_type) = self.left.check(types, scope);
+        let (scope, right_type) = self.right.check(types, scope);
+        let (scope, function_type) = get_function_type(right_type, types, scope);
+
+        if let Some(function_type) = function_type {
+            if function_type.parameters.len() != 1 {
+                println!("Type error: Right hand side of => takes more than one parameter");
+            }
+            // TODO check argument type matches
+            let return_type = function_type.return_type.map(|return_type| *return_type);
+            // TODO properly handle void returning functions
+            (scope, return_type.unwrap_or(Type::Error))
+        } else {
+            println!("Type error: Right hand side of => is not callable");
+            (scope, Type::Error)
         }
     }
 
