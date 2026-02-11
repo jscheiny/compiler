@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, Type, TypeResolver},
+    checker::{Scope, TypeResolver},
     parser::{ExportableModuleDefinitionNode, Identified, ModuleDefinitionNode, Node},
 };
 
@@ -11,28 +11,31 @@ impl ProgramNode {
     pub fn check(&mut self) {
         let mut types = TypeResolver::new();
         for definition in self.definitions() {
-            types.declare(definition.id());
+            match definition {
+                ModuleDefinitionNode::Enum(_)
+                | ModuleDefinitionNode::TypeAlias(_)
+                | ModuleDefinitionNode::Struct(_) => types.declare(definition.id()),
+                ModuleDefinitionNode::Function(_) => {}
+            }
         }
 
         for definition in self.definitions_mut() {
             definition.resolve_type(&mut types);
         }
 
-        let mut module_scope = Box::new(self.get_module_scope(&types));
+        let mut module_scope = Box::new(self.get_module_scope(&mut types));
         for definition in self.definitions() {
             module_scope = definition.check(&types, module_scope);
         }
         types.check();
     }
 
-    pub fn get_module_scope(&self, types: &TypeResolver) -> Scope {
+    pub fn get_module_scope(&self, types: &mut TypeResolver) -> Scope {
         let mut scope = Scope::new();
         for definition in self.definitions() {
-            scope.add(
-                definition.id(),
-                types.get_type_ref(definition.id()).unwrap_or(Type::Error),
-            );
+            definition.add_to_scope(types, &mut scope);
         }
+        dbg!(&scope);
         scope
     }
 
