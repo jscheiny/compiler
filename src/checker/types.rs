@@ -11,7 +11,14 @@ pub enum Type {
     Reference(usize),
     Struct(StructType),
     Tuple(Vec<Type>),
+    Type(RuntimeType),
     Error,
+}
+
+// TODO reconsider this name
+#[derive(Clone, Debug)]
+pub enum RuntimeType {
+    Struct(StructType),
 }
 
 impl Type {

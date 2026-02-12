@@ -65,11 +65,15 @@ pub fn get_function_type(input_type: Type, types: &TypeResolver) -> Option<Funct
             let resolved_type = types.get_type(index).unwrap();
             get_function_type(resolved_type, types)
         }
-        Type::Struct(_struct_type) => todo!("Type error: Implement call operator for structs"),
+        Type::Struct(_) => {
+            println!("Type error: no call operator for struct");
+            None
+        }
         Type::Tuple(_) => {
             println!("Type error: No call operator for tuple");
             None
         }
+        Type::Type(_) => todo!("Implement call operator for types"),
         Type::Error => None,
     }
 }

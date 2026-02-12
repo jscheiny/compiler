@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, Type, TypeResolver},
+    checker::{RuntimeType, Scope, Type, TypeResolver},
     parser::{EnumNode, FunctionNode, Identified, StructNode, TypeAliasNode},
 };
 
@@ -30,11 +30,15 @@ impl ModuleDefinitionNode {
 
     pub fn add_to_scope(&self, types: &mut TypeResolver, scope: &mut Scope) {
         match self {
-            // TODO Consider how these are added to scope
-            Self::Struct(_) | Self::Enum(_) | Self::TypeAlias(_) => {}
+            Self::Struct(node) => {
+                let struct_type = RuntimeType::Struct(node.get_type(types).clone());
+                scope.add(node.id(), Type::Type(struct_type));
+            }
             Self::Function(node) => {
                 scope.add(node.id(), Type::Function(node.get_type(types).clone()));
             }
+            // TODO Consider how these are added to scope
+            Self::Enum(_) | Self::TypeAlias(_) => {}
         }
     }
 

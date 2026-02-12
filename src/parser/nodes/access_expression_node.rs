@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, Type, TypeResolver},
+    checker::{RuntimeType, Scope, Type, TypeResolver},
     parser::{ExpressionNode, Identified, IdentifierNode, Node},
 };
 
@@ -18,12 +18,12 @@ impl AccessExpressionNode {
 
 fn get_field(input_type: Type, field: &String, types: &TypeResolver) -> Option<Type> {
     match input_type {
-        Type::Enum(_) => todo!("Implement access on enums"),
+        Type::Enum(_) => todo!("Implement access on enum values"),
         Type::Function(_) => {
             println!("Type error: No access operator on functions");
             None
         }
-        Type::Primitive(_) => todo!("Implement access on primitives"),
+        Type::Primitive(_) => todo!("Implement access on primitive values"),
         Type::Reference(index) => {
             let resolved_type = types.get_type(index).unwrap();
             get_field(resolved_type, field, types)
@@ -34,11 +34,41 @@ fn get_field(input_type: Type, field: &String, types: &TypeResolver) -> Option<T
                 // TODO respect public/private access
                 Some(member.member_type.get_type())
             } else {
-                println!("Type error: No field `{}` could be found", field);
+                println!(
+                    "Type error: No field `{}` of type `{}` could be found",
+                    field, struct_type.identifier
+                );
                 None
             }
         }
         Type::Tuple(_) => todo!("Implement access on tuples"),
+        Type::Type(inner_type) => get_static_field(&inner_type, field, types),
         Type::Error => None,
+    }
+}
+
+fn get_static_field(
+    runtime_type: &RuntimeType,
+    field: &String,
+    types: &TypeResolver,
+) -> Option<Type> {
+    match runtime_type {
+        RuntimeType::Struct(struct_type) => {
+            let member = struct_type.members.get(field);
+            if let Some(member) = member {
+                // TODO respect public/private access
+                let self_type = types
+                    .get_ref(&struct_type.identifier)
+                    .map(Type::Reference)
+                    .unwrap_or(Type::Error);
+                Some(member.member_type.get_static_type(self_type))
+            } else {
+                println!(
+                    "Type error: No field `{}` of type `{}` could be found",
+                    field, struct_type.identifier
+                );
+                None
+            }
+        }
     }
 }

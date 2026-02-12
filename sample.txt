@@ -1,4 +1,4 @@
-struct A(pub value: bool) {
+struct A(pub value: () -> bool) {
 }
 
 struct B(private_a: A) {
@@ -7,10 +7,12 @@ struct B(private_a: A) {
 
 struct C(pub b: B);
 
-fn test(c: C) {
-    while c.b.get_a().value {}
+type T = C;
 
-    while A.value { // TODO need to fix this -> this should be a function
+fn test(c: T) {
+    while c.b.get_a().value() {}
+
+    while A.value(c.b.get_a())() { // TODO need to fix this -> this should be a function
 
     }
 }

@@ -72,7 +72,10 @@ impl StructNode {
             }
         }
 
-        StructType { members }
+        StructType {
+            identifier: self.id().clone(),
+            members,
+        }
     }
 }
 
