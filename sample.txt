@@ -1,1 +1,5 @@
-struct S(t1: T);
+struct S(t1: bool) {
+    test() { 
+        @t1.@t2;
+    }
+}

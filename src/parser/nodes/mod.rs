@@ -1,3 +1,4 @@
+mod access_expression_node;
 mod binary_op_expression_node;
 mod block_node;
 mod declaration_node;
@@ -31,6 +32,7 @@ mod type_alias_node;
 mod type_node;
 mod while_loop_node;
 
+pub use access_expression_node::*;
 pub use binary_op_expression_node::*;
 pub use block_node::*;
 pub use declaration_node::*;

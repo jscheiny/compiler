@@ -4,10 +4,11 @@ use crate::{
         Token, TokenMatch,
     },
     parser::{
-        Associativity, BinaryOpExpressionNode, BinaryOperator, BlockNode, ExpressionNode,
-        FunctionCallExpressionNode, Identified, IdentifierType, IfExpressionNode, Node, Operator,
-        ParseResult, PostfixOpExpressionNode, PostfixOperator, PrefixOpExpressionNode,
-        PrefixOperator, SyntaxError, TokenSpan, TokenStream, grammar::statement,
+        AccessExpressionNode, Associativity, BinaryOpExpressionNode, BinaryOperator, BlockNode,
+        ExpressionNode, FunctionCallExpressionNode, Identified, IdentifierType, IfExpressionNode,
+        Node, Operator, ParseResult, PostfixOpExpressionNode, PostfixOperator,
+        PrefixOpExpressionNode, PrefixOperator, SyntaxError, TokenSpan, TokenStream,
+        grammar::statement,
     },
 };
 
@@ -37,22 +38,9 @@ fn sub_expression(tokens: &mut TokenStream, min_precedence: i32) -> ParseResult<
                 break;
             }
 
-            let next_min_precedence = operator.precedence()
-                + match operator.associativity() {
-                    Associativity::Left => 1,
-                    Associativity::Right => 0,
-                };
-
             let operator = TokenSpan::singleton(tokens).wrap(operator);
             tokens.next();
-
-            let right = tokens.located_with(sub_expression, next_min_precedence)?;
-            let span = left.span.expand_to(tokens);
-            left = span.wrap(ExpressionNode::BinaryOp(BinaryOpExpressionNode {
-                left: Box::new(left),
-                operator,
-                right: Box::new(right),
-            }));
+            left = complete_binary_op(tokens, operator, left)?;
         } else if OperatorToken::OpenParen.matches(token) {
             let precedence = BinaryOperator::Access.precedence();
             if precedence < min_precedence {
@@ -79,6 +67,35 @@ fn sub_expression(tokens: &mut TokenStream, min_precedence: i32) -> ParseResult<
     }
 
     Ok(left.value)
+}
+
+fn complete_binary_op(
+    tokens: &mut TokenStream,
+    operator: Node<BinaryOperator>,
+    left: Node<ExpressionNode>,
+) -> ParseResult<Node<ExpressionNode>> {
+    if operator.value == BinaryOperator::Access {
+        let field = tokens.identifier(IdentifierType::Field)?;
+        let span = left.span.expand_to(tokens);
+        return Ok(span.wrap(ExpressionNode::Access(AccessExpressionNode {
+            left: Box::new(left),
+            field,
+        })));
+    }
+
+    let next_min_precedence = operator.precedence()
+        + match operator.associativity() {
+            Associativity::Left => 1,
+            Associativity::Right => 0,
+        };
+
+    let right = tokens.located_with(sub_expression, next_min_precedence)?;
+    let span = left.span.expand_to(tokens);
+    Ok(span.wrap(ExpressionNode::BinaryOp(BinaryOpExpressionNode {
+        left: Box::new(left),
+        operator,
+        right: Box::new(right),
+    })))
 }
 
 fn flatten_arguments(expression: Node<ExpressionNode>) -> Vec<Node<ExpressionNode>> {

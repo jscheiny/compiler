@@ -1,17 +1,17 @@
-use std::fmt::Display;
-
 use crate::{
     checker::{Scope, ScopeType, Type, TypeResolver},
     parser::{
-        BinaryOpExpressionNode, BlockNode, FunctionCallExpressionNode, IfExpressionNode,
-        PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType,
+        AccessExpressionNode, BinaryOpExpressionNode, BlockNode, FunctionCallExpressionNode,
+        IfExpressionNode, PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType,
     },
 };
 
 pub enum ExpressionNode {
     PrefixOp(PrefixOpExpressionNode),
     BinaryOp(BinaryOpExpressionNode),
+    Access(AccessExpressionNode),
     PostfixOp(PostfixOpExpressionNode),
+    SelfRef(String),
     FunctionCall(FunctionCallExpressionNode),
     IfExpression(IfExpressionNode),
     BooleanLiteral(bool),
@@ -19,7 +19,6 @@ pub enum ExpressionNode {
     StringLiteral(String),
     Block(BlockNode),
     Identifier(String),
-    SelfRef(String),
     Error,
 }
 
@@ -28,6 +27,7 @@ impl ExpressionNode {
         match self {
             Self::PrefixOp(node) => node.check(types, scope),
             Self::BinaryOp(node) => node.check(types, scope),
+            Self::Access(_) => todo!("Implement type checking for ExpressionNode::Access"),
             Self::PostfixOp(node) => node.check(types, scope),
             Self::FunctionCall(node) => {
                 let (scope, resolved_type) = node.check(types, scope);
@@ -69,49 +69,5 @@ impl ExpressionNode {
         }
 
         (scope, Type::Error)
-    }
-}
-
-impl Display for ExpressionNode {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ExpressionNode::PrefixOp(node) => {
-                write!(f, "{:?}({})", node.operator.value, node.expression.value)
-            }
-            ExpressionNode::BinaryOp(node) => {
-                write!(
-                    f,
-                    "{:?}({}, {})",
-                    node.operator.value, node.left.value, node.right.value
-                )
-            }
-            ExpressionNode::PostfixOp(node) => {
-                write!(f, "{:?}({})", node.operator.value, node.expression.value)
-            }
-            ExpressionNode::FunctionCall(node) => {
-                write!(f, "Call({}, (", node.function.value)?;
-                for (index, arg) in node.arguments.iter().enumerate() {
-                    write!(f, "{}", arg.value)?;
-                    if index != node.arguments.len() - 1 {
-                        write!(f, ", ")?;
-                    }
-                }
-                write!(f, "))")
-            }
-            ExpressionNode::IfExpression(node) => {
-                write!(
-                    f,
-                    "If({})Then({})Else({})",
-                    node.predicate.value, node.if_true.value, node.if_false.value
-                )
-            }
-            ExpressionNode::BooleanLiteral(literal) => write!(f, "{}", literal),
-            ExpressionNode::StringLiteral(literal) => write!(f, "{}", literal),
-            ExpressionNode::IntegerLiteral(literal) => write!(f, "{}", literal),
-            ExpressionNode::Block(_) => write!(f, "[BLOCK]"),
-            ExpressionNode::Identifier(identifier) => write!(f, "{}", identifier),
-            ExpressionNode::SelfRef(identifier) => write!(f, "@{}", identifier),
-            ExpressionNode::Error => write!(f, "[ERROR]"),
-        }
     }
 }
