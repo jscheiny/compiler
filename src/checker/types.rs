@@ -5,7 +5,6 @@ use crate::{
 
 #[derive(Clone, Debug)]
 pub enum Type {
-    Alias(Box<Type>),
     Enum(EnumType),
     Function(FunctionType),
     Primitive(PrimitiveType),

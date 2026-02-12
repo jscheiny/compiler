@@ -53,7 +53,6 @@ pub fn get_function_type(
     scope: Box<Scope>,
 ) -> (Box<Scope>, Option<FunctionType>) {
     match input_type {
-        Type::Alias(resolved_type) => get_function_type(*resolved_type, types, scope),
         Type::Enum(_) => {
             println!("Type error: No call operator for enum");
             (scope, None)
