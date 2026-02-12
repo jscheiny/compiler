@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use crate::{
-    checker::{Scope, Type, TypeResolver},
+    checker::{Scope, ScopeType, Type, TypeResolver},
     parser::{
         BinaryOpExpressionNode, BlockNode, FunctionCallExpressionNode, IfExpressionNode,
         PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType,
@@ -19,6 +19,7 @@ pub enum ExpressionNode {
     StringLiteral(String),
     Block(BlockNode),
     Identifier(String),
+    SelfRef(String),
     Error,
 }
 
@@ -50,8 +51,24 @@ impl ExpressionNode {
                 }
                 (scope, resolved_type.unwrap_or(Type::Error))
             }
+            Self::SelfRef(identifier) => self.check_self_ref(identifier, scope),
             Self::Error => (scope, Type::Error),
         }
+    }
+
+    fn check_self_ref(&self, identifier: &String, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        let self_scope = scope.find_scope(ScopeType::Struct);
+        if let Some(self_scope) = self_scope {
+            let resolved_type = self_scope.lookup_local(identifier);
+            if let Some(resolved_type) = resolved_type {
+                return (scope, resolved_type);
+            }
+            println!("Type error: cannot find value in struct or enum");
+        } else {
+            println!("Type error: Cannot use @ op outside of struct or enum");
+        }
+
+        (scope, Type::Error)
     }
 }
 
@@ -93,6 +110,7 @@ impl Display for ExpressionNode {
             ExpressionNode::IntegerLiteral(literal) => write!(f, "{}", literal),
             ExpressionNode::Block(_) => write!(f, "[BLOCK]"),
             ExpressionNode::Identifier(identifier) => write!(f, "{}", identifier),
+            ExpressionNode::SelfRef(identifier) => write!(f, "@{}", identifier),
             ExpressionNode::Error => write!(f, "[ERROR]"),
         }
     }

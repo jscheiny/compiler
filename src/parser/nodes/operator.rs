@@ -31,7 +31,6 @@ pub enum PrefixOperator {
     Closure,    // .
     LogicalNot, // not
     Negative,   // -
-    SelfRef,    // @
 }
 
 impl Operator for PrefixOperator {
@@ -39,7 +38,6 @@ impl Operator for PrefixOperator {
         match token {
             Token::Operator(OperatorToken::Dot) => Some(Self::Closure),
             Token::Operator(OperatorToken::Minus) => Some(Self::Negative),
-            Token::Operator(OperatorToken::At) => Some(Self::SelfRef),
             Token::Keyword(KeywordToken::Not) => Some(Self::LogicalNot),
             _ => None,
         }

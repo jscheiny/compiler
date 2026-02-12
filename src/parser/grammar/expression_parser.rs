@@ -5,9 +5,9 @@ use crate::{
     },
     parser::{
         Associativity, BinaryOpExpressionNode, BinaryOperator, BlockNode, ExpressionNode,
-        FunctionCallExpressionNode, IfExpressionNode, Node, Operator, ParseResult,
-        PostfixOpExpressionNode, PostfixOperator, PrefixOpExpressionNode, PrefixOperator,
-        SyntaxError, TokenSpan, TokenStream, grammar::statement,
+        FunctionCallExpressionNode, Identified, IdentifierType, IfExpressionNode, Node, Operator,
+        ParseResult, PostfixOpExpressionNode, PostfixOperator, PrefixOpExpressionNode,
+        PrefixOperator, SyntaxError, TokenSpan, TokenStream, grammar::statement,
     },
 };
 
@@ -137,6 +137,11 @@ fn expression_atom(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
         Token::Operator(OperatorToken::OpenBrace) => {
             let block = block(tokens)?;
             Ok(ExpressionNode::Block(block))
+        }
+        Token::Operator(OperatorToken::At) => {
+            tokens.next();
+            let identifier = tokens.identifier(IdentifierType::Field)?;
+            Ok(ExpressionNode::SelfRef(identifier.id().clone()))
         }
         Token::Operator(OperatorToken::OpenParen) => {
             tokens.next();
