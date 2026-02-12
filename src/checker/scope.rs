@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, hash_map::Entry};
 
 use crate::checker::Type;
 
@@ -61,28 +61,42 @@ impl Scope {
         self.values.insert(identifier.to_owned(), value);
     }
 
-    pub fn add_without_shadow(&mut self, identifier: &str, value: Type) {
-        self.values.entry(identifier.to_owned()).or_insert(value);
+    pub fn add_or(&mut self, identifier: &str, value: Type, if_present: impl Fn()) {
+        let entry = self.values.entry(identifier.to_owned());
+        if let Entry::Vacant(v) = entry {
+            v.insert(value);
+        } else {
+            if_present();
+        };
     }
 
     pub fn contains(&self, identifier: &String) -> bool {
+        self.contains_local(identifier) || self.contains_super(identifier)
+    }
+
+    pub fn contains_local(&self, identifier: &String) -> bool {
         self.values.contains_key(identifier)
-            || self
-                .parent
-                .as_ref()
-                .map(|parent| parent.contains(identifier))
-                .unwrap_or(false)
+    }
+
+    fn contains_super(&self, identifier: &String) -> bool {
+        self.parent
+            .as_ref()
+            .map(|parent| parent.contains(identifier))
+            .unwrap_or(false)
     }
 
     pub fn lookup(&self, identifier: &String) -> Option<Type> {
-        self.lookup_local(identifier).or_else(|| {
-            self.parent
-                .as_ref()
-                .and_then(|parent| parent.lookup(identifier))
-        })
+        self.lookup_local(identifier)
+            .or_else(|| self.lookup_super(identifier))
     }
 
     pub fn lookup_local(&self, identifier: &String) -> Option<Type> {
         self.values.get(identifier).cloned()
+    }
+
+    fn lookup_super(&self, identifier: &String) -> Option<Type> {
+        self.parent
+            .as_ref()
+            .and_then(|parent| parent.lookup(identifier))
     }
 }

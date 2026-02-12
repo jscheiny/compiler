@@ -1,4 +1,4 @@
-use std::cell::OnceCell;
+use std::{cell::OnceCell, collections::HashMap};
 
 use crate::{
     checker::{Scope, ScopeType, StructType, Type, TypeResolver},
@@ -29,16 +29,18 @@ impl StructNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
         let mut scope = scope.derive(ScopeType::Struct);
         for field in self.fields.iter() {
-            let resolved_type = field.get_type(types).clone();
-            scope.add_without_shadow(field.id(), resolved_type);
+            let field_type = field.get_type(types).clone();
+            scope.add_or(field.id(), field_type, || {
+                println!("Type error: Duplicate member of name `{}`", field.id())
+            });
         }
 
         if let Some(methods) = self.methods.as_ref() {
             for method in methods.iter() {
-                scope.add_without_shadow(
-                    method.id(),
-                    Type::Function(method.function.get_type(types).clone()),
-                );
+                let method_type = Type::Function(method.function.get_type(types).clone());
+                scope.add_or(method.id(), method_type, || {
+                    println!("Type error: Duplicate member of name `{}`", method.id())
+                });
             }
 
             for method in methods.iter() {
@@ -54,24 +56,23 @@ impl StructNode {
     }
 
     pub fn get_type_impl(&self, types: &mut TypeResolver) -> StructType {
-        let container_name = self.id().clone();
-        let mut struct_type = StructType::new();
+        let mut members = HashMap::new();
 
         for field in self.fields.iter() {
             let member = field.get_member(types);
             let identifier = field.id().clone();
-            struct_type.add_member(identifier, &container_name, member, types);
+            members.entry(identifier).or_insert(member);
         }
 
         if let Some(methods) = self.methods.as_ref() {
             for method in methods.iter() {
                 let member = method.resolve_struct_method(types);
                 let identifier = method.id().clone();
-                struct_type.add_member(identifier, &container_name, member, types);
+                members.entry(identifier).or_insert(member);
             }
         }
 
-        struct_type
+        StructType { members }
     }
 }
 
