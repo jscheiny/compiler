@@ -1,5 +1,3 @@
-use std::ffi::os_str::Display;
-
 use crate::{
     checker::{Scope, Type, TypeResolver},
     parser::{ExpressionNode, Identified, IdentifierNode, Node, TypeNode},
