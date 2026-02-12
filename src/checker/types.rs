@@ -1,5 +1,5 @@
 use crate::{
-    checker::{EnumType, FunctionType, StructType, TypeResolver},
+    checker::{EnumType, FunctionType, StructType, TypeFmt, TypeResolver},
     parser::{PrimitiveType, get_function_type},
 };
 
@@ -75,11 +75,19 @@ impl Type {
             Type::Error => true,
         }
     }
+
     pub fn is_primitive(&self, expected: PrimitiveType) -> bool {
         match self {
             Self::Primitive(primitive) => *primitive == expected,
             Self::Error => true,
             _ => false,
+        }
+    }
+
+    pub fn format<'a>(&'a self, types: &'a TypeResolver) -> TypeFmt<'a> {
+        TypeFmt {
+            resolved_type: self,
+            types,
         }
     }
 }

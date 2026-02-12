@@ -4,13 +4,17 @@ use crate::checker::{DuplicateMemberName, FunctionType, Type, TypeError, TypeRes
 
 #[derive(Default, Clone, Debug)]
 pub struct EnumType {
+    pub identifier: String,
     pub variants: HashMap<String, Option<Type>>,
     pub methods: HashMap<String, EnumMethod>,
 }
 
 impl EnumType {
-    pub fn new() -> Self {
-        Default::default()
+    pub fn new(identifier: String) -> Self {
+        Self {
+            identifier,
+            ..Default::default()
+        }
     }
 
     pub fn add_variant(

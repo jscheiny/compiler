@@ -32,7 +32,7 @@ impl EnumNode {
 
     pub fn get_type_impl(&self, types: &mut TypeResolver) -> EnumType {
         let enum_name = self.id().clone();
-        let mut enum_type = EnumType::new();
+        let mut enum_type = EnumType::new(enum_name.clone());
 
         for variant in self.variants.iter() {
             let member = variant.get_type(types).cloned();

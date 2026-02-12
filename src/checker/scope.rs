@@ -17,6 +17,7 @@ pub struct Scope {
     scope_type: ScopeType,
     parent: Option<Box<Scope>>,
     values: HashMap<String, Type>,
+    return_type: Option<Type>,
 }
 
 impl Scope {
@@ -30,6 +31,20 @@ impl Scope {
             parent: Some(self),
             ..Self::new()
         })
+    }
+
+    pub fn derive_fn(self: Box<Scope>, return_type: &Type) -> Box<Scope> {
+        Box::new(Self {
+            scope_type: ScopeType::Function,
+            parent: Some(self),
+            return_type: Some(return_type.clone()),
+            ..Self::new()
+        })
+    }
+
+    pub fn return_type(&self) -> Option<&Type> {
+        let function_scope = self.find_scope(ScopeType::Function);
+        function_scope.and_then(|scope| scope.return_type.as_ref())
     }
 
     pub fn within(&self, scope_type: ScopeType) -> bool {

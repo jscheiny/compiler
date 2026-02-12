@@ -1,3 +1,5 @@
+use std::ffi::os_str::Display;
+
 use crate::{
     checker::{Scope, Type, TypeResolver},
     parser::{ExpressionNode, Identified, IdentifierNode, Node, TypeNode},
@@ -22,7 +24,11 @@ impl DeclarationNode {
                 let (new_scope, resolved_type) = initializer.check(types, scope);
                 if let Some(expected_type) = expected_type.as_ref() {
                     if !resolved_type.is_assignable_to(expected_type, types) {
-                        println!("Type error: Mismatched variable types");
+                        println!(
+                            "Type error: Could not assign expression of type `{}` to variable of type `{}`",
+                            resolved_type.format(types),
+                            expected_type.format(types)
+                        );
                     }
                 }
                 // TODO check that resolved type matches expected type
