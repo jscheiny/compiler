@@ -15,7 +15,7 @@ impl FunctionCallExpressionNode {
         let (scope, arguments) = self.get_args(types, scope);
 
         if let Some(function_type) = function_type {
-            self.check_arguments(&function_type, &arguments);
+            self.check_args(&function_type, &arguments);
             let return_type = function_type.return_type.map(|return_type| *return_type);
             (scope, return_type)
         } else {
@@ -33,7 +33,7 @@ impl FunctionCallExpressionNode {
         (scope, result)
     }
 
-    fn check_arguments(&self, function_type: &FunctionType, arguments: &[Type]) {
+    fn check_args(&self, function_type: &FunctionType, arguments: &[Type]) {
         if function_type.parameters.len() != arguments.len() {
             println!(
                 "Type error: Call expected {} arguments but recieved {}",
