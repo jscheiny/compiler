@@ -1,15 +1,9 @@
-struct A(pub value: bool) {
+struct A() {
+    pub test(): void {}
 }
-
-struct B(private_a: A) {
-    get_a(): A -> @private_a;
-}
-
-struct C(pub b: B);
-
 
 fn test(a: A) {
 //    while c.b.get_a().value {}
 
-    let x: (A) -> C = A.value;
+    let x: (A) -> void = A.test;
 }

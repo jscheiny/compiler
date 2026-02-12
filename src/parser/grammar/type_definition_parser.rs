@@ -1,5 +1,5 @@
 use crate::{
-    lexer::{IdentifierToken, OperatorToken, Token},
+    lexer::{IdentifierToken, KeywordToken, OperatorToken, Token},
     parser::{
         FunctionTypeNode, Node, ParseResult, PrimitiveType, SyntaxError, TokenStream,
         TupleTypeNode, TypeNode, grammar::comma_separated_list,
@@ -13,6 +13,10 @@ pub fn type_definition(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
             let identifier = identifier.clone();
             tokens.next();
             Ok(TypeNode::UserDefined(identifier))
+        }
+        Token::Keyword(KeywordToken::Void) => {
+            tokens.next();
+            Ok(TypeNode::Void)
         }
         Token::Keyword(keyword) => {
             let keyword = *keyword;

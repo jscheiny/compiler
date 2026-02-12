@@ -8,6 +8,7 @@ pub enum TypeNode {
     Primitive(PrimitiveType),
     Tuple(TupleTypeNode),
     UserDefined(String),
+    Void,
 }
 
 impl TypeNode {
@@ -23,6 +24,7 @@ impl TypeNode {
                     Type::Error
                 }
             },
+            Self::Void => Type::Void,
         }
     }
 }
