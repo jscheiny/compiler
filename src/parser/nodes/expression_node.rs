@@ -29,10 +29,7 @@ impl ExpressionNode {
             Self::BinaryOp(node) => node.check(types, scope),
             Self::Access(node) => node.check(types, scope),
             Self::PostfixOp(node) => node.check(types, scope),
-            Self::FunctionCall(node) => {
-                let (scope, resolved_type) = node.check(types, scope);
-                (scope, resolved_type.unwrap_or(Type::Error))
-            }
+            Self::FunctionCall(node) => node.check(types, scope),
             Self::IfExpression(node) => node.check(types, scope),
             Self::BooleanLiteral(_) => (scope, Type::Primitive(PrimitiveType::Bool)),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),

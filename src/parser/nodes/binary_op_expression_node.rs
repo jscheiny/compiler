@@ -58,9 +58,7 @@ impl BinaryOpExpressionNode {
                 println!("Type error: Function application argument does not match");
             }
 
-            let return_type = function_type.return_type.map(|return_type| *return_type);
-            // TODO properly handle void returning functions
-            (scope, return_type.unwrap_or(Type::Error))
+            (scope, *function_type.return_type)
         } else {
             println!("Type error: Right hand side of => is not callable");
             (scope, Type::Error)

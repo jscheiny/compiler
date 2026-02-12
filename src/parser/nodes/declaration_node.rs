@@ -20,6 +20,11 @@ impl DeclarationNode {
         let (mut scope, resolved_type) = match self.initializer.as_ref() {
             Some(initializer) => {
                 let (new_scope, resolved_type) = initializer.check(types, scope);
+                if let Some(expected_type) = expected_type.as_ref() {
+                    if !resolved_type.is_assignable_to(expected_type, types) {
+                        println!("Type error: Mismatched variable types");
+                    }
+                }
                 // TODO check that resolved type matches expected type
                 (new_scope, expected_type.unwrap_or(resolved_type))
             }

@@ -1,4 +1,4 @@
-struct A(pub value: () -> bool) {
+struct A(pub value: bool) {
 }
 
 struct B(private_a: A) {
@@ -7,12 +7,9 @@ struct B(private_a: A) {
 
 struct C(pub b: B);
 
-type T = C;
 
-fn test(c: T) {
-    while c.b.get_a().value() {}
+fn test(a: A) {
+//    while c.b.get_a().value {}
 
-    while A.value(c.b.get_a())() { // TODO need to fix this -> this should be a function
-
-    }
+    let x: (A) -> C = A.value;
 }

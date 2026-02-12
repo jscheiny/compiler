@@ -81,11 +81,11 @@ impl FunctionNode {
         let return_type = self
             .return_type
             .as_ref()
-            .map(|rt| Box::new(rt.get_type(types)));
+            .map_or(Type::Void, |return_type| return_type.get_type(types));
 
         FunctionType {
             parameters,
-            return_type,
+            return_type: Box::new(return_type),
         }
     }
 }

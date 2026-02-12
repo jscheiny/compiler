@@ -32,7 +32,7 @@ impl FunctionTypeNode {
             .map(|parameter| parameter.get_type(types))
             .collect();
 
-        let return_type = Some(Box::new(self.return_type.get_type(types)));
+        let return_type = Box::new(self.return_type.get_type(types));
 
         FunctionType {
             parameters,

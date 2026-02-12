@@ -32,7 +32,7 @@ impl StructMemberType {
         match self {
             Self::Field(field_type) => Type::Function(FunctionType {
                 parameters: vec![self_type],
-                return_type: Some(Box::new(field_type.clone())),
+                return_type: Box::new(field_type.clone()),
             }),
             Self::Method(function_type) => {
                 let FunctionType {
