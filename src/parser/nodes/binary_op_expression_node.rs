@@ -47,7 +47,7 @@ impl BinaryOpExpressionNode {
     ) -> (Box<Scope>, Type) {
         let (scope, _left_type) = self.left.check(types, scope);
         let (scope, right_type) = self.right.check(types, scope);
-        let (scope, function_type) = get_function_type(right_type, types, scope);
+        let function_type = get_function_type(right_type, types);
 
         if let Some(function_type) = function_type {
             if function_type.parameters.len() != 1 {

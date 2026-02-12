@@ -11,7 +11,7 @@ pub struct FunctionCallExpressionNode {
 impl FunctionCallExpressionNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Option<Type>) {
         let (scope, function_type) = self.function.check(types, scope);
-        let (scope, function_type) = get_function_type(function_type, types, scope);
+        let function_type = get_function_type(function_type, types);
         let (scope, arguments) = self.get_args(types, scope);
 
         if let Some(function_type) = function_type {
@@ -47,33 +47,29 @@ impl FunctionCallExpressionNode {
 }
 
 // TODO move this elsewhere
-pub fn get_function_type(
-    input_type: Type,
-    types: &TypeResolver,
-    scope: Box<Scope>,
-) -> (Box<Scope>, Option<FunctionType>) {
+pub fn get_function_type(input_type: Type, types: &TypeResolver) -> Option<FunctionType> {
     match input_type {
         Type::Enum(_) => {
             println!("Type error: No call operator for enum");
-            (scope, None)
+            None
         }
-        Type::Function(function_type) => (scope, Some(function_type)),
+        Type::Function(function_type) => Some(function_type),
         Type::Primitive(primitive_type) => {
             println!(
                 "Type error: Primitive type `{:?}` is not callable",
                 primitive_type
             );
-            (scope, None)
+            None
         }
         Type::Reference(index) => {
             let resolved_type = types.get_type(index).unwrap();
-            get_function_type(resolved_type, types, scope)
+            get_function_type(resolved_type, types)
         }
         Type::Struct(_struct_type) => todo!("Type error: Implement call operator for structs"),
         Type::Tuple(_) => {
             println!("Type error: No call operator for tuple");
-            (scope, None)
+            None
         }
-        Type::Error => (scope, None),
+        Type::Error => None,
     }
 }
