@@ -1,9 +1,15 @@
 struct A() {
-    pub test(): void {}
+    pub test(): void {
+        return 5;
+    }
 }
 
 fn test(a: A) {
 //    while c.b.get_a().value {}
+  //  let y: A = A.test;
 
-    let x: (A) -> void = A.test;
+//    let x: (A) -> void = A.test;
 }
+
+
+fn test2(): int -> true;

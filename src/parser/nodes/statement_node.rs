@@ -23,29 +23,53 @@ impl StatementNode {
                 let (scope, resolved_type) = expression.check(types, scope);
                 (scope, Some(resolved_type))
             }
-            Self::Break => self.check_loop(scope, KeywordToken::Break),
-            Self::Continue => self.check_loop(scope, KeywordToken::Continue),
+            Self::Break => check_loop(KeywordToken::Break, scope),
+            Self::Continue => check_loop(KeywordToken::Continue, scope),
             Self::Declaration(node) => (node.check(types, scope), None),
             Self::Expression(expression) => {
                 // Discard the type of raw expressions
                 let (scope, _) = expression.check(types, scope);
                 (scope, None)
             }
-            Self::FunctionReturn(Some(expression)) => {
-                // TODO check return type
-                let (scope, _) = expression.check(types, scope);
-                (scope, None)
+            Self::FunctionReturn(expression) => {
+                check_function_return(expression.as_ref(), types, scope)
             }
-            Self::FunctionReturn(None) => (scope, None),
             Self::If(node) => (node.check(types, scope), None),
             Self::WhileLoop(node) => (node.check(types, scope), None),
         }
     }
+}
 
-    fn check_loop(&self, scope: Box<Scope>, keyword: KeywordToken) -> (Box<Scope>, Option<Type>) {
-        if !scope.within(ScopeType::Loop) {
-            println!("Type error: Unexpected {} outside of loop", keyword);
-        }
-        (scope, None)
+fn check_loop(keyword: KeywordToken, scope: Box<Scope>) -> (Box<Scope>, Option<Type>) {
+    if !scope.within(ScopeType::Loop) {
+        println!("Type error: Unexpected {} outside of loop", keyword);
     }
+    (scope, None)
+}
+
+fn check_function_return(
+    expression: Option<&Node<ExpressionNode>>,
+    types: &TypeResolver,
+    mut scope: Box<Scope>,
+) -> (Box<Scope>, Option<Type>) {
+    let expected_type = scope.return_type().cloned();
+    if let Some(expected_type) = expected_type {
+        let (new_scope, resolved_type) = match expression {
+            Some(expression) => expression.check(types, scope),
+            None => (scope, Type::Void),
+        };
+        scope = new_scope;
+
+        if !resolved_type.is_assignable_to(&expected_type, types) {
+            println!(
+                "Type error: Returned type `{}` is not assignable to expected return type of `{}`",
+                resolved_type.format(types),
+                expected_type.format(types)
+            );
+        }
+    } else {
+        println!("Type error: Return found in non function context");
+    }
+
+    (scope, None)
 }

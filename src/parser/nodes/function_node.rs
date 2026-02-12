@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, collections::HashSet};
 
 use crate::{
-    checker::{FunctionType, Scope, ScopeType, Type, TypeResolver},
+    checker::{FunctionType, Scope, Type, TypeResolver},
     parser::{
         FunctionBodyNode, Identified, IdentifierNode, Node, NodeVec, ParameterNode, TypeNode,
     },
@@ -32,16 +32,17 @@ impl FunctionNode {
     }
 
     pub fn check(&self, types: &TypeResolver, parent_scope: Box<Scope>) -> Box<Scope> {
-        let scope = parent_scope.derive(ScopeType::Function);
+        let return_type = &self.get_type(types).return_type;
+        let scope = parent_scope.derive_fn(return_type);
         let scope = self.check_params(types, scope);
-        let (scope, _resolved_type) = match &self.body.value {
-            FunctionBodyNode::Expression(expression) => expression.check(types, scope),
+        let scope = match &self.body.value {
+            FunctionBodyNode::Expression(expression) => {
+                let (scope, _resolved_type) = expression.check(types, scope);
+                scope
+            }
             FunctionBodyNode::Block(block) => {
-                let (scope, resolved_type) = block.check(types, scope);
-                if resolved_type.is_none() && self.return_type.is_some() {
-                    println!("Function body does not return a value when one is required");
-                }
-                (scope, resolved_type.unwrap_or(Type::Error))
+                let (scope, _resolved_type) = block.check(types, scope);
+                scope
             }
         };
         // TODO type check return type vs resolved type

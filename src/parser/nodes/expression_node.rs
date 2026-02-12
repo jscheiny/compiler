@@ -39,7 +39,7 @@ impl ExpressionNode {
             Self::Block(node) => {
                 // TODO handle type checking of block results
                 let (scope, resolved_type) = node.check(types, scope);
-                (scope, resolved_type.unwrap_or(Type::Error))
+                (scope, resolved_type.unwrap_or(Type::Void))
             }
             Self::Identifier(identifier) => {
                 let resolved_type = scope.lookup(identifier);
