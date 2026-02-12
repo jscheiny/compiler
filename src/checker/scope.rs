@@ -70,21 +70,6 @@ impl Scope {
         };
     }
 
-    pub fn contains(&self, identifier: &String) -> bool {
-        self.contains_local(identifier) || self.contains_super(identifier)
-    }
-
-    pub fn contains_local(&self, identifier: &String) -> bool {
-        self.values.contains_key(identifier)
-    }
-
-    fn contains_super(&self, identifier: &String) -> bool {
-        self.parent
-            .as_ref()
-            .map(|parent| parent.contains(identifier))
-            .unwrap_or(false)
-    }
-
     pub fn lookup(&self, identifier: &String) -> Option<Type> {
         self.lookup_local(identifier)
             .or_else(|| self.lookup_super(identifier))
