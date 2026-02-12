@@ -37,19 +37,11 @@ fn field(tokens: &mut TokenStream) -> ParseResult<StructFieldNode> {
         Token::Operator(OperatorToken::Colon) => {
             tokens.next();
             let type_def = Some(tokens.located(type_definition)?);
-            Ok(StructFieldNode {
-                public,
-                identifier,
-                type_def,
-            })
+            Ok(StructFieldNode::new(public, identifier, type_def))
         }
         Token::Operator(OperatorToken::Comma) | Token::Operator(OperatorToken::CloseParen) => {
             tokens.push_error(error);
-            Ok(StructFieldNode {
-                public,
-                identifier,
-                type_def: None,
-            })
+            Ok(StructFieldNode::new(public, identifier, None))
         }
         _ => Err(tokens.make_error(error)),
     }

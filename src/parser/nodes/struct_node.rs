@@ -29,11 +29,7 @@ impl StructNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
         let mut scope = scope.derive(ScopeType::Struct);
         for field in self.fields.iter() {
-            let resolved_type = field
-                .type_def
-                .as_ref()
-                .map(|type_def| type_def.get_type(types))
-                .unwrap_or(Type::Error);
+            let resolved_type = field.get_type(types).clone();
             scope.add_without_shadow(field.id(), resolved_type);
         }
 
@@ -62,7 +58,7 @@ impl StructNode {
         let mut struct_type = StructType::new();
 
         for field in self.fields.iter() {
-            let member = field.resolve_type(types);
+            let member = field.get_member(types);
             let identifier = field.id().clone();
             struct_type.add_member(identifier, &container_name, member, types);
         }
