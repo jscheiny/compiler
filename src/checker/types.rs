@@ -18,6 +18,7 @@ pub enum Type {
     Struct(StructType),
     Tuple(Vec<Type>),
     Type(RuntimeType),
+    Void,
     Error,
 }
 
@@ -70,7 +71,8 @@ impl Type {
                 _ => false,
             },
             Type::Type(_) => todo!("Implement assignability for runtime types"),
-            Type::Error => todo!(),
+            Type::Void => matches!(other, Type::Void),
+            Type::Error => true,
         }
     }
     pub fn is_primitive(&self, expected: PrimitiveType) -> bool {

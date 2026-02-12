@@ -43,6 +43,10 @@ fn get_field(input_type: Type, field: &String, types: &TypeResolver) -> Option<T
         }
         Type::Tuple(_) => todo!("Implement access on tuples"),
         Type::Type(inner_type) => get_static_field(&inner_type, field, types),
+        Type::Void => {
+            println!("Type error: No access operator on void");
+            None
+        }
         Type::Error => None,
     }
 }

@@ -79,6 +79,10 @@ pub fn get_function_type(input_type: Type, types: &TypeResolver) -> Option<Funct
             None
         }
         Type::Type(_) => todo!("Implement call operator for types"),
+        Type::Void => {
+            println!("Type error: no call operator for void");
+            None
+        }
         Type::Error => None,
     }
 }
