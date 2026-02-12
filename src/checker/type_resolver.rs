@@ -27,12 +27,8 @@ impl TypeResolver {
         self.lookup.insert(identifier.clone(), index);
     }
 
-    fn get_ref(&self, identifier: &String) -> Option<usize> {
+    pub fn get_ref(&self, identifier: &String) -> Option<usize> {
         self.lookup.get(identifier).copied()
-    }
-
-    pub fn get_type_ref(&self, identifier: &String) -> Option<Type> {
-        self.get_ref(identifier).map(|index| Type::Reference(index))
     }
 
     pub fn get_type(&self, index: usize) -> Option<Type> {

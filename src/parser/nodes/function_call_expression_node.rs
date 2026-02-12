@@ -33,7 +33,7 @@ impl FunctionCallExpressionNode {
         (scope, result)
     }
 
-    fn check_arguments(&self, function_type: &FunctionType, arguments: &Vec<Type>) {
+    fn check_arguments(&self, function_type: &FunctionType, arguments: &[Type]) {
         if function_type.parameters.len() != arguments.len() {
             println!(
                 "Type error: Call expected {} arguments but recieved {}",

@@ -16,8 +16,8 @@ impl TypeNode {
             Self::Primitive(primitive) => Type::Primitive(*primitive),
             Self::Function(function) => Type::Function(function.get_type(types).clone()),
             Self::Tuple(tuple_type) => tuple_type.get_type(types).clone(),
-            Self::UserDefined(identifier) => match types.get_type_ref(identifier) {
-                Some(resolved_type) => resolved_type,
+            Self::UserDefined(identifier) => match types.get_ref(identifier) {
+                Some(resolved_type) => Type::Reference(resolved_type),
                 None => {
                     println!("Type error: Unknown type `{}`", identifier);
                     Type::Error
