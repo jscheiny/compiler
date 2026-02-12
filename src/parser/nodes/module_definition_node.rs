@@ -30,18 +30,10 @@ impl ModuleDefinitionNode {
 
     pub fn add_to_scope(&self, types: &mut TypeResolver, scope: &mut Scope) {
         match self {
-            Self::Struct(node) => {
-                scope.add(node.id(), Type::Struct(node.get_type(types).clone()));
-            }
-            Self::Enum(node) => {
-                scope.add(node.id(), Type::Enum(node.get_type(types).clone()));
-            }
+            // TODO Consider how these are added to scope
+            Self::Struct(_) | Self::Enum(_) | Self::TypeAlias(_) => {}
             Self::Function(node) => {
                 scope.add(node.id(), Type::Function(node.get_type(types).clone()));
-            }
-            Self::TypeAlias(_node) => {
-                // These shouldn't be in the scope I think?
-                // scope.add(node.id(), node.get_type(types).clone());
             }
         }
     }
