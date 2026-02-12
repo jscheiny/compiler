@@ -1,5 +1,16 @@
-struct S(t1: bool) {
-    test() { 
-        @t1.@t2;
+struct A(pub value: bool) {
+}
+
+struct B(private_a: A) {
+    get_a(): A -> @private_a;
+}
+
+struct C(pub b: B);
+
+fn test(c: C) {
+    while c.b.get_a().value {}
+
+    while A.value { // TODO need to fix this -> this should be a function
+
     }
 }

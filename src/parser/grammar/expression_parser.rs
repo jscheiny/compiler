@@ -50,10 +50,14 @@ fn sub_expression(tokens: &mut TokenStream, min_precedence: i32) -> ParseResult<
             let arguments_span = TokenSpan::singleton(tokens);
             tokens.next();
 
-            let right = tokens.located(expression)?;
-            let arguments = flatten_arguments(right);
+            let arguments = if tokens.accept(&OperatorToken::CloseParen) {
+                vec![]
+            } else {
+                let right = tokens.located(expression)?;
+                tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
+                flatten_arguments(right)
+            };
 
-            tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
             let arguments_span = arguments_span.expand_to(tokens);
             let span = left.span.expand_to(tokens);
 

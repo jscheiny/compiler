@@ -27,7 +27,7 @@ impl ExpressionNode {
         match self {
             Self::PrefixOp(node) => node.check(types, scope),
             Self::BinaryOp(node) => node.check(types, scope),
-            Self::Access(_) => todo!("Implement type checking for ExpressionNode::Access"),
+            Self::Access(node) => node.check(types, scope),
             Self::PostfixOp(node) => node.check(types, scope),
             Self::FunctionCall(node) => {
                 let (scope, resolved_type) = node.check(types, scope);

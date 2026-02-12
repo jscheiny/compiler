@@ -18,6 +18,7 @@ impl Type {
     pub fn is_primitive(&self, expected: PrimitiveType) -> bool {
         match self {
             Self::Primitive(primitive) => *primitive == expected,
+            Self::Error => true,
             _ => false,
         }
     }

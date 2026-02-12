@@ -18,3 +18,12 @@ pub enum StructMemberType {
     Field(Type),
     Method(FunctionType),
 }
+
+impl StructMemberType {
+    pub fn get_type(&self) -> Type {
+        match self {
+            Self::Field(field_type) => field_type.clone(),
+            Self::Method(function_type) => Type::Function(function_type.clone()),
+        }
+    }
+}
