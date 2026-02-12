@@ -45,7 +45,7 @@ impl BinaryOpExpressionNode {
         types: &TypeResolver,
         scope: Box<Scope>,
     ) -> (Box<Scope>, Type) {
-        let (scope, _left_type) = self.left.check(types, scope);
+        let (scope, left_type) = self.left.check(types, scope);
         let (scope, right_type) = self.right.check(types, scope);
         let function_type = get_function_type(right_type, types);
 
@@ -53,7 +53,11 @@ impl BinaryOpExpressionNode {
             if function_type.parameters.len() != 1 {
                 println!("Type error: Right hand side of => takes more than one parameter");
             }
-            // TODO check argument type matches
+
+            if !left_type.is_assignable_to(&function_type.parameters[0], types) {
+                println!("Type error: Function application argument does not match");
+            }
+
             let return_type = function_type.return_type.map(|return_type| *return_type);
             // TODO properly handle void returning functions
             (scope, return_type.unwrap_or(Type::Error))
