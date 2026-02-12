@@ -39,7 +39,7 @@ impl FunctionNode {
             FunctionBodyNode::Block(block) => {
                 let (scope, resolved_type) = block.check(types, scope);
                 if resolved_type.is_none() && self.return_type.is_some() {
-                    println!("Function body does not return a type when one is required");
+                    println!("Function body does not return a value when one is required");
                 }
                 (scope, resolved_type.unwrap_or(Type::Error))
             }
