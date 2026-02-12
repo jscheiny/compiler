@@ -15,10 +15,6 @@ pub fn try_tokenize_identifier(text: &str) -> Option<TryTokenizeResult> {
     let mut width = TokenWidth::new();
     let mut identifier = String::from("");
     for character in text.chars() {
-        if identifier.is_empty() && !character.is_alphabetic() && character != '_' {
-            return None;
-        }
-
         if !character.is_alphanumeric() && character != '_' {
             break;
         }
