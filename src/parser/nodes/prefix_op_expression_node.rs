@@ -13,7 +13,7 @@ impl PrefixOpExpressionNode {
         match *self.operator {
             PrefixOperator::Closure => todo!("Implement type checking for prefix op Closure"),
             PrefixOperator::LogicalNot => self.check_logical_not(types, scope),
-            PrefixOperator::Negative => todo!("Implement type checking for prefix op Negative"),
+            PrefixOperator::Negative => self.check_negative(types, scope),
         }
     }
 
@@ -27,5 +27,18 @@ impl PrefixOpExpressionNode {
         }
 
         (scope, Type::Primitive(PrimitiveType::Bool))
+    }
+
+    fn check_negative(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        let (scope, resolved_type) = self.expression.check(types, scope);
+        match resolved_type {
+            Type::Primitive(PrimitiveType::Float) | Type::Primitive(PrimitiveType::Int) => {
+                (scope, resolved_type)
+            }
+            _ => {
+                println!("Type error: Can only negate numeric types");
+                (scope, Type::Error)
+            }
+        }
     }
 }

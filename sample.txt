@@ -1,6 +1,5 @@
-fn test() {
-    while { -> 3; -> true; } {
-
+fn test(value: int, predicate: bool) {
+    while predicate {
+        let x = -(3, 4, 5);
     }
-
 }
