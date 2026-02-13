@@ -99,14 +99,14 @@ impl TokenStream {
         }
     }
 
-    pub fn push_error(&mut self, kind: SyntaxError) {
-        self.errors.push(self.make_error(kind));
+    pub fn push_error(&mut self, error: SyntaxError) {
+        self.errors.push(self.make_error(error));
     }
 
-    pub fn make_error(&self, kind: SyntaxError) -> LocatedSyntaxError {
+    pub fn make_error(&self, error: SyntaxError) -> LocatedSyntaxError {
         LocatedSyntaxError {
             span: self.current_span(),
-            error: kind,
+            error,
         }
     }
 }

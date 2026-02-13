@@ -6,9 +6,9 @@ use crate::{
     parser::{
         AccessExpressionNode, Associativity, BinaryOpExpressionNode, BinaryOperator, BlockNode,
         ExpressionNode, FunctionCallExpressionNode, Identified, IdentifierType, IfExpressionNode,
-        Node, Operator, ParseResult, PostfixOpExpressionNode, PostfixOperator,
-        PrefixOpExpressionNode, PrefixOperator, SyntaxError, TokenSpan, TokenStream,
-        grammar::statement,
+        LocatedSyntaxError, Node, Operator, ParseResult, PostfixOpExpressionNode, PostfixOperator,
+        PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType, SyntaxError,
+        TokenSpan, TokenStream, grammar::statement,
     },
 };
 
@@ -156,7 +156,7 @@ fn expression_atom(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
             Ok(ExpressionNode::StringLiteral(literal))
         }
         Token::Operator(OperatorToken::OpenBrace) => {
-            let block = block(tokens)?;
+            let block = block(tokens, BlockType::Expression)?;
             Ok(ExpressionNode::Block(block))
         }
         Token::Operator(OperatorToken::At) => {
@@ -195,11 +195,36 @@ fn expression_atom(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
     }
 }
 
-pub fn block(tokens: &mut TokenStream) -> ParseResult<BlockNode> {
+#[derive(Clone, Copy)]
+pub enum BlockType {
+    Statement(StatementType),
+    Expression,
+}
+
+pub fn block(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<BlockNode> {
     tokens.expect(&OperatorToken::OpenBrace, SyntaxError::ExpectedBlock)?;
     let mut statements = vec![];
     while !tokens.accept(&OperatorToken::CloseBrace) {
-        statements.push(tokens.located(statement)?);
+        statements.push(tokens.located_with(statement, block_type)?);
     }
+
+    if matches!(block_type, BlockType::Expression) {
+        for (index, statement) in statements.iter().enumerate() {
+            if index != statements.len() - 1
+                && matches!(statement.value, StatementNode::BlockReturn(_))
+            {
+                let error_index = statement.span.start_index;
+                let span = TokenSpan {
+                    start_index: error_index,
+                    end_index: error_index,
+                };
+                tokens.errors.push(LocatedSyntaxError {
+                    span,
+                    error: SyntaxError::BlockReturnEarly,
+                });
+            }
+        }
+    }
+
     Ok(BlockNode { statements })
 }

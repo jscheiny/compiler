@@ -2,12 +2,12 @@ use crate::{
     lexer::{KeywordToken, OperatorToken, Token, TokenMatch},
     parser::{
         DeclarationNode, ExpressionNode, IdentifierType, IfStatementConditionNode, IfStatementNode,
-        Node, ParseResult, StatementNode, SyntaxError, TokenStream, WhileLoopNode,
-        grammar::{block, expression, type_definition},
+        Node, ParseResult, StatementNode, StatementType, SyntaxError, TokenStream, WhileLoopNode,
+        grammar::{BlockType, block, expression, type_definition},
     },
 };
 
-pub fn statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
+pub fn statement(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<StatementNode> {
     match tokens.peek() {
         Token::Keyword(keyword) => match keyword {
             KeywordToken::Let => declaration(tokens, false),
@@ -21,7 +21,7 @@ pub fn statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
         },
         Token::Operator(operator) => match operator {
             OperatorToken::OpenBrace => block_statement(tokens),
-            OperatorToken::SkinnyArrow => block_return(tokens),
+            OperatorToken::SkinnyArrow => block_return(tokens, block_type),
             _ => expression_statement(tokens),
         },
         _ => expression_statement(tokens),
@@ -88,7 +88,8 @@ fn continue_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
 fn while_loop(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     tokens.next();
     let predicate = tokens.located(expression)?;
-    let body = tokens.located(block)?;
+    let block_type = BlockType::Statement(StatementType::WhileLoop);
+    let body = tokens.located_with(block, block_type)?;
     Ok(StatementNode::WhileLoop(WhileLoopNode { predicate, body }))
 }
 
@@ -100,7 +101,8 @@ fn if_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
         if KeywordToken::If.matches(tokens.peek()) {
             conditions.push(tokens.located(if_condition)?);
         } else {
-            else_branch = Some(tokens.located(block)?);
+            let block_type = BlockType::Statement(StatementType::If);
+            else_branch = Some(tokens.located_with(block, block_type)?);
         }
     }
 
@@ -113,20 +115,29 @@ fn if_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
 fn if_condition(tokens: &mut TokenStream) -> ParseResult<IfStatementConditionNode> {
     tokens.next();
     let predicate = tokens.located(expression)?;
-    let body = tokens.located(block)?;
+    let block_type = BlockType::Statement(StatementType::If);
+    let body = tokens.located_with(block, block_type)?;
     Ok(IfStatementConditionNode { predicate, body })
 }
 
 fn block_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
-    let block = ExpressionNode::Block(block(tokens)?);
+    // TODO is this an expression or a statement?? Maybe add a warning for block returns in this case?
+    let block = ExpressionNode::Block(block(tokens, BlockType::Expression)?);
     Ok(StatementNode::Expression(block))
 }
 
-fn block_return(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
+fn block_return(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<StatementNode> {
+    if let BlockType::Statement(statement_type) = block_type {
+        tokens.push_error(SyntaxError::UnexpectedBlockReturn(statement_type));
+    }
+
     tokens.next();
     let expression = tokens.located(expression)?;
     end_statement(tokens);
-    Ok(StatementNode::BlockReturn(expression))
+    match block_type {
+        BlockType::Expression => Ok(StatementNode::BlockReturn(expression)),
+        BlockType::Statement(_) => Ok(StatementNode::Expression(expression.value)),
+    }
 }
 
 fn expression_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {

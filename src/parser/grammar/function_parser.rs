@@ -3,7 +3,9 @@ use crate::{
     parser::{
         ExpressionNode, FunctionBodyNode, FunctionNode, IdentifierType, MethodNode, Node,
         ParameterNode, ParseResult, SyntaxError, TokenStream,
-        grammar::{block, comma_separated_list, end_statement, expression, type_definition},
+        grammar::{
+            BlockType, block, comma_separated_list, end_statement, expression, type_definition,
+        },
     },
 };
 
@@ -67,7 +69,10 @@ fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyNode> {
         end_statement(tokens);
         Ok(FunctionBodyNode::Expression(expression))
     } else if OperatorToken::OpenBrace.matches(tokens.peek()) {
-        Ok(FunctionBodyNode::Block(block(tokens)?))
+        Ok(FunctionBodyNode::Block(block(
+            tokens,
+            BlockType::Expression,
+        )?))
     } else if OperatorToken::Semicolon.matches(tokens.peek()) {
         tokens.push_error(SyntaxError::ExpectedFunctionBody);
         tokens.next();
