@@ -10,11 +10,15 @@ pub struct BlockNode {
 impl BlockNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Option<Type>) {
         let mut scope = scope.derive(ScopeType::Block);
-        // TODO properly type check block return types
+        // TODO error if no block return statement when one might be expected
         let mut resolved_type = None;
         for statement in self.statements.iter() {
-            (scope, resolved_type) = statement.check(types, scope);
-            // TODO properly handle multiple block returns
+            let (new_scope, statement_type) = statement.check(types, scope);
+            scope = new_scope;
+            // Resolve type to the type of the first block return, everything after is effectively dead code.
+            if resolved_type.is_none() {
+                resolved_type = statement_type;
+            }
         }
         (scope.parent(), resolved_type)
     }

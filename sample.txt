@@ -1,10 +1,6 @@
 fn test() {
-    while true {
-        -> x;
+    while { -> 3; -> true; } {
+
     }
 
-    {
-        -> y;
-        print();
-    }
 }
