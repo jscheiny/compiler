@@ -44,7 +44,7 @@ impl Operator for PrefixOperator {
     }
 
     fn precedence(&self) -> i32 {
-        9
+        8
     }
 }
 
@@ -114,7 +114,7 @@ impl Operator for BinaryOperator {
     fn precedence(&self) -> i32 {
         match self {
             // Functions / Access
-            Self::FunctionApplication | Self::Access => 8,
+            Self::FunctionApplication | Self::Access => 9,
             // Multiplicative
             Self::Multiply | Self::Divide | Self::Mod => 7,
             // Additive
