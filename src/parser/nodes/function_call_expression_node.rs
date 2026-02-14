@@ -43,9 +43,16 @@ impl FunctionCallExpressionNode {
             );
         }
 
-        for (index, (left, right)) in function_type.parameters.iter().zip(arguments).enumerate() {
-            if !left.is_assignable_to(right, types) {
-                println!("Type error: Mismatch in type of argument {}", index);
+        for (index, (parameter, argument)) in
+            function_type.parameters.iter().zip(arguments).enumerate()
+        {
+            if !argument.is_assignable_to(parameter, types) {
+                println!(
+                    "Type error: Arg {} of type `{}` cannot be assigned to parameter of type `{}`",
+                    index,
+                    argument.format(types),
+                    parameter.format(types),
+                );
             }
         }
         // TODO check types of each argument
