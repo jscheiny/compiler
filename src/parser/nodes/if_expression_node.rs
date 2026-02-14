@@ -12,7 +12,7 @@ pub struct IfExpressionNode {
 impl IfExpressionNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let (scope, predicate_type) = self.predicate.check(types, scope);
-        if !predicate_type.is_primitive(PrimitiveType::Bool) {
+        if !predicate_type.is_primitive(PrimitiveType::Bool, types) {
             println!("Type error: If expression predicate must be of type bool");
         }
 

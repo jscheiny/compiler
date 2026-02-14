@@ -1,6 +1,9 @@
-fn test(value: int, predicate: bool) {
+type T = float;
+type U = bool;
+
+fn test(value: U, predicate: T) {
     while predicate {
-        
+        -value;
     }
 }
 
