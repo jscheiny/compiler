@@ -34,7 +34,7 @@ impl BinaryOpExpressionNode {
             }
             O::Access => todo!("Implement type checking for binary op Access"),
             O::FunctionApplication => self.check_function_application(types, scope),
-            O::Comma => todo!("Implement type checking for binary op Comma"),
+            O::Comma => self.check_comma(types, scope),
             O::LogicalAnd => self.check_logical_op(types, scope),
             O::LogicalOr => self.check_logical_op(types, scope),
         }
@@ -63,6 +63,35 @@ impl BinaryOpExpressionNode {
             println!("Type error: Right hand side of => is not callable");
             (scope, Type::Error)
         }
+    }
+
+    fn check_comma(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        let (mut scope, first_type) = self.left.check(types, scope);
+        let mut tuple_types = vec![first_type];
+        let mut current = &self.right;
+
+        loop {
+            if let ExpressionNode::BinaryOp(BinaryOpExpressionNode {
+                left,
+                operator,
+                right,
+            }) = &current.value
+            {
+                if operator.value == BinaryOperator::Comma {
+                    let (new_scope, left_type) = left.check(types, scope);
+                    tuple_types.push(left_type);
+                    scope = new_scope;
+                    current = right;
+                    continue;
+                }
+            }
+            break;
+        }
+
+        let (scope, current_type) = current.check(types, scope);
+        tuple_types.push(current_type);
+
+        (scope, Type::Tuple(tuple_types))
     }
 
     fn check_logical_op(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
