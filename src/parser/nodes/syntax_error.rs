@@ -10,6 +10,7 @@ pub enum SyntaxError {
     BlockReturnEarly,
     ExpectedBlock,
     ExpectedCloseParen,
+    ExpectedClosureParameter,
     ExpectedElse,
     ExpectedEndStatement,
     ExpectedExpression,
@@ -25,6 +26,7 @@ pub enum SyntaxError {
     ExpectedVariants,
     UnexpectedBlockReturn(StatementType),
     UnexpectedComma,
+    UnexpectedTypeExpression,
 }
 
 #[derive(Clone, Copy)]
@@ -98,6 +100,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             E::BlockReturnEarly => return write!(f, "early block return statement"),
             E::ExpectedBlock => write!(f, "expected statement block"),
             E::ExpectedCloseParen => write!(f, "expected close parenthesis"),
+            E::ExpectedClosureParameter => write!(f, "expected parameter"),
             E::ExpectedElse => write!(
                 f,
                 "`{}` following true branch expression",
@@ -119,6 +122,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
                 return write!(f, "unexpected block return in {}", statement_type);
             }
             E::UnexpectedComma => return write!(f, "unexpected comma"),
+            E::UnexpectedTypeExpression => return write!(f, "unexpected type declaration"),
         }?;
         write!(f, ", found ")?;
 
@@ -147,6 +151,7 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
             E::BlockReturnEarly => write!(f, "block return must be the last statement in a block"),
             E::ExpectedBlock => fmt_op(f, O::OpenParen),
             E::ExpectedCloseParen => fmt_op(f, O::CloseParen),
+            E::ExpectedClosureParameter => write!(f, "expected parameter for closure"),
             E::ExpectedElse => write!(f, "expected `{}`", KeywordToken::Else),
             E::ExpectedEndStatement => fmt_op(f, O::Semicolon),
             E::ExpectedExpression => write!(f, "expected expression"),
@@ -164,6 +169,10 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
                 write!(f, "block returns are only allowed in expressions")
             }
             E::UnexpectedComma => write!(f, "commas should only appear in parentheticals"),
+            E::UnexpectedTypeExpression => write!(
+                f,
+                "type declarations should only appear in closure parameter lists"
+            ),
         }
     }
 }

@@ -35,6 +35,7 @@ impl BinaryOpExpressionNode {
             O::Access => todo!("Implement type checking for binary op Access"),
             O::FunctionApplication => self.check_function_application(types, scope),
             O::Comma => self.check_comma(types, scope),
+            O::Type => panic!("Type error: Unexpected closure parameter outside of context"),
             O::LogicalAnd => self.check_logical_op(types, scope),
             O::LogicalOr => self.check_logical_op(types, scope),
         }

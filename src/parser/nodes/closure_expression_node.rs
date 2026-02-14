@@ -1,10 +1,10 @@
 use crate::{
     checker::{Scope, Type, TypeResolver},
-    parser::{ExpressionNode, IdentifierNode, Node},
+    parser::{ClosureParameterExpressionNode, ExpressionNode, Node},
 };
 
 pub struct ClosureExpressionNode {
-    pub parameters: Vec<Option<Node<IdentifierNode>>>,
+    pub parameters: Vec<Option<Node<ClosureParameterExpressionNode>>>,
     pub body: Box<Node<ExpressionNode>>,
 }
 

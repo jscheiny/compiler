@@ -5,11 +5,12 @@ use crate::{
     },
     parser::{
         AccessExpressionNode, Associativity, BinaryOpExpressionNode, BinaryOperator, BlockNode,
-        ClosureExpressionNode, ExpressionNode, FunctionCallExpressionNode, Identified,
-        IdentifierNode, IdentifierType, IfExpressionNode, LocatedSyntaxError, Node, Operator,
-        ParseResult, PostfixOpExpressionNode, PostfixOperator, PrefixOpExpressionNode,
-        PrefixOperator, StatementNode, StatementType, SyntaxError, TokenSpan, TokenStream,
-        grammar::statement,
+        ClosureExpressionNode, ClosureParameterExpressionNode, ExpressionNode,
+        FunctionCallExpressionNode, Identified, IdentifierNode, IdentifierType, IfExpressionNode,
+        LocatedSyntaxError, Node, Operator, ParseResult, PostfixOpExpressionNode, PostfixOperator,
+        PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType, SyntaxError,
+        TokenSpan, TokenStream,
+        grammar::{statement, type_definition},
     },
 };
 
@@ -17,6 +18,7 @@ use crate::{
 struct ExpressionContext {
     pub min_precedence: i32,
     pub allow_commas: bool,
+    pub allow_types: bool,
 }
 
 impl ExpressionContext {
@@ -24,12 +26,14 @@ impl ExpressionContext {
         Self {
             min_precedence: 0,
             allow_commas: true,
+            allow_types: true,
         }
     }
 
     pub fn with_precedence(self, min_precedence: i32) -> Self {
         Self {
             min_precedence,
+            allow_types: false,
             ..self
         }
     }
@@ -37,6 +41,7 @@ impl ExpressionContext {
     pub fn reset_precedence(self) -> Self {
         Self {
             min_precedence: 0,
+            allow_types: false,
             ..self
         }
     }
@@ -78,7 +83,12 @@ fn sub_expression(
 
             let operator = TokenSpan::singleton(tokens).wrap(operator);
             tokens.next();
-            left = complete_binary_op(tokens, operator, left, context)?;
+
+            left = if operator.value == BinaryOperator::Type {
+                complete_closure_parameter(tokens, left, context)
+            } else {
+                complete_binary_op(tokens, left, operator, context)
+            }?
         } else if OperatorToken::OpenParen.matches(token) {
             // Function calls should be treated as the same precedence as a.b
             let precedence = BinaryOperator::Access.precedence();
@@ -113,10 +123,44 @@ fn sub_expression(
     Ok(left.value)
 }
 
+fn complete_closure_parameter(
+    tokens: &mut TokenStream,
+    left: Node<ExpressionNode>,
+    context: ExpressionContext,
+) -> ParseResult<Node<ExpressionNode>> {
+    if context.allow_types {
+        if let ExpressionNode::Identifier(identifier) = left.value {
+            let parameter_type = Some(tokens.located(type_definition)?);
+            let identifier = left.span.wrap(IdentifierNode(identifier));
+            let parameter_span = left.span.expand_to(tokens);
+            return Ok(parameter_span.wrap(ExpressionNode::ClosureParameter(
+                ClosureParameterExpressionNode {
+                    identifier,
+                    parameter_type,
+                },
+            )));
+        }
+    }
+
+    if context.allow_types {
+        tokens.errors.push(LocatedSyntaxError {
+            span: left.span,
+            error: SyntaxError::ExpectedIdentifier(IdentifierType::Parameter),
+        });
+    } else {
+        tokens.push_error(SyntaxError::UnexpectedTypeExpression);
+    }
+
+    // Parse the type definition for errors and so we can continue parsing
+    type_definition(tokens)?;
+    let parameter_span = left.span.expand_to(tokens);
+    Ok(parameter_span.wrap(ExpressionNode::Error))
+}
+
 fn complete_binary_op(
     tokens: &mut TokenStream,
-    operator: Node<BinaryOperator>,
     left: Node<ExpressionNode>,
+    operator: Node<BinaryOperator>,
     context: ExpressionContext,
 ) -> ParseResult<Node<ExpressionNode>> {
     if operator.value == BinaryOperator::Access {
@@ -288,11 +332,18 @@ fn closure(
     let parameters = flatten_commas(args_expression)
         .into_iter()
         .map(|parameter| {
-            if let ExpressionNode::Identifier(id) = parameter.value {
-                Some(parameter.span.wrap(IdentifierNode(id)))
+            if let ExpressionNode::Identifier(identifier) = parameter.value {
+                Some(parameter.span.wrap(ClosureParameterExpressionNode {
+                    identifier: parameter.span.wrap(IdentifierNode(identifier)),
+                    parameter_type: None,
+                }))
+            } else if let ExpressionNode::ClosureParameter(param) = parameter.value {
+                Some(parameter.span.wrap(param))
             } else {
-                // TODO properly error here
-                println!("Syntax error: Closure parameter should be just an identifier?");
+                tokens.errors.push(LocatedSyntaxError {
+                    span: parameter.span,
+                    error: SyntaxError::ExpectedClosureParameter,
+                });
                 None
             }
         })

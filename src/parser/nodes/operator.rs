@@ -70,6 +70,7 @@ pub enum BinaryOperator {
     Access,              // .
     FunctionApplication, // =>
     Comma,               // ,
+    Type,                // :
     LogicalAnd,          // and
     LogicalOr,           // or
 }
@@ -94,6 +95,7 @@ impl Operator for BinaryOperator {
                 O::Dot => Some(Self::Access),
                 O::ThickArrow => Some(Self::FunctionApplication),
                 O::Comma => Some(Self::Comma),
+                O::Colon => Some(Self::Type),
                 O::Equal => Some(Self::Assign),
                 O::Plus => Some(Self::Add),
                 O::Minus => Some(Self::Subtract),
@@ -139,8 +141,8 @@ impl Operator for BinaryOperator {
             | Self::DivideAssign
             | Self::ModAssign
             | Self::Assign => 1,
-            // Comma
-            Self::Comma => 0,
+            // Comma / type
+            Self::Comma | Self::Type => 0,
         }
     }
 }

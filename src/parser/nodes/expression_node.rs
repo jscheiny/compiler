@@ -2,8 +2,8 @@ use crate::{
     checker::{Scope, ScopeType, Type, TypeResolver},
     parser::{
         AccessExpressionNode, BinaryOpExpressionNode, BlockNode, ClosureExpressionNode,
-        FunctionCallExpressionNode, IfExpressionNode, PostfixOpExpressionNode,
-        PrefixOpExpressionNode, PrimitiveType,
+        ClosureParameterExpressionNode, FunctionCallExpressionNode, IfExpressionNode,
+        PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType,
     },
 };
 
@@ -13,6 +13,7 @@ pub enum ExpressionNode {
     Access(AccessExpressionNode),
     PostfixOp(PostfixOpExpressionNode),
     Closure(ClosureExpressionNode),
+    ClosureParameter(ClosureParameterExpressionNode),
     SelfRef(String),
     FunctionCall(FunctionCallExpressionNode),
     IfExpression(IfExpressionNode),
@@ -53,6 +54,9 @@ impl ExpressionNode {
             }
             Self::SelfRef(identifier) => self.check_self_ref(identifier, scope),
             Self::Error => (scope, Type::Error),
+            Self::ClosureParameter(_) => {
+                panic!("Type error: Found closure parameter outside of parameter list")
+            }
         }
     }
 
