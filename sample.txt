@@ -1,7 +1,11 @@
 struct Pair(left: int, right: int);
 
+fn map(value: Pair): (Pair) -> int {
+    return Pair.left;
+}
 
 fn test(pair: Pair) {
-    let x = (pair.left, pair.right, not true, false and true);
-    let y = (a, b, c) -> a + b + c;
+    while 3 => map(pair) {
+
+    }
 }

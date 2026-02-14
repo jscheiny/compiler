@@ -113,8 +113,10 @@ impl Operator for BinaryOperator {
 
     fn precedence(&self) -> i32 {
         match self {
-            // Functions / Access
-            Self::FunctionApplication | Self::Access => 9,
+            // Access (and function calls not expressed here)
+            Self::Access => 9,
+            // Function application should bind slightly less tight than function calls
+            Self::FunctionApplication => 8,
             // Multiplicative
             Self::Multiply | Self::Divide | Self::Mod => 7,
             // Additive

@@ -80,6 +80,7 @@ fn sub_expression(
             tokens.next();
             left = complete_binary_op(tokens, operator, left, context)?;
         } else if OperatorToken::OpenParen.matches(token) {
+            // Function calls should be treated as the same precedence as a.b
             let precedence = BinaryOperator::Access.precedence();
             if precedence < context.min_precedence {
                 break;
