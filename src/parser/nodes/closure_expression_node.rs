@@ -36,20 +36,32 @@ impl ClosureExpressionNode {
 
     fn check_raw(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let mut scope = scope.derive(ScopeType::Closure);
-        for parameter in self.parameters.iter().flatten() {
-            let parameter_type = if let Some(parameter_type) = parameter.parameter_type.as_ref() {
-                parameter_type.get_type(types)
+        let mut parameter_types = vec![];
+        for parameter in self.parameters.iter() {
+            if let Some(parameter) = parameter {
+                let parameter_type = if let Some(parameter_type) = parameter.parameter_type.as_ref()
+                {
+                    parameter_type.get_type(types)
+                } else {
+                    println!(
+                        "Type error: Could not infer type of closure parameter `{}`",
+                        parameter.id()
+                    );
+                    Type::Error
+                };
+                parameter_types.push(parameter_type.clone());
+                scope.add(parameter.id(), parameter_type);
             } else {
-                println!(
-                    "Type error: Could not infer type of closure parameter `{}`",
-                    parameter.id()
-                );
-                Type::Error
-            };
-            scope.add(parameter.id(), parameter_type);
+                parameter_types.push(Type::Error);
+            }
         }
 
         let (scope, return_type) = self.body.check(types, scope, None);
-        (scope.parent(), return_type)
+        let result_type = Type::Function(FunctionType {
+            parameters: parameter_types,
+            return_type: Box::new(return_type),
+        });
+
+        (scope.parent(), result_type)
     }
 }

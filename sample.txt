@@ -2,5 +2,10 @@ struct Pair(left: int, right: int);
 
 fn test(pair: Pair) {
     let left = 3;
-    let x = (left, right) -> left or right;
+    let x = (left: bool, right: bool) -> left and not right;
+    accept(x);
+}
+
+fn accept(value: (bool, bool) -> int) {
+
 }
