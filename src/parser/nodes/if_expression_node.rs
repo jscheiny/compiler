@@ -18,12 +18,18 @@ impl IfExpressionNode {
 
         let (scope, true_type) = self.if_true.check(types, scope);
         let (scope, false_type) = self.if_false.check(types, scope);
-        // TODO check if true type and false types match
 
-        if !matches!(true_type, Type::Error) {
+        if true_type.is_assignable_to(&false_type, types) {
+            (scope, false_type)
+        } else if false_type.is_assignable_to(&true_type, types) {
             (scope, true_type)
         } else {
-            (scope, false_type)
+            println!(
+                "Type error: Types of branches of if expression do not match: `{}` and `{}`",
+                true_type.format(types),
+                false_type.format(types)
+            );
+            (scope, true_type)
         }
     }
 }
