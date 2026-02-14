@@ -76,9 +76,13 @@ impl Type {
         }
     }
 
-    pub fn is_primitive(&self, expected: PrimitiveType) -> bool {
+    pub fn is_primitive(&self, expected: PrimitiveType, types: &TypeResolver) -> bool {
         match self {
             Self::Primitive(primitive) => *primitive == expected,
+            Self::Reference(index) => types
+                .get_type(*index)
+                .unwrap_or(Type::Error)
+                .is_primitive(expected, types),
             Self::Error => true,
             _ => false,
         }
