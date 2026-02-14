@@ -1,12 +1,11 @@
-type T = float;
-type U = bool;
+struct Pair(left: int, right: int);
 
-fn test(value: U, predicate: T) {
-    while predicate {
-        -value;
-    }
-}
+fn test1();
 
-fn test2() {
-    let x: (int, bool) -> int = test;
+fn test(pair: Pair) {
+    let x: bool = 
+        if true then 
+            pair.left
+        else 
+            pair.right;
 }

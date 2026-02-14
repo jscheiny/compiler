@@ -12,16 +12,48 @@ use crate::{
     },
 };
 
-pub fn expression(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
-    sub_expression(tokens, 0)
+#[derive(Clone, Copy, Default)]
+struct ExpressionContext {
+    pub min_precedence: i32,
+    pub allow_commas: bool,
 }
 
-fn sub_expression(tokens: &mut TokenStream, min_precedence: i32) -> ParseResult<ExpressionNode> {
-    let mut left = tokens.located(expression_atom)?;
+impl ExpressionContext {
+    pub fn parentheses() -> Self {
+        Self {
+            min_precedence: 0,
+            allow_commas: true,
+        }
+    }
+
+    pub fn with_precedence(self, min_precedence: i32) -> Self {
+        Self {
+            min_precedence,
+            ..self
+        }
+    }
+
+    pub fn reset_precedence(self) -> Self {
+        Self {
+            min_precedence: 0,
+            ..self
+        }
+    }
+}
+
+pub fn expression(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
+    sub_expression(tokens, Default::default())
+}
+
+fn sub_expression(
+    tokens: &mut TokenStream,
+    context: ExpressionContext,
+) -> ParseResult<ExpressionNode> {
+    let mut left = tokens.located_with(expression_atom, context)?;
     loop {
         let token = tokens.peek();
         if let Some(operator) = PostfixOperator::from_token(token) {
-            if operator.precedence() < min_precedence {
+            if operator.precedence() < context.min_precedence {
                 break;
             }
 
@@ -34,16 +66,21 @@ fn sub_expression(tokens: &mut TokenStream, min_precedence: i32) -> ParseResult<
                 operator,
             }));
         } else if let Some(operator) = BinaryOperator::from_token(token) {
-            if operator.precedence() < min_precedence {
+            if operator.precedence() < context.min_precedence {
                 break;
+            }
+
+            // TODO This should probably still be allowed to continue on...
+            if operator == BinaryOperator::Comma && !context.allow_commas {
+                return Err(tokens.make_error(SyntaxError::UnexpectedComma));
             }
 
             let operator = TokenSpan::singleton(tokens).wrap(operator);
             tokens.next();
-            left = complete_binary_op(tokens, operator, left)?;
+            left = complete_binary_op(tokens, operator, left, context)?;
         } else if OperatorToken::OpenParen.matches(token) {
             let precedence = BinaryOperator::Access.precedence();
-            if precedence < min_precedence {
+            if precedence < context.min_precedence {
                 break;
             }
 
@@ -53,7 +90,8 @@ fn sub_expression(tokens: &mut TokenStream, min_precedence: i32) -> ParseResult<
             let arguments = if tokens.accept(&OperatorToken::CloseParen) {
                 vec![]
             } else {
-                let right = tokens.located(expression)?;
+                let context = ExpressionContext::parentheses();
+                let right = tokens.located_with(sub_expression, context)?;
                 tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
                 flatten_arguments(right)
             };
@@ -77,6 +115,7 @@ fn complete_binary_op(
     tokens: &mut TokenStream,
     operator: Node<BinaryOperator>,
     left: Node<ExpressionNode>,
+    context: ExpressionContext,
 ) -> ParseResult<Node<ExpressionNode>> {
     if operator.value == BinaryOperator::Access {
         let field = tokens.identifier(IdentifierType::Field)?;
@@ -93,7 +132,8 @@ fn complete_binary_op(
             Associativity::Right => 0,
         };
 
-    let right = tokens.located_with(sub_expression, next_min_precedence)?;
+    let context = context.with_precedence(next_min_precedence);
+    let right = tokens.located_with(sub_expression, context)?;
     let span = left.span.expand_to(tokens);
     Ok(span.wrap(ExpressionNode::BinaryOp(BinaryOpExpressionNode {
         left: Box::new(left),
@@ -127,13 +167,17 @@ fn flatten_arguments(expression: Node<ExpressionNode>) -> Vec<Node<ExpressionNod
     arguments
 }
 
-fn expression_atom(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
+fn expression_atom(
+    tokens: &mut TokenStream,
+    context: ExpressionContext,
+) -> ParseResult<ExpressionNode> {
     let operator = PrefixOperator::from_token(tokens.peek());
     if let Some(operator) = operator {
         let precedence = operator.precedence();
         let operator = TokenSpan::singleton(tokens).wrap(operator);
         tokens.next();
-        let expression = tokens.located_with(sub_expression, precedence)?;
+        let context = context.with_precedence(precedence);
+        let expression = tokens.located_with(sub_expression, context)?;
         return Ok(ExpressionNode::PrefixOp(PrefixOpExpressionNode {
             operator,
             expression: Box::new(expression),
@@ -166,17 +210,18 @@ fn expression_atom(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
         }
         Token::Operator(OperatorToken::OpenParen) => {
             tokens.next();
-            let expression = expression(tokens)?;
+            let expression = sub_expression(tokens, ExpressionContext::parentheses())?;
             tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
             Ok(expression)
         }
         Token::Keyword(KeywordToken::If) => {
             tokens.next();
-            let predicate = tokens.located(expression)?;
+            let context = context.reset_precedence();
+            let predicate = tokens.located_with(sub_expression, context)?;
             tokens.expect(&KeywordToken::Then, SyntaxError::ExpectedThen)?;
-            let if_true = tokens.located(expression)?;
+            let if_true = tokens.located_with(sub_expression, context)?;
             tokens.expect(&KeywordToken::Else, SyntaxError::ExpectedElse)?;
-            let if_false = tokens.located(expression)?;
+            let if_false = tokens.located_with(sub_expression, context)?;
             Ok(ExpressionNode::IfExpression(IfExpressionNode {
                 predicate: Box::new(predicate),
                 if_true: Box::new(if_true),

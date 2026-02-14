@@ -24,6 +24,7 @@ pub enum SyntaxError {
     ExpectedType,
     ExpectedVariants,
     UnexpectedBlockReturn(StatementType),
+    UnexpectedComma,
 }
 
 #[derive(Clone, Copy)]
@@ -117,6 +118,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             E::UnexpectedBlockReturn(statement_type) => {
                 return write!(f, "unexpected block return in {}", statement_type);
             }
+            E::UnexpectedComma => return write!(f, "unexpected comma"),
         }?;
         write!(f, ", found ")?;
 
@@ -161,6 +163,7 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
             E::UnexpectedBlockReturn(_) => {
                 write!(f, "block returns are only allowed in expressions")
             }
+            E::UnexpectedComma => write!(f, "commas should only appear in parentheticals"),
         }
     }
 }
