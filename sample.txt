@@ -1,5 +1,9 @@
 fn test(value: int, predicate: bool) {
     while predicate {
-        let x = -(3, 4, 5);
+        
     }
+}
+
+fn test2() {
+    let x: (int, bool) -> int = test;
 }

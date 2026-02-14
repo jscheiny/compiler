@@ -44,7 +44,7 @@ impl Type {
                             .iter()
                             .zip(right.parameters)
                             .all(|(left, right)| left.is_assignable_to(&right, types))
-                    // TODO implement return type assignability checking
+                        && left.return_type.is_assignable_to(&right.return_type, types)
                 }
                 None => false,
             },
