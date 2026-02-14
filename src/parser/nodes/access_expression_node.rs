@@ -31,7 +31,10 @@ fn get_field(input_type: Type, field: &String, types: &TypeResolver) -> Option<T
         Type::Struct(struct_type) => {
             let member = struct_type.members.get(field);
             if let Some(member) = member {
-                // TODO respect public/private access
+                if !member.public {
+                    // TODO respect public/private access
+                    println!("Type error maybe? Check privacy here");
+                }
                 Some(member.member_type.get_type())
             } else {
                 println!(
