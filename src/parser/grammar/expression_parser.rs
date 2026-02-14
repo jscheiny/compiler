@@ -93,7 +93,7 @@ fn sub_expression(
                 let context = ExpressionContext::parentheses();
                 let right = tokens.located_with(sub_expression, context)?;
                 tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
-                flatten_arguments(right)
+                flatten_commas(right)
             };
 
             let arguments_span = arguments_span.expand_to(tokens);
@@ -142,7 +142,7 @@ fn complete_binary_op(
     })))
 }
 
-fn flatten_arguments(expression: Node<ExpressionNode>) -> Vec<Node<ExpressionNode>> {
+fn flatten_commas(expression: Node<ExpressionNode>) -> Vec<Node<ExpressionNode>> {
     let mut arguments = vec![];
     let mut current = expression;
     loop {
