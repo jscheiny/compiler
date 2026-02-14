@@ -10,7 +10,12 @@ pub struct BinaryOpExpressionNode {
 }
 
 impl BinaryOpExpressionNode {
-    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
+    pub fn check(
+        &self,
+        types: &TypeResolver,
+        scope: Box<Scope>,
+        expected_type: Option<&Type>,
+    ) -> (Box<Scope>, Type) {
         use BinaryOperator as O;
         match *self.operator {
             O::Add => todo!("Implement type checking for binary op Add"),
@@ -34,7 +39,7 @@ impl BinaryOpExpressionNode {
             }
             O::Access => todo!("Implement type checking for binary op Access"),
             O::FunctionApplication => self.check_function_application(types, scope),
-            O::Comma => self.check_comma(types, scope),
+            O::Comma => self.check_comma(types, scope, expected_type),
             O::Type => panic!("Type error: Unexpected closure parameter outside of context"),
             O::LogicalAnd => self.check_logical_op(types, scope),
             O::LogicalOr => self.check_logical_op(types, scope),
@@ -46,8 +51,9 @@ impl BinaryOpExpressionNode {
         types: &TypeResolver,
         scope: Box<Scope>,
     ) -> (Box<Scope>, Type) {
-        let (scope, left_type) = self.left.check(types, scope);
-        let (scope, right_type) = self.right.check(types, scope);
+        let (scope, left_type) = self.left.check(types, scope, None);
+        // TODO Can we specify an expectation on the arg type of the function??
+        let (scope, right_type) = self.right.check(types, scope, None);
         let function_type = get_function_type(right_type, types);
 
         if let Some(function_type) = function_type {
@@ -66,8 +72,14 @@ impl BinaryOpExpressionNode {
         }
     }
 
-    fn check_comma(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (mut scope, first_type) = self.left.check(types, scope);
+    fn check_comma(
+        &self,
+        types: &TypeResolver,
+        scope: Box<Scope>,
+        _expected_type: Option<&Type>,
+    ) -> (Box<Scope>, Type) {
+        // TODO type check expected types for tuples here... (replace None args)
+        let (mut scope, first_type) = self.left.check(types, scope, None);
         let mut tuple_types = vec![first_type];
         let mut current = &self.right;
 
@@ -79,7 +91,7 @@ impl BinaryOpExpressionNode {
             }) = &current.value
             {
                 if operator.value == BinaryOperator::Comma {
-                    let (new_scope, left_type) = left.check(types, scope);
+                    let (new_scope, left_type) = left.check(types, scope, None);
                     tuple_types.push(left_type);
                     scope = new_scope;
                     current = right;
@@ -89,21 +101,22 @@ impl BinaryOpExpressionNode {
             break;
         }
 
-        let (scope, current_type) = current.check(types, scope);
+        let (scope, current_type) = current.check(types, scope, None);
         tuple_types.push(current_type);
 
         (scope, Type::Tuple(tuple_types))
     }
 
     fn check_logical_op(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (scope, left_type) = self.left.check(types, scope);
+        let bool_type = Some(&Type::Primitive(PrimitiveType::Bool));
+        let (scope, left_type) = self.left.check(types, scope, bool_type);
         if !left_type.is_primitive(PrimitiveType::Bool, types) {
             println!(
                 "Type error: Left hand side of op `{:?}` should be of type bool",
                 self.operator.value
             );
         }
-        let (scope, right_type) = self.right.check(types, scope);
+        let (scope, right_type) = self.right.check(types, scope, bool_type);
         if !right_type.is_primitive(PrimitiveType::Bool, types) {
             println!(
                 "Type error: Right hand side of op `{:?}` should be of type bool",

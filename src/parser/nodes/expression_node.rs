@@ -26,10 +26,15 @@ pub enum ExpressionNode {
 }
 
 impl ExpressionNode {
-    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
+    pub fn check(
+        &self,
+        types: &TypeResolver,
+        scope: Box<Scope>,
+        expected_type: Option<&Type>,
+    ) -> (Box<Scope>, Type) {
         match self {
             Self::PrefixOp(node) => node.check(types, scope),
-            Self::BinaryOp(node) => node.check(types, scope),
+            Self::BinaryOp(node) => node.check(types, scope, expected_type),
             Self::Access(node) => node.check(types, scope),
             Self::PostfixOp(node) => node.check(types, scope),
             Self::Closure(node) => node.check(types, scope),

@@ -18,7 +18,8 @@ impl PrefixOpExpressionNode {
     }
 
     fn check_logical_not(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (scope, resolved_type) = self.expression.check(types, scope);
+        let bool_type = Some(&Type::Primitive(PrimitiveType::Bool));
+        let (scope, resolved_type) = self.expression.check(types, scope, bool_type);
         if !resolved_type.is_primitive(PrimitiveType::Bool, types) {
             println!(
                 "Type error: Operand of op `{:?}` should be of type bool",
@@ -30,7 +31,7 @@ impl PrefixOpExpressionNode {
     }
 
     fn check_negative(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (scope, resolved_type) = self.expression.check(types, scope);
+        let (scope, resolved_type) = self.expression.check(types, scope, None);
         if resolved_type.is_primitive(PrimitiveType::Float, types)
             || resolved_type.is_primitive(PrimitiveType::Int, types)
         {

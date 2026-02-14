@@ -19,7 +19,8 @@ impl DeclarationNode {
 
         let (mut scope, resolved_type) = match self.initializer.as_ref() {
             Some(initializer) => {
-                let (new_scope, resolved_type) = initializer.check(types, scope);
+                let (new_scope, resolved_type) =
+                    initializer.check(types, scope, expected_type.as_ref());
                 if let Some(expected_type) = expected_type.as_ref() {
                     if !resolved_type.is_assignable_to(expected_type, types) {
                         println!(

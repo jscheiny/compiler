@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, ScopeType, TypeResolver},
+    checker::{Scope, ScopeType, Type, TypeResolver},
     parser::{BlockNode, ExpressionNode, Node, PrimitiveType},
 };
 
@@ -10,7 +10,8 @@ pub struct IfStatementConditionNode {
 
 impl IfStatementConditionNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
-        let (scope, predicate_type) = self.predicate.check(types, scope);
+        let bool_type = Some(&Type::Primitive(PrimitiveType::Bool));
+        let (scope, predicate_type) = self.predicate.check(types, scope, bool_type);
         if !predicate_type.is_primitive(PrimitiveType::Bool, types) {
             println!("Type error: If statement predicate must be of type bool");
         }

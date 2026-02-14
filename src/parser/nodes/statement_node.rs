@@ -19,8 +19,8 @@ impl StatementNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Option<Type>) {
         match self {
             Self::BlockReturn(expression) => {
-                // TODO check that this type matches the expected expression return type
-                let (scope, resolved_type) = expression.check(types, scope);
+                // TODO check that this type matches the expected expression return type (pass in expected type?)
+                let (scope, resolved_type) = expression.check(types, scope, None);
                 (scope, Some(resolved_type))
             }
             Self::Break => check_loop(KeywordToken::Break, scope),
@@ -28,7 +28,7 @@ impl StatementNode {
             Self::Declaration(node) => (node.check(types, scope), None),
             Self::Expression(expression) => {
                 // Discard the type of raw expressions
-                let (scope, _) = expression.check(types, scope);
+                let (scope, _) = expression.check(types, scope, None);
                 (scope, None)
             }
             Self::FunctionReturn(expression) => {
@@ -55,7 +55,7 @@ fn check_function_return(
     let expected_type = scope.return_type().cloned();
     if let Some(expected_type) = expected_type {
         let (new_scope, resolved_type) = match expression {
-            Some(expression) => expression.check(types, scope),
+            Some(expression) => expression.check(types, scope, Some(&expected_type)),
             None => (scope, Type::Void),
         };
         scope = new_scope;

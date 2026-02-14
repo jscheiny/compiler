@@ -10,8 +10,9 @@ pub struct FunctionCallExpressionNode {
 
 impl FunctionCallExpressionNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (scope, function_type) = self.function.check(types, scope);
+        let (scope, function_type) = self.function.check(types, scope, None);
         let function_type = get_function_type(function_type, types);
+        // TODO combine get args and check args so that we can pass in expected types
         let (scope, arguments) = self.get_args(types, scope);
 
         if let Some(function_type) = function_type {
@@ -25,7 +26,8 @@ impl FunctionCallExpressionNode {
     fn get_args(&self, types: &TypeResolver, mut scope: Box<Scope>) -> (Box<Scope>, Vec<Type>) {
         let mut result = vec![];
         for argument in self.arguments.iter() {
-            let (new_scope, resolved_type) = argument.check(types, scope);
+            // TODO pass in the parameter type here...
+            let (new_scope, resolved_type) = argument.check(types, scope, None);
             result.push(resolved_type);
             scope = new_scope;
         }

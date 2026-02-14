@@ -37,7 +37,7 @@ impl FunctionNode {
         let scope = self.check_params(types, scope);
         let scope = match &self.body.value {
             FunctionBodyNode::Expression(expression) => {
-                let (scope, _resolved_type) = expression.check(types, scope);
+                let (scope, _resolved_type) = expression.check(types, scope, Some(return_type));
                 scope
             }
             FunctionBodyNode::Block(block) => {

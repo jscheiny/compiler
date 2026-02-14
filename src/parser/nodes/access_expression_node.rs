@@ -10,7 +10,8 @@ pub struct AccessExpressionNode {
 
 impl AccessExpressionNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (scope, left_type) = self.left.check(types, scope);
+        // TODO consider using expected type here to make a suggestion for what the accessed value should be???
+        let (scope, left_type) = self.left.check(types, scope, None);
         let field_type = get_field(left_type, self.field.id(), types);
         (scope, field_type.unwrap_or(Type::Error))
     }
