@@ -7,6 +7,7 @@ pub enum ScopeType {
     #[default]
     Global,
     Function,
+    Closure,
     Block,
     Loop,
     Struct,

@@ -1,7 +1,6 @@
 struct Pair(left: int, right: int);
 
 fn test(pair: Pair) {
-    while x {}
-
-    let x = (a: int, y: int) -> a + y;
+    let left = 3;
+    let x = (left, right) -> left or right;
 }

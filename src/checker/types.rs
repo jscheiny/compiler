@@ -36,7 +36,7 @@ impl Type {
         // TODO this will need revisement as time goes on...
         match self {
             Type::Enum(_) => todo!("Implement assignability for enums"),
-            Type::Function(left) => match get_function_type(other.clone(), types) {
+            Type::Function(left) => match get_function_type(&other, types) {
                 Some(right) => {
                     left.parameters.len() == right.parameters.len()
                         && left

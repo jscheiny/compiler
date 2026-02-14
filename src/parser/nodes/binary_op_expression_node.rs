@@ -54,7 +54,7 @@ impl BinaryOpExpressionNode {
         let (scope, left_type) = self.left.check(types, scope, None);
         // TODO Can we specify an expectation on the arg type of the function??
         let (scope, right_type) = self.right.check(types, scope, None);
-        let function_type = get_function_type(right_type, types);
+        let function_type = get_function_type(&right_type, types);
 
         if let Some(function_type) = function_type {
             if function_type.parameters.len() != 1 {
