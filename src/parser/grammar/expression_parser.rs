@@ -30,10 +30,10 @@ impl ExpressionContext {
         }
     }
 
-    pub fn with_precedence(self, min_precedence: i32) -> Self {
+    pub fn with_precedence(self, min_precedence: i32, allow_types: bool) -> Self {
         Self {
             min_precedence,
-            allow_types: false,
+            allow_types,
             ..self
         }
     }
@@ -178,7 +178,8 @@ fn complete_binary_op(
             Associativity::Right => 0,
         };
 
-    let context = context.with_precedence(next_min_precedence);
+    let allow_types = operator.value == BinaryOperator::Comma;
+    let context = context.with_precedence(next_min_precedence, allow_types);
     let right = tokens.located_with(sub_expression, context)?;
     let span = left.span.expand_to(tokens);
     Ok(span.wrap(ExpressionNode::BinaryOp(BinaryOpExpressionNode {
@@ -222,7 +223,7 @@ fn expression_atom(
         let precedence = operator.precedence();
         let operator = TokenSpan::singleton(tokens).wrap(operator);
         tokens.next();
-        let context = context.with_precedence(precedence);
+        let context = context.with_precedence(precedence, false);
         let expression = tokens.located_with(sub_expression, context)?;
         return Ok(ExpressionNode::PrefixOp(PrefixOpExpressionNode {
             operator,
