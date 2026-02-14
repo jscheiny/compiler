@@ -5,10 +5,11 @@ use crate::{
     },
     parser::{
         AccessExpressionNode, Associativity, BinaryOpExpressionNode, BinaryOperator, BlockNode,
-        ExpressionNode, FunctionCallExpressionNode, Identified, IdentifierType, IfExpressionNode,
-        LocatedSyntaxError, Node, Operator, ParseResult, PostfixOpExpressionNode, PostfixOperator,
-        PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType, SyntaxError,
-        TokenSpan, TokenStream, grammar::statement,
+        ClosureExpressionNode, ExpressionNode, FunctionCallExpressionNode, Identified,
+        IdentifierNode, IdentifierType, IfExpressionNode, LocatedSyntaxError, Node, Operator,
+        ParseResult, PostfixOpExpressionNode, PostfixOperator, PrefixOpExpressionNode,
+        PrefixOperator, StatementNode, StatementType, SyntaxError, TokenSpan, TokenStream,
+        grammar::statement,
     },
 };
 
@@ -210,9 +211,14 @@ fn expression_atom(
         }
         Token::Operator(OperatorToken::OpenParen) => {
             tokens.next();
-            let expression = sub_expression(tokens, ExpressionContext::parentheses())?;
+            let context = ExpressionContext::parentheses();
+            let expression = tokens.located_with(sub_expression, context)?;
             tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
-            Ok(expression)
+            if tokens.accept(&OperatorToken::SkinnyArrow) {
+                closure(tokens, expression)
+            } else {
+                Ok(expression.value)
+            }
         }
         Token::Keyword(KeywordToken::If) => {
             tokens.next();
@@ -272,4 +278,28 @@ pub fn block(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<Blo
     }
 
     Ok(BlockNode { statements })
+}
+
+fn closure(
+    tokens: &mut TokenStream,
+    args_expression: Node<ExpressionNode>,
+) -> ParseResult<ExpressionNode> {
+    let parameters = flatten_commas(args_expression)
+        .into_iter()
+        .map(|parameter| {
+            if let ExpressionNode::Identifier(id) = parameter.value {
+                Some(parameter.span.wrap(IdentifierNode(id)))
+            } else {
+                // TODO properly error here
+                println!("Syntax error: Closure parameter should be just an identifier?");
+                None
+            }
+        })
+        .collect();
+
+    let body = tokens.located(expression)?;
+    Ok(ExpressionNode::Closure(ClosureExpressionNode {
+        parameters,
+        body: Box::new(body),
+    }))
 }

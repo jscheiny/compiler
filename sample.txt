@@ -1,11 +1,7 @@
 struct Pair(left: int, right: int);
 
-fn test1();
 
 fn test(pair: Pair) {
-    let x: bool = 
-        if true then 
-            pair.left
-        else 
-            pair.right;
+    let x = (pair.left, pair.right, not true, false and true);
+    let y = (a, b, c) -> a + b + c;
 }

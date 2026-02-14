@@ -1,6 +1,7 @@
 mod access_expression_node;
 mod binary_op_expression_node;
 mod block_node;
+mod closure_expression_node;
 mod declaration_node;
 mod enum_node;
 mod enum_variant_node;
@@ -35,6 +36,7 @@ mod while_loop_node;
 pub use access_expression_node::*;
 pub use binary_op_expression_node::*;
 pub use block_node::*;
+pub use closure_expression_node::*;
 pub use declaration_node::*;
 pub use enum_node::*;
 pub use enum_variant_node::*;
