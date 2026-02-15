@@ -34,7 +34,7 @@ impl ExpressionNode {
     ) -> (Box<Scope>, Type) {
         match self {
             Self::PrefixOp(node) => node.check(types, scope),
-            Self::BinaryOp(node) => node.check(types, scope, expected_type),
+            Self::BinaryOp(node) => node.check(types, scope),
             Self::Access(node) => node.check(types, scope),
             Self::PostfixOp(node) => node.check(types, scope),
             Self::Closure(node) => node.check(types, scope, expected_type),
