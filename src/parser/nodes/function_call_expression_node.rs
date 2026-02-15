@@ -13,7 +13,7 @@ impl FunctionCallExpressionNode {
         let (scope, function_type) = self.function.check(types, scope, None);
         let function_type = get_function_type(&function_type, types);
         // TODO combine get args and check args so that we can pass in expected types
-        let (scope, arguments) = self.get_args(types, scope);
+        let (scope, arguments) = self.get_args(types, scope, function_type.as_ref());
 
         if let Some(function_type) = function_type {
             self.check_args(&function_type, &arguments, types);
@@ -23,11 +23,16 @@ impl FunctionCallExpressionNode {
         }
     }
 
-    fn get_args(&self, types: &TypeResolver, mut scope: Box<Scope>) -> (Box<Scope>, Vec<Type>) {
+    fn get_args(
+        &self,
+        types: &TypeResolver,
+        mut scope: Box<Scope>,
+        function_type: Option<&FunctionType>,
+    ) -> (Box<Scope>, Vec<Type>) {
         let mut result = vec![];
-        for argument in self.arguments.iter() {
-            // TODO pass in the parameter type here...
-            let (new_scope, resolved_type) = argument.check(types, scope, None);
+        for (index, argument) in self.arguments.iter().enumerate() {
+            let parameter_type = function_type.and_then(|ft| ft.parameters.get(index));
+            let (new_scope, resolved_type) = argument.check(types, scope, parameter_type);
             result.push(resolved_type);
             scope = new_scope;
         }
