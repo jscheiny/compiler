@@ -10,12 +10,7 @@ pub struct BinaryOpExpressionNode {
 }
 
 impl BinaryOpExpressionNode {
-    pub fn check(
-        &self,
-        types: &TypeResolver,
-        scope: Box<Scope>,
-        expected_type: Option<&Type>,
-    ) -> (Box<Scope>, Type) {
+    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
         use BinaryOperator as O;
         match *self.operator {
             O::Add => todo!("Implement type checking for binary op Add"),
@@ -39,7 +34,7 @@ impl BinaryOpExpressionNode {
             }
             O::Access => todo!("Implement type checking for binary op Access"),
             O::FunctionApplication => self.check_function_application(types, scope),
-            O::Comma => self.check_comma(types, scope, expected_type),
+            O::Comma => self.check_comma(types, scope),
             O::Type => panic!("Type error: Unexpected closure parameter outside of context"),
             O::LogicalAnd => self.check_logical_op(types, scope),
             O::LogicalOr => self.check_logical_op(types, scope),
@@ -72,13 +67,7 @@ impl BinaryOpExpressionNode {
         }
     }
 
-    fn check_comma(
-        &self,
-        types: &TypeResolver,
-        scope: Box<Scope>,
-        _expected_type: Option<&Type>,
-    ) -> (Box<Scope>, Type) {
-        // TODO type check expected types for tuples here... (replace None args)
+    fn check_comma(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let (mut scope, first_type) = self.left.check(types, scope, None);
         let mut tuple_types = vec![first_type];
         let mut current = &self.right;
