@@ -16,7 +16,7 @@ impl IfStatementConditionNode {
         }
 
         let scope = scope.derive(ScopeType::Block);
-        let (scope, resolved_type) = self.body.check(types, scope);
+        let (scope, resolved_type) = self.body.check(types, scope, None);
         if resolved_type.is_some() {
             println!("Type error: Unexpected body return in if block");
         }

@@ -15,7 +15,7 @@ impl IfStatementNode {
         }
 
         if let Some(else_branch) = self.else_branch.as_ref() {
-            let (new_scope, resolved_type) = else_branch.check(types, scope);
+            let (new_scope, resolved_type) = else_branch.check(types, scope, None);
             if resolved_type.is_some() {
                 println!("Type error: Unexpected body return in else block");
             }

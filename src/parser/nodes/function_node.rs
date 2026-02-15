@@ -42,7 +42,7 @@ impl FunctionNode {
                 scope
             }
             FunctionBodyNode::Block(block) => {
-                let (scope, _resolved_type) = block.check(types, scope);
+                let (scope, _resolved_type) = block.check(types, scope, Some(return_type));
                 scope
             }
         };

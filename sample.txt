@@ -1,12 +1,1 @@
-struct Pair(left: int, right: int);
-type T = (int, int) -> bool;
-
-fn test(pair: Pair) {
-    let left = 3;
-    let x: T = (left, right) -> left and not right;
-    accept((left, right) -> (a, b) -> a or b, 3);
-}
-
-fn accept(value: (bool, bool) -> T, x: int): T {
-    return (left, right) -> left and right;
-}
+fn test(): bool -> 5;

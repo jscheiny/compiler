@@ -16,11 +16,15 @@ pub enum StatementNode {
 }
 
 impl StatementNode {
-    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Option<Type>) {
+    pub fn check(
+        &self,
+        types: &TypeResolver,
+        scope: Box<Scope>,
+        expected_type: Option<&Type>,
+    ) -> (Box<Scope>, Option<Type>) {
         match self {
             Self::BlockReturn(expression) => {
-                // TODO check that this type matches the expected expression return type (pass in expected type?)
-                let (scope, resolved_type) = expression.check(types, scope);
+                let (scope, resolved_type) = expression.check_expected(types, scope, expected_type);
                 (scope, Some(resolved_type))
             }
             Self::Break => check_loop(KeywordToken::Break, scope),

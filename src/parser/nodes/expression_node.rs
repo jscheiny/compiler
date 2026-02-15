@@ -50,8 +50,7 @@ impl ExpressionNode {
                 todo!("Implement type checking for ExpressionNode::StringLiteral")
             }
             Self::Block(node) => {
-                // TODO handle type checking of block results
-                let (scope, resolved_type) = node.check(types, scope);
+                let (scope, resolved_type) = node.check(types, scope, expected_type);
                 (scope, resolved_type.unwrap_or(Type::Void))
             }
             Self::Identifier(identifier) => {
