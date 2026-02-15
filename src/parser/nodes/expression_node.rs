@@ -26,7 +26,11 @@ pub enum ExpressionNode {
 }
 
 impl ExpressionNode {
-    pub fn check(
+    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        self.check_expected(types, scope, None)
+    }
+
+    pub fn check_expected(
         &self,
         types: &TypeResolver,
         scope: Box<Scope>,

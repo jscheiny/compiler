@@ -18,7 +18,10 @@ impl ClosureExpressionNode {
         let function_type = expected_type.and_then(|t| get_function_type(t, types));
         let scope = scope.derive(ScopeType::Closure);
         let (scope, parameters) = self.check_parameters(function_type.as_ref(), types, scope);
-        let (scope, return_type) = self.body.check(types, scope, None);
+        let expected_return_type = function_type.map(|t| t.return_type);
+        let (scope, return_type) =
+            self.body
+                .check_expected(types, scope, expected_return_type.as_deref());
         let result_type = Type::Function(FunctionType {
             parameters,
             return_type: Box::new(return_type),

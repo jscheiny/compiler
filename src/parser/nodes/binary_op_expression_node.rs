@@ -46,9 +46,9 @@ impl BinaryOpExpressionNode {
         types: &TypeResolver,
         scope: Box<Scope>,
     ) -> (Box<Scope>, Type) {
-        let (scope, left_type) = self.left.check(types, scope, None);
+        let (scope, left_type) = self.left.check(types, scope);
         // TODO Can we specify an expectation on the arg type of the function??
-        let (scope, right_type) = self.right.check(types, scope, None);
+        let (scope, right_type) = self.right.check(types, scope);
         let function_type = get_function_type(&right_type, types);
 
         if let Some(function_type) = function_type {
@@ -68,7 +68,7 @@ impl BinaryOpExpressionNode {
     }
 
     fn check_comma(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (mut scope, first_type) = self.left.check(types, scope, None);
+        let (mut scope, first_type) = self.left.check(types, scope);
         let mut tuple_types = vec![first_type];
         let mut current = &self.right;
 
@@ -80,7 +80,7 @@ impl BinaryOpExpressionNode {
             }) = &current.value
             {
                 if operator.value == BinaryOperator::Comma {
-                    let (new_scope, left_type) = left.check(types, scope, None);
+                    let (new_scope, left_type) = left.check(types, scope);
                     tuple_types.push(left_type);
                     scope = new_scope;
                     current = right;
@@ -90,21 +90,21 @@ impl BinaryOpExpressionNode {
             break;
         }
 
-        let (scope, current_type) = current.check(types, scope, None);
+        let (scope, current_type) = current.check(types, scope);
         tuple_types.push(current_type);
 
         (scope, Type::Tuple(tuple_types))
     }
 
     fn check_logical_op(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (scope, left_type) = self.left.check(types, scope, None);
+        let (scope, left_type) = self.left.check(types, scope);
         if !left_type.is_primitive(PrimitiveType::Bool, types) {
             println!(
                 "Type error: Left hand side of op `{:?}` should be of type bool",
                 self.operator.value
             );
         }
-        let (scope, right_type) = self.right.check(types, scope, None);
+        let (scope, right_type) = self.right.check(types, scope);
         if !right_type.is_primitive(PrimitiveType::Bool, types) {
             println!(
                 "Type error: Right hand side of op `{:?}` should be of type bool",
