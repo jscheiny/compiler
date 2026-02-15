@@ -97,15 +97,14 @@ impl BinaryOpExpressionNode {
     }
 
     fn check_logical_op(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let bool_type = Some(&Type::Primitive(PrimitiveType::Bool));
-        let (scope, left_type) = self.left.check(types, scope, bool_type);
+        let (scope, left_type) = self.left.check(types, scope, None);
         if !left_type.is_primitive(PrimitiveType::Bool, types) {
             println!(
                 "Type error: Left hand side of op `{:?}` should be of type bool",
                 self.operator.value
             );
         }
-        let (scope, right_type) = self.right.check(types, scope, bool_type);
+        let (scope, right_type) = self.right.check(types, scope, None);
         if !right_type.is_primitive(PrimitiveType::Bool, types) {
             println!(
                 "Type error: Right hand side of op `{:?}` should be of type bool",
