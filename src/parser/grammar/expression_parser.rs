@@ -78,7 +78,7 @@ fn sub_expression(
 
             // TODO This should probably still be allowed to continue on...
             if operator == BinaryOperator::Comma && !context.allow_commas {
-                return Err(tokens.make_error(SyntaxError::UnexpectedComma));
+                break;
             }
 
             let operator = TokenSpan::singleton(tokens).wrap(operator);
