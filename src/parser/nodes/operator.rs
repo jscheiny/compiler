@@ -67,7 +67,7 @@ pub enum BinaryOperator {
     LessThanOrEqual,     // <=
     GreaterThan,         // >
     GreaterThanOrEqual,  // >=
-    Access,              // .
+    Access,              // . TODO this is unused remove it
     FunctionApplication, // =>
     Comma,               // ,
     Type,                // :

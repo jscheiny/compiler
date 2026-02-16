@@ -13,31 +13,29 @@ impl BinaryOpExpressionNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
         use BinaryOperator as O;
         match *self.operator {
-            O::Add => todo!("Implement type checking for binary op Add"),
-            O::AddAssign => todo!("Implement type checking for binary op AddAssign"),
-            O::Subtract => todo!("Implement type checking for binary op Subtract"),
-            O::SubtractAssign => todo!("Implement type checking for binary op SubtractAssign"),
-            O::Multiply => todo!("Implement type checking for binary op Multiply"),
-            O::MultiplyAssign => todo!("Implement type checking for binary op MultiplyAssign"),
-            O::Divide => todo!("Implement type checking for binary op Divide"),
-            O::DivideAssign => todo!("Implement type checking for binary op DivideAssign"),
-            O::Mod => todo!("Implement type checking for binary op Mod"),
-            O::ModAssign => todo!("Implement type checking for binary op ModAssign"),
-            O::Assign => todo!("Implement type checking for binary op Assign"),
-            O::Equal => todo!("Implement type checking for binary op Equal"),
-            O::NotEqual => todo!("Implement type checking for binary op NotEqual"),
-            O::LessThan => todo!("Implement type checking for binary op LessThan"),
-            O::LessThanOrEqual => todo!("Implement type checking for binary op LessThanOrEqual"),
-            O::GreaterThan => todo!("Implement type checking for binary op GreaterThan"),
-            O::GreaterThanOrEqual => {
-                todo!("Implement type checking for binary op GreaterThanOrEqual")
-            }
+            O::Add => todo!("Implement type checking for +"),
+            O::AddAssign => todo!("Implement type checking for +="),
+            O::Subtract => todo!("Implement type checking for -"),
+            O::SubtractAssign => todo!("Implement type checking for -="),
+            O::Multiply => todo!("Implement type checking for *"),
+            O::MultiplyAssign => todo!("Implement type checking for *="),
+            O::Divide => todo!("Implement type checking for /"),
+            O::DivideAssign => todo!("Implement type checking for /="),
+            O::Mod => todo!("Implement type checking for %"),
+            O::ModAssign => todo!("Implement type checking for %="),
+            O::Assign => todo!("Implement type checking for ="),
+            O::Equal => todo!("Implement type checking for =="),
+            O::NotEqual => todo!("Implement type checking for !="),
+            O::LessThan => todo!("Implement type checking for <"),
+            O::LessThanOrEqual => todo!("Implement type checking for <="),
+            O::GreaterThan => todo!("Implement type checking for >"),
+            O::GreaterThanOrEqual => todo!("Implement type checking for >="),
             O::Access => todo!("Implement type checking for binary op Access"),
             O::FunctionApplication => self.check_function_application(types, scope),
             O::Comma => self.check_comma(types, scope),
-            O::Type => panic!("Type error: Unexpected closure parameter outside of context"),
             O::LogicalAnd => self.check_logical_op(types, scope),
             O::LogicalOr => self.check_logical_op(types, scope),
+            O::Type => panic!("Type error: Unexpected closure parameter outside of context"),
         }
     }
 
