@@ -63,7 +63,7 @@ impl ExpressionNode {
             Self::SelfRef(identifier) => self.check_self_ref(identifier, scope),
             Self::Error => (scope, Type::Error),
             Self::ClosureParameter(_) => {
-                panic!("Type error: Found closure parameter outside of parameter list")
+                panic!("ERROR: Unexpected closure parameter outside of parameter list")
             }
         }
     }
