@@ -1,3 +1,10 @@
-fn test(): bool -> {
-    -> 5;
-};
+type T = (bool) -> bool;
+
+fn test(value: bool) {
+    let x = if value then 
+        (x: int) -> -x
+    else
+        (x) -> x;
+
+    let t: T = if value then (x) -> not x else (x) -> x;
+}

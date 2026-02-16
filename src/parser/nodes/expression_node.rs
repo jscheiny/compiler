@@ -43,7 +43,7 @@ impl ExpressionNode {
             Self::PostfixOp(node) => node.check(types, scope),
             Self::Closure(node) => node.check(types, scope, expected_type),
             Self::FunctionCall(node) => node.check(types, scope),
-            Self::IfExpression(node) => node.check(types, scope),
+            Self::IfExpression(node) => node.check(types, scope, expected_type),
             Self::BooleanLiteral(_) => (scope, Type::Primitive(PrimitiveType::Bool)),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
             Self::StringLiteral(_) => {
