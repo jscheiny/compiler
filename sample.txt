@@ -1,8 +1,9 @@
-enum Test(
-    First,
-    First
-) {
-    Second() {
+enum Other(X, Y);
 
+enum Test(
+    A,
+) {
+    a(value: Other) {
+        let x: Test = value;
     }
 }
