@@ -1,5 +1,7 @@
 type T = (bool) -> bool;
 
+type U = (bool) -> (bool) -> bool;
+
 fn test(value: bool) {
     let x = if value then 
         (x: int) -> -x
@@ -7,4 +9,6 @@ fn test(value: bool) {
         (x) -> x;
 
     let t: T = if value then (x) -> not x else (x) -> x;
+
+    let g: U = (x) -> (y) -> x or y;
 }
