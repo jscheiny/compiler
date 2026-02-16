@@ -30,12 +30,12 @@ impl BinaryOpExpressionNode {
             O::LessThanOrEqual => todo!("Implement type checking for <="),
             O::GreaterThan => todo!("Implement type checking for >"),
             O::GreaterThanOrEqual => todo!("Implement type checking for >="),
-            O::Access => todo!("Implement type checking for binary op Access"),
             O::FunctionApplication => self.check_function_application(types, scope),
             O::Comma => self.check_comma(types, scope),
             O::LogicalAnd => self.check_logical_op(types, scope),
             O::LogicalOr => self.check_logical_op(types, scope),
-            O::Type => panic!("Type error: Unexpected closure parameter outside of context"),
+            O::Access => panic!("ERROR: Expected ExpressionNode::Access"),
+            O::Type => panic!("ERROR: Unexpected closure parameter outside of context"),
         }
     }
 
