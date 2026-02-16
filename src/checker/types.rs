@@ -1,6 +1,6 @@
 use crate::{
     checker::{EnumType, FunctionType, StructType, TypeFmt, TypeResolver},
-    parser::{PrimitiveType, get_function_type},
+    parser::PrimitiveType,
 };
 
 // TODO reconsider this name
@@ -36,7 +36,7 @@ impl Type {
         // TODO this will need revisement as time goes on...
         match self {
             Type::Enum(_) => todo!("Implement assignability for enums"),
-            Type::Function(left) => match get_function_type(other, types) {
+            Type::Function(left) => match other.as_function(types) {
                 Some(right) => {
                     left.parameters.len() == right.parameters.len()
                         && left
@@ -85,6 +85,18 @@ impl Type {
                 .is_primitive(expected, types),
             Self::Error => true,
             _ => false,
+        }
+    }
+
+    pub fn as_function(&self, types: &TypeResolver) -> Option<FunctionType> {
+        match self {
+            Type::Function(function_type) => Some(function_type.clone()),
+            Type::Reference(index) => types
+                .get_type(*index)
+                .unwrap_or(Type::Error)
+                .as_function(types),
+            Type::Type(_) => todo!("Implement call operator for types (constructor)"),
+            _ => None,
         }
     }
 

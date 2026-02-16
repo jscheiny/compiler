@@ -1,6 +1,6 @@
 use crate::{
     checker::{Scope, Type, TypeResolver},
-    parser::{BinaryOperator, ExpressionNode, Node, PrimitiveType, get_function_type},
+    parser::{BinaryOperator, ExpressionNode, Node, PrimitiveType},
 };
 
 pub struct BinaryOpExpressionNode {
@@ -49,7 +49,7 @@ impl BinaryOpExpressionNode {
         let (scope, left_type) = self.left.check(types, scope);
         // TODO Can we specify an expectation on the arg type of the function??
         let (scope, right_type) = self.right.check(types, scope);
-        let function_type = get_function_type(&right_type, types);
+        let function_type = right_type.as_function(types);
 
         if let Some(function_type) = function_type {
             if function_type.parameters.len() != 1 {

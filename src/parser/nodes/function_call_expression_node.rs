@@ -11,7 +11,7 @@ pub struct FunctionCallExpressionNode {
 impl FunctionCallExpressionNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let (scope, function_type) = self.function.check(types, scope);
-        let function_type = get_function_type(&function_type, types);
+        let function_type = function_type.as_function(types);
         // TODO combine get args and check args so that we can pass in expected types
         let (scope, arguments) = self.get_args(types, scope, function_type.as_ref());
 
@@ -61,23 +61,5 @@ impl FunctionCallExpressionNode {
             }
         }
         // TODO check types of each argument
-    }
-}
-
-// TODO move this elsewhere
-pub fn get_function_type(input_type: &Type, types: &TypeResolver) -> Option<FunctionType> {
-    match input_type {
-        Type::Function(function_type) => Some(function_type.clone()),
-        Type::Reference(index) => {
-            let resolved_type = types.get_type(*index).unwrap();
-            get_function_type(&resolved_type, types)
-        }
-        Type::Type(_) => todo!("Implement call operator for types"),
-        Type::Enum(_)
-        | Type::Primitive(_)
-        | Type::Struct(_)
-        | Type::Tuple(_)
-        | Type::Void
-        | Type::Error => None,
     }
 }
