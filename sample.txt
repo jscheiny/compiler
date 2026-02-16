@@ -1,1 +1,3 @@
-fn test(): bool -> 5;
+fn test(): bool -> {
+    -> 5;
+};

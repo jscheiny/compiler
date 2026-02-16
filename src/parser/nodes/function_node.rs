@@ -37,14 +37,18 @@ impl FunctionNode {
         let scope = self.check_params(types, scope);
         let scope = match &self.body.value {
             FunctionBodyNode::Expression(expression) => {
-                let (scope, _resolved_type) =
+                let (scope, resolved_type) =
                     expression.check_expected(types, scope, Some(return_type));
+                if !resolved_type.is_assignable_to(return_type, types) {
+                    println!(
+                        "Type error: Returned type `{}` is not assignable to expected return type of `{}`",
+                        resolved_type.format(types),
+                        return_type.format(types)
+                    );
+                }
                 scope
             }
-            FunctionBodyNode::Block(block) => {
-                let (scope, _resolved_type) = block.check(types, scope, Some(return_type));
-                scope
-            }
+            FunctionBodyNode::Block(block) => block.check(types, scope, Some(return_type)).0,
         };
         // TODO type check return type vs resolved type
         scope.parent()
