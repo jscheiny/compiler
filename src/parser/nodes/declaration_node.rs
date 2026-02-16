@@ -30,7 +30,6 @@ impl DeclarationNode {
                         );
                     }
                 }
-                // TODO check that resolved type matches expected type
                 (new_scope, expected_type.unwrap_or(resolved_type))
             }
             None => (scope, Type::Error),
