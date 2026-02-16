@@ -18,7 +18,22 @@ impl AccessExpressionNode {
 
 fn get_field(input_type: Type, field: &String, types: &TypeResolver) -> Option<Type> {
     match input_type {
-        Type::Enum(_) => todo!("Implement access on enum values"),
+        Type::Enum(enum_type) => {
+            let method = enum_type.methods.get(field);
+            if let Some(method) = method {
+                if !method.public {
+                    // TODO respect public/private access
+                    println!("Type error maybe? Check privacy here");
+                }
+                Some(Type::Function(method.function_type.clone()))
+            } else {
+                println!(
+                    "Type error: No field `{}` of type `{}` could be found",
+                    field, enum_type.identifier,
+                );
+                None
+            }
+        }
         Type::Function(_) => {
             println!("Type error: No access operator on functions");
             None
