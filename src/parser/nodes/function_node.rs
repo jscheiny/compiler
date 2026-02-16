@@ -50,7 +50,6 @@ impl FunctionNode {
             }
             FunctionBodyNode::Block(block) => block.check(types, scope, Some(return_type)).0,
         };
-        // TODO type check return type vs resolved type
         scope.parent()
     }
 

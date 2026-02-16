@@ -12,7 +12,6 @@ impl FunctionCallExpressionNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let (scope, function_type) = self.function.check(types, scope);
         let function_type = function_type.as_function(types);
-        // TODO combine get args and check args so that we can pass in expected types
         let (scope, arguments) = self.get_args(types, scope, function_type.as_ref());
 
         if let Some(function_type) = function_type {
@@ -60,6 +59,5 @@ impl FunctionCallExpressionNode {
                 );
             }
         }
-        // TODO check types of each argument
     }
 }
