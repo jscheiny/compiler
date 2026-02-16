@@ -12,3 +12,5 @@ fn test(value: bool) {
 
     let g: U = (x) -> (y) -> x or y;
 }
+
+fn test2(): int -> {};

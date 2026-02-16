@@ -1,7 +1,7 @@
-use std::cell::OnceCell;
+use std::{cell::OnceCell, collections::HashMap};
 
 use crate::{
-    checker::{EnumType, TypeResolver},
+    checker::{EnumType, Scope, ScopeType, Type, TypeResolver},
     parser::{EnumVariantNode, Identified, IdentifierNode, MethodNode, Node, NodeVec},
 };
 
@@ -26,27 +26,50 @@ impl EnumNode {
         }
     }
 
+    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
+        let mut scope = scope.derive(ScopeType::Struct);
+        if let Some(methods) = self.methods.as_ref() {
+            for method in methods.iter() {
+                let method_type = Type::Function(method.function.get_type(types).clone());
+                scope.add_or(method.id(), method_type, || {
+                    println!("Type error: Duplicate member of name `{}`", method.id())
+                });
+            }
+
+            for method in methods.iter() {
+                scope = method.check(types, scope)
+            }
+        }
+
+        scope.parent()
+    }
+
     pub fn get_type(&self, types: &mut TypeResolver) -> &EnumType {
         self.resolved_type.get_or_init(|| self.get_type_impl(types))
     }
 
     pub fn get_type_impl(&self, types: &mut TypeResolver) -> EnumType {
-        let enum_name = self.id().clone();
-        let mut enum_type = EnumType::new(enum_name.clone());
-
+        let mut variants = HashMap::new();
         for variant in self.variants.iter() {
-            let member = variant.get_type(types).cloned();
-            enum_type.add_variant(variant.id(), &enum_name, member, types);
+            let identifier = variant.id().clone();
+            let variant = variant.get_type(types).cloned();
+            variants.entry(identifier).or_insert(variant);
         }
 
-        if let Some(methods) = self.methods.as_ref() {
-            for method in methods.iter() {
+        let mut methods = HashMap::new();
+        if let Some(methods_list) = self.methods.as_ref() {
+            for method in methods_list.iter() {
                 let member = method.resolve_enum_method(types);
-                enum_type.add_method(method.id(), &enum_name, member, types);
+                let identifier = method.id().clone();
+                methods.entry(identifier).or_insert(member);
             }
         }
 
-        enum_type
+        EnumType {
+            identifier: self.id().clone(),
+            variants,
+            methods,
+        }
     }
 }
 
