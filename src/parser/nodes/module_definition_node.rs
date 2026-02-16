@@ -19,7 +19,7 @@ impl ModuleDefinitionNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
         match self {
             Self::Struct(node) => node.check(types, scope),
-            Self::Enum(_node) => todo!("Enum type checking not implemented"),
+            Self::Enum(node) => node.check(types, scope),
             Self::Function(node) => node.check(types, scope),
             Self::TypeAlias(node) => {
                 node.check();

@@ -1,4 +1,7 @@
-use std::{cell::OnceCell, collections::HashMap};
+use std::{
+    cell::OnceCell,
+    collections::{HashMap, HashSet},
+};
 
 use crate::{
     checker::{EnumType, Scope, ScopeType, Type, TypeResolver},
@@ -28,12 +31,22 @@ impl EnumNode {
 
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
         let mut scope = scope.derive(ScopeType::Struct);
+        let mut scope_names = HashSet::new();
+        for variant in self.variants.iter() {
+            if !scope_names.insert(variant.id()) {
+                println!("Type error: Duplicate variant of name `{}`", variant.id())
+            }
+        }
+
         if let Some(methods) = self.methods.as_ref() {
             for method in methods.iter() {
-                let method_type = Type::Function(method.function.get_type(types).clone());
-                scope.add_or(method.id(), method_type, || {
+                if scope_names.contains(method.id()) {
                     println!("Type error: Duplicate member of name `{}`", method.id())
-                });
+                } else {
+                    let method_type = Type::Function(method.function.get_type(types).clone());
+                    scope.add(method.id(), method_type);
+                    scope_names.insert(method.id());
+                }
             }
 
             for method in methods.iter() {

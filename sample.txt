@@ -1,16 +1,8 @@
-type T = (bool) -> bool;
+enum Test(
+    First,
+    First
+) {
+    Second() {
 
-type U = (bool) -> (bool) -> bool;
-
-fn test(value: bool) {
-    let x = if value then 
-        (x: int) -> -x
-    else
-        (x) -> x;
-
-    let t: T = if value then (x) -> not x else (x) -> x;
-
-    let g: U = (x) -> (y) -> x or y;
+    }
 }
-
-fn test2(): int -> {};
