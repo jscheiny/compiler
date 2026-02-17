@@ -35,6 +35,11 @@ impl TypeResolver {
         self.types[index].clone()
     }
 
+    pub fn get_type_by_ref(&self, identifier: &String) -> Option<Type> {
+        self.get_ref(identifier)
+            .and_then(|index| self.get_type(index))
+    }
+
     pub fn resolve(&mut self, identifier: &String, value: Type) {
         let index = self.get_ref(identifier);
         if let Some(index) = index {

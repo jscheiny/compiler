@@ -4,10 +4,13 @@ enum Test(
     Boolean(bool)
 );
 
-type T = Test;
+type T = (bool) -> bool;
 
 fn main() {
+    Test::Boolean(5);
     accept_test(T.Integer(3));
+    let k = T;
+    k:fadfjiaosdf(3, aoifjasdf);
 }
 
 fn accept_test(test: Test) {}

@@ -104,6 +104,19 @@ impl Type {
         }
     }
 
+    pub fn as_runtime_type(self, types: &TypeResolver) -> Option<RuntimeType> {
+        match self {
+            Type::Type(runtime_type) => Some(runtime_type),
+            Type::Enum(enum_type) => Some(RuntimeType::Enum(enum_type)),
+            Type::Struct(struct_type) => Some(RuntimeType::Struct(struct_type)),
+            Type::Reference(index) => types
+                .get_type(index)
+                .unwrap_or(Type::Error)
+                .as_runtime_type(types),
+            _ => None,
+        }
+    }
+
     pub fn format<'a>(&'a self, types: &'a TypeResolver) -> TypeFmt<'a> {
         TypeFmt {
             resolved_type: self,

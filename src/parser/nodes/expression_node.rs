@@ -53,18 +53,32 @@ impl ExpressionNode {
                 let (scope, resolved_type) = node.check(types, scope, expected_type);
                 (scope, resolved_type.unwrap_or(Type::Void))
             }
-            Self::Identifier(identifier) => {
-                let resolved_type = scope.lookup(identifier);
-                if resolved_type.is_none() {
-                    println!("Type Error: Could not find symbol `{}`", identifier)
-                }
-                (scope, resolved_type.unwrap_or(Type::Error))
-            }
+            Self::Identifier(identifier) => self.check_identifier(identifier, types, scope),
             Self::SelfRef(identifier) => self.check_self_ref(identifier, scope),
             Self::Error => (scope, Type::Error),
             Self::ClosureParameter(_) => {
                 panic!("ERROR: Unexpected closure parameter outside of parameter list")
             }
+        }
+    }
+
+    fn check_identifier(
+        &self,
+        identifier: &String,
+        types: &TypeResolver,
+        scope: Box<Scope>,
+    ) -> (Box<Scope>, Type) {
+        if let Some(resolved_type) = scope.lookup(identifier) {
+            (scope, resolved_type)
+        } else if let Some(resolved_type) = types.get_type_by_ref(identifier) {
+            let resolved_type = resolved_type
+                .as_runtime_type(types)
+                .map(Type::Type)
+                .unwrap_or(Type::Error);
+            (scope, resolved_type)
+        } else {
+            println!("Type Error: Could not find symbol `{}`", identifier);
+            (scope, Type::Error)
         }
     }
 
