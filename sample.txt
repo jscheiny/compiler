@@ -1,13 +1,13 @@
-enum Other(X, Y) {
-    pub do_something(): bool {
-    }
+enum Test(
+    Integer(int),
+    Float(float),
+    Boolean(bool)
+);
+
+type T = Test;
+
+fn main() {
+    accept_test(T.Integer(3));
 }
 
-enum Test(
-    A,
-) {
-    a(value: Other) {
-        value.do_something();
-        let x: Other = value;
-    }
-}
+fn accept_test(test: Test) {}
