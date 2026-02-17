@@ -50,6 +50,7 @@ impl Display for TypeFmt<'_> {
                 f,
                 "Runtime({})",
                 match runtime_type {
+                    RuntimeType::Enum(enum_type) => &enum_type.identifier,
                     RuntimeType::Struct(struct_type) => &struct_type.identifier,
                 }
             ),

@@ -6,6 +6,7 @@ use crate::{
 // TODO reconsider this name
 #[derive(Clone, Debug)]
 pub enum RuntimeType {
+    Enum(EnumType),
     Struct(StructType),
 }
 

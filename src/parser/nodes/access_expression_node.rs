@@ -1,5 +1,5 @@
 use crate::{
-    checker::{RuntimeType, Scope, Type, TypeResolver},
+    checker::{FunctionType, RuntimeType, Scope, Type, TypeResolver},
     parser::{ExpressionNode, Identified, IdentifierNode, Node},
 };
 
@@ -74,7 +74,27 @@ fn get_static_field(
     field: &String,
     types: &TypeResolver,
 ) -> Option<Type> {
+    // TODO use reference types instead of expensive copies of self (or switch to RCs!)
     match runtime_type {
+        RuntimeType::Enum(enum_type) => {
+            let self_type = get_self_type(&enum_type.identifier, types);
+            if let Some(variant_type) = enum_type.variants.get(field) {
+                let static_type = match variant_type {
+                    Some(inner_type) => FunctionType::new(inner_type.clone(), self_type),
+                    None => self_type,
+                };
+                Some(static_type)
+            } else if let Some(method) = enum_type.methods.get(field) {
+                // TODO respect public/private access
+                Some(method.function_type.clone().as_static_method(self_type))
+            } else {
+                println!(
+                    "Type error: No method or variant `{}` of enum `{}` could be found",
+                    field, enum_type.identifier
+                );
+                None
+            }
+        }
         RuntimeType::Struct(struct_type) => {
             let member = struct_type.members.get(field);
             if let Some(member) = member {
@@ -83,14 +103,21 @@ fn get_static_field(
                     .get_ref(&struct_type.identifier)
                     .map(Type::Reference)
                     .unwrap_or(Type::Error);
-                Some(member.member_type.get_static_type(self_type))
+                Some(member.member_type.clone().as_static_type(self_type))
             } else {
                 println!(
-                    "Type error: No field `{}` of type `{}` could be found",
+                    "Type error: No field `{}` of struct `{}` could be found",
                     field, struct_type.identifier
                 );
                 None
             }
         }
     }
+}
+
+fn get_self_type(identifier: &String, types: &TypeResolver) -> Type {
+    types
+        .get_ref(identifier)
+        .map(Type::Reference)
+        .unwrap_or(Type::Error)
 }
