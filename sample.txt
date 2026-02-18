@@ -1,12 +1,13 @@
-type T = () -> int;
+type T = bool -> bool -> bool;
 
 fn test() {
-    let x = (1, 2, 3);
-    let y = (x: bool, y: bool) -> x or y;
-    let z = () -> 5;
-    accept(z);
-    accept(() -> 3);
-    //  let a = ();
+    accept((a) -> (b) -> a or b);
 }
 
-fn accept(value: T) {}
+fn accept(value: T) {
+    accept2(value(true));
+}
+
+fn accept2(value: bool -> bool) {
+
+}

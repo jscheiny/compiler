@@ -7,6 +7,20 @@ use crate::{
 };
 
 pub fn type_definition(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
+    let inner_type = tokens.located(type_definition_impl)?;
+    if tokens.accept(&OperatorToken::SkinnyArrow) {
+        let return_type = tokens.located(type_definition)?;
+        let parameters = inner_type.span.wrap(vec![inner_type]);
+        Ok(TypeNode::Function(FunctionTypeNode::new(
+            parameters,
+            Box::new(return_type),
+        )))
+    } else {
+        Ok(inner_type.value)
+    }
+}
+
+pub fn type_definition_impl(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
     let token = tokens.peek();
     match token {
         Token::Identifier(IdentifierToken(identifier)) => {
