@@ -206,32 +206,6 @@ fn function_call(
     )
 }
 
-// TODO move to bottom of file
-fn flatten_commas(expression: Node<ExpressionNode>) -> Vec<Node<ExpressionNode>> {
-    let mut arguments = vec![];
-    let mut current = expression;
-    loop {
-        if let ExpressionNode::BinaryOp(BinaryOpExpressionNode {
-            left,
-            operator,
-            right,
-        }) = current.value
-        {
-            if operator.value != BinaryOperator::Comma {
-                arguments.push(*right);
-                break;
-            }
-            arguments.push(*left);
-            current = *right;
-        } else {
-            arguments.push(current);
-            break;
-        }
-    }
-
-    arguments
-}
-
 fn expression_atom(
     tokens: &mut TokenStream,
     context: ExpressionContext,
@@ -406,4 +380,29 @@ fn if_expression(
         if_true: Box::new(if_true),
         if_false: Box::new(if_false),
     }))
+}
+
+fn flatten_commas(expression: Node<ExpressionNode>) -> Vec<Node<ExpressionNode>> {
+    let mut arguments = vec![];
+    let mut current = expression;
+    loop {
+        if let ExpressionNode::BinaryOp(BinaryOpExpressionNode {
+            left,
+            operator,
+            right,
+        }) = current.value
+        {
+            if operator.value != BinaryOperator::Comma {
+                arguments.push(*right);
+                break;
+            }
+            arguments.push(*left);
+            current = *right;
+        } else {
+            arguments.push(current);
+            break;
+        }
+    }
+
+    arguments
 }
