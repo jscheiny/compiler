@@ -1,6 +1,12 @@
+type T = () -> int;
+
 fn test() {
     let x = (1, 2, 3);
     let y = (x: bool, y: bool) -> x or y;
     let z = () -> 5;
-    let a = ();
+    accept(z);
+    accept(() -> 3);
+    //  let a = ();
 }
+
+fn accept(value: T) {}
