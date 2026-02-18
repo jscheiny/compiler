@@ -9,6 +9,7 @@ use crate::{
 pub enum SyntaxError {
     BlockReturnEarly,
     ExpectedBlock,
+    ExpectedCloseBracket,
     ExpectedCloseParen,
     ExpectedClosureParameter,
     ExpectedElse,
@@ -98,6 +99,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
         match self.error.error {
             E::BlockReturnEarly => return write!(f, "early block return statement"),
             E::ExpectedBlock => write!(f, "expected statement block"),
+            E::ExpectedCloseBracket => write!(f, "expected close bracket"),
             E::ExpectedCloseParen => write!(f, "expected close parenthesis"),
             E::ExpectedClosureParameter => write!(f, "expected parameter"),
             E::ExpectedElse => write!(
@@ -148,6 +150,7 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
         match self.error.error {
             E::BlockReturnEarly => write!(f, "block return must be the last statement in a block"),
             E::ExpectedBlock => fmt_op(f, O::OpenParen),
+            E::ExpectedCloseBracket => fmt_op(f, O::CloseBracket),
             E::ExpectedCloseParen => fmt_op(f, O::CloseParen),
             E::ExpectedClosureParameter => write!(f, "expected parameter for closure"),
             E::ExpectedElse => write!(f, "expected `{}`", KeywordToken::Else),

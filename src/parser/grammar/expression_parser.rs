@@ -4,12 +4,12 @@ use crate::{
         Token, TokenMatch,
     },
     parser::{
-        AccessExpressionNode, Associativity, BinaryOpExpressionNode, BinaryOperator, BlockNode,
-        ClosureExpressionNode, ClosureParameterExpressionNode, ExpressionNode,
-        FunctionCallExpressionNode, Identified, IdentifierNode, IdentifierType, IfExpressionNode,
-        LocatedSyntaxError, Node, Operator, ParseResult, PostfixOpExpressionNode, PostfixOperator,
-        PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType, SyntaxError,
-        TokenSpan, TokenStream,
+        AccessExpressionNode, ArrayExpressionNode, Associativity, BinaryOpExpressionNode,
+        BinaryOperator, BlockNode, ClosureExpressionNode, ClosureParameterExpressionNode,
+        ExpressionNode, FunctionCallExpressionNode, Identified, IdentifierNode, IdentifierType,
+        IfExpressionNode, LocatedSyntaxError, Node, Operator, ParseResult, PostfixOpExpressionNode,
+        PostfixOperator, PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType,
+        SyntaxError, TokenSpan, TokenStream,
         grammar::{statement, type_definition},
     },
 };
@@ -22,6 +22,14 @@ struct ExpressionContext {
 }
 
 impl ExpressionContext {
+    pub fn brackets() -> Self {
+        Self {
+            min_precedence: 0,
+            allow_commas: true,
+            allow_types: false,
+        }
+    }
+
     pub fn parentheses() -> Self {
         Self {
             min_precedence: 0,
@@ -256,6 +264,7 @@ fn expression_atom(
             Ok(ExpressionNode::SelfRef(identifier.id().clone()))
         }
         Token::Operator(OperatorToken::OpenParen) => {
+            // TODO handle empty tuple / function args
             tokens.next();
             let context = ExpressionContext::parentheses();
             let expression = tokens.located_with(sub_expression, context)?;
@@ -265,6 +274,21 @@ fn expression_atom(
             } else {
                 Ok(expression.value)
             }
+        }
+        Token::Operator(OperatorToken::OpenBracket) => {
+            tokens.next();
+            let context = ExpressionContext::brackets();
+            let elements = if tokens.accept(&OperatorToken::CloseBracket) {
+                vec![]
+            } else {
+                let expression = tokens.located_with(sub_expression, context)?;
+                tokens.expect(
+                    &OperatorToken::CloseBracket,
+                    SyntaxError::ExpectedCloseBracket,
+                )?;
+                flatten_commas(expression)
+            };
+            Ok(ExpressionNode::Array(ArrayExpressionNode { elements }))
         }
         Token::Keyword(KeywordToken::If) => {
             tokens.next();

@@ -1,9 +1,9 @@
 use crate::{
     checker::{Scope, ScopeType, Type, TypeResolver},
     parser::{
-        AccessExpressionNode, BinaryOpExpressionNode, BlockNode, ClosureExpressionNode,
-        ClosureParameterExpressionNode, FunctionCallExpressionNode, IfExpressionNode,
-        PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType,
+        AccessExpressionNode, ArrayExpressionNode, BinaryOpExpressionNode, BlockNode,
+        ClosureExpressionNode, ClosureParameterExpressionNode, FunctionCallExpressionNode,
+        IfExpressionNode, PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType,
     },
 };
 
@@ -17,6 +17,7 @@ pub enum ExpressionNode {
     SelfRef(String),
     FunctionCall(FunctionCallExpressionNode),
     IfExpression(IfExpressionNode),
+    Array(ArrayExpressionNode),
     BooleanLiteral(bool),
     IntegerLiteral(i64),
     StringLiteral(String),
@@ -44,6 +45,7 @@ impl ExpressionNode {
             Self::Closure(node) => node.check(types, scope, expected_type),
             Self::FunctionCall(node) => node.check(types, scope),
             Self::IfExpression(node) => node.check(types, scope, expected_type),
+            Self::Array(node) => node.check(types, scope, expected_type),
             Self::BooleanLiteral(_) => (scope, Type::Primitive(PrimitiveType::Bool)),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
             Self::StringLiteral(_) => {

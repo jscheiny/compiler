@@ -13,6 +13,7 @@ pub struct TypeFmt<'a> {
 impl Display for TypeFmt<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.resolved_type {
+            Type::Array(element_type) => write!(f, "[{}]", element_type.format(self.types)),
             Type::Enum(enum_type) => write!(f, "{}", enum_type.identifier),
             Type::Function(function_type) => {
                 write!(f, "(")?;

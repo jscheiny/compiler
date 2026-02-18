@@ -30,7 +30,7 @@ impl StructMemberType {
 
     pub fn as_static_type(self, self_type: Type) -> Type {
         match self {
-            Self::Field(field_type) => FunctionType::new(self_type, field_type),
+            Self::Field(field_type) => Type::Function(FunctionType::new(self_type, field_type)),
             Self::Method(function_type) => function_type.as_static_method(self_type),
         }
     }

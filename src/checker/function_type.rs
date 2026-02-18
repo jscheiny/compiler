@@ -7,11 +7,11 @@ pub struct FunctionType {
 }
 
 impl FunctionType {
-    pub fn new(input_type: Type, output_type: Type) -> Type {
-        Type::Function(FunctionType {
+    pub fn new(input_type: Type, output_type: Type) -> FunctionType {
+        FunctionType {
             parameters: vec![input_type],
             return_type: Box::new(output_type),
-        })
+        }
     }
 
     pub fn as_static_method(mut self, self_type: Type) -> Type {

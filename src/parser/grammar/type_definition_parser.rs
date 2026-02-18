@@ -27,6 +27,7 @@ pub fn type_definition(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
             }
         }
         Token::Operator(OperatorToken::OpenParen) => function_or_tuple_type(tokens),
+        Token::Operator(OperatorToken::OpenBracket) => array_type(tokens),
         _ => Err(tokens.make_error(SyntaxError::ExpectedType)),
     }
 }
@@ -43,6 +44,16 @@ fn function_or_tuple_type(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
     } else {
         Ok(TypeNode::Tuple(TupleTypeNode::new(parameters.value)))
     }
+}
+
+fn array_type(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
+    tokens.next();
+    let element_type = type_definition(tokens)?;
+    tokens.expect(
+        &OperatorToken::CloseBracket,
+        SyntaxError::ExpectedCloseBracket,
+    )?;
+    Ok(TypeNode::Array(Box::new(element_type)))
 }
 
 fn type_list(tokens: &mut TokenStream) -> ParseResult<Vec<Node<TypeNode>>> {

@@ -1,0 +1,80 @@
+use crate::{
+    checker::{Scope, Type, TypeResolver},
+    parser::{ExpressionNode, Node},
+};
+
+pub struct ArrayExpressionNode {
+    pub elements: Vec<Node<ExpressionNode>>,
+}
+
+impl ArrayExpressionNode {
+    pub fn check(
+        &self,
+        types: &TypeResolver,
+        mut scope: Box<Scope>,
+        expected_type: Option<&Type>,
+    ) -> (Box<Scope>, Type) {
+        let expected_element_type = match expected_type {
+            Some(Type::Array(t)) => Some(t.as_ref()),
+            _ => None,
+        };
+
+        let mut resolved_type = None;
+
+        for node in self.elements.iter() {
+            let (new_scope, element_type) =
+                node.check_expected(types, scope, expected_element_type);
+            scope = new_scope;
+
+            if let Some(t) = resolved_type.as_ref() {
+                if element_type.is_assignable_to(&t, types) {
+                    // Element type matches no error and keep going
+                } else if t.is_assignable_to(&element_type, types) {
+                    resolved_type = Some(element_type);
+                } else {
+                    println!(
+                        "Type error: Mismatching types in array literal `{}` and `{}`",
+                        t.format(types),
+                        element_type.format(types)
+                    );
+                }
+            } else {
+                resolved_type = Some(element_type);
+            }
+        }
+
+        if let Some(resolved_type) = resolved_type {
+            (scope, Type::Array(Box::new(resolved_type)))
+        } else if let Some(expected_element_type) = expected_element_type {
+            (scope, Type::Array(Box::new(expected_element_type.clone())))
+        } else {
+            println!("Type error: Could not infer type of empty array");
+            // TODO Should this just return type error?
+            (scope, Type::Array(Box::new(Type::Error)))
+        }
+    }
+
+    // fn check_array_literal(
+    //     &self,
+    //     elements: &Vec<Node<ExpressionNode>>,
+    //     types: &TypeResolver,
+    //     mut scope: Box<Scope>,
+    //     expected_type: Option<&Type>,
+    // ) -> (Box<Scope>, Type) {
+    //     let mut resolved_type = None;
+    //     for node in elements.iter() {
+    //         let (new_scope, element_type) = node.check(types, scope);
+    //         scope = new_scope;
+    //         match resolved_type.as_ref() {
+    //             None => resolved_type = Some(element_type),
+    //             Some(t) => {
+    //                 if element_type.is_assignable_to(t, types)
+    //                     && !t.is_assignable_to(&element_type, types)
+    //                 {}
+    //             }
+    //         }
+    //     }
+
+    //     todo!();
+    // }
+}

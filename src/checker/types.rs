@@ -12,6 +12,7 @@ pub enum RuntimeType {
 
 #[derive(Clone, Debug)]
 pub enum Type {
+    Array(Box<Type>),
     Enum(EnumType),
     Function(FunctionType),
     Primitive(PrimitiveType),
@@ -36,21 +37,31 @@ impl Type {
 
         // TODO this will need revisement as time goes on...
         match self {
+            Type::Array(left) => match other {
+                Type::Array(right) => left.is_assignable_to(right, types),
+                // TODO handle function type coercion better...
+                _ => match self.as_function(types) {
+                    Some(function_type) => {
+                        Type::Function(function_type).is_assignable_to(other, types)
+                    }
+                    None => false,
+                },
+            },
             Type::Enum(left) => match other {
                 Type::Enum(right) => left.identifier == right.identifier,
                 _ => false,
             },
-            Type::Function(left) => match other.as_function(types) {
-                Some(right) => {
+            Type::Function(left) => match other {
+                Type::Function(right) => {
                     left.parameters.len() == right.parameters.len()
                         && left
                             .parameters
                             .iter()
-                            .zip(right.parameters)
+                            .zip(right.parameters.iter())
                             .all(|(left, right)| left.is_assignable_to(&right, types))
                         && left.return_type.is_assignable_to(&right.return_type, types)
                 }
-                None => false,
+                _ => false,
             },
             Type::Primitive(left) => match other {
                 Type::Primitive(right) => left == right,
@@ -94,6 +105,10 @@ impl Type {
 
     pub fn as_function(&self, types: &TypeResolver) -> Option<FunctionType> {
         match self {
+            Type::Array(element_type) => Some(FunctionType::new(
+                Type::Primitive(PrimitiveType::Int),
+                element_type.as_ref().clone(),
+            )),
             Type::Function(function_type) => Some(function_type.clone()),
             Type::Reference(index) => types
                 .get_type(*index)

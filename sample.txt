@@ -1,17 +1,23 @@
-enum Test(
-    Integer(int),
-    Float(float),
-    Boolean(bool)
-);
+type T = (int) -> int;
 
-type T = Test;
-
-fn main() {
-    T.Integer(3);
-    Test.Boolean(true);
-    accept_test(T.Integer(3));
-    let k = T;
-    k.Integer(3);
+fn array_test() {
+    let y = [true, false];
+    let x: [int] = [];
+    let g = [x, (a: int) -> -a];
+    let h: [int] = (a: int) -> -a;
+    accept_array(x);
+    accept_array_kinda(y);
+    accept_t_array(g);
 }
 
-fn accept_test(test: Test) {}
+fn accept_array(x: [int]) {
+
+}
+
+fn accept_array_kinda(x: (int) -> bool) {
+
+}
+
+fn accept_t_array(x: [(int) -> bool]) {
+
+}

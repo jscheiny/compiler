@@ -18,6 +18,11 @@ impl AccessExpressionNode {
 
 fn get_field(input_type: Type, field: &String, types: &TypeResolver) -> Option<Type> {
     match input_type {
+        Type::Array(_) => {
+            // TODO consider if we should allow this
+            println!("Type error: No access operator on arrays");
+            None
+        }
         Type::Enum(enum_type) => {
             let method = enum_type.methods.get(field);
             if let Some(method) = method {
@@ -80,7 +85,9 @@ fn get_static_field(
             let self_type = get_self_type(&enum_type.identifier, types);
             if let Some(variant_type) = enum_type.variants.get(field) {
                 let static_type = match variant_type {
-                    Some(inner_type) => FunctionType::new(inner_type.clone(), self_type),
+                    Some(inner_type) => {
+                        Type::Function(FunctionType::new(inner_type.clone(), self_type))
+                    }
                     None => self_type,
                 };
                 Some(static_type)
