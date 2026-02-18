@@ -15,8 +15,7 @@ impl FunctionCallExpressionNode {
         let (scope, arguments) = self.get_args(types, scope, function_type.as_ref());
 
         if let Some(function_type) = function_type {
-            self.check_args(&function_type, &arguments, types);
-            (scope, *function_type.return_type)
+            (scope, self.check_args(function_type, &arguments, types))
         } else {
             (scope, Type::Error)
         }
@@ -38,10 +37,15 @@ impl FunctionCallExpressionNode {
         (scope, result)
     }
 
-    fn check_args(&self, function_type: &FunctionType, arguments: &[Type], types: &TypeResolver) {
-        if function_type.parameters.len() != arguments.len() {
+    fn check_args(
+        &self,
+        function_type: FunctionType,
+        arguments: &[Type],
+        types: &TypeResolver,
+    ) -> Type {
+        if arguments.len() > function_type.parameters.len() {
             println!(
-                "Type error: Call expected {} arguments but recieved {}",
+                "Type error: Call expected at most {} arguments but recieved {}",
                 function_type.parameters.len(),
                 arguments.len()
             );
@@ -58,6 +62,16 @@ impl FunctionCallExpressionNode {
                     parameter.format(types),
                 );
             }
+        }
+
+        if arguments.len() < function_type.parameters.len() {
+            let remaining_parameters = &function_type.parameters[arguments.len()..];
+            Type::Function(FunctionType {
+                parameters: remaining_parameters.to_vec(),
+                return_type: function_type.return_type,
+            })
+        } else {
+            *function_type.return_type
         }
     }
 }
