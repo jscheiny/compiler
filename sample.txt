@@ -1,23 +1,6 @@
-type T = (int) -> int;
-
-fn array_test() {
-    let y = [true, false];
-    let x: [int] = [];
-    let g = [x, (a: int) -> -a];
-    let h: [int] = (a: int) -> -a;
-    accept_array(x);
-    accept_array_kinda(y);
-    accept_t_array(g);
-}
-
-fn accept_array(x: [int]) {
-
-}
-
-fn accept_array_kinda(x: (int) -> bool) {
-
-}
-
-fn accept_t_array(x: [(int) -> bool]) {
-
+fn test() {
+    let x = (1, 2, 3);
+    let y = (x: bool, y: bool) -> x or y;
+    let z = () -> 5;
+    let a = ();
 }

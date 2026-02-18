@@ -11,6 +11,7 @@ pub enum SyntaxError {
     ExpectedBlock,
     ExpectedCloseBracket,
     ExpectedCloseParen,
+    ExpectedClosureBody,
     ExpectedClosureParameter,
     ExpectedElse,
     ExpectedEndStatement,
@@ -101,6 +102,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             E::ExpectedBlock => write!(f, "expected statement block"),
             E::ExpectedCloseBracket => write!(f, "expected close bracket"),
             E::ExpectedCloseParen => write!(f, "expected close parenthesis"),
+            E::ExpectedClosureBody => write!(f, "expected closure body"),
             E::ExpectedClosureParameter => write!(f, "expected parameter"),
             E::ExpectedElse => write!(
                 f,
@@ -152,6 +154,7 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
             E::ExpectedBlock => fmt_op(f, O::OpenParen),
             E::ExpectedCloseBracket => fmt_op(f, O::CloseBracket),
             E::ExpectedCloseParen => fmt_op(f, O::CloseParen),
+            E::ExpectedClosureBody => fmt_op(f, O::SkinnyArrow),
             E::ExpectedClosureParameter => write!(f, "expected parameter for closure"),
             E::ExpectedElse => write!(f, "expected `{}`", KeywordToken::Else),
             E::ExpectedEndStatement => fmt_op(f, O::Semicolon),

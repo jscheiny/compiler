@@ -263,18 +263,7 @@ fn expression_atom(
             let identifier = tokens.identifier(IdentifierType::Field)?;
             Ok(ExpressionNode::SelfRef(identifier.id().clone()))
         }
-        Token::Operator(OperatorToken::OpenParen) => {
-            // TODO handle empty tuple / function args
-            tokens.next();
-            let context = ExpressionContext::parentheses();
-            let expression = tokens.located_with(sub_expression, context)?;
-            tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
-            if tokens.accept(&OperatorToken::SkinnyArrow) {
-                closure(tokens, expression)
-            } else {
-                Ok(expression.value)
-            }
-        }
+        Token::Operator(OperatorToken::OpenParen) => closure_or_tuple(tokens),
         Token::Operator(OperatorToken::OpenBracket) => {
             tokens.next();
             let context = ExpressionContext::brackets();
@@ -350,11 +339,32 @@ pub fn block(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<Blo
     Ok(BlockNode { statements })
 }
 
+fn closure_or_tuple(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
+    // TODO handle empty tuple / function args
+    tokens.next();
+    if tokens.accept(&OperatorToken::CloseParen) {
+        tokens.expect(
+            &OperatorToken::SkinnyArrow,
+            SyntaxError::ExpectedClosureBody,
+        )?;
+        return closure(tokens, vec![]);
+    }
+
+    let context = ExpressionContext::parentheses();
+    let expression = tokens.located_with(sub_expression, context)?;
+    tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
+    if tokens.accept(&OperatorToken::SkinnyArrow) {
+        closure(tokens, flatten_commas(expression))
+    } else {
+        Ok(expression.value)
+    }
+}
+
 fn closure(
     tokens: &mut TokenStream,
-    args_expression: Node<ExpressionNode>,
+    parameters: Vec<Node<ExpressionNode>>,
 ) -> ParseResult<ExpressionNode> {
-    let parameters = flatten_commas(args_expression)
+    let parameters = parameters
         .into_iter()
         .map(|parameter| {
             if let ExpressionNode::Identifier(identifier) = parameter.value {
