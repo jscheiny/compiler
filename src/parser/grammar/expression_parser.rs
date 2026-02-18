@@ -92,6 +92,7 @@ fn sub_expression(
             let operator = TokenSpan::singleton(tokens).wrap(operator);
             tokens.next();
 
+            // TODO should we remove type as a binary operator and treat it like function calls below...
             left = if operator.value == BinaryOperator::Type {
                 closure_parameter(tokens, left, context)
             } else {
@@ -105,6 +106,15 @@ fn sub_expression(
             }
 
             left = function_call(tokens, left)?;
+        } else if OperatorToken::SkinnyArrow.matches(token) {
+            // Function binding should be treated as the same precedence as a.b
+            let precedence = BinaryOperator::Access.precedence();
+            if precedence < context.min_precedence {
+                println!("Here :(");
+                break;
+            }
+
+            left = simple_closure(tokens, left)?;
         } else {
             break;
         }
@@ -204,6 +214,30 @@ fn function_call(
             arguments: arguments_span.wrap(arguments),
         })),
     )
+}
+
+fn simple_closure(
+    tokens: &mut TokenStream,
+    left: Node<ExpressionNode>,
+) -> ParseResult<Node<ExpressionNode>> {
+    tokens.next();
+    let parameter = match left.value {
+        ExpressionNode::Identifier(identifier) => Ok(ExpressionNode::ClosureParameter(
+            ClosureParameterExpressionNode {
+                identifier: left.span.wrap(IdentifierNode(identifier)),
+                parameter_type: None,
+            },
+        )),
+        _ => Err(LocatedSyntaxError {
+            span: left.span,
+            error: SyntaxError::ExpectedIdentifier(IdentifierType::Parameter),
+        }),
+    }?;
+
+    let parameters = vec![left.span.wrap(parameter)];
+    let closure = closure(tokens, parameters)?;
+    let full_span = left.span.expand_to(tokens);
+    Ok(full_span.wrap(closure))
 }
 
 fn expression_atom(

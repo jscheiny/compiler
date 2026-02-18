@@ -1,7 +1,10 @@
 type T = bool -> bool -> bool;
 
 fn test() {
-    accept((a) -> (b) -> a or b);
+    accept(a -> b -> (a or b));
+    // TODO why does the type inference here do this...
+    let x: [int -> int] = a -> -a;
+    let x = 3 -> 4;
 }
 
 fn accept(value: T) {
