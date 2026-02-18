@@ -1,10 +1,17 @@
 type T = bool -> bool -> bool;
+type U = (int, int, bool) -> bool;
+
 
 fn test() {
+    let u: U = (a, b) -> a and b;
+    accept2(u(true));
+
     accept(a -> b -> (a or b));
+
     // TODO why does the type inference here do this...
-    let x: [int -> int] = a -> -a;
-    let x = 3 -> 4;
+    // let x: [int -> int] = a -> -a;
+
+    // let x = 3 -> 4;
 }
 
 fn accept(value: T) {
