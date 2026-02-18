@@ -15,13 +15,21 @@ impl ClosureExpressionNode {
         scope: Box<Scope>,
         expected_type: Option<&Type>,
     ) -> (Box<Scope>, Type) {
-        let function_type = expected_type.and_then(|t| t.as_function(types));
+        let function_type = get_expected_type(expected_type, types);
         let scope = scope.derive(ScopeType::Closure);
         let (scope, parameters) = self.check_parameters(function_type.as_ref(), types, scope);
         let expected_return_type = function_type.map(|t| t.return_type);
         let (scope, return_type) =
             self.body
                 .check_expected(types, scope, expected_return_type.as_deref());
+
+        let some_parameter_is_error_type = parameters
+            .iter()
+            .any(|parameter| matches!(parameter, Type::Error));
+        if some_parameter_is_error_type || matches!(return_type, Type::Error) {
+            return (scope.parent(), Type::Error);
+        }
+
         let result_type = Type::Function(FunctionType {
             parameters,
             return_type: Box::new(return_type),
@@ -71,5 +79,13 @@ fn get_parameter_type(
             parameter.id()
         );
         Type::Error
+    }
+}
+
+fn get_expected_type(t: Option<&Type>, types: &TypeResolver) -> Option<FunctionType> {
+    match t {
+        Some(Type::Function(function_type)) => Some(function_type.clone()),
+        Some(Type::Reference(index)) => get_expected_type(types.get_type(*index).as_ref(), types),
+        _ => None,
     }
 }

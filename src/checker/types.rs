@@ -30,8 +30,8 @@ impl Type {
             return true;
         }
 
-        if let Type::Reference(other_ref) = other {
-            let resolved_other = types.get_type(*other_ref).unwrap_or(Type::Error);
+        if let Type::Reference(index) = other {
+            let resolved_other = types.get_type(*index).unwrap_or(Type::Error);
             return self.is_assignable_to(&resolved_other, types);
         }
 
