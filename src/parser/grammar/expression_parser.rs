@@ -93,9 +93,9 @@ fn sub_expression(
             tokens.next();
 
             left = if operator.value == BinaryOperator::Type {
-                complete_closure_parameter(tokens, left, context)
+                closure_parameter(tokens, left, context)
             } else {
-                complete_binary_op(tokens, left, operator, context)
+                binary_op_expression(tokens, left, operator, context)
             }?
         } else if OperatorToken::OpenParen.matches(token) {
             // Function calls should be treated as the same precedence as a.b
@@ -104,25 +104,7 @@ fn sub_expression(
                 break;
             }
 
-            let arguments_span = TokenSpan::singleton(tokens);
-            tokens.next();
-
-            let arguments = if tokens.accept(&OperatorToken::CloseParen) {
-                vec![]
-            } else {
-                let context = ExpressionContext::parentheses();
-                let right = tokens.located_with(sub_expression, context)?;
-                tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
-                flatten_commas(right)
-            };
-
-            let arguments_span = arguments_span.expand_to(tokens);
-            let span = left.span.expand_to(tokens);
-
-            left = span.wrap(ExpressionNode::FunctionCall(FunctionCallExpressionNode {
-                function: Box::new(left),
-                arguments: arguments_span.wrap(arguments),
-            }))
+            left = function_call(tokens, left)?;
         } else {
             break;
         }
@@ -131,7 +113,7 @@ fn sub_expression(
     Ok(left.value)
 }
 
-fn complete_closure_parameter(
+fn closure_parameter(
     tokens: &mut TokenStream,
     left: Node<ExpressionNode>,
     context: ExpressionContext,
@@ -165,7 +147,7 @@ fn complete_closure_parameter(
     Ok(parameter_span.wrap(ExpressionNode::Error))
 }
 
-fn complete_binary_op(
+fn binary_op_expression(
     tokens: &mut TokenStream,
     left: Node<ExpressionNode>,
     operator: Node<BinaryOperator>,
@@ -197,6 +179,34 @@ fn complete_binary_op(
     })))
 }
 
+fn function_call(
+    tokens: &mut TokenStream,
+    left: Node<ExpressionNode>,
+) -> ParseResult<Node<ExpressionNode>> {
+    let arguments_span = TokenSpan::singleton(tokens);
+    tokens.next();
+
+    let arguments = if tokens.accept(&OperatorToken::CloseParen) {
+        vec![]
+    } else {
+        let context = ExpressionContext::parentheses();
+        let right = tokens.located_with(sub_expression, context)?;
+        tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
+        flatten_commas(right)
+    };
+
+    let arguments_span = arguments_span.expand_to(tokens);
+    let span = left.span.expand_to(tokens);
+
+    Ok(
+        span.wrap(ExpressionNode::FunctionCall(FunctionCallExpressionNode {
+            function: Box::new(left),
+            arguments: arguments_span.wrap(arguments),
+        })),
+    )
+}
+
+// TODO move to bottom of file
 fn flatten_commas(expression: Node<ExpressionNode>) -> Vec<Node<ExpressionNode>> {
     let mut arguments = vec![];
     let mut current = expression;
@@ -264,35 +274,8 @@ fn expression_atom(
             Ok(ExpressionNode::SelfRef(identifier.id().clone()))
         }
         Token::Operator(OperatorToken::OpenParen) => closure_or_tuple(tokens),
-        Token::Operator(OperatorToken::OpenBracket) => {
-            tokens.next();
-            let context = ExpressionContext::brackets();
-            let elements = if tokens.accept(&OperatorToken::CloseBracket) {
-                vec![]
-            } else {
-                let expression = tokens.located_with(sub_expression, context)?;
-                tokens.expect(
-                    &OperatorToken::CloseBracket,
-                    SyntaxError::ExpectedCloseBracket,
-                )?;
-                flatten_commas(expression)
-            };
-            Ok(ExpressionNode::Array(ArrayExpressionNode { elements }))
-        }
-        Token::Keyword(KeywordToken::If) => {
-            tokens.next();
-            let context = context.reset_precedence();
-            let predicate = tokens.located_with(sub_expression, context)?;
-            tokens.expect(&KeywordToken::Then, SyntaxError::ExpectedThen)?;
-            let if_true = tokens.located_with(sub_expression, context)?;
-            tokens.expect(&KeywordToken::Else, SyntaxError::ExpectedElse)?;
-            let if_false = tokens.located_with(sub_expression, context)?;
-            Ok(ExpressionNode::IfExpression(IfExpressionNode {
-                predicate: Box::new(predicate),
-                if_true: Box::new(if_true),
-                if_false: Box::new(if_false),
-            }))
-        }
+        Token::Operator(OperatorToken::OpenBracket) => array(tokens),
+        Token::Keyword(KeywordToken::If) => if_expression(tokens, context),
         Token::Keyword(KeywordToken::True) => {
             tokens.next();
             Ok(ExpressionNode::BooleanLiteral(true))
@@ -388,5 +371,39 @@ fn closure(
     Ok(ExpressionNode::Closure(ClosureExpressionNode {
         parameters,
         body: Box::new(body),
+    }))
+}
+
+fn array(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
+    tokens.next();
+    let context = ExpressionContext::brackets();
+    let elements = if tokens.accept(&OperatorToken::CloseBracket) {
+        vec![]
+    } else {
+        let expression = tokens.located_with(sub_expression, context)?;
+        tokens.expect(
+            &OperatorToken::CloseBracket,
+            SyntaxError::ExpectedCloseBracket,
+        )?;
+        flatten_commas(expression)
+    };
+    Ok(ExpressionNode::Array(ArrayExpressionNode { elements }))
+}
+
+fn if_expression(
+    tokens: &mut TokenStream,
+    context: ExpressionContext,
+) -> ParseResult<ExpressionNode> {
+    tokens.next();
+    let context = context.reset_precedence();
+    let predicate = tokens.located_with(sub_expression, context)?;
+    tokens.expect(&KeywordToken::Then, SyntaxError::ExpectedThen)?;
+    let if_true = tokens.located_with(sub_expression, context)?;
+    tokens.expect(&KeywordToken::Else, SyntaxError::ExpectedElse)?;
+    let if_false = tokens.located_with(sub_expression, context)?;
+    Ok(ExpressionNode::IfExpression(IfExpressionNode {
+        predicate: Box::new(predicate),
+        if_true: Box::new(if_true),
+        if_false: Box::new(if_false),
     }))
 }
