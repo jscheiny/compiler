@@ -297,7 +297,6 @@ pub fn block(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<Blo
 }
 
 fn closure_or_tuple(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
-    // TODO handle empty tuple / function args
     tokens.next();
     if tokens.accept(&OperatorToken::CloseParen) {
         tokens.expect(
