@@ -19,6 +19,7 @@ pub enum ExpressionNode {
     IfExpression(IfExpressionNode),
     Array(ArrayExpressionNode),
     BooleanLiteral(bool),
+    CharacterLiteral(String),
     IntegerLiteral(i64),
     StringLiteral(String),
     Block(BlockNode),
@@ -47,6 +48,7 @@ impl ExpressionNode {
             Self::IfExpression(node) => node.check(types, scope, expected_type),
             Self::Array(node) => node.check(types, scope, expected_type),
             Self::BooleanLiteral(_) => (scope, Type::Primitive(PrimitiveType::Bool)),
+            Self::CharacterLiteral(_) => (scope, Type::Primitive(PrimitiveType::Char)),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
             Self::StringLiteral(_) => {
                 todo!("Implement type checking for ExpressionNode::StringLiteral")

@@ -259,6 +259,12 @@ fn expression_atom(
             tokens.next();
             Ok(ExpressionNode::Identifier(identifier))
         }
+        Token::CharacterLiteral(literal) => {
+            let literal = literal.clone();
+            // TODO syntax checking on literal...
+            tokens.next();
+            Ok(ExpressionNode::CharacterLiteral(literal))
+        }
         Token::IntegerLiteral(literal) => {
             let literal = *literal;
             tokens.next();
