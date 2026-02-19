@@ -1,5 +1,5 @@
 use crate::{
-    lexer::{KeywordToken, OperatorToken, Token, TokenMatch},
+    lexer::{KeywordToken, Symbol, Token, TokenMatch},
     parser::{
         DeclarationNode, ExpressionNode, IdentifierType, IfStatementConditionNode, IfStatementNode,
         Node, ParseResult, StatementNode, StatementType, SyntaxError, TokenStream, WhileLoopNode,
@@ -20,8 +20,8 @@ pub fn statement(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult
             _ => expression_statement(tokens),
         },
         Token::Operator(operator) => match operator {
-            OperatorToken::OpenBrace => block_statement(tokens),
-            OperatorToken::SkinnyArrow => block_return(tokens, block_type),
+            Symbol::OpenBrace => block_statement(tokens),
+            Symbol::SkinnyArrow => block_return(tokens, block_type),
             _ => expression_statement(tokens),
         },
         _ => expression_statement(tokens),
@@ -31,7 +31,7 @@ pub fn statement(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult
 fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<StatementNode> {
     tokens.next();
     let identifier = tokens.identifier(IdentifierType::Variable)?;
-    let type_def = if tokens.accept(&OperatorToken::Colon) {
+    let type_def = if tokens.accept(&Symbol::Colon) {
         Some(tokens.located(type_definition)?)
     } else {
         None
@@ -50,11 +50,11 @@ fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<Statement
 fn initializer(tokens: &mut TokenStream) -> ParseResult<Option<Node<ExpressionNode>>> {
     let error = SyntaxError::ExpectedInitializer;
     match tokens.peek() {
-        Token::Operator(OperatorToken::Equal) => {
+        Token::Operator(Symbol::Equal) => {
             tokens.next();
             Ok(Some(tokens.located(expression)?))
         }
-        Token::Operator(OperatorToken::Semicolon) => {
+        Token::Operator(Symbol::Semicolon) => {
             tokens.push_error(error);
             Ok(None)
         }
@@ -64,7 +64,7 @@ fn initializer(tokens: &mut TokenStream) -> ParseResult<Option<Node<ExpressionNo
 
 fn function_return(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     tokens.next();
-    if tokens.accept(&OperatorToken::Semicolon) {
+    if tokens.accept(&Symbol::Semicolon) {
         Ok(StatementNode::FunctionReturn(None))
     } else {
         let expression = tokens.located(expression)?;
@@ -147,7 +147,7 @@ fn expression_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> 
 }
 
 pub fn end_statement(tokens: &mut TokenStream) {
-    if !tokens.accept(&OperatorToken::Semicolon) {
+    if !tokens.accept(&Symbol::Semicolon) {
         tokens.push_error(SyntaxError::ExpectedEndStatement);
     }
 }

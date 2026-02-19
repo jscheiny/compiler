@@ -1,5 +1,5 @@
 use crate::{
-    lexer::{KeywordToken, OperatorToken, Token},
+    lexer::{KeywordToken, Symbol, Token},
     parser::{
         IdentifierType, Node, ParseResult, StructFieldNode, StructNode, SyntaxError, TokenStream,
         grammar::{comma_separated_list, methods, type_definition},
@@ -17,11 +17,11 @@ pub fn structure(tokens: &mut TokenStream) -> ParseResult<StructNode> {
 
 fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<Node<StructFieldNode>>> {
     match tokens.peek() {
-        Token::Operator(OperatorToken::OpenParen) => {
+        Token::Operator(Symbol::OpenParen) => {
             tokens.next();
-            comma_separated_list(tokens, OperatorToken::CloseParen, field)
+            comma_separated_list(tokens, Symbol::CloseParen, field)
         }
-        Token::Operator(OperatorToken::OpenBrace) => {
+        Token::Operator(Symbol::OpenBrace) => {
             tokens.push_error(SyntaxError::ExpectedFields);
             Ok(vec![])
         }
@@ -34,12 +34,12 @@ fn field(tokens: &mut TokenStream) -> ParseResult<StructFieldNode> {
     let identifier = tokens.identifier(IdentifierType::Field)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {
-        Token::Operator(OperatorToken::Colon) => {
+        Token::Operator(Symbol::Colon) => {
             tokens.next();
             let type_def = Some(tokens.located(type_definition)?);
             Ok(StructFieldNode::new(public, identifier, type_def))
         }
-        Token::Operator(OperatorToken::Comma) | Token::Operator(OperatorToken::CloseParen) => {
+        Token::Operator(Symbol::Comma) | Token::Operator(Symbol::CloseParen) => {
             tokens.push_error(error);
             Ok(StructFieldNode::new(public, identifier, None))
         }

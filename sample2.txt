@@ -1,0 +1,5 @@
+type T = bool -> int;
+
+fn get(): T {
+    return a -> -a;
+}

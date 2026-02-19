@@ -1,7 +1,7 @@
 use std::{fmt::Display, rc::Rc};
 
 use crate::{
-    lexer::{KeywordToken, LocatedToken, OperatorToken, Token},
+    lexer::{KeywordToken, LocatedToken, Symbol, Token},
     parser::TokenSpan,
 };
 
@@ -147,28 +147,28 @@ pub struct SyntaxErrorInlineMessage<'a> {
 
 impl<'a> Display for SyntaxErrorInlineMessage<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use OperatorToken as O;
+        use Symbol as S;
         use SyntaxError as E;
         match self.error.error {
             E::BlockReturnEarly => write!(f, "block return must be the last statement in a block"),
-            E::ExpectedBlock => fmt_op(f, O::OpenParen),
-            E::ExpectedCloseBracket => fmt_op(f, O::CloseBracket),
-            E::ExpectedCloseParen => fmt_op(f, O::CloseParen),
-            E::ExpectedClosureBody => fmt_op(f, O::SkinnyArrow),
+            E::ExpectedBlock => fmt_op(f, S::OpenParen),
+            E::ExpectedCloseBracket => fmt_op(f, S::CloseBracket),
+            E::ExpectedCloseParen => fmt_op(f, S::CloseParen),
+            E::ExpectedClosureBody => fmt_op(f, S::SkinnyArrow),
             E::ExpectedClosureParameter => write!(f, "expected parameter for closure"),
             E::ExpectedElse => write!(f, "expected `{}`", KeywordToken::Else),
-            E::ExpectedEndStatement => fmt_op(f, O::Semicolon),
+            E::ExpectedEndStatement => fmt_op(f, S::Semicolon),
             E::ExpectedExpression => write!(f, "expected expression"),
-            E::ExpectedFunctionBody => fmt_ops(f, O::SkinnyArrow, O::OpenBrace),
+            E::ExpectedFunctionBody => fmt_ops(f, S::SkinnyArrow, S::OpenBrace),
             E::ExpectedIdentifier(id_type) => write!(f, "expected {}", id_type),
-            E::ExpectedInitializer => fmt_op(f, O::Equal),
-            E::ExpectedFields => fmt_op(f, O::OpenParen),
-            E::ExpectedMethods => fmt_ops(f, O::OpenBrace, O::Semicolon),
-            E::ExpectedParameters => fmt_op(f, O::OpenParen),
+            E::ExpectedInitializer => fmt_op(f, S::Equal),
+            E::ExpectedFields => fmt_op(f, S::OpenParen),
+            E::ExpectedMethods => fmt_ops(f, S::OpenBrace, S::Semicolon),
+            E::ExpectedParameters => fmt_op(f, S::OpenParen),
             E::ExpectedThen => write!(f, "expected `{}`", KeywordToken::Then),
             E::ExpectedTopLevelDefinition => write!(f, "expected struct, tuple, enum, or function"),
             E::ExpectedType => write!(f, "expected type name"),
-            E::ExpectedVariants => fmt_op(f, O::OpenParen),
+            E::ExpectedVariants => fmt_op(f, S::OpenParen),
             E::UnexpectedBlockReturn(_) => {
                 write!(f, "block returns are only allowed in expressions")
             }
@@ -180,14 +180,10 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
     }
 }
 
-fn fmt_op(f: &mut std::fmt::Formatter<'_>, operator: OperatorToken) -> std::fmt::Result {
+fn fmt_op(f: &mut std::fmt::Formatter<'_>, operator: Symbol) -> std::fmt::Result {
     write!(f, "expected `{}`", operator)
 }
 
-fn fmt_ops(
-    f: &mut std::fmt::Formatter<'_>,
-    op1: OperatorToken,
-    op2: OperatorToken,
-) -> std::fmt::Result {
+fn fmt_ops(f: &mut std::fmt::Formatter<'_>, op1: Symbol, op2: Symbol) -> std::fmt::Result {
     write!(f, "expected `{}` or `{}`", op1, op2)
 }

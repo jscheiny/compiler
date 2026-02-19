@@ -1,7 +1,7 @@
 use crate::{
     lexer::{
-        IdentifierToken, IntegerLiteralToken, KeywordToken, OperatorToken, StringLiteralToken,
-        Token, TokenMatch,
+        IdentifierToken, IntegerLiteralToken, KeywordToken, StringLiteralToken, Symbol, Token,
+        TokenMatch,
     },
     parser::{
         AccessExpressionNode, ArrayExpressionNode, Associativity, BinaryOpExpressionNode,
@@ -98,7 +98,7 @@ fn sub_expression(
             } else {
                 binary_op_expression(tokens, left, operator, context)
             }?
-        } else if OperatorToken::OpenParen.matches(token) {
+        } else if Symbol::OpenParen.matches(token) {
             // Function calls should be treated as the same precedence as a.b
             let precedence = BinaryOperator::Access.precedence();
             if precedence < context.min_precedence {
@@ -106,7 +106,7 @@ fn sub_expression(
             }
 
             left = function_call(tokens, left)?;
-        } else if OperatorToken::SkinnyArrow.matches(token) {
+        } else if Symbol::SkinnyArrow.matches(token) {
             // Function binding should be treated as the same precedence as a.b
             let precedence = BinaryOperator::Access.precedence();
             if precedence < context.min_precedence {
@@ -196,12 +196,12 @@ fn function_call(
     let arguments_span = TokenSpan::singleton(tokens);
     tokens.next();
 
-    let arguments = if tokens.accept(&OperatorToken::CloseParen) {
+    let arguments = if tokens.accept(&Symbol::CloseParen) {
         vec![]
     } else {
         let context = ExpressionContext::parentheses();
         let right = tokens.located_with(sub_expression, context)?;
-        tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
+        tokens.expect(&Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
         flatten_commas(right)
     };
 
@@ -272,17 +272,17 @@ fn expression_atom(
             tokens.next();
             Ok(ExpressionNode::StringLiteral(literal))
         }
-        Token::Operator(OperatorToken::OpenBrace) => {
+        Token::Operator(Symbol::OpenBrace) => {
             let block = block(tokens, BlockType::Expression)?;
             Ok(ExpressionNode::Block(block))
         }
-        Token::Operator(OperatorToken::At) => {
+        Token::Operator(Symbol::At) => {
             tokens.next();
             let identifier = tokens.identifier(IdentifierType::Field)?;
             Ok(ExpressionNode::SelfRef(identifier.id().clone()))
         }
-        Token::Operator(OperatorToken::OpenParen) => closure_or_tuple(tokens),
-        Token::Operator(OperatorToken::OpenBracket) => array(tokens),
+        Token::Operator(Symbol::OpenParen) => closure_or_tuple(tokens),
+        Token::Operator(Symbol::OpenBracket) => array(tokens),
         Token::Keyword(KeywordToken::If) => if_expression(tokens, context),
         Token::Keyword(KeywordToken::True) => {
             tokens.next();
@@ -303,9 +303,9 @@ pub enum BlockType {
 }
 
 pub fn block(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<BlockNode> {
-    tokens.expect(&OperatorToken::OpenBrace, SyntaxError::ExpectedBlock)?;
+    tokens.expect(&Symbol::OpenBrace, SyntaxError::ExpectedBlock)?;
     let mut statements = vec![];
-    while !tokens.accept(&OperatorToken::CloseBrace) {
+    while !tokens.accept(&Symbol::CloseBrace) {
         statements.push(tokens.located_with(statement, block_type)?);
     }
 
@@ -332,18 +332,15 @@ pub fn block(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<Blo
 
 fn closure_or_tuple(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
     tokens.next();
-    if tokens.accept(&OperatorToken::CloseParen) {
-        tokens.expect(
-            &OperatorToken::SkinnyArrow,
-            SyntaxError::ExpectedClosureBody,
-        )?;
+    if tokens.accept(&Symbol::CloseParen) {
+        tokens.expect(&Symbol::SkinnyArrow, SyntaxError::ExpectedClosureBody)?;
         return closure(tokens, vec![]);
     }
 
     let context = ExpressionContext::parentheses();
     let expression = tokens.located_with(sub_expression, context)?;
-    tokens.expect(&OperatorToken::CloseParen, SyntaxError::ExpectedCloseParen)?;
-    if tokens.accept(&OperatorToken::SkinnyArrow) {
+    tokens.expect(&Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
+    if tokens.accept(&Symbol::SkinnyArrow) {
         closure(tokens, flatten_commas(expression))
     } else {
         Ok(expression.value)
@@ -384,14 +381,11 @@ fn closure(
 fn array(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
     tokens.next();
     let context = ExpressionContext::brackets();
-    let elements = if tokens.accept(&OperatorToken::CloseBracket) {
+    let elements = if tokens.accept(&Symbol::CloseBracket) {
         vec![]
     } else {
         let expression = tokens.located_with(sub_expression, context)?;
-        tokens.expect(
-            &OperatorToken::CloseBracket,
-            SyntaxError::ExpectedCloseBracket,
-        )?;
+        tokens.expect(&Symbol::CloseBracket, SyntaxError::ExpectedCloseBracket)?;
         flatten_commas(expression)
     };
     Ok(ExpressionNode::Array(ArrayExpressionNode { elements }))

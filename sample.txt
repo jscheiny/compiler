@@ -1,16 +1,33 @@
 type T = bool -> bool -> bool;
 type U = (int, int, bool) -> bool;
 
+enum Option[T](
+    Some(T),
+    None
+) {
+    pub map[U](mapper: T -> U): Option[U] -> @and_then(mapper => Option.Some);
+
+    pub and_then[U](mapper: T -> Option[U]) -> match self {
+        Some(value) -> mapper(value)
+        None -> None
+    };
+
+    pub unwrap(): U -> match self {
+        Some(value) -> value
+        None -> panic(...)
+    };
+}
+
 
 fn test() {
     // let u: U = (a, b) -> a and b;
-    //accept2(u(true));
-
+    // accept2(u(true));
     // accept(a -> b -> (a or b));
 
     let x: [int -> int] = a -> -a;
 
-    // let x = 3 -> 4;
+    let x = [true];
+    array(x);
 }
 
 fn accept(value: T) {
@@ -18,5 +35,9 @@ fn accept(value: T) {
 }
 
 fn accept2(value: bool -> bool) {
+
+}
+
+fn array(value: [int]) {
 
 }

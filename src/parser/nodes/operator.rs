@@ -1,4 +1,4 @@
-use crate::lexer::{KeywordToken, OperatorToken, Token};
+use crate::lexer::{KeywordToken, Symbol, Token};
 
 pub trait Operator
 where
@@ -16,7 +16,7 @@ pub enum PostfixOperator {
 impl Operator for PostfixOperator {
     fn from_token(token: &Token) -> Option<PostfixOperator> {
         match token {
-            Token::Operator(OperatorToken::QuestionMark) => Some(Self::NullShortCircuit),
+            Token::Operator(Symbol::QuestionMark) => Some(Self::NullShortCircuit),
             _ => None,
         }
     }
@@ -36,8 +36,8 @@ pub enum PrefixOperator {
 impl Operator for PrefixOperator {
     fn from_token(token: &Token) -> Option<PrefixOperator> {
         match token {
-            Token::Operator(OperatorToken::Dot) => Some(Self::Closure),
-            Token::Operator(OperatorToken::Minus) => Some(Self::Negative),
+            Token::Operator(Symbol::Dot) => Some(Self::Closure),
+            Token::Operator(Symbol::Minus) => Some(Self::Negative),
             Token::Keyword(KeywordToken::Not) => Some(Self::LogicalNot),
             _ => None,
         }
@@ -78,30 +78,30 @@ pub enum BinaryOperator {
 impl Operator for BinaryOperator {
     fn from_token(token: &Token) -> Option<BinaryOperator> {
         use KeywordToken as K;
-        use OperatorToken as O;
+        use Symbol as S;
         match token {
             Token::Operator(operator) => match operator {
-                O::PlusEqual => Some(Self::AddAssign),
-                O::MinusEqual => Some(Self::SubtractAssign),
-                O::TimesEqual => Some(Self::MultiplyAssign),
-                O::SlashEqual => Some(Self::DivideAssign),
-                O::PercentEqual => Some(Self::ModAssign),
-                O::DoubleEqual => Some(Self::Equal),
-                O::NotEqual => Some(Self::NotEqual),
-                O::LessThan => Some(Self::LessThan),
-                O::LessThanEqual => Some(Self::LessThanOrEqual),
-                O::GreaterThan => Some(Self::GreaterThan),
-                O::GreaterThanEqual => Some(Self::GreaterThanOrEqual),
-                O::Dot => Some(Self::Access),
-                O::ThickArrow => Some(Self::FunctionApplication),
-                O::Comma => Some(Self::Comma),
-                O::Colon => Some(Self::Type),
-                O::Equal => Some(Self::Assign),
-                O::Plus => Some(Self::Add),
-                O::Minus => Some(Self::Subtract),
-                O::Times => Some(Self::Multiply),
-                O::Slash => Some(Self::Divide),
-                O::Percent => Some(Self::Mod),
+                S::PlusEqual => Some(Self::AddAssign),
+                S::MinusEqual => Some(Self::SubtractAssign),
+                S::TimesEqual => Some(Self::MultiplyAssign),
+                S::SlashEqual => Some(Self::DivideAssign),
+                S::PercentEqual => Some(Self::ModAssign),
+                S::DoubleEqual => Some(Self::Equal),
+                S::NotEqual => Some(Self::NotEqual),
+                S::LessThan => Some(Self::LessThan),
+                S::LessThanEqual => Some(Self::LessThanOrEqual),
+                S::GreaterThan => Some(Self::GreaterThan),
+                S::GreaterThanEqual => Some(Self::GreaterThanOrEqual),
+                S::Dot => Some(Self::Access),
+                S::ThickArrow => Some(Self::FunctionApplication),
+                S::Comma => Some(Self::Comma),
+                S::Colon => Some(Self::Type),
+                S::Equal => Some(Self::Assign),
+                S::Plus => Some(Self::Add),
+                S::Minus => Some(Self::Subtract),
+                S::Times => Some(Self::Multiply),
+                S::Slash => Some(Self::Divide),
+                S::Percent => Some(Self::Mod),
                 _ => None,
             },
             Token::Keyword(keyword) => match keyword {

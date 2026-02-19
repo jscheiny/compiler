@@ -1,5 +1,5 @@
 use crate::{
-    lexer::{IdentifierToken, KeywordToken, OperatorToken, Token},
+    lexer::{IdentifierToken, KeywordToken, Symbol, Token},
     parser::{
         FunctionTypeNode, Node, ParseResult, PrimitiveType, SyntaxError, TokenStream,
         TupleTypeNode, TypeNode, grammar::comma_separated_list,
@@ -8,7 +8,7 @@ use crate::{
 
 pub fn type_definition(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
     let inner_type = tokens.located(type_definition_impl)?;
-    if tokens.accept(&OperatorToken::SkinnyArrow) {
+    if tokens.accept(&Symbol::SkinnyArrow) {
         let return_type = tokens.located(type_definition)?;
         let parameters = inner_type.span.wrap(vec![inner_type]);
         Ok(TypeNode::Function(FunctionTypeNode::new(
@@ -40,8 +40,8 @@ pub fn type_definition_impl(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
                 None => Err(tokens.make_error(SyntaxError::ExpectedType)),
             }
         }
-        Token::Operator(OperatorToken::OpenParen) => function_or_tuple_type(tokens),
-        Token::Operator(OperatorToken::OpenBracket) => array_type(tokens),
+        Token::Operator(Symbol::OpenParen) => function_or_tuple_type(tokens),
+        Token::Operator(Symbol::OpenBracket) => array_type(tokens),
         _ => Err(tokens.make_error(SyntaxError::ExpectedType)),
     }
 }
@@ -49,7 +49,7 @@ pub fn type_definition_impl(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
 fn function_or_tuple_type(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
     tokens.next();
     let parameters = tokens.located(type_list)?;
-    if tokens.accept(&OperatorToken::SkinnyArrow) {
+    if tokens.accept(&Symbol::SkinnyArrow) {
         let return_type = tokens.located(type_definition)?;
         Ok(TypeNode::Function(FunctionTypeNode::new(
             parameters,
@@ -63,13 +63,10 @@ fn function_or_tuple_type(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
 fn array_type(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
     tokens.next();
     let element_type = type_definition(tokens)?;
-    tokens.expect(
-        &OperatorToken::CloseBracket,
-        SyntaxError::ExpectedCloseBracket,
-    )?;
+    tokens.expect(&Symbol::CloseBracket, SyntaxError::ExpectedCloseBracket)?;
     Ok(TypeNode::Array(Box::new(element_type)))
 }
 
 fn type_list(tokens: &mut TokenStream) -> ParseResult<Vec<Node<TypeNode>>> {
-    comma_separated_list(tokens, OperatorToken::CloseParen, type_definition)
+    comma_separated_list(tokens, Symbol::CloseParen, type_definition)
 }

@@ -6,7 +6,7 @@ use strum_macros::EnumIter;
 use crate::lexer::{Token, TokenMatch, TokenWidth, TryTokenizeResult};
 
 #[derive(Clone, Copy, EnumIter, PartialEq, Eq)]
-pub enum OperatorToken {
+pub enum Symbol {
     // Two character operators
     PlusEqual,
     MinusEqual,
@@ -42,7 +42,7 @@ pub enum OperatorToken {
     Comma,
 }
 
-impl OperatorToken {
+impl Symbol {
     fn as_str(&self) -> &str {
         match self {
             // Two character operators
@@ -82,13 +82,13 @@ impl OperatorToken {
     }
 }
 
-impl Display for OperatorToken {
+impl Display for Symbol {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl TokenMatch for OperatorToken {
+impl TokenMatch for Symbol {
     fn matches(&self, token: &Token) -> bool {
         match token {
             Token::Operator(op) => *op == *self,
@@ -98,7 +98,7 @@ impl TokenMatch for OperatorToken {
 }
 
 pub fn try_tokenize_operator(text: &str) -> Option<TryTokenizeResult> {
-    for operator in OperatorToken::iter() {
+    for operator in Symbol::iter() {
         let operator_str = operator.as_str();
         if text.starts_with(operator_str) {
             return Some(TryTokenizeResult {
