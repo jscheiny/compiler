@@ -97,7 +97,7 @@ impl TokenMatch for Symbol {
     }
 }
 
-pub fn try_tokenize_operator(text: &str) -> Option<TryTokenizeResult> {
+pub fn try_tokenize_symbol(text: &str) -> Option<TryTokenizeResult> {
     for symbol in Symbol::iter() {
         let symbol_str = symbol.as_str();
         if text.starts_with(symbol_str) {

@@ -1,7 +1,7 @@
 use crate::lexer::{
     CharacterLocation, CharacterSpan, LocatedToken, Token, TokenWidth, try_tokenize_identifier,
     try_tokenize_integer_literal, try_tokenize_keyword, try_tokenize_multiline_comment,
-    try_tokenize_operator, try_tokenize_single_line_comment, try_tokenize_string_literal,
+    try_tokenize_single_line_comment, try_tokenize_string_literal, try_tokenize_symbol,
     try_tokenize_whitespace,
 };
 
@@ -77,7 +77,7 @@ struct NextToken<'a> {
 fn next_token(text: &str) -> Option<NextToken<'_>> {
     try_tokenize_single_line_comment(text)
         .or_else(|| try_tokenize_multiline_comment(text))
-        .or_else(|| try_tokenize_operator(text))
+        .or_else(|| try_tokenize_symbol(text))
         .or_else(|| try_tokenize_keyword(text))
         .or_else(|| try_tokenize_string_literal(text))
         .or_else(|| try_tokenize_integer_literal(text))
