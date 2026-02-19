@@ -12,7 +12,10 @@ impl IfStatementConditionNode {
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
         let (scope, predicate_type) = self.predicate.check(types, scope);
         if !predicate_type.is_primitive(PrimitiveType::Bool, types) {
-            println!("Type error: If statement predicate must be of type bool");
+            println!(
+                "Type error: If statement predicate must be of type bool, found `{}`",
+                predicate_type.format(types)
+            );
         }
 
         let scope = scope.derive(ScopeType::Block);

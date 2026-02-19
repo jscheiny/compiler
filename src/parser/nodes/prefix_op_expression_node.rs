@@ -21,8 +21,9 @@ impl PrefixOpExpressionNode {
         let (scope, resolved_type) = self.expression.check(types, scope);
         if !resolved_type.is_primitive(PrimitiveType::Bool, types) {
             println!(
-                "Type error: Operand of op `{:?}` should be of type bool",
-                self.operator.value
+                "Type error: Operand of op `{:?}` should be of type bool, found `{}`",
+                self.operator.value,
+                resolved_type.format(types)
             );
         }
 
