@@ -18,6 +18,6 @@ fn accept_str(c: [char]) {
     
 }
 
-fn accept_fn(f: int -> [char    ]) {
+fn accept_fn(f: int -> char) {
 
 }
