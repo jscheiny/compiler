@@ -14,7 +14,7 @@ impl Display for LocatedToken {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub enum Token {
     CharacterLiteral(String),
     Identifier(String),
