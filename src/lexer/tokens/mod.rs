@@ -1,3 +1,4 @@
+mod character_literal;
 mod comments;
 mod identifier_token;
 mod integer_literal_token;
@@ -8,6 +9,7 @@ mod token_match;
 mod token_width;
 mod whitespace;
 
+pub use character_literal::*;
 pub use comments::*;
 pub use identifier_token::*;
 pub use integer_literal_token::*;

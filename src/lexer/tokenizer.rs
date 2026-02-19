@@ -1,8 +1,8 @@
 use crate::lexer::{
-    CharacterLocation, CharacterSpan, LocatedToken, Token, TokenWidth, try_tokenize_identifier,
-    try_tokenize_integer_literal, try_tokenize_keyword, try_tokenize_multiline_comment,
-    try_tokenize_single_line_comment, try_tokenize_string_literal, try_tokenize_symbol,
-    try_tokenize_whitespace,
+    CharacterLocation, CharacterSpan, LocatedToken, Token, TokenWidth,
+    try_tokenize_character_literal, try_tokenize_identifier, try_tokenize_integer_literal,
+    try_tokenize_keyword, try_tokenize_multiline_comment, try_tokenize_single_line_comment,
+    try_tokenize_string_literal, try_tokenize_symbol, try_tokenize_whitespace,
 };
 
 pub struct TokenizerResult {
@@ -80,6 +80,7 @@ fn next_token(text: &str) -> Option<NextToken<'_>> {
         .or_else(|| try_tokenize_symbol(text))
         .or_else(|| try_tokenize_keyword(text))
         .or_else(|| try_tokenize_string_literal(text))
+        .or_else(|| try_tokenize_character_literal(text))
         .or_else(|| try_tokenize_integer_literal(text))
         .or_else(|| try_tokenize_identifier(text))
         .or_else(|| try_tokenize_whitespace(text))

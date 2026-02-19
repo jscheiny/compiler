@@ -127,6 +127,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
         let LocatedToken { token, .. } = &self.tokens[self.error.span.start_index];
         use Token as T;
         match token {
+            T::CharacterLiteral(_) => write!(f, "character literal"),
             T::Identifier(identifier) => write!(f, "identifier `{}`", identifier),
             T::IntegerLiteral(literal) => write!(f, "integer literal `{}`", literal),
             T::StringLiteral(literal) => write!(f, "string literal {}", literal),

@@ -16,6 +16,7 @@ impl Display for LocatedToken {
 
 #[derive(Clone)]
 pub enum Token {
+    CharacterLiteral(String),
     Identifier(String),
     IntegerLiteral(i64),
     StringLiteral(String),
@@ -27,9 +28,10 @@ pub enum Token {
 impl Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::CharacterLiteral(literal) => write!(f, "Character:'{}'", literal),
             Self::Identifier(identifier) => write!(f, "Identifier:{}", identifier),
-            Self::IntegerLiteral(integer_literal) => write!(f, "Integer:{}", integer_literal),
-            Self::StringLiteral(string_literal) => write!(f, "String:{}", string_literal),
+            Self::IntegerLiteral(literal) => write!(f, "Integer:{}", literal),
+            Self::StringLiteral(literal) => write!(f, "String:\"{}\"", literal),
             Self::Symbol(symbol) => write!(f, "Symbol:{}", symbol),
             Self::Keyword(keyword) => write!(f, "Keyword:{}", keyword),
             Self::EndOfFile => write!(f, "[EOF]"),
