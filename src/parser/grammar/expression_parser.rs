@@ -1,5 +1,5 @@
 use crate::{
-    lexer::{IntegerLiteralToken, Keyword, StringLiteralToken, Symbol, Token, TokenMatch},
+    lexer::{Keyword, StringLiteralToken, Symbol, Token, TokenMatch},
     parser::{
         AccessExpressionNode, ArrayExpressionNode, Associativity, BinaryOpExpressionNode,
         BinaryOperator, BlockNode, ClosureExpressionNode, ClosureParameterExpressionNode,
@@ -259,7 +259,7 @@ fn expression_atom(
             tokens.next();
             Ok(ExpressionNode::Identifier(identifier))
         }
-        Token::IntegerLiteral(IntegerLiteralToken(literal)) => {
+        Token::IntegerLiteral(literal) => {
             let literal = *literal;
             tokens.next();
             Ok(ExpressionNode::IntegerLiteral(literal))
