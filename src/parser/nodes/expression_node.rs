@@ -8,22 +8,22 @@ use crate::{
 };
 
 pub enum ExpressionNode {
-    PrefixOp(PrefixOpExpressionNode),
-    BinaryOp(BinaryOpExpressionNode),
     Access(AccessExpressionNode),
-    PostfixOp(PostfixOpExpressionNode),
-    Closure(ClosureExpressionNode),
-    ClosureParameter(ClosureParameterExpressionNode),
-    SelfRef(String),
-    FunctionCall(FunctionCallExpressionNode),
-    IfExpression(IfExpressionNode),
     Array(ArrayExpressionNode),
+    BinaryOp(BinaryOpExpressionNode),
+    Block(BlockNode),
     BooleanLiteral(bool),
     CharacterLiteral(String),
-    IntegerLiteral(i64),
-    StringLiteral(String),
-    Block(BlockNode),
+    Closure(ClosureExpressionNode),
+    ClosureParameter(ClosureParameterExpressionNode),
+    FunctionCall(FunctionCallExpressionNode),
     Identifier(String),
+    IfExpression(IfExpressionNode),
+    IntegerLiteral(i64),
+    PostfixOp(PostfixOpExpressionNode),
+    PrefixOp(PrefixOpExpressionNode),
+    SelfRef(String),
+    StringLiteral(String),
     Error,
 }
 
@@ -39,31 +39,31 @@ impl ExpressionNode {
         expected_type: Option<&Type>,
     ) -> (Box<Scope>, Type) {
         match self {
-            Self::PrefixOp(node) => node.check(types, scope),
-            Self::BinaryOp(node) => node.check(types, scope),
             Self::Access(node) => node.check(types, scope),
-            Self::PostfixOp(node) => node.check(types, scope),
-            Self::Closure(node) => node.check(types, scope, expected_type),
-            Self::FunctionCall(node) => node.check(types, scope),
-            Self::IfExpression(node) => node.check(types, scope, expected_type),
             Self::Array(node) => node.check(types, scope, expected_type),
-            Self::BooleanLiteral(_) => (scope, Type::Primitive(PrimitiveType::Bool)),
-            Self::CharacterLiteral(_) => (scope, Type::Primitive(PrimitiveType::Char)),
-            Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
-            Self::StringLiteral(_) => (
-                scope,
-                Type::Array(Box::new(Type::Primitive(PrimitiveType::Char))),
-            ),
+            Self::BinaryOp(node) => node.check(types, scope),
             Self::Block(node) => {
                 let (scope, resolved_type) = node.check(types, scope, expected_type);
                 (scope, resolved_type.unwrap_or(Type::Void))
             }
-            Self::Identifier(identifier) => self.check_identifier(identifier, types, scope),
-            Self::SelfRef(identifier) => self.check_self_ref(identifier, scope),
-            Self::Error => (scope, Type::Error),
+            Self::BooleanLiteral(_) => (scope, Type::Primitive(PrimitiveType::Bool)),
+            Self::CharacterLiteral(_) => (scope, Type::Primitive(PrimitiveType::Char)),
+            Self::Closure(node) => node.check(types, scope, expected_type),
             Self::ClosureParameter(_) => {
                 panic!("ERROR: Unexpected closure parameter outside of parameter list")
             }
+            Self::FunctionCall(node) => node.check(types, scope),
+            Self::Identifier(identifier) => self.check_identifier(identifier, types, scope),
+            Self::IfExpression(node) => node.check(types, scope, expected_type),
+            Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
+            Self::PostfixOp(node) => node.check(types, scope),
+            Self::PrefixOp(node) => node.check(types, scope),
+            Self::SelfRef(identifier) => self.check_self_ref(identifier, scope),
+            Self::StringLiteral(_) => (
+                scope,
+                Type::Array(Box::new(Type::Primitive(PrimitiveType::Char))),
+            ),
+            Self::Error => (scope, Type::Error),
         }
     }
 
