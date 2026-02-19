@@ -19,7 +19,7 @@ pub fn statement(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult
             KeywordToken::If => if_statement(tokens),
             _ => expression_statement(tokens),
         },
-        Token::Symbol(operator) => match operator {
+        Token::Symbol(symbol) => match symbol {
             Symbol::OpenBrace => block_statement(tokens),
             Symbol::SkinnyArrow => block_return(tokens, block_type),
             _ => expression_statement(tokens),
