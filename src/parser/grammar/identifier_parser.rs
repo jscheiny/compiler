@@ -1,5 +1,5 @@
 use crate::{
-    lexer::{IdentifierToken, Token},
+    lexer::Token,
     parser::{IdentifierNode, IdentifierType, ParseResult, SyntaxError, TokenStream},
 };
 
@@ -9,7 +9,7 @@ pub fn identifier(
 ) -> ParseResult<IdentifierNode> {
     let token = tokens.peek();
     match token {
-        Token::Identifier(IdentifierToken(identifier)) => {
+        Token::Identifier(identifier) => {
             let identifier = identifier.clone();
             tokens.next();
             Ok(IdentifierNode(identifier))

@@ -1,8 +1,6 @@
 use std::fmt::Display;
 
-use crate::lexer::{
-    CharacterSpan, IdentifierToken, IntegerLiteralToken, Keyword, StringLiteralToken, Symbol,
-};
+use crate::lexer::{CharacterSpan, IntegerLiteralToken, Keyword, StringLiteralToken, Symbol};
 
 #[derive(Clone)]
 pub struct LocatedToken {
@@ -18,7 +16,7 @@ impl Display for LocatedToken {
 
 #[derive(Clone)]
 pub enum Token {
-    Identifier(IdentifierToken),
+    Identifier(String),
     IntegerLiteral(IntegerLiteralToken),
     StringLiteral(StringLiteralToken),
     Symbol(Symbol),

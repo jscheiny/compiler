@@ -1,8 +1,5 @@
 use crate::{
-    lexer::{
-        IdentifierToken, IntegerLiteralToken, Keyword, StringLiteralToken, Symbol, Token,
-        TokenMatch,
-    },
+    lexer::{IntegerLiteralToken, Keyword, StringLiteralToken, Symbol, Token, TokenMatch},
     parser::{
         AccessExpressionNode, ArrayExpressionNode, Associativity, BinaryOpExpressionNode,
         BinaryOperator, BlockNode, ClosureExpressionNode, ClosureParameterExpressionNode,
@@ -257,7 +254,7 @@ fn expression_atom(
         }));
     }
     match tokens.peek() {
-        Token::Identifier(IdentifierToken(identifier)) => {
+        Token::Identifier(identifier) => {
             let identifier = identifier.clone();
             tokens.next();
             Ok(ExpressionNode::Identifier(identifier))

@@ -1,15 +1,4 @@
-use std::fmt::Display;
-
 use crate::lexer::{Token, TokenWidth, TryTokenizeResult};
-
-#[derive(Clone)]
-pub struct IdentifierToken(pub String);
-
-impl Display for IdentifierToken {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
 
 pub fn try_tokenize_identifier(text: &str) -> Option<TryTokenizeResult> {
     let mut width = TokenWidth::new();
@@ -29,7 +18,7 @@ pub fn try_tokenize_identifier(text: &str) -> Option<TryTokenizeResult> {
     }
 
     Some(TryTokenizeResult {
-        token: Some(Token::Identifier(IdentifierToken(identifier))),
+        token: Some(Token::Identifier(identifier)),
         width,
     })
 }
