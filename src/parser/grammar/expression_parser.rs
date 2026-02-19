@@ -42,14 +42,6 @@ impl ExpressionContext {
             ..self
         }
     }
-
-    pub fn reset_precedence(self) -> Self {
-        Self {
-            min_precedence: 0,
-            allow_types: false,
-            ..self
-        }
-    }
 }
 
 pub fn expression(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
@@ -286,7 +278,7 @@ fn expression_atom(
         }
         Token::Symbol(Symbol::OpenParen) => closure_or_tuple(tokens),
         Token::Symbol(Symbol::OpenBracket) => array(tokens),
-        Token::Keyword(Keyword::If) => if_expression(tokens, context),
+        Token::Keyword(Keyword::If) => if_expression(tokens),
         Token::Keyword(Keyword::True) => {
             tokens.next();
             Ok(ExpressionNode::BooleanLiteral(true))
@@ -394,17 +386,13 @@ fn array(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
     Ok(ExpressionNode::Array(ArrayExpressionNode { elements }))
 }
 
-fn if_expression(
-    tokens: &mut TokenStream,
-    context: ExpressionContext,
-) -> ParseResult<ExpressionNode> {
+fn if_expression(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
     tokens.next();
-    let context = context.reset_precedence();
-    let predicate = tokens.located_with(sub_expression, context)?;
+    let predicate = tokens.located(expression)?;
     tokens.expect(&Keyword::Then, SyntaxError::ExpectedThen)?;
-    let if_true = tokens.located_with(sub_expression, context)?;
+    let if_true = tokens.located(expression)?;
     tokens.expect(&Keyword::Else, SyntaxError::ExpectedElse)?;
-    let if_false = tokens.located_with(sub_expression, context)?;
+    let if_false = tokens.located(expression)?;
     Ok(ExpressionNode::IfExpression(IfExpressionNode {
         predicate: Box::new(predicate),
         if_true: Box::new(if_true),
