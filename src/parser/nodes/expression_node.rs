@@ -50,9 +50,10 @@ impl ExpressionNode {
             Self::BooleanLiteral(_) => (scope, Type::Primitive(PrimitiveType::Bool)),
             Self::CharacterLiteral(_) => (scope, Type::Primitive(PrimitiveType::Char)),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
-            Self::StringLiteral(_) => {
-                todo!("Implement type checking for ExpressionNode::StringLiteral")
-            }
+            Self::StringLiteral(_) => (
+                scope,
+                Type::Array(Box::new(Type::Primitive(PrimitiveType::Char))),
+            ),
             Self::Block(node) => {
                 let (scope, resolved_type) = node.check(types, scope, expected_type);
                 (scope, resolved_type.unwrap_or(Type::Void))

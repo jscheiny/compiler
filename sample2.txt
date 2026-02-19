@@ -1,5 +1,23 @@
 type T = bool -> int;
 
 fn get(): T {
-    return a -> -a;
+    let x = '5';
+    accept_char(x);
+    let x = "abcdefg";
+    accept_str("abcdefg");
+    accept_fn("abcdefg");
+    accept_fn(['a', 'b', 'c']);
+    accept_fn(a -> 'a');
+}
+
+fn accept_char(c: char) {
+
+}
+
+fn accept_str(c: [char]) {
+    
+}
+
+fn accept_fn(f: int -> [char    ]) {
+
 }
