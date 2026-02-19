@@ -17,11 +17,11 @@ pub fn structure(tokens: &mut TokenStream) -> ParseResult<StructNode> {
 
 fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<Node<StructFieldNode>>> {
     match tokens.peek() {
-        Token::Operator(Symbol::OpenParen) => {
+        Token::Symbol(Symbol::OpenParen) => {
             tokens.next();
             comma_separated_list(tokens, Symbol::CloseParen, field)
         }
-        Token::Operator(Symbol::OpenBrace) => {
+        Token::Symbol(Symbol::OpenBrace) => {
             tokens.push_error(SyntaxError::ExpectedFields);
             Ok(vec![])
         }
@@ -34,12 +34,12 @@ fn field(tokens: &mut TokenStream) -> ParseResult<StructFieldNode> {
     let identifier = tokens.identifier(IdentifierType::Field)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {
-        Token::Operator(Symbol::Colon) => {
+        Token::Symbol(Symbol::Colon) => {
             tokens.next();
             let type_def = Some(tokens.located(type_definition)?);
             Ok(StructFieldNode::new(public, identifier, type_def))
         }
-        Token::Operator(Symbol::Comma) | Token::Operator(Symbol::CloseParen) => {
+        Token::Symbol(Symbol::Comma) | Token::Symbol(Symbol::CloseParen) => {
             tokens.push_error(error);
             Ok(StructFieldNode::new(public, identifier, None))
         }

@@ -16,7 +16,7 @@ pub enum PostfixOperator {
 impl Operator for PostfixOperator {
     fn from_token(token: &Token) -> Option<PostfixOperator> {
         match token {
-            Token::Operator(Symbol::QuestionMark) => Some(Self::NullShortCircuit),
+            Token::Symbol(Symbol::QuestionMark) => Some(Self::NullShortCircuit),
             _ => None,
         }
     }
@@ -36,8 +36,8 @@ pub enum PrefixOperator {
 impl Operator for PrefixOperator {
     fn from_token(token: &Token) -> Option<PrefixOperator> {
         match token {
-            Token::Operator(Symbol::Dot) => Some(Self::Closure),
-            Token::Operator(Symbol::Minus) => Some(Self::Negative),
+            Token::Symbol(Symbol::Dot) => Some(Self::Closure),
+            Token::Symbol(Symbol::Minus) => Some(Self::Negative),
             Token::Keyword(KeywordToken::Not) => Some(Self::LogicalNot),
             _ => None,
         }
@@ -80,7 +80,7 @@ impl Operator for BinaryOperator {
         use KeywordToken as K;
         use Symbol as S;
         match token {
-            Token::Operator(operator) => match operator {
+            Token::Symbol(operator) => match operator {
                 S::PlusEqual => Some(Self::AddAssign),
                 S::MinusEqual => Some(Self::SubtractAssign),
                 S::TimesEqual => Some(Self::MultiplyAssign),

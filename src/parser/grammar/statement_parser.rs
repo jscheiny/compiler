@@ -19,7 +19,7 @@ pub fn statement(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult
             KeywordToken::If => if_statement(tokens),
             _ => expression_statement(tokens),
         },
-        Token::Operator(operator) => match operator {
+        Token::Symbol(operator) => match operator {
             Symbol::OpenBrace => block_statement(tokens),
             Symbol::SkinnyArrow => block_return(tokens, block_type),
             _ => expression_statement(tokens),
@@ -50,11 +50,11 @@ fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<Statement
 fn initializer(tokens: &mut TokenStream) -> ParseResult<Option<Node<ExpressionNode>>> {
     let error = SyntaxError::ExpectedInitializer;
     match tokens.peek() {
-        Token::Operator(Symbol::Equal) => {
+        Token::Symbol(Symbol::Equal) => {
             tokens.next();
             Ok(Some(tokens.located(expression)?))
         }
-        Token::Operator(Symbol::Semicolon) => {
+        Token::Symbol(Symbol::Semicolon) => {
             tokens.push_error(error);
             Ok(None)
         }

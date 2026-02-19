@@ -134,7 +134,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             T::Identifier(identifier) => write!(f, "identifier `{}`", identifier),
             T::IntegerLiteral(literal) => write!(f, "integer literal `{}`", literal),
             T::StringLiteral(literal) => write!(f, "string literal {}", literal),
-            T::Operator(operator) => write!(f, "`{}`", operator),
+            T::Symbol(operator) => write!(f, "`{}`", operator),
             T::Keyword(keyword) => write!(f, "keyword `{}`", keyword),
             T::EndOfFile => write!(f, "end of file"),
         }

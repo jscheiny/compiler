@@ -40,8 +40,8 @@ pub fn type_definition_impl(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
                 None => Err(tokens.make_error(SyntaxError::ExpectedType)),
             }
         }
-        Token::Operator(Symbol::OpenParen) => function_or_tuple_type(tokens),
-        Token::Operator(Symbol::OpenBracket) => array_type(tokens),
+        Token::Symbol(Symbol::OpenParen) => function_or_tuple_type(tokens),
+        Token::Symbol(Symbol::OpenBracket) => array_type(tokens),
         _ => Err(tokens.make_error(SyntaxError::ExpectedType)),
     }
 }

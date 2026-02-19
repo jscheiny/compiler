@@ -86,12 +86,12 @@ pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<Node<ParameterNod
     let error = SyntaxError::ExpectedParameters;
     use Symbol as S;
     match tokens.peek() {
-        Token::Operator(S::OpenParen) => {
+        Token::Symbol(S::OpenParen) => {
             tokens.next();
             let list = comma_separated_list(tokens, S::CloseParen, parameter)?;
             Ok(list)
         }
-        Token::Operator(S::SkinnyArrow) | Token::Operator(S::OpenBrace) => {
+        Token::Symbol(S::SkinnyArrow) | Token::Symbol(S::OpenBrace) => {
             tokens.push_error(error);
             Ok(vec![])
         }
@@ -103,12 +103,12 @@ fn parameter(tokens: &mut TokenStream) -> ParseResult<ParameterNode> {
     let identifier = tokens.identifier(IdentifierType::Parameter)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {
-        Token::Operator(Symbol::Colon) => {
+        Token::Symbol(Symbol::Colon) => {
             tokens.next();
             let type_def = Some(tokens.located(type_definition)?);
             Ok(ParameterNode::new(identifier, type_def))
         }
-        Token::Operator(Symbol::Comma) | Token::Operator(Symbol::CloseParen) => {
+        Token::Symbol(Symbol::Comma) | Token::Symbol(Symbol::CloseParen) => {
             tokens.push_error(error);
             Ok(ParameterNode::new(identifier, None))
         }

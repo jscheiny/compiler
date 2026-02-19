@@ -7,7 +7,7 @@ use crate::lexer::{Token, TokenMatch, TokenWidth, TryTokenizeResult};
 
 #[derive(Clone, Copy, EnumIter, PartialEq, Eq)]
 pub enum Symbol {
-    // Two character operators
+    // Two character symbols
     PlusEqual,
     MinusEqual,
     TimesEqual,
@@ -19,7 +19,7 @@ pub enum Symbol {
     GreaterThanEqual,
     SkinnyArrow,
     ThickArrow,
-    // One character operators
+    // One character symbols
     Semicolon,
     Equal,
     LessThan,
@@ -45,7 +45,7 @@ pub enum Symbol {
 impl Symbol {
     fn as_str(&self) -> &str {
         match self {
-            // Two character operators
+            // Two character symbols
             Self::PlusEqual => "+=",
             Self::MinusEqual => "-=",
             Self::TimesEqual => "*=",
@@ -57,7 +57,7 @@ impl Symbol {
             Self::GreaterThanEqual => ">=",
             Self::SkinnyArrow => "->",
             Self::ThickArrow => "=>",
-            // One character operators
+            // One character symbols
             Self::Semicolon => ";",
             Self::Equal => "=",
             Self::LessThan => "<",
@@ -91,19 +91,19 @@ impl Display for Symbol {
 impl TokenMatch for Symbol {
     fn matches(&self, token: &Token) -> bool {
         match token {
-            Token::Operator(op) => *op == *self,
+            Token::Symbol(op) => *op == *self,
             _ => false,
         }
     }
 }
 
 pub fn try_tokenize_operator(text: &str) -> Option<TryTokenizeResult> {
-    for operator in Symbol::iter() {
-        let operator_str = operator.as_str();
-        if text.starts_with(operator_str) {
+    for symbol in Symbol::iter() {
+        let symbol_str = symbol.as_str();
+        if text.starts_with(symbol_str) {
             return Some(TryTokenizeResult {
-                token: Some(Token::Operator(operator)),
-                width: TokenWidth::from(operator_str),
+                token: Some(Token::Symbol(symbol)),
+                width: TokenWidth::from(symbol_str),
             });
         }
     }

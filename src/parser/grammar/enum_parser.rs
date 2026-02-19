@@ -16,11 +16,11 @@ pub fn enumeration(tokens: &mut TokenStream) -> ParseResult<EnumNode> {
 
 fn enum_variants(tokens: &mut TokenStream) -> ParseResult<Vec<Node<EnumVariantNode>>> {
     match tokens.peek() {
-        Token::Operator(Symbol::OpenParen) => {
+        Token::Symbol(Symbol::OpenParen) => {
             tokens.next();
             comma_separated_list(tokens, Symbol::CloseParen, enum_variant)
         }
-        Token::Operator(Symbol::OpenBrace) => {
+        Token::Symbol(Symbol::OpenBrace) => {
             tokens.push_error(SyntaxError::ExpectedVariants);
             Ok(vec![])
         }

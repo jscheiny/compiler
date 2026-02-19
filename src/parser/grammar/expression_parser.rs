@@ -272,17 +272,17 @@ fn expression_atom(
             tokens.next();
             Ok(ExpressionNode::StringLiteral(literal))
         }
-        Token::Operator(Symbol::OpenBrace) => {
+        Token::Symbol(Symbol::OpenBrace) => {
             let block = block(tokens, BlockType::Expression)?;
             Ok(ExpressionNode::Block(block))
         }
-        Token::Operator(Symbol::At) => {
+        Token::Symbol(Symbol::At) => {
             tokens.next();
             let identifier = tokens.identifier(IdentifierType::Field)?;
             Ok(ExpressionNode::SelfRef(identifier.id().clone()))
         }
-        Token::Operator(Symbol::OpenParen) => closure_or_tuple(tokens),
-        Token::Operator(Symbol::OpenBracket) => array(tokens),
+        Token::Symbol(Symbol::OpenParen) => closure_or_tuple(tokens),
+        Token::Symbol(Symbol::OpenBracket) => array(tokens),
         Token::Keyword(KeywordToken::If) => if_expression(tokens, context),
         Token::Keyword(KeywordToken::True) => {
             tokens.next();

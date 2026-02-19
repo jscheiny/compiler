@@ -21,7 +21,7 @@ pub enum Token {
     Identifier(IdentifierToken),
     IntegerLiteral(IntegerLiteralToken),
     StringLiteral(StringLiteralToken),
-    Operator(Symbol),
+    Symbol(Symbol),
     Keyword(KeywordToken),
     EndOfFile,
 }
@@ -32,7 +32,7 @@ impl Display for Token {
             Self::Identifier(identifier) => write!(f, "Identifier:{}", identifier),
             Self::IntegerLiteral(integer_literal) => write!(f, "Integer:{}", integer_literal),
             Self::StringLiteral(string_literal) => write!(f, "String:{}", string_literal),
-            Self::Operator(operator) => write!(f, "Operator:{}", operator),
+            Self::Symbol(operator) => write!(f, "Operator:{}", operator),
             Self::Keyword(keyword) => write!(f, "Keyword:{}", keyword),
             Self::EndOfFile => write!(f, "[EOF]"),
         }
