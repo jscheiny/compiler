@@ -49,32 +49,7 @@ impl ArrayExpressionNode {
             (scope, Type::Array(Box::new(expected_element_type.clone())))
         } else {
             println!("Type error: Could not infer type of empty array");
-            // TODO Should this just return type error?
             (scope, Type::Array(Box::new(Type::Error)))
         }
     }
-
-    // fn check_array_literal(
-    //     &self,
-    //     elements: &Vec<Node<ExpressionNode>>,
-    //     types: &TypeResolver,
-    //     mut scope: Box<Scope>,
-    //     expected_type: Option<&Type>,
-    // ) -> (Box<Scope>, Type) {
-    //     let mut resolved_type = None;
-    //     for node in elements.iter() {
-    //         let (new_scope, element_type) = node.check(types, scope);
-    //         scope = new_scope;
-    //         match resolved_type.as_ref() {
-    //             None => resolved_type = Some(element_type),
-    //             Some(t) => {
-    //                 if element_type.is_assignable_to(t, types)
-    //                     && !t.is_assignable_to(&element_type, types)
-    //                 {}
-    //             }
-    //         }
-    //     }
-
-    //     todo!();
-    // }
 }
