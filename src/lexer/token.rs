@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use crate::lexer::{
-    CharacterSpan, IdentifierToken, IntegerLiteralToken, KeywordToken, StringLiteralToken, Symbol,
+    CharacterSpan, IdentifierToken, IntegerLiteralToken, Keyword, StringLiteralToken, Symbol,
 };
 
 #[derive(Clone)]
@@ -22,7 +22,7 @@ pub enum Token {
     IntegerLiteral(IntegerLiteralToken),
     StringLiteral(StringLiteralToken),
     Symbol(Symbol),
-    Keyword(KeywordToken),
+    Keyword(Keyword),
     EndOfFile,
 }
 

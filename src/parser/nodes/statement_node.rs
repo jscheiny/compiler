@@ -1,6 +1,6 @@
 use crate::{
     checker::{Scope, ScopeType, Type, TypeResolver},
-    lexer::KeywordToken,
+    lexer::Keyword,
     parser::{DeclarationNode, ExpressionNode, IfStatementNode, Node, WhileLoopNode},
 };
 
@@ -27,8 +27,8 @@ impl StatementNode {
                 let (scope, resolved_type) = expression.check_expected(types, scope, expected_type);
                 (scope, Some(resolved_type))
             }
-            Self::Break => check_loop(KeywordToken::Break, scope),
-            Self::Continue => check_loop(KeywordToken::Continue, scope),
+            Self::Break => check_loop(Keyword::Break, scope),
+            Self::Continue => check_loop(Keyword::Continue, scope),
             Self::Declaration(node) => (node.check(types, scope), None),
             Self::Expression(expression) => {
                 // Discard the type of raw expressions
@@ -44,7 +44,7 @@ impl StatementNode {
     }
 }
 
-fn check_loop(keyword: KeywordToken, scope: Box<Scope>) -> (Box<Scope>, Option<Type>) {
+fn check_loop(keyword: Keyword, scope: Box<Scope>) -> (Box<Scope>, Option<Type>) {
     if !scope.within(ScopeType::Loop) {
         println!("Type error: Unexpected {} outside of loop", keyword);
     }

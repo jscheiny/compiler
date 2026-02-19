@@ -1,5 +1,5 @@
 use crate::{
-    lexer::{KeywordToken, Token},
+    lexer::{Keyword, Token},
     parser::{
         ExportableModuleDefinitionNode, ModuleDefinitionNode, ParseResult, ProgramNode,
         SyntaxError, TokenStream,
@@ -19,14 +19,14 @@ pub fn program(tokens: &mut TokenStream) -> ParseResult<ProgramNode> {
 fn exportable_module_definition(
     tokens: &mut TokenStream,
 ) -> ParseResult<ExportableModuleDefinitionNode> {
-    let public = tokens.accept(&KeywordToken::Pub);
+    let public = tokens.accept(&Keyword::Pub);
     let definition = module_definition(tokens)?;
     Ok(ExportableModuleDefinitionNode { public, definition })
 }
 
 fn module_definition(tokens: &mut TokenStream) -> ParseResult<ModuleDefinitionNode> {
     if let Token::Keyword(keyword) = tokens.peek() {
-        use KeywordToken as K;
+        use Keyword as K;
         match keyword {
             K::Struct => Ok(ModuleDefinitionNode::Struct(structure(tokens)?)),
             K::Enum => Ok(ModuleDefinitionNode::Enum(enumeration(tokens)?)),

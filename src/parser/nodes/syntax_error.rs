@@ -1,7 +1,7 @@
 use std::{fmt::Display, rc::Rc};
 
 use crate::{
-    lexer::{KeywordToken, LocatedToken, Symbol, Token},
+    lexer::{Keyword, LocatedToken, Symbol, Token},
     parser::TokenSpan,
 };
 
@@ -104,11 +104,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             E::ExpectedCloseParen => write!(f, "expected close parenthesis"),
             E::ExpectedClosureBody => write!(f, "expected closure body"),
             E::ExpectedClosureParameter => write!(f, "expected parameter"),
-            E::ExpectedElse => write!(
-                f,
-                "`{}` following true branch expression",
-                KeywordToken::Else
-            ),
+            E::ExpectedElse => write!(f, "`{}` following true branch expression", Keyword::Else),
             E::ExpectedEndStatement => write!(f, "expected end of statement"),
             E::ExpectedExpression => write!(f, "expected expression"),
             E::ExpectedFields => write!(f, "expected fields"),
@@ -117,7 +113,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             E::ExpectedInitializer => write!(f, "expected initializer"),
             E::ExpectedMethods => write!(f, "expected methods block"),
             E::ExpectedParameters => write!(f, "expected parameters"),
-            E::ExpectedThen => write!(f, "expected `{}` following predicate`", KeywordToken::Then),
+            E::ExpectedThen => write!(f, "expected `{}` following predicate`", Keyword::Then),
             E::ExpectedTopLevelDefinition => write!(f, "expected struct, tuple, enum, or function"),
             E::ExpectedType => write!(f, "expected type name"),
             E::ExpectedVariants => write!(f, "expected enum variants"),
@@ -156,7 +152,7 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
             E::ExpectedCloseParen => fmt_symbol(f, S::CloseParen),
             E::ExpectedClosureBody => fmt_symbol(f, S::SkinnyArrow),
             E::ExpectedClosureParameter => write!(f, "expected parameter for closure"),
-            E::ExpectedElse => write!(f, "expected `{}`", KeywordToken::Else),
+            E::ExpectedElse => write!(f, "expected `{}`", Keyword::Else),
             E::ExpectedEndStatement => fmt_symbol(f, S::Semicolon),
             E::ExpectedExpression => write!(f, "expected expression"),
             E::ExpectedFunctionBody => fmt_symbols(f, S::SkinnyArrow, S::OpenBrace),
@@ -165,7 +161,7 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
             E::ExpectedFields => fmt_symbol(f, S::OpenParen),
             E::ExpectedMethods => fmt_symbols(f, S::OpenBrace, S::Semicolon),
             E::ExpectedParameters => fmt_symbol(f, S::OpenParen),
-            E::ExpectedThen => write!(f, "expected `{}`", KeywordToken::Then),
+            E::ExpectedThen => write!(f, "expected `{}`", Keyword::Then),
             E::ExpectedTopLevelDefinition => write!(f, "expected struct, tuple, enum, or function"),
             E::ExpectedType => write!(f, "expected type name"),
             E::ExpectedVariants => fmt_symbol(f, S::OpenParen),

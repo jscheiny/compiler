@@ -6,7 +6,7 @@ use strum_macros::EnumIter;
 use crate::lexer::{Token, TokenMatch, TokenWidth, TryTokenizeResult};
 
 #[derive(Clone, Copy, Debug, EnumIter, PartialEq, Eq)]
-pub enum KeywordToken {
+pub enum Keyword {
     Continue,
     Return,
     Struct,
@@ -33,7 +33,7 @@ pub enum KeywordToken {
     Or,
 }
 
-impl KeywordToken {
+impl Keyword {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Continue => "continue",
@@ -64,13 +64,13 @@ impl KeywordToken {
     }
 }
 
-impl Display for KeywordToken {
+impl Display for Keyword {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl TokenMatch for KeywordToken {
+impl TokenMatch for Keyword {
     fn matches(&self, token: &Token) -> bool {
         match token {
             Token::Keyword(op) => *op == *self,
@@ -80,7 +80,7 @@ impl TokenMatch for KeywordToken {
 }
 
 pub fn try_tokenize_keyword(text: &str) -> Option<TryTokenizeResult> {
-    for keyword in KeywordToken::iter() {
+    for keyword in Keyword::iter() {
         let keyword_str = keyword.as_str();
         if text.starts_with(keyword_str) {
             return Some(TryTokenizeResult {

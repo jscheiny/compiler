@@ -1,5 +1,5 @@
 use crate::{
-    lexer::{KeywordToken, Symbol, Token, TokenMatch},
+    lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
         DeclarationNode, ExpressionNode, IdentifierType, IfStatementConditionNode, IfStatementNode,
         Node, ParseResult, StatementNode, StatementType, SyntaxError, TokenStream, WhileLoopNode,
@@ -10,13 +10,13 @@ use crate::{
 pub fn statement(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<StatementNode> {
     match tokens.peek() {
         Token::Keyword(keyword) => match keyword {
-            KeywordToken::Let => declaration(tokens, false),
-            KeywordToken::Mut => declaration(tokens, true),
-            KeywordToken::Return => function_return(tokens),
-            KeywordToken::Break => break_statement(tokens),
-            KeywordToken::Continue => continue_statement(tokens),
-            KeywordToken::While => while_loop(tokens),
-            KeywordToken::If => if_statement(tokens),
+            Keyword::Let => declaration(tokens, false),
+            Keyword::Mut => declaration(tokens, true),
+            Keyword::Return => function_return(tokens),
+            Keyword::Break => break_statement(tokens),
+            Keyword::Continue => continue_statement(tokens),
+            Keyword::While => while_loop(tokens),
+            Keyword::If => if_statement(tokens),
             _ => expression_statement(tokens),
         },
         Token::Symbol(symbol) => match symbol {
@@ -97,8 +97,8 @@ fn if_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     let mut conditions = vec![tokens.located(if_condition)?];
     let mut else_branch = None;
 
-    while tokens.accept(&KeywordToken::Else) {
-        if KeywordToken::If.matches(tokens.peek()) {
+    while tokens.accept(&Keyword::Else) {
+        if Keyword::If.matches(tokens.peek()) {
             conditions.push(tokens.located(if_condition)?);
         } else {
             let block_type = BlockType::Statement(StatementType::If);

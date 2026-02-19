@@ -1,6 +1,6 @@
 use crate::{
     lexer::{
-        IdentifierToken, IntegerLiteralToken, KeywordToken, StringLiteralToken, Symbol, Token,
+        IdentifierToken, IntegerLiteralToken, Keyword, StringLiteralToken, Symbol, Token,
         TokenMatch,
     },
     parser::{
@@ -283,12 +283,12 @@ fn expression_atom(
         }
         Token::Symbol(Symbol::OpenParen) => closure_or_tuple(tokens),
         Token::Symbol(Symbol::OpenBracket) => array(tokens),
-        Token::Keyword(KeywordToken::If) => if_expression(tokens, context),
-        Token::Keyword(KeywordToken::True) => {
+        Token::Keyword(Keyword::If) => if_expression(tokens, context),
+        Token::Keyword(Keyword::True) => {
             tokens.next();
             Ok(ExpressionNode::BooleanLiteral(true))
         }
-        Token::Keyword(KeywordToken::False) => {
+        Token::Keyword(Keyword::False) => {
             tokens.next();
             Ok(ExpressionNode::BooleanLiteral(false))
         }
@@ -398,9 +398,9 @@ fn if_expression(
     tokens.next();
     let context = context.reset_precedence();
     let predicate = tokens.located_with(sub_expression, context)?;
-    tokens.expect(&KeywordToken::Then, SyntaxError::ExpectedThen)?;
+    tokens.expect(&Keyword::Then, SyntaxError::ExpectedThen)?;
     let if_true = tokens.located_with(sub_expression, context)?;
-    tokens.expect(&KeywordToken::Else, SyntaxError::ExpectedElse)?;
+    tokens.expect(&Keyword::Else, SyntaxError::ExpectedElse)?;
     let if_false = tokens.located_with(sub_expression, context)?;
     Ok(ExpressionNode::IfExpression(IfExpressionNode {
         predicate: Box::new(predicate),

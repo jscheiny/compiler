@@ -1,5 +1,5 @@
 use crate::{
-    lexer::{KeywordToken, Symbol, Token},
+    lexer::{Keyword, Symbol, Token},
     parser::{
         IdentifierType, Node, ParseResult, StructFieldNode, StructNode, SyntaxError, TokenStream,
         grammar::{comma_separated_list, methods, type_definition},
@@ -30,7 +30,7 @@ fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<Node<StructFieldNode>>> {
 }
 
 fn field(tokens: &mut TokenStream) -> ParseResult<StructFieldNode> {
-    let public = tokens.accept(&KeywordToken::Pub);
+    let public = tokens.accept(&Keyword::Pub);
     let identifier = tokens.identifier(IdentifierType::Field)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {

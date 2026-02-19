@@ -1,5 +1,5 @@
 use crate::{
-    lexer::{KeywordToken, Symbol, Token, TokenMatch},
+    lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
         ExpressionNode, FunctionBodyNode, FunctionNode, IdentifierType, MethodNode, Node,
         ParameterNode, ParseResult, SyntaxError, TokenStream,
@@ -30,7 +30,7 @@ fn methods_impl(tokens: &mut TokenStream) -> ParseResult<Vec<Node<MethodNode>>> 
 }
 
 fn method(tokens: &mut TokenStream) -> ParseResult<MethodNode> {
-    let public = tokens.accept(&KeywordToken::Pub);
+    let public = tokens.accept(&Keyword::Pub);
     let function = tokens.located(nested_function)?;
     Ok(MethodNode { public, function })
 }

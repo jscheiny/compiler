@@ -1,5 +1,5 @@
 use crate::{
-    lexer::{IdentifierToken, KeywordToken, Symbol, Token},
+    lexer::{IdentifierToken, Keyword, Symbol, Token},
     parser::{
         FunctionTypeNode, Node, ParseResult, PrimitiveType, SyntaxError, TokenStream,
         TupleTypeNode, TypeNode, grammar::comma_separated_list,
@@ -28,7 +28,7 @@ pub fn type_definition_impl(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
             tokens.next();
             Ok(TypeNode::UserDefined(identifier))
         }
-        Token::Keyword(KeywordToken::Void) => {
+        Token::Keyword(Keyword::Void) => {
             tokens.next();
             Ok(TypeNode::Void)
         }

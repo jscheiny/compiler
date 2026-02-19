@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use crate::{
     checker::{RuntimeType, Type, TypeResolver},
-    lexer::KeywordToken,
+    lexer::Keyword,
 };
 
 pub struct TypeFmt<'a> {
@@ -55,7 +55,7 @@ impl Display for TypeFmt<'_> {
                     RuntimeType::Struct(struct_type) => &struct_type.identifier,
                 }
             ),
-            Type::Void => write!(f, "{}", KeywordToken::Void),
+            Type::Void => write!(f, "{}", Keyword::Void),
             Type::Error => write!(f, "<error-type>"),
         }
     }

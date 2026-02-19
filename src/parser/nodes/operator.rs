@@ -1,4 +1,4 @@
-use crate::lexer::{KeywordToken, Symbol, Token};
+use crate::lexer::{Keyword, Symbol, Token};
 
 pub trait Operator
 where
@@ -38,7 +38,7 @@ impl Operator for PrefixOperator {
         match token {
             Token::Symbol(Symbol::Dot) => Some(Self::Closure),
             Token::Symbol(Symbol::Minus) => Some(Self::Negative),
-            Token::Keyword(KeywordToken::Not) => Some(Self::LogicalNot),
+            Token::Keyword(Keyword::Not) => Some(Self::LogicalNot),
             _ => None,
         }
     }
@@ -77,7 +77,6 @@ pub enum BinaryOperator {
 
 impl Operator for BinaryOperator {
     fn from_token(token: &Token) -> Option<BinaryOperator> {
-        use KeywordToken as K;
         use Symbol as S;
         match token {
             Token::Symbol(operator) => match operator {
@@ -105,8 +104,8 @@ impl Operator for BinaryOperator {
                 _ => None,
             },
             Token::Keyword(keyword) => match keyword {
-                K::And => Some(Self::LogicalAnd),
-                K::Or => Some(Self::LogicalOr),
+                Keyword::And => Some(Self::LogicalAnd),
+                Keyword::Or => Some(Self::LogicalOr),
                 _ => None,
             },
             _ => None,
