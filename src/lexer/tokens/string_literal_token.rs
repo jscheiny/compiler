@@ -1,15 +1,4 @@
-use std::fmt::Display;
-
 use crate::lexer::{Token, TokenWidth, TryTokenizeResult};
-
-#[derive(Clone)]
-pub struct StringLiteralToken(pub String);
-
-impl Display for StringLiteralToken {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "\"{}\"", self.0)
-    }
-}
 
 const DOUBLE_QUOTE: char = '"';
 const ESCAPE: char = '\\';
@@ -45,7 +34,7 @@ pub fn try_tokenize_string_literal(text: &str) -> Option<TryTokenizeResult> {
     let string = text[1..width.bytes].to_string();
     width.add_char(DOUBLE_QUOTE);
     Some(TryTokenizeResult {
-        token: Some(Token::StringLiteral(StringLiteralToken(string))),
+        token: Some(Token::StringLiteral(string)),
         width,
     })
 }
