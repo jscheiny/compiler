@@ -1,19 +1,12 @@
-enum Simple(A, B, C);
+enum Simple(A, B, C(int));
 
-
-fn test_match(value: Simple) {
-    match value {
-        A, B, C -> {
-           true;
-        }
-        D -> 7;
-    };
+fn test() {
+    let x: Simple = 3 => C;
+    let x: Simple = C(3);
+    accept_simple(x);
+    let y = Simple.C(3);
+    accept_simple(y);
+    accept_simple(C(34));
 }
 
-fn test2() {
-    let x: [char] = "test";
-    let x: bool -> char = "test";
-    while x {
-        
-    }
-}
+fn accept_simple(s: Simple) {}
