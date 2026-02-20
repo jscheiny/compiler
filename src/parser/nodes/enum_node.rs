@@ -30,7 +30,8 @@ impl EnumNode {
     }
 
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
-        let mut scope = scope.derive(ScopeType::Struct);
+        let index = types.get_ref(self.id()).unwrap();
+        let mut scope = scope.derive(ScopeType::Struct(index));
         let mut scope_names = HashSet::new();
         for variant in self.variants.iter() {
             if !scope_names.insert(variant.id()) {

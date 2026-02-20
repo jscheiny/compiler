@@ -19,6 +19,7 @@ pub enum Keyword {
     Char,
     Else,
     Enum,
+    SelfValue, // Actually 4 characters but can't call it `Self``
     Then,
     True,
     Type,
@@ -50,6 +51,7 @@ impl Keyword {
             Self::Char => "char",
             Self::Else => "else",
             Self::Enum => "enum",
+            Self::SelfValue => "self",
             Self::Then => "then",
             Self::True => "true",
             Self::Type => "type",

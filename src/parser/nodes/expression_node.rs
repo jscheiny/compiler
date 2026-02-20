@@ -25,6 +25,7 @@ pub enum ExpressionNode {
     PostfixOp(PostfixOpExpressionNode),
     PrefixOp(PrefixOpExpressionNode),
     SelfRef(String),
+    SelfValue,
     StringLiteral(String),
     Error,
 }
@@ -64,6 +65,7 @@ impl ExpressionNode {
             Self::PostfixOp(node) => node.check(types, scope),
             Self::PrefixOp(node) => node.check(types, scope),
             Self::SelfRef(identifier) => self.check_self_ref(identifier, scope),
+            Self::SelfValue => self.check_self_value(scope),
             Self::StringLiteral(_) => (
                 scope,
                 Type::Array(Box::new(Type::Primitive(PrimitiveType::Char))),
@@ -110,7 +112,7 @@ impl ExpressionNode {
     }
 
     fn check_self_ref(&self, identifier: &String, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let self_scope = scope.find_scope(ScopeType::Struct);
+        let self_scope = scope.find_scope(|scope_type| matches!(scope_type, ScopeType::Struct(_)));
         if let Some(self_scope) = self_scope {
             let resolved_type = self_scope.lookup_local(identifier);
             if let Some(resolved_type) = resolved_type {
@@ -122,5 +124,23 @@ impl ExpressionNode {
         }
 
         (scope, Type::Error)
+    }
+
+    fn check_self_value(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        let mut self_index = None;
+        scope.find_scope(|scope_type| match scope_type {
+            ScopeType::Struct(index) => {
+                self_index = Some(index);
+                true
+            }
+            _ => false,
+        });
+
+        if let Some(index) = self_index {
+            (scope, Type::Reference(index))
+        } else {
+            println!("Type error: Cannot use `self` outside of a ref or struct");
+            (scope, Type::Error)
+        }
     }
 }

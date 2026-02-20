@@ -27,7 +27,8 @@ impl StructNode {
     }
 
     pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
-        let mut scope = scope.derive(ScopeType::Struct);
+        let index = types.get_ref(self.id()).unwrap();
+        let mut scope = scope.derive(ScopeType::Struct(index));
         for field in self.fields.iter() {
             let field_type = field.get_type(types).clone();
             scope.add_or(field.id(), field_type, || {

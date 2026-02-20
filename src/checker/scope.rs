@@ -11,7 +11,7 @@ pub enum ScopeType {
     Block,
     MatchCase,
     Loop,
-    Struct,
+    Struct(usize),
 }
 
 #[derive(Default, Debug)]
@@ -45,7 +45,8 @@ impl Scope {
     }
 
     pub fn return_type(&self) -> Option<&Type> {
-        let function_scope = self.find_scope(ScopeType::Function);
+        let function_scope =
+            self.find_scope(|scope_type| matches!(scope_type, ScopeType::Function));
         function_scope.and_then(|scope| scope.return_type.as_ref())
     }
 
@@ -58,12 +59,12 @@ impl Scope {
                 .unwrap_or(false)
     }
 
-    pub fn find_scope(&self, scope_type: ScopeType) -> Option<&Scope> {
+    pub fn find_scope(&self, mut predicate: impl FnMut(ScopeType) -> bool) -> Option<&Scope> {
         if let Some(parent) = self.parent.as_ref() {
-            if parent.scope_type == scope_type {
+            if predicate(parent.scope_type) {
                 Some(parent)
             } else {
-                parent.find_scope(scope_type)
+                parent.find_scope(predicate)
             }
         } else {
             None

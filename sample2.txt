@@ -1,20 +1,30 @@
-enum Simple(A, B(Other), C(int));
+// enum Simple(A, B(Other), C(int));
 enum Other(D, E, F(bool)) {
-    pub get_value(): int {
-        return 5;
+    pub test() {
+        self.get_value();
+    }
+
+    pub get_value(): bool {
+        -> match self.get_value() {
+            D -> true;
+            E -> false;
+            F(let value) -> value;
+        };
     }
 }
 
-fn test() {
-    let x: Simple = 3 => C;
-    match x {
-        let x -> 6;
-        A -> 5;
-        B(let other) -> other.get_value();
-        B(F(let y)) -> -y;
-        C(let x) -> 5;
-    };
-    // TODO else cases
-}
-
-fn accept_simple(s: Simple): int {}
+// enum Test(A());
+// 
+// fn test() {
+//     let x: Simple = 3 => C;
+//     match x {
+//         let x -> 6;
+//         A -> 5;
+//         B(let self) -> other.get_value();
+//         B(F(let y)) -> -y;
+//         C(let x) -> 5;
+//     };
+//     // TODO else cases
+// }
+// 
+// fn accept_simple(s: Simple): int {}

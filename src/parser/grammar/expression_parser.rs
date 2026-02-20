@@ -99,7 +99,6 @@ fn sub_expression(
             // Function binding should be treated as the same precedence as a.b
             let precedence = BinaryOperator::Access.precedence();
             if precedence < context.min_precedence {
-                println!("Here :(");
                 break;
             }
 
@@ -246,6 +245,10 @@ fn expression_atom(
         }));
     }
     match tokens.peek() {
+        Token::Keyword(Keyword::SelfValue) => {
+            tokens.next();
+            Ok(ExpressionNode::SelfValue)
+        }
         Token::Identifier(identifier) => {
             let identifier = identifier.clone();
             tokens.next();
