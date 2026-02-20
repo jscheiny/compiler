@@ -8,15 +8,11 @@ where
     Self: Sized + IntoEnumIterator,
 {
     fn as_token(&self) -> Token;
-    fn from_token(token: &Token) -> Option<Self> {
-        for operator in Self::iter() {
-            if operator.as_token() == *token {
-                return Some(operator);
-            }
-        }
-        None
-    }
     fn precedence(&self) -> i32;
+
+    fn from_token(token: &Token) -> Option<Self> {
+        Self::iter().find(|operator| operator.as_token() == *token)
+    }
 }
 
 #[derive(Copy, Clone, Debug, EnumIter)]

@@ -27,7 +27,7 @@ impl ArrayExpressionNode {
             scope = new_scope;
 
             if let Some(t) = resolved_type.as_ref() {
-                if element_type.is_assignable_to(&t, types) {
+                if element_type.is_assignable_to(t, types) {
                     // Element type matches no error and keep going
                 } else if t.is_assignable_to(&element_type, types) {
                     resolved_type = Some(element_type);
