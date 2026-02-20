@@ -63,6 +63,7 @@ fn function(tokens: &mut TokenStream, has_keyword: bool) -> ParseResult<Function
     Ok(FunctionNode::new(identifier, parameters, return_type, body))
 }
 
+// TODO arrow functions are broken because A -> B is a valid type...
 fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyNode> {
     if tokens.accept(&Symbol::SkinnyArrow) {
         let expression = expression(tokens)?;
