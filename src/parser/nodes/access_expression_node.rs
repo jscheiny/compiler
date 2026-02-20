@@ -1,5 +1,5 @@
 use crate::{
-    checker::{FunctionType, RuntimeType, Scope, Type, TypeResolver},
+    checker::{RuntimeType, Scope, Type, TypeResolver},
     parser::{ExpressionNode, Identified, IdentifierNode, Node},
 };
 
@@ -82,17 +82,11 @@ fn get_static_field(
     // TODO use reference types instead of expensive copies of self (or switch to RCs!)
     match runtime_type {
         RuntimeType::Enum(enum_type) => {
-            let self_type = get_self_type(&enum_type.identifier, types);
-            if let Some(variant_type) = enum_type.variants.get(field) {
-                let static_type = match variant_type {
-                    Some(inner_type) => {
-                        Type::Function(FunctionType::new(inner_type.clone(), self_type))
-                    }
-                    None => self_type,
-                };
-                Some(static_type)
+            if let Some(variant_type) = enum_type.get_variant(field) {
+                Some(variant_type)
             } else if let Some(method) = enum_type.methods.get(field) {
                 // TODO respect public/private access
+                let self_type = get_self_type(&enum_type.identifier, types);
                 Some(method.function_type.clone().as_static_method(self_type))
             } else {
                 println!(

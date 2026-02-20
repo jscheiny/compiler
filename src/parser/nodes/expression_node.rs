@@ -43,7 +43,7 @@ impl ExpressionNode {
         match self {
             Self::Access(node) => node.check(types, scope),
             Self::Array(node) => node.check(types, scope, expected_type),
-            Self::BinaryOp(node) => node.check(types, scope),
+            Self::BinaryOp(node) => node.check(types, scope, expected_type),
             Self::Block(node) => {
                 let (scope, resolved_type) = node.check(types, scope, expected_type);
                 (scope, resolved_type.unwrap_or(Type::Void))
@@ -54,8 +54,10 @@ impl ExpressionNode {
             Self::ClosureParameter(_) => {
                 panic!("ERROR: Unexpected closure parameter outside of parameter list")
             }
-            Self::FunctionCall(node) => node.check(types, scope),
-            Self::Identifier(identifier) => self.check_identifier(identifier, types, scope),
+            Self::FunctionCall(node) => node.check(types, scope, expected_type),
+            Self::Identifier(identifier) => {
+                self.check_identifier(identifier, types, scope, expected_type)
+            }
             Self::IfExpression(node) => node.check(types, scope, expected_type),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
             Self::Match(node) => node.check(types, scope, expected_type),
@@ -75,7 +77,13 @@ impl ExpressionNode {
         identifier: &String,
         types: &TypeResolver,
         scope: Box<Scope>,
+        expected_type: Option<&Type>,
     ) -> (Box<Scope>, Type) {
+        let expected_enum_type = expected_type.and_then(|e| match e.deref(types) {
+            Type::Enum(enum_type) => Some(enum_type),
+            _ => None,
+        });
+
         // TODO disallow use of types as values
         if let Some(resolved_type) = scope.lookup(identifier) {
             (scope, resolved_type)
@@ -87,6 +95,13 @@ impl ExpressionNode {
                     println!("Type Error: Could not resolve `{}` as a value", identifier);
                     (scope, Type::Error)
                 }
+            }
+        } else if let Some(enum_type) = expected_enum_type {
+            if let Some(variant_type) = enum_type.get_variant(identifier) {
+                (scope, variant_type)
+            } else {
+                println!("Type Error: Could not find symbol `{}`", identifier);
+                (scope, Type::Error)
             }
         } else {
             println!("Type Error: Could not find symbol `{}`", identifier);

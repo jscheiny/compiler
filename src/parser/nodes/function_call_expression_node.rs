@@ -9,8 +9,13 @@ pub struct FunctionCallExpressionNode {
 }
 
 impl FunctionCallExpressionNode {
-    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (scope, function_type) = self.function.check(types, scope);
+    pub fn check(
+        &self,
+        types: &TypeResolver,
+        scope: Box<Scope>,
+        expected_type: Option<&Type>,
+    ) -> (Box<Scope>, Type) {
+        let (scope, function_type) = self.function.check_expected(types, scope, expected_type);
         let function_type = function_type.as_function(types);
         let (scope, arguments) = self.get_args(types, scope, function_type.as_ref());
 

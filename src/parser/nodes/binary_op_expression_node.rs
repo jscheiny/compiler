@@ -10,7 +10,12 @@ pub struct BinaryOpExpressionNode {
 }
 
 impl BinaryOpExpressionNode {
-    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
+    pub fn check(
+        &self,
+        types: &TypeResolver,
+        scope: Box<Scope>,
+        expected_type: Option<&Type>,
+    ) -> (Box<Scope>, Type) {
         use BinaryOperator as O;
         match *self.operator {
             O::Add => todo!("Implement type checking for +"),
@@ -30,7 +35,7 @@ impl BinaryOpExpressionNode {
             O::LessThanOrEqual => todo!("Implement type checking for <="),
             O::GreaterThan => todo!("Implement type checking for >"),
             O::GreaterThanOrEqual => todo!("Implement type checking for >="),
-            O::FunctionApplication => self.check_function_application(types, scope),
+            O::FunctionApplication => self.check_function_application(types, scope, expected_type),
             O::Comma => self.check_comma(types, scope),
             O::LogicalAnd => self.check_logical_op(types, scope),
             O::LogicalOr => self.check_logical_op(types, scope),
@@ -43,9 +48,10 @@ impl BinaryOpExpressionNode {
         &self,
         types: &TypeResolver,
         scope: Box<Scope>,
+        expected_type: Option<&Type>,
     ) -> (Box<Scope>, Type) {
         let (scope, left_type) = self.left.check(types, scope);
-        let (scope, right_type) = self.right.check(types, scope);
+        let (scope, right_type) = self.right.check_expected(types, scope, expected_type);
         let function_type = right_type.as_function(types);
 
         if let Some(function_type) = function_type {
