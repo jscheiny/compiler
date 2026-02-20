@@ -24,7 +24,13 @@ pub fn match_expression(tokens: &mut TokenStream) -> ParseResult<ExpressionNode>
 }
 
 fn match_case(tokens: &mut TokenStream) -> ParseResult<MatchCaseNode> {
-    let pattern = tokens.located_with(match_pattern, true)?;
+    let pattern = if Keyword::Else.matches(tokens.peek()) {
+        let pattern = tokens.current_span().wrap(MatchPatternNode::Else);
+        tokens.next();
+        pattern
+    } else {
+        tokens.located_with(match_pattern, true)?
+    };
     tokens.expect(&Symbol::SkinnyArrow, SyntaxError::ExpectedMatchExpression)?;
     let expect_semicolon = !Symbol::OpenBrace.matches(tokens.peek());
     let if_match = tokens.located(expression)?;

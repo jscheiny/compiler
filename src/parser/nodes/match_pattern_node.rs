@@ -8,6 +8,7 @@ use crate::{
 pub enum MatchPatternNode {
     Variant(VariantMatchPattern),
     Binding(IdentifierNode),
+    Else,
 }
 
 impl MatchPatternNode {
@@ -29,6 +30,7 @@ impl MatchPatternNode {
                     bindings.insert(identifier.0.clone(), subject_type.clone());
                 }
             }
+            MatchPatternNode::Else => {}
         }
     }
 }
