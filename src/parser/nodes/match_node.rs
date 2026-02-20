@@ -1,5 +1,5 @@
 use crate::{
-    checker::{EnumType, Scope, Type, TypeResolver},
+    checker::{Scope, Type, TypeResolver},
     parser::{ExpressionNode, MatchCaseNode, Node},
 };
 
@@ -22,14 +22,13 @@ impl MatchNode {
         // TODO completeness check
 
         for case in self.cases.iter() {
-            let (new_scope, case_type) =
-                case.check(types, scope, expected_type, subject_type.as_ref());
+            let (new_scope, case_type) = case.check(types, scope, expected_type, &subject_type);
             scope = new_scope;
 
             // TODO dedupe with array parsing potentially
             if let Some(t) = resolved_type.as_ref() {
                 if case_type.is_assignable_to(t, types) {
-                    // Case type matches no error and keep going
+                    // Case type matches: no error and keep going
                 } else if t.is_assignable_to(&case_type, types) {
                     resolved_type = Some(case_type);
                 } else {
@@ -51,22 +50,17 @@ impl MatchNode {
         }
     }
 
-    fn check_subject(
-        &self,
-        types: &TypeResolver,
-        scope: Box<Scope>,
-    ) -> (Box<Scope>, Option<EnumType>) {
+    fn check_subject(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let (scope, subject_type) = self.subject.check(types, scope);
         let subject_type = subject_type.as_deref(types);
-        if let Type::Enum(enum_type) = subject_type {
-            (scope, Some(enum_type))
-        } else {
+        if !matches!(subject_type, Type::Enum(_)) {
             // TODO handle other types besides enums
             println!(
                 "Type error: Match expression currently only supports enum types, found `{}`",
                 subject_type.format(types)
             );
-            (scope, None)
         }
+
+        (scope, subject_type)
     }
 }

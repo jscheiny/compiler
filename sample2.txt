@@ -1,12 +1,20 @@
-enum Simple(A, B, C(int));
+enum Simple(A, B(Other), C(int));
+enum Other(D, E, F(bool)) {
+    pub get_value(): int {
+        return 5;
+    }
+}
 
 fn test() {
     let x: Simple = 3 => C;
-    let x: Simple = C(3);
-    accept_simple(x);
-    let y = Simple.C(3);
-    accept_simple(y);
-    accept_simple(C(34));
+    match x {
+        let x -> 6;
+        A -> 5;
+        B(let other) -> other.get_value();
+        B(F(let y)) -> -y;
+        C(let x) -> 5;
+    };
+    // TODO else cases
 }
 
-fn accept_simple(s: Simple) {}
+fn accept_simple(s: Simple): int {}

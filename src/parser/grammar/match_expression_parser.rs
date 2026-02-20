@@ -1,8 +1,8 @@
 use crate::{
-    lexer::{Symbol, TokenMatch},
+    lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
-        ExpressionNode, IdentifierType, MatchCaseNode, MatchNode, MatchPatternNode, Node,
-        ParseResult, SyntaxError, TokenStream,
+        ExpressionNode, IdentifierNode, IdentifierType, MatchCaseNode, MatchNode, MatchPatternNode,
+        ParseResult, SyntaxError, TokenStream, VariantMatchPattern,
         grammar::{expression_parser::expression, statement_parser::end_statement},
     },
 };
@@ -24,29 +24,52 @@ pub fn match_expression(tokens: &mut TokenStream) -> ParseResult<ExpressionNode>
 }
 
 fn match_case(tokens: &mut TokenStream) -> ParseResult<MatchCaseNode> {
-    let patterns = match_patterns(tokens)?;
+    let pattern = tokens.located(match_pattern)?;
+    tokens.expect(&Symbol::SkinnyArrow, SyntaxError::ExpectedMatchExpression)?;
     let expect_semicolon = !Symbol::OpenBrace.matches(tokens.peek());
     let if_match = tokens.located(expression)?;
     if expect_semicolon {
         end_statement(tokens);
     }
-    Ok(MatchCaseNode { patterns, if_match })
+    Ok(MatchCaseNode { pattern, if_match })
 }
 
-fn match_patterns(tokens: &mut TokenStream) -> ParseResult<Vec<Node<MatchPatternNode>>> {
-    let first_pattern = tokens.located(match_pattern)?;
-    let mut patterns = vec![first_pattern];
+// fn match_patterns(tokens: &mut TokenStream) -> ParseResult<Vec<Node<MatchPatternNode>>> {
+//     let first_pattern = tokens.located(match_pattern)?;
+//     let mut patterns = vec![first_pattern];
 
-    while !tokens.accept(&Symbol::SkinnyArrow) {
-        tokens.expect(&Symbol::Comma, SyntaxError::ExpectedMatchExpression)?;
-        patterns.push(tokens.located(match_pattern)?);
-    }
+//     while !tokens.accept(&Symbol::SkinnyArrow) {
+//         tokens.expect(&Symbol::Comma, SyntaxError::ExpectedMatchExpression)?;
+//         patterns.push(tokens.located(match_pattern)?);
+//     }
 
-    Ok(patterns)
-}
+//     Ok(patterns)
+// }
 
 fn match_pattern(tokens: &mut TokenStream) -> ParseResult<MatchPatternNode> {
-    // TODO match patterns should be much more capable...
-    let identifier = tokens.identifier(IdentifierType::Variant)?;
-    Ok(MatchPatternNode { identifier })
+    if let Token::Identifier(identifier) = tokens.peek() {
+        let identifier = tokens
+            .current_span()
+            .wrap(IdentifierNode(identifier.clone()));
+        tokens.next();
+        // TODO accept / expect don't need to take references these are always copyable
+        if tokens.accept(&Symbol::OpenParen) {
+            let inner_pattern = tokens.located(match_pattern)?;
+            tokens.expect(&Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
+            Ok(MatchPatternNode::Variant(VariantMatchPattern {
+                identifier,
+                inner_pattern: Some(Box::new(inner_pattern)),
+            }))
+        } else {
+            Ok(MatchPatternNode::Variant(VariantMatchPattern {
+                identifier,
+                inner_pattern: None,
+            }))
+        }
+    } else if tokens.accept(&Keyword::Let) {
+        let identifier = tokens.identifier(IdentifierType::PatternBinding)?;
+        Ok(MatchPatternNode::Binding(identifier.value))
+    } else {
+        Err(tokens.make_error(SyntaxError::ExpectedMatchPattern))
+    }
 }

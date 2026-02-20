@@ -9,6 +9,7 @@ pub enum ScopeType {
     Function,
     Closure,
     Block,
+    MatchCase,
     Loop,
     Struct,
 }
