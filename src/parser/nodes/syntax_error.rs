@@ -29,6 +29,7 @@ pub enum SyntaxError {
     ExpectedTopLevelDefinition,
     ExpectedType,
     ExpectedVariants,
+    UnexpectedBindingPattern,
     UnexpectedBlockReturn(StatementType),
     UnexpectedTypeExpression,
 }
@@ -125,6 +126,9 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             E::ExpectedTopLevelDefinition => write!(f, "expected struct, tuple, enum, or function"),
             E::ExpectedType => write!(f, "expected type name"),
             E::ExpectedVariants => write!(f, "expected enum variants"),
+            E::UnexpectedBindingPattern => {
+                return write!(f, "unexpected top level binding pattern");
+            }
             E::UnexpectedBlockReturn(statement_type) => {
                 return write!(f, "unexpected block return in {}", statement_type);
             }
@@ -177,6 +181,13 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
             E::ExpectedTopLevelDefinition => write!(f, "expected struct, tuple, enum, or function"),
             E::ExpectedType => write!(f, "expected type name"),
             E::ExpectedVariants => fmt_symbol(f, S::OpenParen),
+            E::UnexpectedBindingPattern => {
+                write!(
+                    f,
+                    "will match all cases, use `{}` case instead",
+                    Keyword::Else
+                )
+            }
             E::UnexpectedBlockReturn(_) => {
                 write!(f, "block returns are only allowed in expressions")
             }

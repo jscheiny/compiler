@@ -24,7 +24,7 @@ pub fn match_expression(tokens: &mut TokenStream) -> ParseResult<ExpressionNode>
 }
 
 fn match_case(tokens: &mut TokenStream) -> ParseResult<MatchCaseNode> {
-    let pattern = tokens.located(match_pattern)?;
+    let pattern = tokens.located_with(match_pattern, true)?;
     tokens.expect(&Symbol::SkinnyArrow, SyntaxError::ExpectedMatchExpression)?;
     let expect_semicolon = !Symbol::OpenBrace.matches(tokens.peek());
     let if_match = tokens.located(expression)?;
@@ -46,7 +46,7 @@ fn match_case(tokens: &mut TokenStream) -> ParseResult<MatchCaseNode> {
 //     Ok(patterns)
 // }
 
-fn match_pattern(tokens: &mut TokenStream) -> ParseResult<MatchPatternNode> {
+fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<MatchPatternNode> {
     if let Token::Identifier(identifier) = tokens.peek() {
         let identifier = tokens
             .current_span()
@@ -54,7 +54,7 @@ fn match_pattern(tokens: &mut TokenStream) -> ParseResult<MatchPatternNode> {
         tokens.next();
         // TODO accept / expect don't need to take references these are always copyable
         if tokens.accept(&Symbol::OpenParen) {
-            let inner_pattern = tokens.located(match_pattern)?;
+            let inner_pattern = tokens.located_with(match_pattern, false)?;
             tokens.expect(&Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
             Ok(MatchPatternNode::Variant(VariantMatchPattern {
                 identifier,
@@ -66,7 +66,11 @@ fn match_pattern(tokens: &mut TokenStream) -> ParseResult<MatchPatternNode> {
                 inner_pattern: None,
             }))
         }
-    } else if tokens.accept(&Keyword::Let) {
+    } else if Keyword::Let.matches(tokens.peek()) {
+        if top_level {
+            tokens.push_error(SyntaxError::UnexpectedBindingPattern);
+        }
+        tokens.next();
         let identifier = tokens.identifier(IdentifierType::PatternBinding)?;
         Ok(MatchPatternNode::Binding(identifier.value))
     } else {
