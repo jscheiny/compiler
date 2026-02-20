@@ -1,7 +1,7 @@
 use crate::{
     lexer::{Symbol, TokenMatch},
     parser::{
-        ExpressionNode, IdentifierType, MatchCaseNode, MatchExpressionNode, MatchPatternNode, Node,
+        ExpressionNode, IdentifierType, MatchCaseNode, MatchNode, MatchPatternNode, Node,
         ParseResult, SyntaxError, TokenStream,
         grammar::{expression_parser::expression, statement_parser::end_statement},
     },
@@ -17,7 +17,7 @@ pub fn match_expression(tokens: &mut TokenStream) -> ParseResult<ExpressionNode>
         cases.push(tokens.located(match_case)?);
     }
 
-    Ok(ExpressionNode::Match(MatchExpressionNode {
+    Ok(ExpressionNode::Match(MatchNode {
         subject: Box::new(subject),
         cases,
     }))

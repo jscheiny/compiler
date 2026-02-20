@@ -3,7 +3,7 @@ use crate::{
     parser::{
         AccessExpressionNode, ArrayExpressionNode, BinaryOpExpressionNode, BlockNode,
         ClosureExpressionNode, ClosureParameterExpressionNode, FunctionCallExpressionNode,
-        IfExpressionNode, MatchExpressionNode, PostfixOpExpressionNode, PrefixOpExpressionNode,
+        IfExpressionNode, MatchNode, PostfixOpExpressionNode, PrefixOpExpressionNode,
         PrimitiveType,
     },
 };
@@ -21,7 +21,7 @@ pub enum ExpressionNode {
     Identifier(String),
     IfExpression(IfExpressionNode),
     IntegerLiteral(i64),
-    Match(MatchExpressionNode),
+    Match(MatchNode),
     PostfixOp(PostfixOpExpressionNode),
     PrefixOp(PrefixOpExpressionNode),
     SelfRef(String),
