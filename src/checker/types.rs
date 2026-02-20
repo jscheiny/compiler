@@ -29,9 +29,8 @@ impl Type {
         if matches!(self, Type::Error) || matches!(other, Type::Error) {
             return true;
         }
-
-        if let Type::Reference(index) = other {
-            let resolved_other = types.get_type(*index).unwrap_or(Type::Error);
+        if let Type::Reference(_) = other {
+            let resolved_other = other.deref(types);
             return self.is_assignable_to(&resolved_other, types);
         }
 
@@ -40,7 +39,7 @@ impl Type {
             Type::Array(left) => match other {
                 Type::Array(right) => left.is_assignable_to(right, types),
                 // TODO handle function type coercion better...
-                _ => match self.as_function(types) {
+                _ => match self.clone().as_function(types) {
                     Some(function_type) => {
                         Type::Function(function_type).is_assignable_to(other, types)
                     }
@@ -58,7 +57,7 @@ impl Type {
                             .parameters
                             .iter()
                             .zip(right.parameters.iter())
-                            .all(|(left, right)| left.is_assignable_to(&right, types))
+                            .all(|(left, right)| left.is_assignable_to(right, types))
                         && left.return_type.is_assignable_to(&right.return_type, types)
                 }
                 _ => false,
@@ -67,10 +66,7 @@ impl Type {
                 Type::Primitive(right) => left == right,
                 _ => false,
             },
-            Type::Reference(index) => types
-                .get_type(*index)
-                .unwrap_or(Type::Error)
-                .is_assignable_to(other, types),
+            Type::Reference(_) => self.deref(types).is_assignable_to(other, types),
             Type::Struct(left) => match other {
                 Type::Struct(right) => left.identifier == right.identifier,
                 _ => false,
@@ -92,43 +88,45 @@ impl Type {
     }
 
     pub fn is_primitive(&self, expected: PrimitiveType, types: &TypeResolver) -> bool {
-        match self {
-            Self::Primitive(primitive) => *primitive == expected,
-            Self::Reference(index) => types
-                .get_type(*index)
-                .unwrap_or(Type::Error)
-                .is_primitive(expected, types),
+        match self.deref(types) {
+            Self::Primitive(primitive) => primitive == expected,
             Self::Error => true,
             _ => false,
         }
     }
 
-    pub fn as_function(&self, types: &TypeResolver) -> Option<FunctionType> {
-        match self {
+    pub fn as_function(self, types: &TypeResolver) -> Option<FunctionType> {
+        match self.as_deref(types) {
             Type::Array(element_type) => Some(FunctionType::new(
                 Type::Primitive(PrimitiveType::Int),
                 element_type.as_ref().clone(),
             )),
             Type::Function(function_type) => Some(function_type.clone()),
-            Type::Reference(index) => types
-                .get_type(*index)
-                .unwrap_or(Type::Error)
-                .as_function(types),
             Type::Type(_) => todo!("Implement call operator for types (constructor)"),
             _ => None,
         }
     }
 
     pub fn as_runtime_type(self, types: &TypeResolver) -> Option<RuntimeType> {
-        match self {
+        match self.as_deref(types) {
             Type::Type(runtime_type) => Some(runtime_type),
             Type::Enum(enum_type) => Some(RuntimeType::Enum(enum_type)),
             Type::Struct(struct_type) => Some(RuntimeType::Struct(struct_type)),
-            Type::Reference(index) => types
-                .get_type(index)
-                .unwrap_or(Type::Error)
-                .as_runtime_type(types),
             _ => None,
+        }
+    }
+
+    pub fn as_deref(self, types: &TypeResolver) -> Type {
+        match self {
+            Type::Reference(index) => types.get_type(index).unwrap_or(Type::Error).as_deref(types),
+            _ => self,
+        }
+    }
+
+    pub fn deref(&self, types: &TypeResolver) -> Type {
+        match self {
+            Type::Reference(index) => types.get_type(*index).unwrap_or(Type::Error).deref(types),
+            _ => self.clone(),
         }
     }
 
