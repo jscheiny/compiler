@@ -3,7 +3,8 @@ use crate::{
     parser::{
         AccessExpressionNode, ArrayExpressionNode, BinaryOpExpressionNode, BlockNode,
         ClosureExpressionNode, ClosureParameterExpressionNode, FunctionCallExpressionNode,
-        IfExpressionNode, PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType,
+        IfExpressionNode, MatchExpressionNode, PostfixOpExpressionNode, PrefixOpExpressionNode,
+        PrimitiveType,
     },
 };
 
@@ -20,6 +21,7 @@ pub enum ExpressionNode {
     Identifier(String),
     IfExpression(IfExpressionNode),
     IntegerLiteral(i64),
+    Match(MatchExpressionNode),
     PostfixOp(PostfixOpExpressionNode),
     PrefixOp(PrefixOpExpressionNode),
     SelfRef(String),
@@ -56,6 +58,7 @@ impl ExpressionNode {
             Self::Identifier(identifier) => self.check_identifier(identifier, types, scope),
             Self::IfExpression(node) => node.check(types, scope, expected_type),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
+            Self::Match(_) => todo!("Implement type checking for match expressions"),
             Self::PostfixOp(node) => node.check(types, scope),
             Self::PrefixOp(node) => node.check(types, scope),
             Self::SelfRef(identifier) => self.check_self_ref(identifier, scope),

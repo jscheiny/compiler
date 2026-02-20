@@ -1,23 +1,11 @@
-type T = bool -> int;
+enum Simple(A, B, C);
 
-fn get(): T {
-    let x = '5';
-    accept_char(x);
-    let x = "abcdefg";
-    accept_str("abcdefg");
-    accept_fn("abcdefg");
-    accept_fn(['a', 'b', 'c']);
-    accept_fn(a -> 'a');
-}
 
-fn accept_char(c: char) {
-
-}
-
-fn accept_str(c: [char]) {
-    
-}
-
-fn accept_fn(f: int -> char) {
-
+fn test_match(value: Simple) {
+    match value {
+        A, B, C -> {
+            -> 6;
+        }
+        D -> 7;
+    };
 }

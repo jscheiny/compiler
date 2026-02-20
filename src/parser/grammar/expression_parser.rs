@@ -7,7 +7,7 @@ use crate::{
         IfExpressionNode, LocatedSyntaxError, Node, Operator, ParseResult, PostfixOpExpressionNode,
         PostfixOperator, PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType,
         SyntaxError, TokenSpan, TokenStream,
-        grammar::{statement, type_definition},
+        grammar::{match_expression, statement, type_definition},
     },
 };
 
@@ -279,6 +279,7 @@ fn expression_atom(
         Token::Symbol(Symbol::OpenParen) => closure_or_tuple(tokens),
         Token::Symbol(Symbol::OpenBracket) => array(tokens),
         Token::Keyword(Keyword::If) => if_expression(tokens),
+        Token::Keyword(Keyword::Match) => match_expression(tokens),
         Token::Keyword(Keyword::True) => {
             tokens.next();
             Ok(ExpressionNode::BooleanLiteral(true))
