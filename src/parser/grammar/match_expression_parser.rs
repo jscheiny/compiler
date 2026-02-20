@@ -47,33 +47,35 @@ fn match_case(tokens: &mut TokenStream) -> ParseResult<MatchCaseNode> {
 // }
 
 fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<MatchPatternNode> {
-    if let Token::Identifier(identifier) = tokens.peek() {
-        let identifier = tokens
-            .current_span()
-            .wrap(IdentifierNode(identifier.clone()));
-        tokens.next();
-        // TODO accept / expect don't need to take references these are always copyable
-        if tokens.accept(&Symbol::OpenParen) {
-            let inner_pattern = tokens.located_with(match_pattern, false)?;
-            tokens.expect(&Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
-            Ok(MatchPatternNode::Variant(VariantMatchPattern {
-                identifier,
-                inner_pattern: Some(Box::new(inner_pattern)),
-            }))
-        } else {
-            Ok(MatchPatternNode::Variant(VariantMatchPattern {
-                identifier,
-                inner_pattern: None,
-            }))
+    match tokens.peek() {
+        Token::Identifier(identifier) => {
+            let identifier = tokens
+                .current_span()
+                .wrap(IdentifierNode(identifier.clone()));
+            tokens.next();
+            // TODO accept / expect don't need to take references these are always copyable
+            if tokens.accept(&Symbol::OpenParen) {
+                let inner_pattern = tokens.located_with(match_pattern, false)?;
+                tokens.expect(&Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
+                Ok(MatchPatternNode::Variant(VariantMatchPattern {
+                    identifier,
+                    inner_pattern: Some(Box::new(inner_pattern)),
+                }))
+            } else {
+                Ok(MatchPatternNode::Variant(VariantMatchPattern {
+                    identifier,
+                    inner_pattern: None,
+                }))
+            }
         }
-    } else if Keyword::Let.matches(tokens.peek()) {
-        if top_level {
-            tokens.push_error(SyntaxError::UnexpectedBindingPattern);
+        Token::Keyword(Keyword::Let) => {
+            if top_level {
+                tokens.push_error(SyntaxError::UnexpectedBindingPattern);
+            }
+            tokens.next();
+            let identifier = tokens.identifier(IdentifierType::PatternBinding)?;
+            Ok(MatchPatternNode::Binding(identifier.value))
         }
-        tokens.next();
-        let identifier = tokens.identifier(IdentifierType::PatternBinding)?;
-        Ok(MatchPatternNode::Binding(identifier.value))
-    } else {
-        Err(tokens.make_error(SyntaxError::ExpectedMatchPattern))
+        _ => Err(tokens.make_error(SyntaxError::ExpectedMatchPattern)),
     }
 }
