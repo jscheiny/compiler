@@ -58,7 +58,7 @@ impl ExpressionNode {
             Self::Identifier(identifier) => self.check_identifier(identifier, types, scope),
             Self::IfExpression(node) => node.check(types, scope, expected_type),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
-            Self::Match(_) => todo!("Implement type checking for match expressions"),
+            Self::Match(node) => node.check(types, scope, expected_type),
             Self::PostfixOp(node) => node.check(types, scope),
             Self::PrefixOp(node) => node.check(types, scope),
             Self::SelfRef(identifier) => self.check_self_ref(identifier, scope),

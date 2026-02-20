@@ -4,8 +4,16 @@ enum Simple(A, B, C);
 fn test_match(value: Simple) {
     match value {
         A, B, C -> {
-            -> 6;
+           true;
         }
         D -> 7;
     };
+}
+
+fn test2() {
+    let x: [char] = "test";
+    let x: bool -> char = "test";
+    while x {
+        
+    }
 }
