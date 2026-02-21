@@ -8,7 +8,7 @@ enum Other(D, E, F(bool)) {
         match self.get_value() {
             D -> true;
             E -> 3;
-            F(else) -> not value;
+            F(let x) -> not value;
             else -> true;
         }
     }
