@@ -32,7 +32,7 @@ pub fn statement(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult
 fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<StatementNode> {
     tokens.next();
     let identifier = tokens.identifier(IdentifierType::Variable)?;
-    let type_def = if tokens.accept(&Symbol::Colon) {
+    let type_def = if tokens.accept(Symbol::Colon) {
         Some(tokens.located(type_definition)?)
     } else {
         None
@@ -65,7 +65,7 @@ fn initializer(tokens: &mut TokenStream) -> ParseResult<Option<Node<ExpressionNo
 
 fn function_return(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     tokens.next();
-    if tokens.accept(&Symbol::Semicolon) {
+    if tokens.accept(Symbol::Semicolon) {
         Ok(StatementNode::FunctionReturn(None))
     } else {
         let expression = tokens.located(expression)?;
@@ -98,7 +98,7 @@ fn if_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     let mut conditions = vec![tokens.located(if_condition)?];
     let mut else_branch = None;
 
-    while tokens.accept(&Keyword::Else) {
+    while tokens.accept(Keyword::Else) {
         if Keyword::If.matches(tokens.peek()) {
             conditions.push(tokens.located(if_condition)?);
         } else {
@@ -148,7 +148,7 @@ fn expression_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> 
 }
 
 pub fn end_statement(tokens: &mut TokenStream) {
-    if !tokens.accept(&Symbol::Semicolon) {
+    if !tokens.accept(Symbol::Semicolon) {
         tokens.push_error(SyntaxError::ExpectedEndStatement);
     }
 }

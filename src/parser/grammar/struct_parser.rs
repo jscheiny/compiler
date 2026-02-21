@@ -30,7 +30,7 @@ fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<Node<StructFieldNode>>> {
 }
 
 fn field(tokens: &mut TokenStream) -> ParseResult<StructFieldNode> {
-    let public = tokens.accept(&Keyword::Pub);
+    let public = tokens.accept(Keyword::Pub);
     let identifier = tokens.identifier(IdentifierType::Field)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {

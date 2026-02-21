@@ -184,12 +184,12 @@ fn function_call(
     let arguments_span = TokenSpan::singleton(tokens);
     tokens.next();
 
-    let arguments = if tokens.accept(&Symbol::CloseParen) {
+    let arguments = if tokens.accept(Symbol::CloseParen) {
         vec![]
     } else {
         let context = ExpressionContext::parentheses();
         let right = tokens.located_with(sub_expression, context)?;
-        tokens.expect(&Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
+        tokens.expect(Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
         flatten_commas(right)
     };
 
@@ -302,9 +302,9 @@ pub enum BlockType {
 }
 
 pub fn block(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<BlockNode> {
-    tokens.expect(&Symbol::OpenBrace, SyntaxError::ExpectedBlock)?;
+    tokens.expect(Symbol::OpenBrace, SyntaxError::ExpectedBlock)?;
     let mut statements = vec![];
-    while !tokens.accept(&Symbol::CloseBrace) {
+    while !tokens.accept(Symbol::CloseBrace) {
         statements.push(tokens.located_with(statement, block_type)?);
     }
 
@@ -331,15 +331,15 @@ pub fn block(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<Blo
 
 fn closure_or_tuple(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
     tokens.next();
-    if tokens.accept(&Symbol::CloseParen) {
-        tokens.expect(&Symbol::SkinnyArrow, SyntaxError::ExpectedClosureBody)?;
+    if tokens.accept(Symbol::CloseParen) {
+        tokens.expect(Symbol::SkinnyArrow, SyntaxError::ExpectedClosureBody)?;
         return closure(tokens, vec![]);
     }
 
     let context = ExpressionContext::parentheses();
     let expression = tokens.located_with(sub_expression, context)?;
-    tokens.expect(&Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
-    if tokens.accept(&Symbol::SkinnyArrow) {
+    tokens.expect(Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
+    if tokens.accept(Symbol::SkinnyArrow) {
         closure(tokens, flatten_commas(expression))
     } else {
         Ok(expression.value)
@@ -380,11 +380,11 @@ fn closure(
 fn array(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
     tokens.next();
     let context = ExpressionContext::brackets();
-    let elements = if tokens.accept(&Symbol::CloseBracket) {
+    let elements = if tokens.accept(Symbol::CloseBracket) {
         vec![]
     } else {
         let expression = tokens.located_with(sub_expression, context)?;
-        tokens.expect(&Symbol::CloseBracket, SyntaxError::ExpectedCloseBracket)?;
+        tokens.expect(Symbol::CloseBracket, SyntaxError::ExpectedCloseBracket)?;
         flatten_commas(expression)
     };
     Ok(ExpressionNode::Array(ArrayExpressionNode { elements }))
@@ -393,9 +393,9 @@ fn array(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
 fn if_expression(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
     tokens.next();
     let predicate = tokens.located(expression)?;
-    tokens.expect(&Keyword::Then, SyntaxError::ExpectedThen)?;
+    tokens.expect(Keyword::Then, SyntaxError::ExpectedThen)?;
     let if_true = tokens.located(expression)?;
-    tokens.expect(&Keyword::Else, SyntaxError::ExpectedElse)?;
+    tokens.expect(Keyword::Else, SyntaxError::ExpectedElse)?;
     let if_false = tokens.located(expression)?;
     Ok(ExpressionNode::IfExpression(IfExpressionNode {
         predicate: Box::new(predicate),

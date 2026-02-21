@@ -12,7 +12,7 @@ use crate::{
 pub fn methods(tokens: &mut TokenStream) -> ParseResult<Option<Node<Vec<Node<MethodNode>>>>> {
     if Symbol::OpenBrace.matches(tokens.peek()) {
         Ok(Some(tokens.located(methods_impl)?))
-    } else if tokens.accept(&Symbol::Semicolon) {
+    } else if tokens.accept(Symbol::Semicolon) {
         Ok(None)
     } else {
         tokens.push_error(SyntaxError::ExpectedMethods);
@@ -23,14 +23,14 @@ pub fn methods(tokens: &mut TokenStream) -> ParseResult<Option<Node<Vec<Node<Met
 fn methods_impl(tokens: &mut TokenStream) -> ParseResult<Vec<Node<MethodNode>>> {
     tokens.next();
     let mut methods = vec![];
-    while !tokens.accept(&Symbol::CloseBrace) {
+    while !tokens.accept(Symbol::CloseBrace) {
         methods.push(tokens.located(method)?);
     }
     Ok(methods)
 }
 
 fn method(tokens: &mut TokenStream) -> ParseResult<MethodNode> {
-    let public = tokens.accept(&Keyword::Pub);
+    let public = tokens.accept(Keyword::Pub);
     let function = tokens.located(nested_function)?;
     Ok(MethodNode { public, function })
 }
@@ -54,7 +54,7 @@ fn function(tokens: &mut TokenStream, has_keyword: bool) -> ParseResult<Function
     };
     let identifier = tokens.identifier(identifier_type)?;
     let parameters = tokens.located(parameters)?;
-    let return_type = if tokens.accept(&Symbol::Colon) {
+    let return_type = if tokens.accept(Symbol::Colon) {
         Some(tokens.located(type_definition)?)
     } else {
         None
@@ -65,7 +65,7 @@ fn function(tokens: &mut TokenStream, has_keyword: bool) -> ParseResult<Function
 
 // TODO arrow functions are broken because A -> B is a valid type...
 fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyNode> {
-    if tokens.accept(&Symbol::SkinnyArrow) {
+    if tokens.accept(Symbol::SkinnyArrow) {
         let expression = expression(tokens)?;
         end_statement(tokens);
         Ok(FunctionBodyNode::Expression(expression))

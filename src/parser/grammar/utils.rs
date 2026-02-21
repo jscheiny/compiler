@@ -10,9 +10,9 @@ pub fn comma_separated_list<T>(
 ) -> ParseResult<Vec<Node<T>>> {
     // TODO this could use better errors
     let mut entries = vec![];
-    while !tokens.accept(&close_symbol) {
+    while !tokens.accept(close_symbol) {
         entries.push(tokens.located(&parse_entry)?);
-        if tokens.accept(&Symbol::Comma) {
+        if tokens.accept(Symbol::Comma) {
             continue;
         }
     }

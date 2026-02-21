@@ -23,7 +23,7 @@ impl TokenStream {
         }
     }
 
-    pub fn accept(&mut self, predicate: &impl TokenMatch) -> bool {
+    pub fn accept(&mut self, predicate: impl TokenMatch) -> bool {
         if predicate.matches(self.peek()) {
             self.next();
             true
@@ -32,7 +32,7 @@ impl TokenStream {
         }
     }
 
-    pub fn expect(&mut self, predicate: &impl TokenMatch, error: SyntaxError) -> ParseResult<()> {
+    pub fn expect(&mut self, predicate: impl TokenMatch, error: SyntaxError) -> ParseResult<()> {
         if self.accept(predicate) {
             Ok(())
         } else {

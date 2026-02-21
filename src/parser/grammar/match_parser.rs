@@ -19,9 +19,9 @@ fn match_block(tokens: &mut TokenStream) -> ParseResult<MatchNode> {
     tokens.next();
 
     let subject = tokens.located(expression)?;
-    tokens.expect(&Symbol::OpenBrace, SyntaxError::ExpectedMatchBlock)?;
+    tokens.expect(Symbol::OpenBrace, SyntaxError::ExpectedMatchBlock)?;
     let mut cases = vec![];
-    while !tokens.accept(&Symbol::CloseBrace) {
+    while !tokens.accept(Symbol::CloseBrace) {
         cases.push(tokens.located(match_case)?);
     }
 
@@ -39,7 +39,7 @@ fn match_case(tokens: &mut TokenStream) -> ParseResult<MatchCaseNode> {
     } else {
         tokens.located_with(match_pattern, true)?
     };
-    tokens.expect(&Symbol::SkinnyArrow, SyntaxError::ExpectedMatchExpression)?;
+    tokens.expect(Symbol::SkinnyArrow, SyntaxError::ExpectedMatchExpression)?;
     let expect_semicolon = !Symbol::OpenBrace.matches(tokens.peek());
     let if_match = tokens.located(expression)?;
     if expect_semicolon {
@@ -52,8 +52,8 @@ fn match_case(tokens: &mut TokenStream) -> ParseResult<MatchCaseNode> {
 //     let first_pattern = tokens.located(match_pattern)?;
 //     let mut patterns = vec![first_pattern];
 
-//     while !tokens.accept(&Symbol::SkinnyArrow) {
-//         tokens.expect(&Symbol::Comma, SyntaxError::ExpectedMatchExpression)?;
+//     while !tokens.accept(Symbol::SkinnyArrow) {
+//         tokens.expect(Symbol::Comma, SyntaxError::ExpectedMatchExpression)?;
 //         patterns.push(tokens.located(match_pattern)?);
 //     }
 
@@ -68,9 +68,9 @@ fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<Match
                 .wrap(IdentifierNode(identifier.clone()));
             tokens.next();
             // TODO accept / expect don't need to take references these are always copyable
-            if tokens.accept(&Symbol::OpenParen) {
+            if tokens.accept(Symbol::OpenParen) {
                 let inner_pattern = tokens.located_with(match_pattern, false)?;
-                tokens.expect(&Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
+                tokens.expect(Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
                 Ok(MatchPatternNode::Variant(VariantMatchPattern {
                     identifier,
                     inner_pattern: Some(Box::new(inner_pattern)),
