@@ -58,13 +58,11 @@ impl VariantMatchPattern {
                     } else {
                         return self.check_inner_pattern(types, bindings, inner_type);
                     }
-                } else {
-                    if self.inner_pattern.is_some() {
-                        println!(
-                            "Type error: Expected no binding pattern for untyped variant `{}`",
-                            self.identifier.id()
-                        );
-                    }
+                } else if self.inner_pattern.is_some() {
+                    println!(
+                        "Type error: Expected no binding pattern for untyped variant `{}`",
+                        self.identifier.id()
+                    );
                 }
             } else {
                 println!(
