@@ -1,7 +1,7 @@
 use crate::{
     checker::{Scope, ScopeType, Type, TypeResolver},
     lexer::Keyword,
-    parser::{DeclarationNode, ExpressionNode, IfStatementNode, Node, WhileLoopNode},
+    parser::{DeclarationNode, ExpressionNode, IfStatementNode, MatchNode, Node, WhileLoopNode},
 };
 
 pub enum StatementNode {
@@ -12,6 +12,7 @@ pub enum StatementNode {
     Expression(ExpressionNode),
     FunctionReturn(Option<Node<ExpressionNode>>),
     If(IfStatementNode),
+    Match(MatchNode),
     WhileLoop(WhileLoopNode),
 }
 
@@ -39,6 +40,7 @@ impl StatementNode {
                 check_function_return(expression.as_ref(), types, scope)
             }
             Self::If(node) => (node.check(types, scope), None),
+            Self::Match(node) => (node.check_statement(types, scope), None),
             Self::WhileLoop(node) => (node.check(types, scope), None),
         }
     }

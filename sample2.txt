@@ -5,12 +5,12 @@ enum Other(D, E, F(bool)) {
     }
 
     pub get_value(): bool {
-        -> match self.get_value() {
+        match self.get_value() {
             D -> true;
-            E -> false;
+            E -> 3;
             F(else) -> not value;
             else -> true;
-        };
+        }
     }
 }
 

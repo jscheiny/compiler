@@ -2,12 +2,20 @@ use crate::{
     lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
         ExpressionNode, IdentifierNode, IdentifierType, MatchCaseNode, MatchNode, MatchPatternNode,
-        ParseResult, SyntaxError, TokenStream, VariantMatchPattern,
+        ParseResult, StatementNode, SyntaxError, TokenStream, VariantMatchPattern,
         grammar::{expression_parser::expression, statement_parser::end_statement},
     },
 };
 
+pub fn match_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
+    Ok(StatementNode::Match(match_block(tokens)?))
+}
+
 pub fn match_expression(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
+    Ok(ExpressionNode::Match(match_block(tokens)?))
+}
+
+fn match_block(tokens: &mut TokenStream) -> ParseResult<MatchNode> {
     tokens.next();
 
     let subject = tokens.located(expression)?;
@@ -17,10 +25,10 @@ pub fn match_expression(tokens: &mut TokenStream) -> ParseResult<ExpressionNode>
         cases.push(tokens.located(match_case)?);
     }
 
-    Ok(ExpressionNode::Match(MatchNode {
+    Ok(MatchNode {
         subject: Box::new(subject),
         cases,
-    }))
+    })
 }
 
 fn match_case(tokens: &mut TokenStream) -> ParseResult<MatchCaseNode> {

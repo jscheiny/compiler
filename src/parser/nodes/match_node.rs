@@ -9,6 +9,16 @@ pub struct MatchNode {
 }
 
 impl MatchNode {
+    pub fn check_statement(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
+        let (mut scope, subject_type) = self.check_subject(types, scope);
+        for case in self.cases.iter() {
+            let (new_scope, _) = case.check(types, scope, None, &subject_type);
+            scope = new_scope
+        }
+
+        scope
+    }
+
     pub fn check(
         &self,
         types: &TypeResolver,

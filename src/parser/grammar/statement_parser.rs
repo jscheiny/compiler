@@ -3,7 +3,9 @@ use crate::{
     parser::{
         DeclarationNode, ExpressionNode, IdentifierType, IfStatementConditionNode, IfStatementNode,
         Node, ParseResult, StatementNode, StatementType, SyntaxError, TokenStream, WhileLoopNode,
-        grammar::{BlockType, block, expression, type_definition},
+        grammar::{
+            BlockType, block, expression, match_expression_parser::match_statement, type_definition,
+        },
     },
 };
 
@@ -17,6 +19,7 @@ pub fn statement(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult
             Keyword::Continue => continue_statement(tokens),
             Keyword::While => while_loop(tokens),
             Keyword::If => if_statement(tokens),
+            Keyword::Match => match_statement(tokens),
             _ => expression_statement(tokens),
         },
         Token::Symbol(symbol) => match symbol {
