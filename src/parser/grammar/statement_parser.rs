@@ -3,9 +3,7 @@ use crate::{
     parser::{
         DeclarationNode, ExpressionNode, IdentifierType, IfStatementConditionNode, IfStatementNode,
         Node, ParseResult, StatementNode, StatementType, SyntaxError, TokenStream, WhileLoopNode,
-        grammar::{
-            BlockType, block, expression, match_expression_parser::match_statement, type_definition,
-        },
+        grammar::{BlockType, block, expression, match_statement, type_definition},
     },
 };
 
