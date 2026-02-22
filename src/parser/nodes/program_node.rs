@@ -27,7 +27,6 @@ impl ProgramNode {
         for definition in self.definitions() {
             module_scope = definition.check(&types, module_scope);
         }
-        types.check();
     }
 
     pub fn get_module_scope(&self, types: &mut TypeResolver) -> Scope {
