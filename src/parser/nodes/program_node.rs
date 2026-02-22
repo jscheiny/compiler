@@ -27,7 +27,7 @@ impl ProgramNode {
 
         let mut scope = Box::new(self.get_module_scope(types));
         for definition in self.definitions() {
-            scope = definition.check(&scope.types.clone(), scope);
+            scope = definition.check(scope);
         }
     }
 

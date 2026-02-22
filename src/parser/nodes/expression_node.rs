@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, ScopeType, Type, TypeResolver},
+    checker::{Scope, ScopeType, Type},
     parser::{
         AccessExpressionNode, ArrayExpressionNode, BinaryOpExpressionNode, BlockNode,
         ClosureExpressionNode, ClosureParameterExpressionNode, FunctionCallExpressionNode,
@@ -31,39 +31,36 @@ pub enum ExpressionNode {
 }
 
 impl ExpressionNode {
-    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        self.check_expected(types, scope, None)
+    pub fn check(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        self.check_expected(scope, None)
     }
 
     pub fn check_expected(
         &self,
-        types: &TypeResolver,
         scope: Box<Scope>,
         expected_type: Option<&Type>,
     ) -> (Box<Scope>, Type) {
         match self {
-            Self::Access(node) => node.check(types, scope),
-            Self::Array(node) => node.check(types, scope, expected_type),
-            Self::BinaryOp(node) => node.check(types, scope, expected_type),
+            Self::Access(node) => node.check(scope),
+            Self::Array(node) => node.check(scope, expected_type),
+            Self::BinaryOp(node) => node.check(scope, expected_type),
             Self::Block(node) => {
-                let (scope, resolved_type) = node.check(types, scope, expected_type);
+                let (scope, resolved_type) = node.check(scope, expected_type);
                 (scope, resolved_type.unwrap_or(Type::Void))
             }
             Self::BooleanLiteral(_) => (scope, Type::Primitive(PrimitiveType::Bool)),
             Self::CharacterLiteral(_) => (scope, Type::Primitive(PrimitiveType::Char)),
-            Self::Closure(node) => node.check(types, scope, expected_type),
+            Self::Closure(node) => node.check(scope, expected_type),
             Self::ClosureParameter(_) => {
                 panic!("ERROR: Unexpected closure parameter outside of parameter list")
             }
-            Self::FunctionCall(node) => node.check(types, scope, expected_type),
-            Self::Identifier(identifier) => {
-                self.check_identifier(identifier, types, scope, expected_type)
-            }
-            Self::IfExpression(node) => node.check(types, scope, expected_type),
+            Self::FunctionCall(node) => node.check(scope, expected_type),
+            Self::Identifier(identifier) => self.check_identifier(identifier, scope, expected_type),
+            Self::IfExpression(node) => node.check(scope, expected_type),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
-            Self::Match(node) => node.check(types, scope, expected_type),
-            Self::PostfixOp(node) => node.check(types, scope),
-            Self::PrefixOp(node) => node.check(types, scope),
+            Self::Match(node) => node.check(scope, expected_type),
+            Self::PostfixOp(node) => node.check(scope),
+            Self::PrefixOp(node) => node.check(scope),
             Self::SelfRef(identifier) => self.check_self_ref(identifier, scope),
             Self::SelfValue => self.check_self_value(scope),
             Self::StringLiteral(_) => (
@@ -77,11 +74,10 @@ impl ExpressionNode {
     fn check_identifier(
         &self,
         identifier: &String,
-        types: &TypeResolver,
         scope: Box<Scope>,
         expected_type: Option<&Type>,
     ) -> (Box<Scope>, Type) {
-        let expected_enum_type = expected_type.and_then(|e| match e.deref(types) {
+        let expected_enum_type = expected_type.and_then(|e| match e.deref(&scope.types) {
             Type::Enum(enum_type) => Some(enum_type),
             _ => None,
         });
@@ -89,8 +85,8 @@ impl ExpressionNode {
         // TODO disallow use of types as values
         if let Some(resolved_type) = scope.lookup(identifier) {
             (scope, resolved_type)
-        } else if let Some(resolved_type) = types.get_ref(identifier).map(Type::Reference) {
-            let resolved_type = resolved_type.as_runtime_type(types).map(Type::Type);
+        } else if let Some(resolved_type) = scope.types.get_ref(identifier).map(Type::Reference) {
+            let resolved_type = resolved_type.as_runtime_type(&scope.types).map(Type::Type);
             match resolved_type {
                 Some(resolved_type) => (scope, resolved_type),
                 None => {

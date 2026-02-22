@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, Type, TypeResolver},
+    checker::{Scope, Type},
     parser::{ExpressionNode, Node, PrimitiveType},
 };
 
@@ -10,33 +10,28 @@ pub struct IfExpressionNode {
 }
 
 impl IfExpressionNode {
-    pub fn check(
-        &self,
-        types: &TypeResolver,
-        scope: Box<Scope>,
-        expected_type: Option<&Type>,
-    ) -> (Box<Scope>, Type) {
-        let (scope, predicate_type) = self.predicate.check(types, scope);
-        if !predicate_type.is_primitive(PrimitiveType::Bool, types) {
+    pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
+        let (scope, predicate_type) = self.predicate.check(scope);
+        if !predicate_type.is_primitive(PrimitiveType::Bool, &scope.types) {
             println!(
                 "Type error: If expression predicate must be of type bool, found `{}`",
-                predicate_type.format(types)
+                predicate_type.format(&scope.types)
             );
         }
 
-        let (scope, true_type) = self.if_true.check_expected(types, scope, expected_type);
+        let (scope, true_type) = self.if_true.check_expected(scope, expected_type);
         let expected_type = expected_type.or(Some(&true_type));
-        let (scope, false_type) = self.if_false.check_expected(types, scope, expected_type);
+        let (scope, false_type) = self.if_false.check_expected(scope, expected_type);
 
-        if true_type.is_assignable_to(&false_type, types) {
+        if true_type.is_assignable_to(&false_type, &scope.types) {
             (scope, false_type)
-        } else if false_type.is_assignable_to(&true_type, types) {
+        } else if false_type.is_assignable_to(&true_type, &scope.types) {
             (scope, true_type)
         } else {
             println!(
                 "Type error: Types of branches of if expression do not match: `{}` and `{}`",
-                true_type.format(types),
-                false_type.format(types)
+                true_type.format(&scope.types),
+                false_type.format(&scope.types)
             );
             (scope, true_type)
         }

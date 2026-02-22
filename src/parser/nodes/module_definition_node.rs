@@ -16,11 +16,11 @@ pub enum ModuleDefinitionNode {
 }
 
 impl ModuleDefinitionNode {
-    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
+    pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
         match self {
-            Self::Struct(node) => node.check(types, scope),
-            Self::Enum(node) => node.check(types, scope),
-            Self::Function(node) => node.check(types, scope),
+            Self::Struct(node) => node.check(scope),
+            Self::Enum(node) => node.check(scope),
+            Self::Function(node) => node.check(scope),
             Self::TypeAlias(node) => {
                 node.check();
                 scope

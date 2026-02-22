@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, Type, TypeResolver},
+    checker::{Scope, Type},
     parser::{ExpressionNode, Node, PostfixOperator},
 };
 
@@ -9,7 +9,7 @@ pub struct PostfixOpExpressionNode {
 }
 
 impl PostfixOpExpressionNode {
-    pub fn check(&self, _types: &TypeResolver, _scope: Box<Scope>) -> (Box<Scope>, Type) {
+    pub fn check(&self, _scope: Box<Scope>) -> (Box<Scope>, Type) {
         match *self.operator {
             PostfixOperator::NullShortCircuit => {
                 todo!("Implement type checking for prefix op NullShortCircuit")

@@ -9,9 +9,9 @@ pub struct AccessExpressionNode {
 }
 
 impl AccessExpressionNode {
-    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (scope, left_type) = self.left.check(types, scope);
-        let field_type = get_field(left_type, self.field.id(), types);
+    pub fn check(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        let (scope, left_type) = self.left.check(scope);
+        let field_type = get_field(left_type, self.field.id(), &scope.types);
         (scope, field_type.unwrap_or(Type::Error))
     }
 }

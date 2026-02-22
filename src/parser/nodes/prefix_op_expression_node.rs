@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, Type, TypeResolver},
+    checker::{Scope, Type},
     parser::{ExpressionNode, Node, PrefixOperator, PrimitiveType},
 };
 
@@ -9,31 +9,31 @@ pub struct PrefixOpExpressionNode {
 }
 
 impl PrefixOpExpressionNode {
-    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
+    pub fn check(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
         match *self.operator {
             PrefixOperator::Closure => todo!("Implement type checking for prefix op Closure"),
-            PrefixOperator::LogicalNot => self.check_logical_not(types, scope),
-            PrefixOperator::Negative => self.check_negative(types, scope),
+            PrefixOperator::LogicalNot => self.check_logical_not(scope),
+            PrefixOperator::Negative => self.check_negative(scope),
         }
     }
 
-    fn check_logical_not(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (scope, resolved_type) = self.expression.check(types, scope);
-        if !resolved_type.is_primitive(PrimitiveType::Bool, types) {
+    fn check_logical_not(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        let (scope, resolved_type) = self.expression.check(scope);
+        if !resolved_type.is_primitive(PrimitiveType::Bool, &scope.types) {
             println!(
                 "Type error: Operand of op `{:?}` should be of type bool, found `{}`",
                 self.operator.value,
-                resolved_type.format(types)
+                resolved_type.format(&scope.types)
             );
         }
 
         (scope, Type::Primitive(PrimitiveType::Bool))
     }
 
-    fn check_negative(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (scope, resolved_type) = self.expression.check(types, scope);
-        if resolved_type.is_primitive(PrimitiveType::Float, types)
-            || resolved_type.is_primitive(PrimitiveType::Int, types)
+    fn check_negative(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        let (scope, resolved_type) = self.expression.check(scope);
+        if resolved_type.is_primitive(PrimitiveType::Float, &scope.types)
+            || resolved_type.is_primitive(PrimitiveType::Int, &scope.types)
         {
             (scope, resolved_type)
         } else {

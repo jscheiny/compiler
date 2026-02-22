@@ -9,8 +9,8 @@ pub struct MethodNode {
 }
 
 impl MethodNode {
-    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
-        self.function.check(types, scope)
+    pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
+        self.function.check(scope)
     }
 
     pub fn resolve_struct_method(&self, types: &TypeResolver) -> StructMember {

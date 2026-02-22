@@ -9,18 +9,14 @@ pub struct FunctionCallExpressionNode {
 }
 
 impl FunctionCallExpressionNode {
-    pub fn check(
-        &self,
-        types: &TypeResolver,
-        scope: Box<Scope>,
-        expected_type: Option<&Type>,
-    ) -> (Box<Scope>, Type) {
-        let (scope, function_type) = self.function.check_expected(types, scope, expected_type);
-        let function_type = function_type.as_function(types);
-        let (scope, arguments) = self.get_args(types, scope, function_type.as_ref());
+    pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
+        let (scope, function_type) = self.function.check_expected(scope, expected_type);
+        let function_type = function_type.as_function(&scope.types);
+        let (scope, arguments) = self.get_args(scope, function_type.as_ref());
 
         if let Some(function_type) = function_type {
-            (scope, self.check_args(function_type, &arguments, types))
+            let result_type = self.check_args(function_type, &arguments, &scope.types);
+            (scope, result_type)
         } else {
             (scope, Type::Error)
         }
@@ -28,14 +24,13 @@ impl FunctionCallExpressionNode {
 
     fn get_args(
         &self,
-        types: &TypeResolver,
         mut scope: Box<Scope>,
         function_type: Option<&FunctionType>,
     ) -> (Box<Scope>, Vec<Type>) {
         let mut result = vec![];
         for (index, argument) in self.arguments.iter().enumerate() {
             let parameter_type = function_type.and_then(|ft| ft.parameters.get(index));
-            let (new_scope, resolved_type) = argument.check_expected(types, scope, parameter_type);
+            let (new_scope, resolved_type) = argument.check_expected(scope, parameter_type);
             result.push(resolved_type);
             scope = new_scope;
         }

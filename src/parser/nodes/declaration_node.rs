@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, Type, TypeResolver},
+    checker::{Scope, Type},
     parser::{ExpressionNode, Identified, IdentifierNode, Node, TypeNode},
 };
 
@@ -11,22 +11,22 @@ pub struct DeclarationNode {
 }
 
 impl DeclarationNode {
-    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
+    pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
         let expected_type = self
             .type_def
             .as_ref()
-            .map(|type_def| type_def.get_type(types));
+            .map(|type_def| type_def.get_type(&scope.types));
 
         let (mut scope, resolved_type) = match self.initializer.as_ref() {
             Some(initializer) => {
                 let (new_scope, resolved_type) =
-                    initializer.check_expected(types, scope, expected_type.as_ref());
+                    initializer.check_expected(scope, expected_type.as_ref());
                 if let Some(expected_type) = expected_type.as_ref() {
-                    if !resolved_type.is_assignable_to(expected_type, types) {
+                    if !resolved_type.is_assignable_to(expected_type, &new_scope.types) {
                         println!(
                             "Type error: Could not assign expression of type `{}` to variable of type `{}`",
-                            resolved_type.format(types),
-                            expected_type.format(types)
+                            resolved_type.format(&new_scope.types),
+                            expected_type.format(&new_scope.types)
                         );
                     }
                 }

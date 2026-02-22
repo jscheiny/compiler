@@ -31,29 +31,28 @@ impl FunctionNode {
         }
     }
 
-    pub fn check(&self, types: &TypeResolver, parent_scope: Box<Scope>) -> Box<Scope> {
-        let return_type = &self.get_type(types).return_type;
+    pub fn check(&self, parent_scope: Box<Scope>) -> Box<Scope> {
+        let return_type = &self.get_type(&parent_scope.types).return_type;
         let scope = parent_scope.derive_fn(return_type);
-        let scope = self.check_params(types, scope);
+        let scope = self.check_params(scope);
         let scope = match &self.body.value {
             FunctionBodyNode::Expression(expression) => {
-                let (scope, resolved_type) =
-                    expression.check_expected(types, scope, Some(return_type));
-                if !resolved_type.is_assignable_to(return_type, types) {
+                let (scope, resolved_type) = expression.check_expected(scope, Some(return_type));
+                if !resolved_type.is_assignable_to(return_type, &scope.types) {
                     println!(
                         "Type error: Returned type `{}` is not assignable to expected return type of `{}`",
-                        resolved_type.format(types),
-                        return_type.format(types)
+                        resolved_type.format(&scope.types),
+                        return_type.format(&scope.types)
                     );
                 }
                 scope
             }
-            FunctionBodyNode::Block(block) => block.check(types, scope, Some(return_type)).0,
+            FunctionBodyNode::Block(block) => block.check(scope, Some(return_type)).0,
         };
         scope.parent()
     }
 
-    fn check_params(&self, types: &TypeResolver, mut scope: Box<Scope>) -> Box<Scope> {
+    fn check_params(&self, mut scope: Box<Scope>) -> Box<Scope> {
         let mut param_names = HashSet::new();
         for param in self.parameters.iter() {
             if param_names.contains(param.id()) {
@@ -64,7 +63,7 @@ impl FunctionNode {
                 );
             } else {
                 param_names.insert(param.id().clone());
-                scope.add(param.id(), param.get_type(types).clone());
+                scope.add(param.id(), param.get_type(&scope.types).clone());
             }
         }
         scope

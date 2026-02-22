@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, Type, TypeResolver},
+    checker::{Scope, Type},
     parser::{BinaryOperator, ExpressionNode, Node, PrimitiveType},
 };
 
@@ -10,12 +10,7 @@ pub struct BinaryOpExpressionNode {
 }
 
 impl BinaryOpExpressionNode {
-    pub fn check(
-        &self,
-        types: &TypeResolver,
-        scope: Box<Scope>,
-        expected_type: Option<&Type>,
-    ) -> (Box<Scope>, Type) {
+    pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         use BinaryOperator as O;
         match *self.operator {
             O::Add => todo!("Implement type checking for +"),
@@ -35,10 +30,10 @@ impl BinaryOpExpressionNode {
             O::LessThanOrEqual => todo!("Implement type checking for <="),
             O::GreaterThan => todo!("Implement type checking for >"),
             O::GreaterThanOrEqual => todo!("Implement type checking for >="),
-            O::FunctionApplication => self.check_function_application(types, scope, expected_type),
-            O::Comma => self.check_comma(types, scope),
-            O::LogicalAnd => self.check_logical_op(types, scope),
-            O::LogicalOr => self.check_logical_op(types, scope),
+            O::FunctionApplication => self.check_function_application(scope, expected_type),
+            O::Comma => self.check_comma(scope),
+            O::LogicalAnd => self.check_logical_op(scope),
+            O::LogicalOr => self.check_logical_op(scope),
             O::Access => panic!("ERROR: Expected ExpressionNode::Access"),
             O::Type => panic!("ERROR: Unexpected closure parameter outside of context"),
         }
@@ -46,20 +41,19 @@ impl BinaryOpExpressionNode {
 
     fn check_function_application(
         &self,
-        types: &TypeResolver,
         scope: Box<Scope>,
         expected_type: Option<&Type>,
     ) -> (Box<Scope>, Type) {
-        let (scope, left_type) = self.left.check(types, scope);
-        let (scope, right_type) = self.right.check_expected(types, scope, expected_type);
-        let function_type = right_type.as_function(types);
+        let (scope, left_type) = self.left.check(scope);
+        let (scope, right_type) = self.right.check_expected(scope, expected_type);
+        let function_type = right_type.as_function(&scope.types);
 
         if let Some(function_type) = function_type {
             if function_type.parameters.len() != 1 {
                 println!("Type error: Right hand side of => takes more than one parameter");
             }
 
-            if !left_type.is_assignable_to(&function_type.parameters[0], types) {
+            if !left_type.is_assignable_to(&function_type.parameters[0], &scope.types) {
                 println!("Type error: Function application argument does not match");
             }
 
@@ -70,8 +64,8 @@ impl BinaryOpExpressionNode {
         }
     }
 
-    fn check_comma(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (mut scope, first_type) = self.left.check(types, scope);
+    fn check_comma(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        let (mut scope, first_type) = self.left.check(scope);
         let mut tuple_types = vec![first_type];
         let mut current = &self.right;
 
@@ -83,7 +77,7 @@ impl BinaryOpExpressionNode {
             }) = &current.value
             {
                 if operator.value == BinaryOperator::Comma {
-                    let (new_scope, left_type) = left.check(types, scope);
+                    let (new_scope, left_type) = left.check(scope);
                     tuple_types.push(left_type);
                     scope = new_scope;
                     current = right;
@@ -93,27 +87,27 @@ impl BinaryOpExpressionNode {
             break;
         }
 
-        let (scope, current_type) = current.check(types, scope);
+        let (scope, current_type) = current.check(scope);
         tuple_types.push(current_type);
 
         (scope, Type::Tuple(tuple_types))
     }
 
-    fn check_logical_op(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (scope, left_type) = self.left.check(types, scope);
-        if !left_type.is_primitive(PrimitiveType::Bool, types) {
+    fn check_logical_op(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        let (scope, left_type) = self.left.check(scope);
+        if !left_type.is_primitive(PrimitiveType::Bool, &scope.types) {
             println!(
                 "Type error: Left hand side of op `{:?}` should be of type bool, found `{}`",
                 self.operator.value,
-                left_type.format(types),
+                left_type.format(&scope.types),
             );
         }
-        let (scope, right_type) = self.right.check(types, scope);
-        if !right_type.is_primitive(PrimitiveType::Bool, types) {
+        let (scope, right_type) = self.right.check(scope);
+        if !right_type.is_primitive(PrimitiveType::Bool, &scope.types) {
             println!(
                 "Type error: Right hand side of op `{:?}` should be of type bool, found `{}`",
                 self.operator.value,
-                right_type.format(types),
+                right_type.format(&scope.types),
             );
         }
 

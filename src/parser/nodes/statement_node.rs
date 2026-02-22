@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, ScopeType, Type, TypeResolver},
+    checker::{Scope, ScopeType, Type},
     lexer::Keyword,
     parser::{DeclarationNode, ExpressionNode, IfStatementNode, MatchNode, Node, WhileLoopNode},
 };
@@ -19,29 +19,26 @@ pub enum StatementNode {
 impl StatementNode {
     pub fn check(
         &self,
-        types: &TypeResolver,
         scope: Box<Scope>,
         expected_type: Option<&Type>,
     ) -> (Box<Scope>, Option<Type>) {
         match self {
             Self::BlockReturn(expression) => {
-                let (scope, resolved_type) = expression.check_expected(types, scope, expected_type);
+                let (scope, resolved_type) = expression.check_expected(scope, expected_type);
                 (scope, Some(resolved_type))
             }
             Self::Break => check_loop(Keyword::Break, scope),
             Self::Continue => check_loop(Keyword::Continue, scope),
-            Self::Declaration(node) => (node.check(types, scope), None),
+            Self::Declaration(node) => (node.check(scope), None),
             Self::Expression(expression) => {
                 // Discard the type of raw expressions
-                let (scope, _) = expression.check(types, scope);
+                let (scope, _) = expression.check(scope);
                 (scope, None)
             }
-            Self::FunctionReturn(expression) => {
-                check_function_return(expression.as_ref(), types, scope)
-            }
-            Self::If(node) => (node.check(types, scope), None),
-            Self::Match(node) => (node.check_statement(types, scope), None),
-            Self::WhileLoop(node) => (node.check(types, scope), None),
+            Self::FunctionReturn(expression) => check_function_return(expression.as_ref(), scope),
+            Self::If(node) => (node.check(scope), None),
+            Self::Match(node) => (node.check_statement(scope), None),
+            Self::WhileLoop(node) => (node.check(scope), None),
         }
     }
 }
@@ -55,22 +52,21 @@ fn check_loop(keyword: Keyword, scope: Box<Scope>) -> (Box<Scope>, Option<Type>)
 
 fn check_function_return(
     expression: Option<&Node<ExpressionNode>>,
-    types: &TypeResolver,
     mut scope: Box<Scope>,
 ) -> (Box<Scope>, Option<Type>) {
     let expected_type = scope.return_type().cloned();
     if let Some(expected_type) = expected_type {
         let (new_scope, resolved_type) = match expression {
-            Some(expression) => expression.check_expected(types, scope, Some(&expected_type)),
+            Some(expression) => expression.check_expected(scope, Some(&expected_type)),
             None => (scope, Type::Void),
         };
         scope = new_scope;
 
-        if !resolved_type.is_assignable_to(&expected_type, types) {
+        if !resolved_type.is_assignable_to(&expected_type, &scope.types) {
             println!(
                 "Type error: Returned type `{}` is not assignable to expected return type of `{}`",
-                resolved_type.format(types),
-                expected_type.format(types)
+                resolved_type.format(&scope.types),
+                expected_type.format(&scope.types)
             );
         }
     } else {

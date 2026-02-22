@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, Type, TypeResolver},
+    checker::{Scope, Type},
     parser::{ExpressionNode, MatchCaseNode, Node},
 };
 
@@ -9,43 +9,38 @@ pub struct MatchNode {
 }
 
 impl MatchNode {
-    pub fn check_statement(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
-        let (mut scope, subject_type) = self.check_subject(types, scope);
+    pub fn check_statement(&self, scope: Box<Scope>) -> Box<Scope> {
+        let (mut scope, subject_type) = self.check_subject(scope);
         for case in self.cases.iter() {
-            let (new_scope, _) = case.check(types, scope, None, &subject_type);
+            let (new_scope, _) = case.check(scope, None, &subject_type);
             scope = new_scope
         }
 
         scope
     }
 
-    pub fn check(
-        &self,
-        types: &TypeResolver,
-        scope: Box<Scope>,
-        expected_type: Option<&Type>,
-    ) -> (Box<Scope>, Type) {
-        let (mut scope, subject_type) = self.check_subject(types, scope);
+    pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
+        let (mut scope, subject_type) = self.check_subject(scope);
         let mut resolved_type = None;
 
         // TODO don't check for match branches in statement version
         // TODO completeness check
 
         for case in self.cases.iter() {
-            let (new_scope, case_type) = case.check(types, scope, expected_type, &subject_type);
+            let (new_scope, case_type) = case.check(scope, expected_type, &subject_type);
             scope = new_scope;
 
             // TODO dedupe with array parsing potentially
             if let Some(t) = resolved_type.as_ref() {
-                if case_type.is_assignable_to(t, types) {
+                if case_type.is_assignable_to(t, &scope.types) {
                     // Case type matches: no error and keep going
-                } else if t.is_assignable_to(&case_type, types) {
+                } else if t.is_assignable_to(&case_type, &scope.types) {
                     resolved_type = Some(case_type);
                 } else {
                     println!(
                         "Type error: Mismatching types in match cases `{}` and `{}`",
-                        t.format(types),
-                        case_type.format(types)
+                        t.format(&scope.types),
+                        case_type.format(&scope.types)
                     );
                 }
             } else {
@@ -60,14 +55,14 @@ impl MatchNode {
         }
     }
 
-    fn check_subject(&self, types: &TypeResolver, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (scope, subject_type) = self.subject.check(types, scope);
-        let subject_type = subject_type.as_deref(types);
+    fn check_subject(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        let (scope, subject_type) = self.subject.check(scope);
+        let subject_type = subject_type.as_deref(&scope.types);
         if !matches!(subject_type, Type::Enum(_)) {
             // TODO handle other types besides enums
             println!(
                 "Type error: Match expression currently only supports enum types, found `{}`",
-                subject_type.format(types)
+                subject_type.format(&scope.types)
             );
         }
 

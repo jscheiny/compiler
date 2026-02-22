@@ -29,8 +29,8 @@ impl EnumNode {
         }
     }
 
-    pub fn check(&self, types: &TypeResolver, scope: Box<Scope>) -> Box<Scope> {
-        let index = types.get_ref(self.id()).unwrap();
+    pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
+        let index = scope.types.get_ref(self.id()).unwrap();
         let mut scope = scope.derive(ScopeType::Struct(index));
         let mut scope_names = HashSet::new();
         for variant in self.variants.iter() {
@@ -44,14 +44,15 @@ impl EnumNode {
                 if scope_names.contains(method.id()) {
                     println!("Type error: Duplicate member of name `{}`", method.id())
                 } else {
-                    let method_type = Type::Function(method.function.get_type(types).clone());
+                    let method_type =
+                        Type::Function(method.function.get_type(&scope.types).clone());
                     scope.add(method.id(), method_type);
                     scope_names.insert(method.id());
                 }
             }
 
             for method in methods.iter() {
-                scope = method.check(types, scope)
+                scope = method.check(scope)
             }
         }
 

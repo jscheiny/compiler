@@ -9,19 +9,14 @@ pub struct ClosureExpressionNode {
 }
 
 impl ClosureExpressionNode {
-    pub fn check(
-        &self,
-        types: &TypeResolver,
-        scope: Box<Scope>,
-        expected_type: Option<&Type>,
-    ) -> (Box<Scope>, Type) {
-        let function_type = get_expected_type(expected_type, types);
+    pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
+        let function_type = get_expected_type(expected_type, &scope.types);
         let scope = scope.derive(ScopeType::Closure);
-        let (scope, parameters) = self.check_parameters(function_type.as_ref(), types, scope);
+        let (scope, parameters) = self.check_parameters(function_type.as_ref(), scope);
         let expected_return_type = function_type.map(|t| t.return_type);
-        let (scope, return_type) =
-            self.body
-                .check_expected(types, scope, expected_return_type.as_deref());
+        let (scope, return_type) = self
+            .body
+            .check_expected(scope, expected_return_type.as_deref());
 
         let some_parameter_is_error_type = parameters
             .iter()
@@ -40,7 +35,6 @@ impl ClosureExpressionNode {
     fn check_parameters(
         &self,
         expected_type: Option<&FunctionType>,
-        types: &TypeResolver,
         mut scope: Box<Scope>,
     ) -> (Box<Scope>, Vec<Type>) {
         let parameter_types = self
@@ -49,7 +43,8 @@ impl ClosureExpressionNode {
             .enumerate()
             .map(|(index, parameter)| {
                 if let Some(parameter) = parameter {
-                    let parameter_type = get_parameter_type(parameter, index, expected_type, types);
+                    let parameter_type =
+                        get_parameter_type(parameter, index, expected_type, &scope.types);
                     scope.add(parameter.id(), parameter_type.clone());
                     parameter_type
                 } else {
