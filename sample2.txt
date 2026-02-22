@@ -5,10 +5,10 @@ enum Other(D, E, F(bool)) {
     }
 
     pub get_value(): bool {
-        match self.get_value() {
+        match self {
             D -> true;
             E -> 3;
-            F(let x) -> not value;
+            F(let value) -> not value;
             else -> true;
         }
     }
@@ -25,7 +25,6 @@ enum Other(D, E, F(bool)) {
 //         B(F(let y)) -> -y;
 //         C(let x) -> 5;
 //     };
-//     // TODO else cases
 // }
 // 
 // fn accept_simple(s: Simple): int {}
