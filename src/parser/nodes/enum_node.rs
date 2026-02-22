@@ -58,11 +58,11 @@ impl EnumNode {
         scope.parent()
     }
 
-    pub fn get_type(&self, types: &mut TypeResolver) -> &EnumType {
+    pub fn get_type(&self, types: &TypeResolver) -> &EnumType {
         self.resolved_type.get_or_init(|| self.get_type_impl(types))
     }
 
-    pub fn get_type_impl(&self, types: &mut TypeResolver) -> EnumType {
+    pub fn get_type_impl(&self, types: &TypeResolver) -> EnumType {
         let mut variants = HashMap::new();
         for variant in self.variants.iter() {
             let identifier = variant.id().clone();

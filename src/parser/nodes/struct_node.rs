@@ -52,11 +52,11 @@ impl StructNode {
         scope.parent()
     }
 
-    pub fn get_type(&self, types: &mut TypeResolver) -> &StructType {
+    pub fn get_type(&self, types: &TypeResolver) -> &StructType {
         self.resolved_type.get_or_init(|| self.get_type_impl(types))
     }
 
-    pub fn get_type_impl(&self, types: &mut TypeResolver) -> StructType {
+    pub fn get_type_impl(&self, types: &TypeResolver) -> StructType {
         let mut members = HashMap::new();
 
         for field in self.fields.iter() {

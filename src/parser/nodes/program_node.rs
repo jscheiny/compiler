@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::{
     checker::{Scope, TypeResolver},
     parser::{ExportableModuleDefinitionNode, Identified, ModuleDefinitionNode, Node},
@@ -23,16 +25,16 @@ impl ProgramNode {
             definition.resolve_type(&mut types);
         }
 
-        let mut module_scope = Box::new(self.get_module_scope(&mut types));
+        let mut scope = Box::new(self.get_module_scope(types));
         for definition in self.definitions() {
-            module_scope = definition.check(&types, module_scope);
+            scope = definition.check(&scope.types.clone(), scope);
         }
     }
 
-    pub fn get_module_scope(&self, types: &mut TypeResolver) -> Scope {
-        let mut scope = Scope::new();
+    pub fn get_module_scope(&self, types: TypeResolver) -> Scope {
+        let mut scope = Scope::new(Rc::new(types));
         for definition in self.definitions() {
-            definition.add_to_scope(types, &mut scope);
+            definition.add_to_scope(&mut scope);
         }
         scope
     }

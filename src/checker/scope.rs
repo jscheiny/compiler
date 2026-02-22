@@ -1,6 +1,9 @@
-use std::collections::{HashMap, hash_map::Entry};
+use std::{
+    collections::{HashMap, hash_map::Entry},
+    rc::Rc,
+};
 
-use crate::checker::Type;
+use crate::checker::{Type, TypeResolver};
 
 #[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
 pub enum ScopeType {
@@ -16,6 +19,7 @@ pub enum ScopeType {
 
 #[derive(Default, Debug)]
 pub struct Scope {
+    pub types: Rc<TypeResolver>,
     scope_type: ScopeType,
     parent: Option<Box<Scope>>,
     values: HashMap<String, Type>,
@@ -23,24 +27,29 @@ pub struct Scope {
 }
 
 impl Scope {
-    pub fn new() -> Self {
-        Default::default()
+    pub fn new(types: Rc<TypeResolver>) -> Self {
+        Self {
+            types,
+            ..Default::default()
+        }
     }
 
     pub fn derive(self: Box<Scope>, scope_type: ScopeType) -> Box<Scope> {
+        let types = self.types.clone();
         Box::new(Self {
             scope_type,
             parent: Some(self),
-            ..Self::new()
+            ..Self::new(types)
         })
     }
 
     pub fn derive_fn(self: Box<Scope>, return_type: &Type) -> Box<Scope> {
+        let types = self.types.clone();
         Box::new(Self {
             scope_type: ScopeType::Function,
             parent: Some(self),
             return_type: Some(return_type.clone()),
-            ..Self::new()
+            ..Self::new(types)
         })
     }
 
