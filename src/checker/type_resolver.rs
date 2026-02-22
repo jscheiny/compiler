@@ -1,12 +1,11 @@
 use std::collections::HashMap;
 
-use crate::checker::{DuplicateType, Type, TypeError};
+use crate::checker::Type;
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct TypeResolver {
     types: Vec<Option<Type>>,
     lookup: HashMap<String, usize>,
-    errors: Vec<TypeError>,
 }
 
 impl TypeResolver {
@@ -16,9 +15,7 @@ impl TypeResolver {
 
     pub fn declare(&mut self, identifier: &String) {
         if self.lookup.contains_key(identifier) {
-            self.push_error(TypeError::DuplicateType(DuplicateType {
-                identifier: identifier.clone(),
-            }));
+            println!("Type error: Duplicate types of name `{}`", identifier);
             return;
         }
 
@@ -43,16 +40,6 @@ impl TypeResolver {
             }
         } else {
             panic!("Could not resolve {}", identifier);
-        }
-    }
-
-    pub fn push_error(&mut self, error: TypeError) {
-        self.errors.push(error);
-    }
-
-    pub fn check(&self) {
-        for error in self.errors.iter() {
-            println!("{}", error);
         }
     }
 }
