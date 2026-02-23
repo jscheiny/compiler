@@ -11,25 +11,26 @@ pub struct ClosureExpressionNode {
 impl ClosureExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         let function_type = get_expected_type(expected_type, &scope.types);
-        let scope = scope.derive(ScopeType::Closure);
-        let (scope, parameters) = self.check_parameters(function_type.as_ref(), scope);
-        let expected_return_type = function_type.map(|t| t.return_type);
-        let (scope, return_type) = self
-            .body
-            .check_expected(scope, expected_return_type.as_deref());
+        scope.nest_with(ScopeType::Closure, |scope| {
+            let (scope, parameters) = self.check_parameters(function_type.as_ref(), scope);
+            let expected_return_type = function_type.map(|t| t.return_type);
+            let (scope, return_type) = self
+                .body
+                .check_expected(scope, expected_return_type.as_deref());
 
-        let some_parameter_is_error_type = parameters
-            .iter()
-            .any(|parameter| matches!(parameter, Type::Error));
-        if some_parameter_is_error_type || matches!(return_type, Type::Error) {
-            return (scope.parent(), Type::Error);
-        }
+            let some_parameter_is_error_type = parameters
+                .iter()
+                .any(|parameter| matches!(parameter, Type::Error));
+            if some_parameter_is_error_type || matches!(return_type, Type::Error) {
+                return (scope, Type::Error);
+            }
 
-        let result_type = Type::Function(FunctionType {
-            parameters,
-            return_type: Box::new(return_type),
-        });
-        (scope.parent(), result_type)
+            let result_type = Type::Function(FunctionType {
+                parameters,
+                return_type: Box::new(return_type),
+            });
+            (scope, result_type)
+        })
     }
 
     fn check_parameters(

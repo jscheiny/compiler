@@ -33,23 +33,23 @@ impl FunctionNode {
 
     pub fn check(&self, parent_scope: Box<Scope>) -> Box<Scope> {
         let return_type = &self.get_type(&parent_scope.types).return_type;
-        let scope = parent_scope.derive_fn(return_type);
-        let scope = self.check_params(scope);
-        let scope = match &self.body.value {
-            FunctionBodyNode::Expression(expression) => {
-                let (scope, resolved_type) = expression.check_expected(scope, Some(return_type));
-                if !resolved_type.is_assignable_to(return_type, &scope.types) {
-                    println!(
-                        "Type error: Returned type `{}` is not assignable to expected return type of `{}`",
-                        resolved_type.format(&scope.types),
-                        return_type.format(&scope.types)
-                    );
+        parent_scope.nest_fn(return_type, |scope| {
+            let scope = self.check_params(scope);
+            match &self.body.value {
+                FunctionBodyNode::Expression(expression) => {
+                    let (scope, resolved_type) = expression.check_expected(scope, Some(return_type));
+                    if !resolved_type.is_assignable_to(return_type, &scope.types) {
+                        println!(
+                            "Type error: Returned type `{}` is not assignable to expected return type of `{}`",
+                            resolved_type.format(&scope.types),
+                            return_type.format(&scope.types)
+                        );
+                    }
+                    scope
                 }
-                scope
+                FunctionBodyNode::Block(block) => block.check(scope, Some(return_type)).0,
             }
-            FunctionBodyNode::Block(block) => block.check(scope, Some(return_type)).0,
-        };
-        scope.parent()
+        })
     }
 
     fn check_params(&self, mut scope: Box<Scope>) -> Box<Scope> {

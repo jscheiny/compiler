@@ -34,23 +34,43 @@ impl Scope {
         }
     }
 
-    pub fn derive(self: Box<Scope>, scope_type: ScopeType) -> Box<Scope> {
+    pub fn nest(
+        self: Box<Scope>,
+        scope_type: ScopeType,
+        handler: impl FnOnce(Box<Scope>) -> Box<Scope>,
+    ) -> Box<Scope> {
+        let (scope, _) = self.nest_with(scope_type, |scope| (handler(scope), ()));
+        scope
+    }
+
+    pub fn nest_with<T>(
+        self: Box<Scope>,
+        scope_type: ScopeType,
+        handler: impl FnOnce(Box<Scope>) -> (Box<Scope>, T),
+    ) -> (Box<Scope>, T) {
         let types = self.types.clone();
-        Box::new(Self {
+        let scope = Box::new(Self {
             scope_type,
             parent: Some(self),
             ..Self::new(types)
-        })
+        });
+        let (scope, result) = handler(scope);
+        (scope.parent(), result)
     }
 
-    pub fn derive_fn(self: Box<Scope>, return_type: &Type) -> Box<Scope> {
+    pub fn nest_fn(
+        self: Box<Scope>,
+        return_type: &Type,
+        handler: impl FnOnce(Box<Scope>) -> Box<Scope>,
+    ) -> Box<Scope> {
         let types = self.types.clone();
-        Box::new(Self {
+        let scope = Box::new(Self {
             scope_type: ScopeType::Function,
             parent: Some(self),
             return_type: Some(return_type.clone()),
             ..Self::new(types)
-        })
+        });
+        handler(scope).parent()
     }
 
     pub fn return_type(&self) -> Option<&Type> {
@@ -80,7 +100,7 @@ impl Scope {
         }
     }
 
-    pub fn parent(self) -> Box<Scope> {
+    fn parent(self) -> Box<Scope> {
         self.parent.unwrap()
     }
 

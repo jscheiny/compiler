@@ -28,28 +28,30 @@ impl StructNode {
 
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
         let index = scope.types.get_ref(self.id()).unwrap();
-        let mut scope = scope.derive(ScopeType::Struct(index));
-        for field in self.fields.iter() {
-            let field_type = field.get_type(&scope.types).clone();
-            scope.add_or(field.id(), field_type, || {
-                println!("Type error: Duplicate member of name `{}`", field.id())
-            });
-        }
-
-        if let Some(methods) = self.methods.as_ref() {
-            for method in methods.iter() {
-                let method_type = Type::Function(method.function.get_type(&scope.types).clone());
-                scope.add_or(method.id(), method_type, || {
-                    println!("Type error: Duplicate member of name `{}`", method.id())
+        scope.nest(ScopeType::Struct(index), |mut scope| {
+            for field in self.fields.iter() {
+                let field_type = field.get_type(&scope.types).clone();
+                scope.add_or(field.id(), field_type, || {
+                    println!("Type error: Duplicate member of name `{}`", field.id())
                 });
             }
 
-            for method in methods.iter() {
-                scope = method.check(scope)
-            }
-        }
+            if let Some(methods) = self.methods.as_ref() {
+                for method in methods.iter() {
+                    let method_type =
+                        Type::Function(method.function.get_type(&scope.types).clone());
+                    scope.add_or(method.id(), method_type, || {
+                        println!("Type error: Duplicate member of name `{}`", method.id())
+                    });
+                }
 
-        scope.parent()
+                for method in methods.iter() {
+                    scope = method.check(scope)
+                }
+            }
+
+            scope
+        })
     }
 
     pub fn get_type(&self, types: &TypeResolver) -> &StructType {
