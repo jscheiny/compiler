@@ -3,11 +3,13 @@ use std::{
     rc::Rc,
 };
 
-use crate::checker::{Type, TypeResolver};
+use crate::{
+    checker::{Type, TypeResolver},
+    lexer::SourceCode,
+};
 
-#[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum ScopeType {
-    #[default]
     Global,
     Function,
     Closure,
@@ -17,9 +19,9 @@ pub enum ScopeType {
     Struct(usize),
 }
 
-#[derive(Default, Debug)]
 pub struct Scope {
     pub types: Rc<TypeResolver>,
+    pub source: Rc<SourceCode>,
     scope_type: ScopeType,
     parent: Option<Box<Scope>>,
     values: HashMap<String, Type>,
@@ -27,10 +29,14 @@ pub struct Scope {
 }
 
 impl Scope {
-    pub fn new(types: Rc<TypeResolver>) -> Self {
+    pub fn new(source: Rc<SourceCode>, types: Rc<TypeResolver>) -> Self {
         Self {
             types,
-            ..Default::default()
+            source,
+            scope_type: ScopeType::Global,
+            parent: None,
+            values: HashMap::new(),
+            return_type: None,
         }
     }
 
@@ -48,11 +54,12 @@ impl Scope {
         scope_type: ScopeType,
         handler: impl FnOnce(Box<Scope>) -> (Box<Scope>, T),
     ) -> (Box<Scope>, T) {
+        let source = self.source.clone();
         let types = self.types.clone();
         let scope = Box::new(Self {
             scope_type,
             parent: Some(self),
-            ..Self::new(types)
+            ..Self::new(source, types)
         });
         let (scope, result) = handler(scope);
         (scope.parent(), result)
@@ -63,12 +70,13 @@ impl Scope {
         return_type: &Type,
         handler: impl FnOnce(Box<Scope>) -> Box<Scope>,
     ) -> Box<Scope> {
+        let source = self.source.clone();
         let types = self.types.clone();
         let scope = Box::new(Self {
             scope_type: ScopeType::Function,
             parent: Some(self),
             return_type: Some(return_type.clone()),
-            ..Self::new(types)
+            ..Self::new(source, types)
         });
         handler(scope).parent()
     }

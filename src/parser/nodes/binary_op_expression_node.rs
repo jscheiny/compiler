@@ -1,5 +1,8 @@
+use colored::Colorize;
+
 use crate::{
     checker::{Scope, Type},
+    lexer::Severity,
     parser::{BinaryOperator, ExpressionNode, Node, PrimitiveType},
 };
 
@@ -50,11 +53,40 @@ impl BinaryOpExpressionNode {
 
         if let Some(function_type) = function_type {
             if function_type.parameters.len() != 1 {
-                println!("Type error: Right hand side of => takes more than one parameter");
+                println!(
+                    "{} Applied function must take only one parameter",
+                    "Type error:".red().bold(),
+                );
+                scope.source.print_token_span(
+                    self.right.span,
+                    '^',
+                    format!(
+                        "type: `{}`",
+                        Type::Function(function_type.clone()).format(&scope.types)
+                    )
+                    .as_str(),
+                    Severity::Error,
+                );
             }
 
-            if !left_type.is_assignable_to(&function_type.parameters[0], &scope.types) {
-                println!("Type error: Function application argument does not match");
+            if !function_type.parameters.is_empty()
+                && !left_type.is_assignable_to(&function_type.parameters[0], &scope.types)
+            {
+                println!(
+                    "{} Function application argument does not match parameter type",
+                    "Type error:".red().bold(),
+                );
+                scope.source.print_token_span(
+                    self.left.span,
+                    '^',
+                    format!(
+                        "expected value of type `{}`, found `{}`",
+                        left_type.format(&scope.types),
+                        function_type.parameters[0].format(&scope.types)
+                    )
+                    .as_str(),
+                    Severity::Error,
+                );
             }
 
             (scope, *function_type.return_type)

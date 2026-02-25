@@ -2,6 +2,7 @@ use std::rc::Rc;
 
 use crate::{
     checker::{Scope, TypeResolver},
+    lexer::SourceCode,
     parser::{ExportableModuleDefinitionNode, Identified, ModuleDefinitionNode, Node},
 };
 
@@ -10,7 +11,7 @@ pub struct ProgramNode {
 }
 
 impl ProgramNode {
-    pub fn check(&mut self) {
+    pub fn check(&mut self, source: Rc<SourceCode>) {
         let mut types = TypeResolver::new();
         for definition in self.definitions() {
             match definition {
@@ -25,14 +26,14 @@ impl ProgramNode {
             definition.resolve_type(&mut types);
         }
 
-        let mut scope = Box::new(self.get_module_scope(types));
+        let mut scope = Box::new(self.get_module_scope(source, types));
         for definition in self.definitions() {
             scope = definition.check(scope);
         }
     }
 
-    pub fn get_module_scope(&self, types: TypeResolver) -> Scope {
-        let mut scope = Scope::new(Rc::new(types));
+    pub fn get_module_scope(&self, source: Rc<SourceCode>, types: TypeResolver) -> Scope {
+        let mut scope = Scope::new(source, Rc::new(types));
         for definition in self.definitions() {
             definition.add_to_scope(&mut scope);
         }

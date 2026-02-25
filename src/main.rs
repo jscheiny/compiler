@@ -1,4 +1,4 @@
-use std::{env, process::exit};
+use std::{env, process::exit, rc::Rc};
 
 use colored::Colorize;
 
@@ -34,7 +34,7 @@ fn main() {
 
     match result {
         Ok(mut program) => {
-            program.check();
+            program.check(Rc::new(source));
         }
         Err(error) => {
             print_err(&source, &error);
