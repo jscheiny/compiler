@@ -4,7 +4,7 @@ use crate::{
         AccessExpressionNode, ArrayExpressionNode, BinaryOpExpressionNode, BlockNode,
         ClosureExpressionNode, ClosureParameterExpressionNode, DeferredAccessExpressionNode,
         FunctionCallExpressionNode, Identified, IdentifierNode, IfExpressionNode, MatchNode, Node,
-        PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType,
+        PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType, TokenSpan,
     },
 };
 
@@ -25,8 +25,8 @@ pub enum ExpressionNode {
     Match(MatchNode),
     PostfixOp(PostfixOpExpressionNode),
     PrefixOp(PrefixOpExpressionNode),
-    SelfRef(String),
-    SelfValue,
+    SelfRef(Node<IdentifierNode>),
+    SelfValue(TokenSpan),
     StringLiteral(String),
     Error,
 }
@@ -64,7 +64,7 @@ impl ExpressionNode {
             Self::PostfixOp(node) => node.check(scope),
             Self::PrefixOp(node) => node.check(scope),
             Self::SelfRef(identifier) => self.check_self_ref(identifier, scope),
-            Self::SelfValue => self.check_self_value(scope),
+            Self::SelfValue(span) => self.check_self_value(*span, scope),
             Self::StringLiteral(_) => (
                 scope,
                 Type::Array(Box::new(Type::Primitive(PrimitiveType::Char))),
@@ -123,22 +123,35 @@ impl ExpressionNode {
         }
     }
 
-    fn check_self_ref(&self, identifier: &String, scope: Box<Scope>) -> (Box<Scope>, Type) {
+    fn check_self_ref(
+        &self,
+        identifier: &Node<IdentifierNode>,
+        scope: Box<Scope>,
+    ) -> (Box<Scope>, Type) {
         let self_scope = scope.find_scope(|scope_type| matches!(scope_type, ScopeType::Struct(_)));
         if let Some(self_scope) = self_scope {
-            let resolved_type = self_scope.lookup_local(identifier);
+            let resolved_type = self_scope.lookup_local(identifier.id());
             if let Some(resolved_type) = resolved_type {
                 return (scope, resolved_type);
             }
-            println!("Type error: cannot find value in struct or enum");
+            scope.source.print_type_error(
+                identifier.span,
+                &format!("Could not find member `{}`", identifier.id()),
+                "self type does not contain a member with this name",
+            );
         } else {
-            println!("Type error: Cannot use @ op outside of struct or enum");
+            let span = TokenSpan::singleton_of(identifier.span.start_index - 1);
+            scope.source.print_type_error(
+                span,
+                "Self reference outside of struct or enum",
+                "operator invalid outside of struct or enum",
+            );
         }
 
         (scope, Type::Error)
     }
 
-    fn check_self_value(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
+    fn check_self_value(&self, span: TokenSpan, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let mut self_index = None;
         scope.find_scope(|scope_type| match scope_type {
             ScopeType::Struct(index) => {
@@ -151,7 +164,11 @@ impl ExpressionNode {
         if let Some(index) = self_index {
             (scope, Type::Reference(index))
         } else {
-            println!("Type error: Cannot use `self` outside of a ref or struct");
+            scope.source.print_type_error(
+                span,
+                "Invalid `self` outside of struct or enum",
+                "`self` value only available inside of struct or enum",
+            );
             (scope, Type::Error)
         }
     }

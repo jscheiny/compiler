@@ -3,10 +3,10 @@ use crate::{
     parser::{
         AccessExpressionNode, ArrayExpressionNode, Associativity, BinaryOpExpressionNode,
         BinaryOperator, BlockNode, ClosureExpressionNode, ClosureParameterExpressionNode,
-        DeferredAccessExpressionNode, ExpressionNode, FunctionCallExpressionNode, Identified,
-        IdentifierNode, IdentifierType, IfExpressionNode, LocatedSyntaxError, Node, Operator,
-        ParseResult, PostfixOpExpressionNode, PostfixOperator, PrefixOpExpressionNode,
-        PrefixOperator, StatementNode, StatementType, SyntaxError, TokenSpan, TokenStream,
+        DeferredAccessExpressionNode, ExpressionNode, FunctionCallExpressionNode, IdentifierNode,
+        IdentifierType, IfExpressionNode, LocatedSyntaxError, Node, Operator, ParseResult,
+        PostfixOpExpressionNode, PostfixOperator, PrefixOpExpressionNode, PrefixOperator,
+        StatementNode, StatementType, SyntaxError, TokenSpan, TokenStream,
         grammar::{match_expression, statement, type_definition},
     },
 };
@@ -246,8 +246,9 @@ fn expression_atom(
     }
     match tokens.peek() {
         Token::Keyword(Keyword::SelfValue) => {
+            let span = TokenSpan::singleton(tokens);
             tokens.next();
-            Ok(ExpressionNode::SelfValue)
+            Ok(ExpressionNode::SelfValue(span))
         }
         Token::Identifier(identifier) => {
             let span = TokenSpan::singleton(tokens);
@@ -278,7 +279,7 @@ fn expression_atom(
         Token::Symbol(Symbol::At) => {
             tokens.next();
             let identifier = tokens.identifier(IdentifierType::Field)?;
-            Ok(ExpressionNode::SelfRef(identifier.id().clone()))
+            Ok(ExpressionNode::SelfRef(identifier))
         }
         Token::Symbol(Symbol::Dot) => deferred_access(tokens),
         Token::Symbol(Symbol::OpenParen) => closure_or_tuple(tokens),
