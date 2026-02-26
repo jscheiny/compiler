@@ -34,7 +34,6 @@ impl Operator for PostfixOperator {
 
 #[derive(Clone, Copy, Debug, EnumIter)]
 pub enum PrefixOperator {
-    Closure,    // .
     LogicalNot, // not
     Negative,   // -
 }
@@ -42,7 +41,6 @@ pub enum PrefixOperator {
 impl Operator for PrefixOperator {
     fn as_token(&self) -> Token {
         match self {
-            Self::Closure => Token::Symbol(Symbol::Dot),
             Self::Negative => Token::Symbol(Symbol::Minus),
             Self::LogicalNot => Token::Keyword(Keyword::Not),
         }
