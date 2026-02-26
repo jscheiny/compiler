@@ -2,7 +2,7 @@ use crate::{
     checker::{Scope, ScopeType, Type},
     parser::{
         AccessExpressionNode, ArrayExpressionNode, BinaryOpExpressionNode, BlockNode,
-        ClosureExpressionNode, ClosureParameterExpressionNode, DeferredAccessNode,
+        ClosureExpressionNode, ClosureParameterExpressionNode, DeferredAccessExpressionNode,
         FunctionCallExpressionNode, IfExpressionNode, MatchNode, PostfixOpExpressionNode,
         PrefixOpExpressionNode, PrimitiveType,
     },
@@ -17,7 +17,7 @@ pub enum ExpressionNode {
     CharacterLiteral(String),
     Closure(ClosureExpressionNode),
     ClosureParameter(ClosureParameterExpressionNode),
-    DeferredAccess(DeferredAccessNode),
+    DeferredAccess(DeferredAccessExpressionNode),
     FunctionCall(FunctionCallExpressionNode),
     Identifier(String),
     IfExpression(IfExpressionNode),

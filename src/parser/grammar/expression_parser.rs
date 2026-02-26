@@ -3,10 +3,10 @@ use crate::{
     parser::{
         AccessExpressionNode, ArrayExpressionNode, Associativity, BinaryOpExpressionNode,
         BinaryOperator, BlockNode, ClosureExpressionNode, ClosureParameterExpressionNode,
-        DeferredAccessNode, ExpressionNode, FunctionCallExpressionNode, Identified, IdentifierNode,
-        IdentifierType, IfExpressionNode, LocatedSyntaxError, Node, Operator, ParseResult,
-        PostfixOpExpressionNode, PostfixOperator, PrefixOpExpressionNode, PrefixOperator,
-        StatementNode, StatementType, SyntaxError, TokenSpan, TokenStream,
+        DeferredAccessExpressionNode, ExpressionNode, FunctionCallExpressionNode, Identified,
+        IdentifierNode, IdentifierType, IfExpressionNode, LocatedSyntaxError, Node, Operator,
+        ParseResult, PostfixOpExpressionNode, PostfixOperator, PrefixOpExpressionNode,
+        PrefixOperator, StatementNode, StatementType, SyntaxError, TokenSpan, TokenStream,
         grammar::{match_expression, statement, type_definition},
     },
 };
@@ -340,10 +340,9 @@ fn deferred_access(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
         None
     };
 
-    Ok(ExpressionNode::DeferredAccess(DeferredAccessNode {
-        field,
-        arguments,
-    }))
+    Ok(ExpressionNode::DeferredAccess(
+        DeferredAccessExpressionNode { field, arguments },
+    ))
 }
 
 fn closure_or_tuple(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {

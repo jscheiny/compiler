@@ -5,12 +5,12 @@ use crate::{
     },
 };
 
-pub struct DeferredAccessNode {
+pub struct DeferredAccessExpressionNode {
     pub field: Node<IdentifierNode>,
     pub arguments: Option<NodeVec<ExpressionNode>>,
 }
 
-impl DeferredAccessNode {
+impl DeferredAccessExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         let function_type = expected_type.and_then(|t| t.clone().as_function(&scope.types));
         if let Some(mut function_type) = function_type {
