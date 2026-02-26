@@ -1,10 +1,10 @@
 use crate::{
     checker::{Scope, Type},
-    parser::{ExpressionNode, Node},
+    parser::{ExpressionNode, NodeVec},
 };
 
 pub struct ArrayExpressionNode {
-    pub elements: Vec<Node<ExpressionNode>>,
+    pub elements: NodeVec<ExpressionNode>,
 }
 
 impl ArrayExpressionNode {
@@ -46,7 +46,11 @@ impl ArrayExpressionNode {
         } else if let Some(expected_element_type) = expected_element_type {
             (scope, Type::Array(Box::new(expected_element_type.clone())))
         } else {
-            println!("Type error: Could not infer type of empty array");
+            scope.source.print_type_error(
+                self.elements.span,
+                "Empty array is ambiguous",
+                "could not infer type of empty array",
+            );
             (scope, Type::Array(Box::new(Type::Error)))
         }
     }

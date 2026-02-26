@@ -394,16 +394,20 @@ fn closure(
 }
 
 fn array(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
+    let elements = tokens.located(array_elements)?;
+    Ok(ExpressionNode::Array(ArrayExpressionNode { elements }))
+}
+
+fn array_elements(tokens: &mut TokenStream) -> ParseResult<Vec<Node<ExpressionNode>>> {
     tokens.next();
     let context = ExpressionContext::brackets();
-    let elements = if tokens.accept(Symbol::CloseBracket) {
-        vec![]
+    if tokens.accept(Symbol::CloseBracket) {
+        Ok(vec![])
     } else {
         let expression = tokens.located_with(sub_expression, context)?;
         tokens.expect(Symbol::CloseBracket, SyntaxError::ExpectedCloseBracket)?;
-        flatten_commas(expression)
-    };
-    Ok(ExpressionNode::Array(ArrayExpressionNode { elements }))
+        Ok(flatten_commas(expression))
+    }
 }
 
 fn if_expression(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
