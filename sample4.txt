@@ -1,10 +1,16 @@
-struct Coordinate(value: bool);
+struct S(test: int, test: int) {
+    test() {}
 
-struct Pair(left: Coordinate, right: Coordinate);
+    test() {
+        break;
+        continue;
+    }
 
-fn main(pair: Pair) {
-    accept_function(p -> p.left.value);
-    accept_function(.left.value);
+    a() {}
 }
 
-fn accept_function(f: Pair -> int) {}
+enum E () {}
+
+fn main(value: S) {
+    5 => E;
+}
