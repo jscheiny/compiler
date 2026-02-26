@@ -1,8 +1,6 @@
 use crate::{
     checker::{FunctionType, Scope, Type},
-    parser::{
-        ExpressionNode, Identified, IdentifierNode, Node, NodeVec, check_function_call, get_field,
-    },
+    parser::{ExpressionNode, IdentifierNode, Node, NodeVec, check_function_call, get_field},
 };
 
 pub struct DeferredAccessExpressionNode {
@@ -21,8 +19,7 @@ impl DeferredAccessExpressionNode {
             }
 
             let parameter_type = function_type.parameters.swap_remove(0);
-            let field_type =
-                get_field(&parameter_type, self.field.id(), &scope.types).unwrap_or(Type::Error);
+            let field_type = get_field(&parameter_type, &self.field, &scope).unwrap_or(Type::Error);
             let (scope, result_type) = if let Some(arguments) = self.arguments.as_ref() {
                 let field_function_type = field_type.as_function(&scope.types);
                 check_function_call(scope, field_function_type.as_ref(), &arguments.value)

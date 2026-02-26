@@ -7,6 +7,13 @@ pub struct TokenSpan {
 }
 
 impl TokenSpan {
+    pub fn singleton_of(index: usize) -> TokenSpan {
+        TokenSpan {
+            start_index: index,
+            end_index: index,
+        }
+    }
+
     pub fn singleton(tokens: &TokenStream) -> TokenSpan {
         TokenSpan {
             start_index: tokens.index(),
