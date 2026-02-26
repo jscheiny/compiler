@@ -16,14 +16,19 @@ impl Display for TypeFmt<'_> {
             Type::Array(element_type) => write!(f, "[{}]", element_type.format(self.types)),
             Type::Enum(enum_type) => write!(f, "{}", enum_type.identifier),
             Type::Function(function_type) => {
-                write!(f, "(")?;
+                if function_type.parameters.len() != 1 {
+                    write!(f, "(")?;
+                }
                 for (index, parameter) in function_type.parameters.iter().enumerate() {
                     write!(f, "{}", parameter.format(self.types))?;
                     if index != function_type.parameters.len() - 1 {
                         write!(f, ", ")?;
                     }
                 }
-                write!(f, ") -> {}", function_type.return_type.format(self.types))
+                if function_type.parameters.len() != 1 {
+                    write!(f, ")")?;
+                }
+                write!(f, " -> {}", function_type.return_type.format(self.types))
             }
             Type::Primitive(primitive_type) => write!(f, "{}", primitive_type),
             Type::Reference(index) => {
