@@ -41,8 +41,8 @@ impl DeferredAccessExpressionNode {
             let span = TokenSpan::singleton_of(self.field.span.start_index - 1);
             scope.source.print_type_error(
                 span,
-                "Could not infer type of implicit parameter",
-                "deferred access must be assigned to a function",
+                "Deferred access type is ambiguous",
+                "could not infer type of implicit parameter",
             );
             (scope, Type::Error)
         }

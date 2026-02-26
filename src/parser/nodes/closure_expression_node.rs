@@ -45,7 +45,7 @@ impl ClosureExpressionNode {
             .map(|(index, parameter)| {
                 if let Some(parameter) = parameter {
                     let parameter_type =
-                        get_parameter_type(parameter, index, expected_type, &scope.types);
+                        get_parameter_type(parameter, index, expected_type, &scope);
                     scope.add(parameter.id(), parameter_type.clone());
                     parameter_type
                 } else {
@@ -62,17 +62,18 @@ fn get_parameter_type(
     parameter: &Node<ClosureParameterExpressionNode>,
     index: usize,
     expected_type: Option<&FunctionType>,
-    types: &TypeResolver,
+    scope: &Scope,
 ) -> Type {
     let expected_type = expected_type.and_then(|ft| ft.parameters.get(index));
     if let Some(given_type) = parameter.parameter_type.as_ref() {
-        given_type.get_type(types)
+        given_type.get_type(&scope.types)
     } else if let Some(expected_type) = expected_type {
         expected_type.clone()
     } else {
-        println!(
-            "Type error: Could not infer type of closure parameter `{}`",
-            parameter.id()
+        scope.source.print_type_error(
+            parameter.span,
+            "Parameter type is ambiguous",
+            "could not infer type of parameter",
         );
         Type::Error
     }
