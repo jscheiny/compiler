@@ -116,12 +116,12 @@ impl Scope {
         self.values.insert(identifier.to_owned(), value);
     }
 
-    pub fn add_or(&mut self, identifier: &str, value: Type, if_present: impl Fn()) {
+    pub fn add_or(&mut self, identifier: &str, value: Type, if_present: impl Fn(&Scope)) {
         let entry = self.values.entry(identifier.to_owned());
         if let Entry::Vacant(v) = entry {
             v.insert(value);
         } else {
-            if_present();
+            if_present(&self);
         };
     }
 

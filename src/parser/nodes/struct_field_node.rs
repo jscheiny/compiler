@@ -6,9 +6,9 @@ use crate::{
 };
 
 pub struct StructFieldNode {
-    public: bool,
-    identifier: Node<IdentifierNode>,
-    type_def: Option<Node<TypeNode>>,
+    pub public: bool,
+    pub identifier: Node<IdentifierNode>,
+    pub type_def: Option<Node<TypeNode>>,
     resolved_type: OnceCell<Type>,
 }
 

@@ -8,10 +8,10 @@ use crate::{
 };
 
 pub struct FunctionNode {
-    identifier: Node<IdentifierNode>,
-    parameters: NodeVec<ParameterNode>,
-    return_type: Option<Node<TypeNode>>,
-    body: Node<FunctionBodyNode>,
+    pub identifier: Node<IdentifierNode>,
+    pub parameters: NodeVec<ParameterNode>,
+    pub return_type: Option<Node<TypeNode>>,
+    pub body: Node<FunctionBodyNode>,
     resolved_type: OnceCell<FunctionType>,
 }
 

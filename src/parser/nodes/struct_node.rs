@@ -31,8 +31,15 @@ impl StructNode {
         scope.nest(ScopeType::Struct(index), |mut scope| {
             for field in self.fields.iter() {
                 let field_type = field.get_type(&scope.types).clone();
-                scope.add_or(field.id(), field_type, || {
-                    println!("Type error: Duplicate member of name `{}`", field.id())
+                scope.add_or(field.id(), field_type, |scope| {
+                    scope.source.print_type_error(
+                        field.identifier.span,
+                        "Duplicate struct member",
+                        &format!(
+                            "a member of struct `{}` already exists with this name",
+                            self.id()
+                        ),
+                    );
                 });
             }
 
@@ -40,8 +47,15 @@ impl StructNode {
                 for method in methods.iter() {
                     let method_type =
                         Type::Function(method.function.get_type(&scope.types).clone());
-                    scope.add_or(method.id(), method_type, || {
-                        println!("Type error: Duplicate member of name `{}`", method.id())
+                    scope.add_or(method.id(), method_type, |scope| {
+                        scope.source.print_type_error(
+                            method.function.identifier.span,
+                            "Duplicate struct member",
+                            &format!(
+                                "a member of struct `{}` already exists with this name",
+                                self.id()
+                            ),
+                        );
                     });
                 }
 
