@@ -46,7 +46,7 @@ impl BinaryOpExpressionNode {
     ) -> (Box<Scope>, Type) {
         let (scope, left_type) = self.left.check(scope);
         let (scope, right_type) = self.right.check_expected(scope, expected_type);
-        let function_type = right_type.as_function(&scope.types);
+        let function_type = right_type.clone().as_function(&scope.types);
 
         if let Some(function_type) = function_type {
             if function_type.parameters.len() != 1 {
@@ -76,7 +76,13 @@ impl BinaryOpExpressionNode {
 
             (scope, *function_type.return_type)
         } else {
-            println!("Type error: Right hand side of => is not callable");
+            if !matches!(right_type, Type::Error) {
+                scope.source.print_type_error(
+                    self.right.span,
+                    "Cannot apply function",
+                    &format!("type `{}` is not callable", right_type.format(&scope.types)),
+                );
+            }
             (scope, Type::Error)
         }
     }

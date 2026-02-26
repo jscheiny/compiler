@@ -102,7 +102,9 @@ impl Type {
                 element_type.as_ref().clone(),
             )),
             Type::Function(function_type) => Some(function_type.clone()),
-            Type::Type(_) => todo!("Implement call operator for types (constructor)"),
+            Type::Type(RuntimeType::Struct(_)) => {
+                todo!("Implement call operator for types (constructor)")
+            }
             _ => None,
         }
     }
