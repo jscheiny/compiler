@@ -26,10 +26,14 @@ impl ArrayExpressionNode {
                 } else if t.is_assignable_to(&element_type, &scope.types) {
                     resolved_type = Some(element_type);
                 } else {
-                    println!(
-                        "Type error: Mismatching types in array literal `{}` and `{}`",
-                        t.format(&scope.types),
-                        element_type.format(&scope.types)
+                    scope.source.print_type_error(
+                        node.span,
+                        "Mismatching array types",
+                        &format!(
+                            "element of type `{}` does not match previous type `{}`",
+                            element_type.format(&scope.types),
+                            t.format(&scope.types)
+                        ),
                     );
                 }
             } else {
