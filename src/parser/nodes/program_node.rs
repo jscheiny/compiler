@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::{
     checker::{Scope, TypeResolver},
     lexer::SourceCode,
-    parser::{ExportableModuleDefinitionNode, Identified, ModuleDefinitionNode, Node},
+    parser::{ExportableModuleDefinitionNode, ModuleDefinitionNode, Node},
 };
 
 pub struct ProgramNode {
@@ -14,12 +14,7 @@ impl ProgramNode {
     pub fn check(&mut self, source: Rc<SourceCode>) {
         let mut types = TypeResolver::new();
         for definition in self.definitions() {
-            match definition {
-                ModuleDefinitionNode::Enum(_)
-                | ModuleDefinitionNode::TypeAlias(_)
-                | ModuleDefinitionNode::Struct(_) => types.declare(definition.id()),
-                ModuleDefinitionNode::Function(_) => {}
-            }
+            types.declare(definition.identifier(), &source);
         }
 
         for definition in self.definitions_mut() {

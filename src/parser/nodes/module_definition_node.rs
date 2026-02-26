@@ -1,7 +1,7 @@
 use crate::{
     checker::{RuntimeType, Scope, Type, TypeResolver},
     lexer::SourceCode,
-    parser::{EnumNode, FunctionNode, Identified, StructNode, TypeAliasNode},
+    parser::{EnumNode, FunctionNode, Identified, IdentifierNode, Node, StructNode, TypeAliasNode},
 };
 
 pub struct ExportableModuleDefinitionNode {
@@ -67,6 +67,15 @@ impl ModuleDefinitionNode {
                 types.resolve(node.id(), resolved_type);
             }
             Self::Function(_) => {}
+        }
+    }
+
+    pub fn identifier(&self) -> &Node<IdentifierNode> {
+        match self {
+            Self::Struct(node) => &node.identifier,
+            Self::Enum(node) => &node.identifier,
+            Self::Function(node) => &node.identifier,
+            Self::TypeAlias(node) => &node.identifier,
         }
     }
 }

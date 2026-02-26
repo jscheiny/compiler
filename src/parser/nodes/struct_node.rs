@@ -7,9 +7,9 @@ use crate::{
 };
 
 pub struct StructNode {
-    identifier: Node<IdentifierNode>,
-    fields: NodeVec<StructFieldNode>,
-    methods: Option<NodeVec<MethodNode>>,
+    pub identifier: Node<IdentifierNode>,
+    pub fields: NodeVec<StructFieldNode>,
+    pub methods: Option<NodeVec<MethodNode>>,
     resolved_type: OnceCell<StructType>,
 }
 

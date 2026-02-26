@@ -10,9 +10,9 @@ use crate::{
 };
 
 pub struct EnumNode {
-    identifier: Node<IdentifierNode>,
-    variants: NodeVec<EnumVariantNode>,
-    methods: Option<NodeVec<MethodNode>>,
+    pub identifier: Node<IdentifierNode>,
+    pub variants: NodeVec<EnumVariantNode>,
+    pub methods: Option<NodeVec<MethodNode>>,
     resolved_type: OnceCell<EnumType>,
 }
 

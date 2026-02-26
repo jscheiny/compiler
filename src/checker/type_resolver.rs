@@ -1,6 +1,10 @@
 use std::collections::HashMap;
 
-use crate::checker::Type;
+use crate::{
+    checker::Type,
+    lexer::SourceCode,
+    parser::{Identified, IdentifierNode, Node},
+};
 
 #[derive(Default, Debug)]
 pub struct TypeResolver {
@@ -13,15 +17,19 @@ impl TypeResolver {
         Default::default()
     }
 
-    pub fn declare(&mut self, identifier: &String) {
-        if self.lookup.contains_key(identifier) {
-            println!("Type error: Duplicate types of name `{}`", identifier);
+    pub fn declare(&mut self, identifier: &Node<IdentifierNode>, source: &SourceCode) {
+        if self.lookup.contains_key(identifier.id()) {
+            source.print_type_error(
+                identifier.span,
+                "Duplicate type name",
+                "a type already exists with this name",
+            );
             return;
         }
 
         let index = self.types.len();
         self.types.push(None);
-        self.lookup.insert(identifier.clone(), index);
+        self.lookup.insert(identifier.id().clone(), index);
     }
 
     pub fn get_ref(&self, identifier: &String) -> Option<usize> {
