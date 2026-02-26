@@ -30,7 +30,7 @@ impl DeferredAccessExpressionNode {
             let field_type = get_field(&parameter_type, &self.field, &scope).unwrap_or(Type::Error);
             let (scope, result_type) = if let Some(arguments) = self.arguments.as_ref() {
                 let field_function_type = field_type.as_function(&scope.types);
-                check_function_call(scope, field_function_type.as_ref(), &arguments.value)
+                check_function_call(scope, field_function_type.as_ref(), &arguments)
             } else {
                 (scope, field_type)
             };

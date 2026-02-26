@@ -19,7 +19,7 @@ impl FunctionCallExpressionNode {
 pub fn check_function_call(
     mut scope: Box<Scope>,
     function_type: Option<&FunctionType>,
-    argument_expressions: &Vec<Node<ExpressionNode>>,
+    argument_expressions: &NodeVec<ExpressionNode>,
 ) -> (Box<Scope>, Type) {
     let mut arguments = vec![];
     for (index, argument) in argument_expressions.iter().enumerate() {
@@ -35,21 +35,33 @@ pub fn check_function_call(
 
     let function_type = function_type.unwrap();
     if arguments.len() > function_type.parameters.len() {
-        println!(
-            "Type error: Call expected at most {} arguments but recieved {}",
-            function_type.parameters.len(),
-            arguments.len()
+        scope.source.print_type_error(
+            argument_expressions.span,
+            "Too many arguments",
+            &format!(
+                "expected at most {} argument{} but received {}",
+                function_type.parameters.len(),
+                if function_type.parameters.len() == 1 {
+                    ""
+                } else {
+                    "s"
+                },
+                arguments.len()
+            ),
         );
     }
 
     let parameters_and_arguments = function_type.parameters.iter().zip(&arguments);
     for (index, (parameter, argument)) in parameters_and_arguments.enumerate() {
         if !argument.is_assignable_to(parameter, &scope.types) {
-            println!(
-                "Type error: Arg {} of type `{}` cannot be assigned to parameter of type `{}`",
-                index,
-                argument.format(&scope.types),
-                parameter.format(&scope.types),
+            scope.source.print_type_error(
+                argument_expressions[index].span,
+                "Argument not assignable to parameter type",
+                &format!(
+                    "expected type `{}`, found type `{}`",
+                    parameter.format(&scope.types),
+                    argument.format(&scope.types),
+                ),
             );
         }
     }
