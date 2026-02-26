@@ -1,7 +1,9 @@
 use crate::{
     checker::{Scope, ScopeType, Type},
     lexer::Keyword,
-    parser::{DeclarationNode, ExpressionNode, IfStatementNode, MatchNode, Node, WhileLoopNode},
+    parser::{
+        DeclarationNode, ExpressionNode, IfStatementNode, MatchNode, Node, TokenSpan, WhileLoopNode,
+    },
 };
 
 pub enum StatementNode {
@@ -21,14 +23,15 @@ impl StatementNode {
         &self,
         scope: Box<Scope>,
         expected_type: Option<&Type>,
+        span: TokenSpan,
     ) -> (Box<Scope>, Option<Type>) {
         match self {
             Self::BlockReturn(expression) => {
                 let (scope, resolved_type) = expression.check_expected(scope, expected_type);
                 (scope, Some(resolved_type))
             }
-            Self::Break => check_loop(Keyword::Break, scope),
-            Self::Continue => check_loop(Keyword::Continue, scope),
+            Self::Break => check_loop(Keyword::Break, span, scope),
+            Self::Continue => check_loop(Keyword::Continue, span, scope),
             Self::Declaration(node) => (node.check(scope), None),
             Self::Expression(expression) => {
                 // Discard the type of raw expressions
@@ -43,9 +46,13 @@ impl StatementNode {
     }
 }
 
-fn check_loop(keyword: Keyword, scope: Box<Scope>) -> (Box<Scope>, Option<Type>) {
+fn check_loop(keyword: Keyword, span: TokenSpan, scope: Box<Scope>) -> (Box<Scope>, Option<Type>) {
     if !scope.within(ScopeType::Loop) {
-        println!("Type error: Unexpected {} outside of loop", keyword);
+        scope.source.print_type_error(
+            span,
+            &format!("Unexpected {}", keyword),
+            &format!("{} is not valid outside of a loop", keyword),
+        );
     }
     (scope, None)
 }

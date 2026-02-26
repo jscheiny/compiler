@@ -38,7 +38,7 @@ impl SourceCode {
     }
 
     pub fn print_type_error(&self, span: TokenSpan, message: &str, inline_message: &str) {
-        println!("{} {}", "Type error:".red().bold(), message,);
+        println!("{} {}", "Error:".red().bold(), message,);
         self.print_token_span(span, '^', inline_message, Severity::Error);
         println!();
     }
