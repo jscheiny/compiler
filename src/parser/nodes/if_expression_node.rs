@@ -29,10 +29,14 @@ impl IfExpressionNode {
         } else if false_type.is_assignable_to(&true_type, &scope.types) {
             (scope, true_type)
         } else {
-            println!(
-                "Type error: Types of branches of if expression do not match: `{}` and `{}`",
-                true_type.format(&scope.types),
-                false_type.format(&scope.types)
+            scope.source.print_type_error(
+                self.if_false.span,
+                "If expression branch types don't match",
+                &format!(
+                    "true branch type `{}` not compatible with false branch type `{}`",
+                    true_type.format(&scope.types),
+                    false_type.format(&scope.types),
+                ),
             );
             (scope, true_type)
         }

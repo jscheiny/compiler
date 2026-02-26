@@ -37,10 +37,14 @@ impl MatchNode {
                 } else if t.is_assignable_to(&case_type, &scope.types) {
                     resolved_type = Some(case_type);
                 } else {
-                    println!(
-                        "Type error: Mismatching types in match cases `{}` and `{}`",
-                        t.format(&scope.types),
-                        case_type.format(&scope.types)
+                    scope.source.print_type_error(
+                        case.if_match.span,
+                        "Match cases types don't match",
+                        &format!(
+                            "case results in type `{}` which does not match previous type `{}`",
+                            case_type.format(&scope.types),
+                            t.format(&scope.types)
+                        ),
                     );
                 }
             } else {
@@ -60,9 +64,10 @@ impl MatchNode {
         let subject_type = subject_type.as_deref(&scope.types);
         if !matches!(subject_type, Type::Enum(_)) {
             // TODO handle other types besides enums
-            println!(
-                "Type error: Match expression currently only supports enum types, found `{}`",
-                subject_type.format(&scope.types)
+            scope.source.print_type_error(
+                self.subject.span,
+                "Match expressions only support enums",
+                &format!("found type: `{}`", subject_type.format(&scope.types)),
             );
         }
 
