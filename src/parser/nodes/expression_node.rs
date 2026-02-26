@@ -3,8 +3,8 @@ use crate::{
     parser::{
         AccessExpressionNode, ArrayExpressionNode, BinaryOpExpressionNode, BlockNode,
         ClosureExpressionNode, ClosureParameterExpressionNode, DeferredAccessExpressionNode,
-        FunctionCallExpressionNode, IfExpressionNode, MatchNode, PostfixOpExpressionNode,
-        PrefixOpExpressionNode, PrimitiveType,
+        FunctionCallExpressionNode, Identified, IdentifierNode, IfExpressionNode, MatchNode, Node,
+        PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType,
     },
 };
 
@@ -19,7 +19,7 @@ pub enum ExpressionNode {
     ClosureParameter(ClosureParameterExpressionNode),
     DeferredAccess(DeferredAccessExpressionNode),
     FunctionCall(FunctionCallExpressionNode),
-    Identifier(String),
+    Identifier(Node<IdentifierNode>),
     IfExpression(IfExpressionNode),
     IntegerLiteral(i64),
     Match(MatchNode),
@@ -75,7 +75,7 @@ impl ExpressionNode {
 
     fn check_identifier(
         &self,
-        identifier: &String,
+        identifier: &Node<IdentifierNode>,
         scope: Box<Scope>,
         expected_type: Option<&Type>,
     ) -> (Box<Scope>, Type) {
@@ -85,26 +85,40 @@ impl ExpressionNode {
         });
 
         // TODO disallow use of types as values
-        if let Some(resolved_type) = scope.lookup(identifier) {
+        if let Some(resolved_type) = scope.lookup(identifier.id()) {
             (scope, resolved_type)
-        } else if let Some(resolved_type) = scope.types.get_ref(identifier).map(Type::Reference) {
+        } else if let Some(resolved_type) =
+            scope.types.get_ref(identifier.id()).map(Type::Reference)
+        {
             let resolved_type = resolved_type.as_runtime_type(&scope.types).map(Type::Type);
             match resolved_type {
                 Some(resolved_type) => (scope, resolved_type),
                 None => {
-                    println!("Type Error: Could not resolve `{}` as a value", identifier);
+                    scope.source.print_type_error(
+                        identifier.span,
+                        "Invalid type as value",
+                        "cannot use type as a value",
+                    );
                     (scope, Type::Error)
                 }
             }
         } else if let Some(enum_type) = expected_enum_type {
-            if let Some(variant_type) = enum_type.get_variant(identifier) {
+            if let Some(variant_type) = enum_type.get_variant(identifier.id()) {
                 (scope, variant_type)
             } else {
-                println!("Type Error: Could not find symbol `{}`", identifier);
+                scope.source.print_type_error(
+                    identifier.span,
+                    &format!("Could not find value `{}`", identifier.id()),
+                    "no such symbol found",
+                );
                 (scope, Type::Error)
             }
         } else {
-            println!("Type Error: Could not find symbol `{}`", identifier);
+            scope.source.print_type_error(
+                identifier.span,
+                &format!("Could not find value `{}`", identifier.id()),
+                "no such symbol found",
+            );
             (scope, Type::Error)
         }
     }
