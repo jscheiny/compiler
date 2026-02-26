@@ -1,6 +1,8 @@
 use crate::{
     checker::{FunctionType, Scope, Type},
-    parser::{ExpressionNode, IdentifierNode, Node, NodeVec, check_function_call, get_field},
+    parser::{
+        ExpressionNode, IdentifierNode, Node, NodeVec, TokenSpan, check_function_call, get_field,
+    },
 };
 
 pub struct DeferredAccessExpressionNode {
@@ -13,8 +15,14 @@ impl DeferredAccessExpressionNode {
         let function_type = expected_type.and_then(|t| t.clone().as_function(&scope.types));
         if let Some(mut function_type) = function_type {
             if function_type.parameters.len() != 1 {
-                println!(
-                    "Type error: Expected deferred access expression to be assigned to function taking exactly one parameter"
+                scope.source.print_type_error(
+                    // TODO this span should cover the whole node...
+                    self.field.span,
+                    "Deferred access expression must be a single parameter function",
+                    &format!(
+                        "expected type takes {} parameters",
+                        function_type.parameters.len(),
+                    ),
                 );
             }
 
@@ -30,7 +38,12 @@ impl DeferredAccessExpressionNode {
             let function_type = FunctionType::new(parameter_type, result_type);
             (scope, Type::Function(function_type))
         } else {
-            println!("Type error: Could not infer type of deferred access in non-function context");
+            let span = TokenSpan::singleton_of(self.field.span.start_index - 1);
+            scope.source.print_type_error(
+                span,
+                "Could not infer type of implicit parameter",
+                "deferred access must be assigned to a function",
+            );
             (scope, Type::Error)
         }
     }
