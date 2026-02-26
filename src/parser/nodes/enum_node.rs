@@ -35,14 +35,25 @@ impl EnumNode {
             let mut scope_names = HashSet::new();
             for variant in self.variants.iter() {
                 if !scope_names.insert(variant.id()) {
-                    println!("Type error: Duplicate variant of name `{}`", variant.id())
+                    scope.source.print_type_error(
+                        variant.identifier.span,
+                        &format!("Duplicate enum variant `{}`", variant.id()),
+                        &format!("a variant of `{}` already exists with this name", self.id()),
+                    );
                 }
             }
 
             if let Some(methods) = self.methods.as_ref() {
                 for method in methods.iter() {
                     if scope_names.contains(method.id()) {
-                        println!("Type error: Duplicate member of name `{}`", method.id())
+                        scope.source.print_type_error(
+                            method.function.identifier.span,
+                            &format!("Duplicate enum member `{}`", method.id()),
+                            &format!(
+                                "a variant or method of `{}` already exists with this name",
+                                self.id()
+                            ),
+                        );
                     } else {
                         let method_type =
                             Type::Function(method.function.get_type(&scope.types).clone());

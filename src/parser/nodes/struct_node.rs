@@ -34,9 +34,9 @@ impl StructNode {
                 scope.add_or(field.id(), field_type, |scope| {
                     scope.source.print_type_error(
                         field.identifier.span,
-                        "Duplicate struct member",
+                        &format!("Duplicate struct member `{}`", field.id()),
                         &format!(
-                            "a member of struct `{}` already exists with this name",
+                            "a field of struct `{}` already exists with this name",
                             self.id()
                         ),
                     );
@@ -50,9 +50,9 @@ impl StructNode {
                     scope.add_or(method.id(), method_type, |scope| {
                         scope.source.print_type_error(
                             method.function.identifier.span,
-                            "Duplicate struct member",
+                            &format!("Duplicate struct member `{}`", method.id()),
                             &format!(
-                                "a member of struct `{}` already exists with this name",
+                                "a field or method of struct `{}` already exists with this name",
                                 self.id()
                             ),
                         );

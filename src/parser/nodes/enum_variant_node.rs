@@ -6,8 +6,8 @@ use crate::{
 };
 
 pub struct EnumVariantNode {
-    identifier: Node<IdentifierNode>,
-    type_def: Option<Node<TypeNode>>,
+    pub identifier: Node<IdentifierNode>,
+    pub type_def: Option<Node<TypeNode>>,
     resolved_type: OnceCell<Option<Type>>,
 }
 
