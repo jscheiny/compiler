@@ -23,7 +23,7 @@ impl ProgramNode {
         }
 
         for definition in self.definitions_mut() {
-            definition.resolve_type(&mut types);
+            definition.resolve_type(&mut types, &source);
         }
 
         let mut scope = Box::new(self.get_module_scope(source, types));

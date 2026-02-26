@@ -1,5 +1,6 @@
 use crate::{
     checker::{RuntimeType, Scope, Type, TypeResolver},
+    lexer::SourceCode,
     parser::{EnumNode, FunctionNode, Identified, StructNode, TypeAliasNode},
 };
 
@@ -31,17 +32,19 @@ impl ModuleDefinitionNode {
     pub fn add_to_scope(&self, scope: &mut Scope) {
         match self {
             Self::Enum(node) => {
-                let enum_type = RuntimeType::Enum(node.get_type(&scope.types).clone());
+                let enum_type =
+                    RuntimeType::Enum(node.get_type(&scope.types, &scope.source).clone());
                 scope.add(node.id(), Type::Type(enum_type));
             }
             Self::Struct(node) => {
-                let struct_type = RuntimeType::Struct(node.get_type(&scope.types).clone());
+                let struct_type =
+                    RuntimeType::Struct(node.get_type(&scope.types, &scope.source).clone());
                 scope.add(node.id(), Type::Type(struct_type));
             }
             Self::Function(node) => {
                 scope.add(
                     node.id(),
-                    Type::Function(node.get_type(&scope.types).clone()),
+                    Type::Function(node.get_type(&scope.types, &scope.source).clone()),
                 );
             }
             // TODO Consider how these are added to scope
@@ -49,18 +52,18 @@ impl ModuleDefinitionNode {
         }
     }
 
-    pub fn resolve_type(&mut self, types: &mut TypeResolver) {
+    pub fn resolve_type(&mut self, types: &mut TypeResolver, source: &SourceCode) {
         match self {
             Self::Struct(node) => {
-                let resolved_type = Type::Struct(node.get_type(types).clone());
+                let resolved_type = Type::Struct(node.get_type(types, source).clone());
                 types.resolve(node.id(), resolved_type);
             }
             Self::Enum(node) => {
-                let resolved_type = Type::Enum(node.get_type(types).clone());
+                let resolved_type = Type::Enum(node.get_type(types, source).clone());
                 types.resolve(node.id(), resolved_type);
             }
             Self::TypeAlias(node) => {
-                let resolved_type = node.get_type(types).clone();
+                let resolved_type = node.get_type(types, source).clone();
                 types.resolve(node.id(), resolved_type);
             }
             Self::Function(_) => {}

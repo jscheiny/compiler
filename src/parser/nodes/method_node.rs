@@ -1,5 +1,6 @@
 use crate::{
     checker::{EnumMethod, Scope, StructMember, StructMemberType, TypeResolver},
+    lexer::SourceCode,
     parser::{FunctionNode, Identified, Node},
 };
 
@@ -13,16 +14,16 @@ impl MethodNode {
         self.function.check(scope)
     }
 
-    pub fn resolve_struct_method(&self, types: &TypeResolver) -> StructMember {
-        let function_type = self.function.get_type(types).clone();
+    pub fn resolve_struct_method(&self, types: &TypeResolver, source: &SourceCode) -> StructMember {
+        let function_type = self.function.get_type(types, source).clone();
         StructMember {
             public: self.public,
             member_type: StructMemberType::Method(function_type),
         }
     }
 
-    pub fn resolve_enum_method(&self, types: &TypeResolver) -> EnumMethod {
-        let function_type = self.function.get_type(types).clone();
+    pub fn resolve_enum_method(&self, types: &TypeResolver, source: &SourceCode) -> EnumMethod {
+        let function_type = self.function.get_type(types, source).clone();
         EnumMethod {
             public: self.public,
             function_type,

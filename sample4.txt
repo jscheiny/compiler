@@ -1,16 +1,12 @@
-struct S(test: int, test: int) {
-    test() {}
+enum E(
+    A((int, int)),
+    B
+);
 
-    test() {
-        break;
-        continue;
+fn test(value: (Eadf, int)) {
+    match value {
+        A(A) -> x;
+        B(let x) -> x;
+        Crap(let x) -> x;
     }
-
-    a() {}
-}
-
-enum E () {}
-
-fn main(value: S) {
-    5 => E;
 }

@@ -2,6 +2,7 @@ use std::{cell::OnceCell, collections::HashSet};
 
 use crate::{
     checker::{FunctionType, Scope, Type, TypeResolver},
+    lexer::SourceCode,
     parser::{
         FunctionBodyNode, Identified, IdentifierNode, Node, NodeVec, ParameterNode, TypeNode,
     },
@@ -31,9 +32,9 @@ impl FunctionNode {
         }
     }
 
-    pub fn check(&self, parent_scope: Box<Scope>) -> Box<Scope> {
-        let return_type = &self.get_type(&parent_scope.types).return_type;
-        parent_scope.nest_fn(return_type, |scope| {
+    pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
+        let return_type = &self.get_type(&scope.types, &scope.source).return_type;
+        scope.nest_fn(return_type, |scope| {
             let scope = self.check_params(scope);
             match &self.body.value {
                 FunctionBodyNode::Expression(expression) => {
@@ -67,29 +68,32 @@ impl FunctionNode {
                 );
             } else {
                 param_names.insert(param.id().clone());
-                scope.add(param.id(), param.get_type(&scope.types).clone());
+                scope.add(
+                    param.id(),
+                    param.get_type(&scope.types, &scope.source).clone(),
+                );
             }
         }
         scope
     }
 
-    pub fn get_type(&self, types: &TypeResolver) -> &FunctionType {
-        self.resolved_type.get_or_init(|| self.get_type_impl(types))
+    pub fn get_type(&self, types: &TypeResolver, source: &SourceCode) -> &FunctionType {
+        self.resolved_type
+            .get_or_init(|| self.get_type_impl(types, source))
     }
 
-    fn get_type_impl(&self, types: &TypeResolver) -> FunctionType {
+    fn get_type_impl(&self, types: &TypeResolver, source: &SourceCode) -> FunctionType {
         let parameters = self
             .parameters
             .value
             .iter()
-            .map(|parameter| parameter.get_type(types))
+            .map(|parameter| parameter.get_type(types, source))
             .cloned()
             .collect();
 
-        let return_type = self
-            .return_type
-            .as_ref()
-            .map_or(Type::Void, |return_type| return_type.get_type(types));
+        let return_type = self.return_type.as_ref().map_or(Type::Void, |return_type| {
+            return_type.get_type(types, source)
+        });
 
         FunctionType {
             parameters,
