@@ -1,8 +1,5 @@
-use colored::Colorize;
-
 use crate::{
     checker::{Scope, Type},
-    lexer::Severity,
     parser::{BinaryOperator, ExpressionNode, Node, PrimitiveType},
 };
 
@@ -53,39 +50,27 @@ impl BinaryOpExpressionNode {
 
         if let Some(function_type) = function_type {
             if function_type.parameters.len() != 1 {
-                println!(
-                    "{} Applied function must take only one parameter",
-                    "Type error:".red().bold(),
-                );
-                scope.source.print_token_span(
+                scope.source.print_type_error(
                     self.right.span,
-                    '^',
-                    format!(
+                    "Applied function must take only one parameter",
+                    &format!(
                         "type: `{}`",
                         Type::Function(function_type.clone()).format(&scope.types)
-                    )
-                    .as_str(),
-                    Severity::Error,
+                    ),
                 );
             }
 
             if !function_type.parameters.is_empty()
                 && !left_type.is_assignable_to(&function_type.parameters[0], &scope.types)
             {
-                println!(
-                    "{} Function application argument does not match parameter type",
-                    "Type error:".red().bold(),
-                );
-                scope.source.print_token_span(
+                scope.source.print_type_error(
                     self.left.span,
-                    '^',
-                    format!(
+                    "Function application argument does not match parameter type",
+                    &format!(
                         "expected value of type `{}`, found `{}`",
                         left_type.format(&scope.types),
                         function_type.parameters[0].format(&scope.types)
-                    )
-                    .as_str(),
-                    Severity::Error,
+                    ),
                 );
             }
 
