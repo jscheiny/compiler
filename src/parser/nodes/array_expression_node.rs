@@ -51,7 +51,7 @@ impl ArrayExpressionNode {
                 "Empty array is ambiguous",
                 "could not infer type of empty array",
             );
-            (scope, Type::Array(Box::new(Type::Error)))
+            (scope, Type::Error)
         }
     }
 }

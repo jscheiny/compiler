@@ -13,9 +13,10 @@ impl IfExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         let (scope, predicate_type) = self.predicate.check(scope);
         if !predicate_type.is_primitive(PrimitiveType::Bool, &scope.types) {
-            println!(
-                "Type error: If expression predicate must be of type bool, found `{}`",
-                predicate_type.format(&scope.types)
+            scope.source.print_type_error(
+                self.predicate.span,
+                "If expression predicate expected to be bool",
+                &format!("found type: `{}`", predicate_type.format(&scope.types)),
             );
         }
 
