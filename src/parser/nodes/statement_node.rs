@@ -38,7 +38,9 @@ impl StatementNode {
                 let (scope, _) = expression.check(scope);
                 (scope, None)
             }
-            Self::FunctionReturn(expression) => check_function_return(expression.as_ref(), scope),
+            Self::FunctionReturn(expression) => {
+                check_function_return(expression.as_ref(), span, scope)
+            }
             Self::If(node) => (node.check(scope), None),
             Self::Match(node) => (node.check_statement(scope), None),
             Self::WhileLoop(node) => (node.check(scope), None),
@@ -59,6 +61,7 @@ fn check_loop(keyword: Keyword, span: TokenSpan, scope: Box<Scope>) -> (Box<Scop
 
 fn check_function_return(
     expression: Option<&Node<ExpressionNode>>,
+    statement_span: TokenSpan,
     mut scope: Box<Scope>,
 ) -> (Box<Scope>, Option<Type>) {
     let expected_type = scope.return_type().cloned();
@@ -70,14 +73,26 @@ fn check_function_return(
         scope = new_scope;
 
         if !resolved_type.is_assignable_to(&expected_type, &scope.types) {
-            println!(
-                "Type error: Returned type `{}` is not assignable to expected return type of `{}`",
-                resolved_type.format(&scope.types),
-                expected_type.format(&scope.types)
+            let error_span = match expression {
+                Some(expression) => expression.span,
+                None => statement_span,
+            };
+            scope.source.print_type_error(
+                error_span,
+                &format!(
+                    "Function must return value of type `{}`",
+                    expected_type.format(&scope.types)
+                ),
+                &format!("found type: `{}`", resolved_type.format(&scope.types)),
             );
         }
     } else {
-        println!("Type error: Return found in non function context");
+        // TODO should this be a panic? I don't think this ought to occur
+        scope.source.print_type_error(
+            statement_span,
+            "Unexpected return",
+            "return found outside of a function",
+        );
     }
 
     (scope, None)
