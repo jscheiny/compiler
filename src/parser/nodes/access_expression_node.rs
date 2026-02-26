@@ -1,5 +1,5 @@
 use crate::{
-    checker::{RuntimeType, Scope, Type, TypeResolver},
+    checker::{FunctionType, RuntimeType, Scope, Type, TypeResolver},
     parser::{ExpressionNode, Identified, IdentifierNode, Node},
 };
 
@@ -9,8 +9,9 @@ pub struct AccessExpressionNode {
 }
 
 impl AccessExpressionNode {
-    pub fn check(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let (scope, left_type) = self.left.check(scope);
+    pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
+        // TODO should we change the expected type here?
+        let (scope, left_type) = self.left.check_expected(scope, expected_type);
         let field_type = get_field(&left_type, self.field.id(), &scope.types);
         (scope, field_type.unwrap_or(Type::Error))
     }
@@ -28,7 +29,7 @@ pub fn get_field(input_type: &Type, field: &String, types: &TypeResolver) -> Opt
             if let Some(method) = method {
                 if !method.public {
                     // TODO respect public/private access
-                    println!("Type error maybe? Check privacy here");
+                    // println!("Type error maybe? Check privacy here");
                 }
                 Some(Type::Function(method.function_type.clone()))
             } else {
@@ -39,10 +40,14 @@ pub fn get_field(input_type: &Type, field: &String, types: &TypeResolver) -> Opt
                 None
             }
         }
-        Type::Function(_) => {
-            // TODO add access operator based on return type
-            println!("Type error: No access operator on functions");
-            None
+        Type::Function(function_type) => {
+            let result_type = get_field(&function_type.return_type, field, types);
+            result_type.map(|result_type| {
+                Type::Function(FunctionType {
+                    parameters: function_type.parameters.clone(),
+                    return_type: Box::new(result_type),
+                })
+            })
         }
         Type::Primitive(_) => todo!("Implement access on primitive values"),
         Type::Reference(index) => {
@@ -54,7 +59,7 @@ pub fn get_field(input_type: &Type, field: &String, types: &TypeResolver) -> Opt
             if let Some(member) = member {
                 if !member.public {
                     // TODO respect public/private access
-                    println!("Type error maybe? Check privacy here");
+                    // println!("Type error maybe? Check privacy here");
                 }
                 Some(member.member_type.get_type())
             } else {

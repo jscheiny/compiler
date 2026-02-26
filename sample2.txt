@@ -1,30 +1,8 @@
-// enum Simple(A, B(Other), C(int));
-enum Other(D, E, F(bool)) {
-    pub test() {
-        self.get_value();
-    }
+fn test(value: int, value2: bool): bool {
 
-    pub get_value(): bool {
-        match self {
-            D -> true;
-            E -> 3;
-            F(let value) -> not value;
-            else -> true;
-        }
-    }
 }
 
-// enum Test(A());
-// 
-// fn test() {
-//     let x: Simple = 3 => C;
-//     match x {
-//         let x -> 6;
-//         A -> 5;
-//         B(let self) -> other.get_value();
-//         B(F(let y)) -> -y;
-//         C(let x) -> 5;
-//     };
-// }
-// 
-// fn accept_simple(s: Simple): int {}
+fn main() {
+    let x: bool -> bool = test(3);
+    let y: bool = test();
+}

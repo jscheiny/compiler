@@ -1,0 +1,10 @@
+struct Coordinate(value: bool);
+
+struct Pair(left: Coordinate, right: Coordinate);
+
+fn main(pair: Pair) {
+    accept_function(p -> p.left.value);
+    accept_function(.left.value);
+}
+
+fn accept_function(f: Pair -> int) {}

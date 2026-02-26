@@ -42,7 +42,7 @@ impl ExpressionNode {
         expected_type: Option<&Type>,
     ) -> (Box<Scope>, Type) {
         match self {
-            Self::Access(node) => node.check(scope),
+            Self::Access(node) => node.check(scope, expected_type),
             Self::Array(node) => node.check(scope, expected_type),
             Self::BinaryOp(node) => node.check(scope, expected_type),
             Self::Block(node) => {
