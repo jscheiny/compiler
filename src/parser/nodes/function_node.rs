@@ -37,12 +37,16 @@ impl FunctionNode {
             let scope = self.check_params(scope);
             match &self.body.value {
                 FunctionBodyNode::Expression(expression) => {
-                    let (scope, resolved_type) = expression.check_expected(scope, Some(return_type));
+                    let (scope, resolved_type) =
+                        expression.check_expected(scope, Some(return_type));
                     if !resolved_type.is_assignable_to(return_type, &scope.types) {
-                        println!(
-                            "Type error: Returned type `{}` is not assignable to expected return type of `{}`",
-                            resolved_type.format(&scope.types),
-                            return_type.format(&scope.types)
+                        scope.source.print_type_error(
+                            self.body.span,
+                            &format!(
+                                "Function must return value of type `{}`",
+                                return_type.format(&scope.types)
+                            ),
+                            &format!("found type: `{}`", resolved_type.format(&scope.types)),
                         );
                     }
                     scope
@@ -56,10 +60,10 @@ impl FunctionNode {
         let mut param_names = HashSet::new();
         for param in self.parameters.iter() {
             if param_names.contains(param.id()) {
-                println!(
-                    "Type error: Duplicate parameter named `{}` of function `{}`",
-                    param.id(),
-                    self.id()
+                scope.source.print_type_error(
+                    param.identifier.span,
+                    &format!("Duplicate parameter name `{}`", param.id()),
+                    "function already contains a parameter with this name",
                 );
             } else {
                 param_names.insert(param.id().clone());

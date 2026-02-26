@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use crate::{
-    checker::{Type, TypeResolver},
-    parser::{Identified, IdentifierNode, Node},
+    checker::{Scope, Type},
+    parser::{Identified, IdentifierNode, Node, TokenSpan},
 };
 
 pub enum MatchPatternNode {
@@ -14,17 +14,19 @@ pub enum MatchPatternNode {
 impl MatchPatternNode {
     pub fn check(
         &self,
-        types: &TypeResolver,
+        scope: &Scope,
+        span: TokenSpan,
         bindings: &mut HashMap<String, Type>,
         subject_type: &Type,
     ) {
         match self {
-            MatchPatternNode::Variant(pattern) => pattern.check(types, bindings, subject_type),
+            MatchPatternNode::Variant(pattern) => pattern.check(scope, bindings, subject_type),
             MatchPatternNode::Binding(identifier) => {
                 if bindings.contains_key(&identifier.0) {
-                    println!(
-                        "Type error: Duplicate binding for identifier `{}`",
-                        identifier.0
+                    scope.source.print_type_error(
+                        span,
+                        &format!("Duplicate pattern binding of `{}`", identifier.0),
+                        "a binding of this name is declared elsewhere in this pattern",
                     );
                 } else {
                     bindings.insert(identifier.0.clone(), subject_type.clone());
@@ -41,53 +43,61 @@ pub struct VariantMatchPattern {
 }
 
 impl VariantMatchPattern {
-    pub fn check(
-        &self,
-        types: &TypeResolver,
-        bindings: &mut HashMap<String, Type>,
-        subject_type: &Type,
-    ) {
-        if let Type::Enum(enum_type) = subject_type.deref(types) {
+    pub fn check(&self, scope: &Scope, bindings: &mut HashMap<String, Type>, subject_type: &Type) {
+        if let Type::Enum(enum_type) = subject_type.deref(&scope.types) {
             if let Some(variant) = enum_type.variants.get(self.identifier.id()) {
                 if let Some(inner_type) = variant {
                     if self.inner_pattern.is_none() {
-                        println!(
-                            "Type error: Expected binding pattern for typed variant `{}`",
-                            self.identifier.id()
+                        // TODO consider relaxing this when the subject is just an identifier...
+                        scope.source.print_type_error(
+                            self.identifier.span,
+                            "Expected binding pattern",
+                            &format!(
+                                "typed variant `{}` must have a binding pattern",
+                                self.identifier.id()
+                            ),
                         );
                     } else {
-                        return self.check_inner_pattern(types, bindings, inner_type);
+                        return self.check_inner_pattern(scope, bindings, inner_type);
                     }
-                } else if self.inner_pattern.is_some() {
-                    println!(
-                        "Type error: Expected no binding pattern for untyped variant `{}`",
-                        self.identifier.id()
+                } else if let Some(inner_pattern) = self.inner_pattern.as_ref() {
+                    scope.source.print_type_error(
+                        inner_pattern.span,
+                        "Unexpected binding pattern",
+                        &format!(
+                            "untyped variant `{}` cannot use a binding pattern",
+                            self.identifier.id()
+                        ),
                     );
                 }
             } else {
-                println!(
-                    "Type error: No such variant `{}` on enum `{}`",
-                    self.identifier.id(),
-                    enum_type.identifier
+                scope.source.print_type_error(
+                    self.identifier.span,
+                    &format!("Could not find variant `{}`", self.identifier.id()),
+                    &format!("enum `{}` has no such variant", enum_type.identifier),
                 );
             }
         } else if !matches!(subject_type, Type::Error) {
-            println!(
-                "Type error: Cannot use variant pattern on non-enum type `{}`",
-                subject_type.format(types),
+            scope.source.print_type_error(
+                self.identifier.span,
+                "Unexpected variant pattern",
+                &format!(
+                    "cannot use variant pattern on non-enum type `{}`",
+                    subject_type.format(&scope.types),
+                ),
             );
         }
-        self.check_inner_pattern(types, bindings, &Type::Error);
+        self.check_inner_pattern(scope, bindings, &Type::Error);
     }
 
     fn check_inner_pattern(
         &self,
-        types: &TypeResolver,
+        scope: &Scope,
         bindings: &mut HashMap<String, Type>,
         bound_type: &Type,
     ) {
         if let Some(inner_pattern) = self.inner_pattern.as_ref() {
-            inner_pattern.check(types, bindings, bound_type);
+            inner_pattern.check(scope, inner_pattern.span, bindings, bound_type);
         }
     }
 }

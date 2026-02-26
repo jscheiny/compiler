@@ -8,6 +8,7 @@ pub struct ClosureExpressionNode {
     pub body: Box<Node<ExpressionNode>>,
 }
 
+// TODO handle duplicate parameter names
 impl ClosureExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         let function_type = get_expected_type(expected_type, &scope.types);

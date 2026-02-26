@@ -19,7 +19,7 @@ impl MatchCaseNode {
     ) -> (Box<Scope>, Type) {
         let mut bindings = HashMap::new();
         self.pattern
-            .check(&scope.types, &mut bindings, subject_type);
+            .check(&scope, self.pattern.span, &mut bindings, subject_type);
         scope.nest_with(ScopeType::MatchCase, |mut scope| {
             for (identifier, bound_type) in bindings {
                 scope.add(identifier.as_str(), bound_type);
