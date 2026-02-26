@@ -11,12 +11,12 @@ pub struct AccessExpressionNode {
 impl AccessExpressionNode {
     pub fn check(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let (scope, left_type) = self.left.check(scope);
-        let field_type = get_field(left_type, self.field.id(), &scope.types);
+        let field_type = get_field(&left_type, self.field.id(), &scope.types);
         (scope, field_type.unwrap_or(Type::Error))
     }
 }
 
-fn get_field(input_type: Type, field: &String, types: &TypeResolver) -> Option<Type> {
+pub fn get_field(input_type: &Type, field: &String, types: &TypeResolver) -> Option<Type> {
     match input_type {
         Type::Array(_) => {
             // TODO consider if we should allow this
@@ -45,8 +45,8 @@ fn get_field(input_type: Type, field: &String, types: &TypeResolver) -> Option<T
         }
         Type::Primitive(_) => todo!("Implement access on primitive values"),
         Type::Reference(index) => {
-            let resolved_type = types.get_type(index).unwrap();
-            get_field(resolved_type, field, types)
+            let resolved_type = types.get_type(*index).unwrap();
+            get_field(&resolved_type, field, types)
         }
         Type::Struct(struct_type) => {
             let member = struct_type.members.get(field);

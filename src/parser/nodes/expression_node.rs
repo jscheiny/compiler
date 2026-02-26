@@ -2,9 +2,9 @@ use crate::{
     checker::{Scope, ScopeType, Type},
     parser::{
         AccessExpressionNode, ArrayExpressionNode, BinaryOpExpressionNode, BlockNode,
-        ClosureExpressionNode, ClosureParameterExpressionNode, FunctionCallExpressionNode,
-        IfExpressionNode, MatchNode, PostfixOpExpressionNode, PrefixOpExpressionNode,
-        PrimitiveType,
+        ClosureExpressionNode, ClosureParameterExpressionNode, DeferredAccessNode,
+        FunctionCallExpressionNode, IfExpressionNode, MatchNode, PostfixOpExpressionNode,
+        PrefixOpExpressionNode, PrimitiveType,
     },
 };
 
@@ -17,6 +17,7 @@ pub enum ExpressionNode {
     CharacterLiteral(String),
     Closure(ClosureExpressionNode),
     ClosureParameter(ClosureParameterExpressionNode),
+    DeferredAccess(DeferredAccessNode),
     FunctionCall(FunctionCallExpressionNode),
     Identifier(String),
     IfExpression(IfExpressionNode),
@@ -54,6 +55,7 @@ impl ExpressionNode {
             Self::ClosureParameter(_) => {
                 panic!("ERROR: Unexpected closure parameter outside of parameter list")
             }
+            Self::DeferredAccess(node) => node.check(scope, expected_type),
             Self::FunctionCall(node) => node.check(scope, expected_type),
             Self::Identifier(identifier) => self.check_identifier(identifier, scope, expected_type),
             Self::IfExpression(node) => node.check(scope, expected_type),

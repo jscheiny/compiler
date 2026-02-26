@@ -1,0 +1,21 @@
+struct Test(pub value: int) {
+    pub get_value(): bool {
+        return true;
+    }
+}
+
+type T = Test;
+type U = bool;
+
+struct Array(pub values: [T]) {
+    pub map(mapper: T -> U): [U] {}
+}
+
+// fn test(x): A -> B => (a) -> x + a
+
+fn main(array: Array) {
+    //array.map(t => t.value);
+    // array.map(Test.value);
+    array.map(.get_value);
+    // let x: Test -> bool = .value;
+}

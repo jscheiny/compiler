@@ -11,7 +11,7 @@ pub struct PrefixOpExpressionNode {
 impl PrefixOpExpressionNode {
     pub fn check(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
         match *self.operator {
-            PrefixOperator::Closure => todo!("Implement type checking for prefix op Closure"),
+            // PrefixOperator::Closure => todo!("Implement type checking for prefix op Closure"),
             PrefixOperator::LogicalNot => self.check_logical_not(scope),
             PrefixOperator::Negative => self.check_negative(scope),
         }

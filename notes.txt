@@ -1,0 +1,13 @@
+Notes:
+
+Deferred access operator:
+    .x    == a -> a.x
+    .f(x) == a -> a.f(x)
+
+General design note:
+    Given f: (...Args) -> T
+    f should be usable as a T:
+    - f.x == (args) -> f(args).x
+    - f + g == (args) -> f(args) + g(args)
+    - f + c == (args) -> f(args) + c
+    - c + f == (args) -> c + f(args)

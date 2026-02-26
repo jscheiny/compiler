@@ -143,6 +143,9 @@ impl BinaryOpExpressionNode {
             );
         }
 
+        println!("Left = {}", left_type.format(&scope.types));
+        println!("Right = {}", right_type.format(&scope.types));
+
         (scope, Type::Primitive(PrimitiveType::Bool))
     }
 }

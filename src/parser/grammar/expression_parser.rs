@@ -3,10 +3,10 @@ use crate::{
     parser::{
         AccessExpressionNode, ArrayExpressionNode, Associativity, BinaryOpExpressionNode,
         BinaryOperator, BlockNode, ClosureExpressionNode, ClosureParameterExpressionNode,
-        ExpressionNode, FunctionCallExpressionNode, Identified, IdentifierNode, IdentifierType,
-        IfExpressionNode, LocatedSyntaxError, Node, Operator, ParseResult, PostfixOpExpressionNode,
-        PostfixOperator, PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType,
-        SyntaxError, TokenSpan, TokenStream,
+        DeferredAccessNode, ExpressionNode, FunctionCallExpressionNode, Identified, IdentifierNode,
+        IdentifierType, IfExpressionNode, LocatedSyntaxError, Node, Operator, ParseResult,
+        PostfixOpExpressionNode, PostfixOperator, PrefixOpExpressionNode, PrefixOperator,
+        StatementNode, StatementType, SyntaxError, TokenSpan, TokenStream,
         grammar::{match_expression, statement, type_definition},
     },
 };
@@ -86,7 +86,7 @@ fn sub_expression(
                 closure_parameter(tokens, left, context)
             } else {
                 binary_op_expression(tokens, left, operator, context)
-            }?
+            }?;
         } else if Symbol::OpenParen.matches(token) {
             // Function calls should be treated as the same precedence as a.b
             let precedence = BinaryOperator::Access.precedence();
@@ -181,27 +181,28 @@ fn function_call(
     tokens: &mut TokenStream,
     left: Node<ExpressionNode>,
 ) -> ParseResult<Node<ExpressionNode>> {
-    let arguments_span = TokenSpan::singleton(tokens);
-    tokens.next();
-
-    let arguments = if tokens.accept(Symbol::CloseParen) {
-        vec![]
-    } else {
-        let context = ExpressionContext::parentheses();
-        let right = tokens.located_with(sub_expression, context)?;
-        tokens.expect(Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
-        flatten_commas(right)
-    };
-
-    let arguments_span = arguments_span.expand_to(tokens);
+    let arguments = tokens.located(function_arguments)?;
     let span = left.span.expand_to(tokens);
 
     Ok(
         span.wrap(ExpressionNode::FunctionCall(FunctionCallExpressionNode {
             function: Box::new(left),
-            arguments: arguments_span.wrap(arguments),
+            arguments,
         })),
     )
+}
+
+fn function_arguments(tokens: &mut TokenStream) -> ParseResult<Vec<Node<ExpressionNode>>> {
+    tokens.next();
+
+    if tokens.accept(Symbol::CloseParen) {
+        Ok(vec![])
+    } else {
+        let context = ExpressionContext::parentheses();
+        let right = tokens.located_with(sub_expression, context)?;
+        tokens.expect(Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
+        Ok(flatten_commas(right))
+    }
 }
 
 fn simple_closure(
@@ -279,6 +280,7 @@ fn expression_atom(
             let identifier = tokens.identifier(IdentifierType::Field)?;
             Ok(ExpressionNode::SelfRef(identifier.id().clone()))
         }
+        Token::Symbol(Symbol::Dot) => deferred_access(tokens),
         Token::Symbol(Symbol::OpenParen) => closure_or_tuple(tokens),
         Token::Symbol(Symbol::OpenBracket) => array(tokens),
         Token::Keyword(Keyword::If) => if_expression(tokens),
@@ -327,6 +329,21 @@ pub fn block(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<Blo
     }
 
     Ok(BlockNode { statements })
+}
+
+fn deferred_access(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
+    tokens.next();
+    let field = tokens.identifier(IdentifierType::Field)?;
+    // let arguments = if Symbol::OpenParen.matches(tokens.peek()) {
+    //     Some(tokens.located(function_arguments)?)
+    // } else {
+    //     None
+    // };
+
+    Ok(ExpressionNode::DeferredAccess(DeferredAccessNode {
+        field,
+        arguments: None,
+    }))
 }
 
 fn closure_or_tuple(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
@@ -405,7 +422,7 @@ fn if_expression(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
 }
 
 fn flatten_commas(expression: Node<ExpressionNode>) -> Vec<Node<ExpressionNode>> {
-    let mut arguments = vec![];
+    let mut arguments: Vec<Node<ExpressionNode>> = vec![];
     let mut current = expression;
     loop {
         if let ExpressionNode::BinaryOp(BinaryOpExpressionNode {
@@ -415,7 +432,13 @@ fn flatten_commas(expression: Node<ExpressionNode>) -> Vec<Node<ExpressionNode>>
         }) = current.value
         {
             if operator.value != BinaryOperator::Comma {
-                arguments.push(*right);
+                arguments.push(current.span.wrap(ExpressionNode::BinaryOp(
+                    BinaryOpExpressionNode {
+                        left,
+                        operator,
+                        right,
+                    },
+                )));
                 break;
             }
             arguments.push(*left);
