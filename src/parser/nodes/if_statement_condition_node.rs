@@ -20,12 +20,7 @@ impl IfStatementConditionNode {
         }
 
         scope.nest(ScopeType::Block, |scope| {
-            let (scope, resolved_type) = self.body.check(scope, None);
-            if resolved_type.is_some() {
-                // TODO we will need better infrastructure to correctly place the span for this error
-                println!("Type error: Unexpected body return in if block");
-            }
-
+            let (scope, _) = self.body.check(scope, None);
             scope
         })
     }
