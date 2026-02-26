@@ -1,6 +1,6 @@
 use crate::{
     checker::{Scope, Type},
-    parser::{BinaryOperator, ExpressionNode, Node, PrimitiveType},
+    parser::{BinaryOperator, ExpressionNode, Node, Operator, PrimitiveType, TokenSpan},
 };
 
 pub struct BinaryOpExpressionNode {
@@ -117,23 +117,36 @@ impl BinaryOpExpressionNode {
     }
 
     fn check_logical_op(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        let bool_type = Type::Primitive(PrimitiveType::Bool);
+
         let (scope, left_type) = self.left.check(scope);
         if !left_type.is_primitive(PrimitiveType::Bool, &scope.types) {
-            println!(
-                "Type error: Left hand side of op `{:?}` should be of type bool, found `{}`",
-                self.operator.value,
-                left_type.format(&scope.types),
-            );
+            self.print_operand_error(&scope, self.left.span, &bool_type, &left_type);
         }
+
         let (scope, right_type) = self.right.check(scope);
         if !right_type.is_primitive(PrimitiveType::Bool, &scope.types) {
-            println!(
-                "Type error: Right hand side of op `{:?}` should be of type bool, found `{}`",
-                self.operator.value,
-                right_type.format(&scope.types),
-            );
+            self.print_operand_error(&scope, self.right.span, &bool_type, &right_type);
         }
 
         (scope, Type::Primitive(PrimitiveType::Bool))
+    }
+
+    fn print_operand_error(
+        &self,
+        scope: &Scope,
+        span: TokenSpan,
+        expected_type: &Type,
+        found_type: &Type,
+    ) {
+        scope.source.print_type_error(
+            span,
+            &format!(
+                "Operands of `{}` should be of type `{}`",
+                self.operator.as_token(),
+                expected_type.format(&scope.types)
+            ),
+            &format!("found type: `{}`", found_type.format(&scope.types)),
+        );
     }
 }

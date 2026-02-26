@@ -1,6 +1,6 @@
 use crate::{
     checker::{Scope, Type},
-    parser::{ExpressionNode, Node, PrefixOperator, PrimitiveType},
+    parser::{ExpressionNode, Node, Operator, PrefixOperator, PrimitiveType},
 };
 
 pub struct PrefixOpExpressionNode {
@@ -19,10 +19,13 @@ impl PrefixOpExpressionNode {
     fn check_logical_not(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let (scope, resolved_type) = self.expression.check(scope);
         if !resolved_type.is_primitive(PrimitiveType::Bool, &scope.types) {
-            println!(
-                "Type error: Operand of op `{:?}` should be of type bool, found `{}`",
-                self.operator.value,
-                resolved_type.format(&scope.types)
+            scope.source.print_type_error(
+                self.expression.span,
+                &format!(
+                    "Operand of `{}` should be of type `bool`",
+                    self.operator.as_token(),
+                ),
+                &format!("found type: `{}`", resolved_type.format(&scope.types)),
             );
         }
 
@@ -36,7 +39,13 @@ impl PrefixOpExpressionNode {
         {
             (scope, resolved_type)
         } else {
-            println!("Type error: Can only negate numeric types");
+            if !matches!(resolved_type, Type::Error) {
+                scope.source.print_type_error(
+                    self.expression.span,
+                    "Negation can only be applied to numeric types",
+                    &format!("found type: `{}`", resolved_type.format(&scope.types)),
+                );
+            }
             (scope, Type::Error)
         }
     }
