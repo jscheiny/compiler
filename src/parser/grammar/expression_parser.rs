@@ -405,7 +405,7 @@ fn if_expression(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
 }
 
 fn flatten_commas(expression: Node<ExpressionNode>) -> Vec<Node<ExpressionNode>> {
-    let mut arguments = vec![];
+    let mut arguments: Vec<Node<ExpressionNode>> = vec![];
     let mut current = expression;
     loop {
         if let ExpressionNode::BinaryOp(BinaryOpExpressionNode {
@@ -415,7 +415,13 @@ fn flatten_commas(expression: Node<ExpressionNode>) -> Vec<Node<ExpressionNode>>
         }) = current.value
         {
             if operator.value != BinaryOperator::Comma {
-                arguments.push(*right);
+                arguments.push(current.span.wrap(ExpressionNode::BinaryOp(
+                    BinaryOpExpressionNode {
+                        left,
+                        operator,
+                        right,
+                    },
+                )));
                 break;
             }
             arguments.push(*left);
