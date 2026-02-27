@@ -7,6 +7,7 @@ mod string_literal_token;
 mod symbol;
 mod token_match;
 mod token_width;
+mod tokenizer;
 mod whitespace;
 
 pub use character_literal::*;
@@ -18,4 +19,5 @@ pub use string_literal_token::*;
 pub use symbol::*;
 pub use token_match::*;
 pub use token_width::*;
+pub use tokenizer::*;
 pub use whitespace::*;

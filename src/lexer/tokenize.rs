@@ -2,12 +2,8 @@ use crate::lexer::{
     CharacterLiteralTokenizer, CharacterLocation, CharacterSpan, IdentifierTokenizer,
     IntegerLiteralTokenizer, KeywordTokenizer, LocatedToken, MultiLineCommentTokenizer,
     SingleLineCommentTokenizer, StringLiteralTokenizer, SymbolTokenizer, Token, TokenWidth,
-    WhitespaceTokenizer,
+    Tokenizer, TryTokenizeResult, WhitespaceTokenizer,
 };
-
-pub trait Tokenizer {
-    fn try_tokenize(&self, text: &str) -> Option<TryTokenizeResult>;
-}
 
 pub struct TokenizerResult {
     pub tokens: Vec<LocatedToken>,
@@ -76,11 +72,6 @@ pub fn tokenize(mut text: &str) -> TokenizerResult {
         },
     });
     TokenizerResult { tokens, errors }
-}
-
-pub struct TryTokenizeResult {
-    pub token: Option<Token>,
-    pub width: TokenWidth,
 }
 
 struct NextToken<'a> {
