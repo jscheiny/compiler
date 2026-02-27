@@ -1,9 +1,8 @@
 use std::fmt::Display;
 
-use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use crate::lexer::{Token, TokenMatch, TokenWidth, Tokenizer, TryTokenizeResult};
+use crate::lexer::{Token, TokenMatch};
 
 #[derive(Clone, Copy, EnumIter, PartialEq, Eq)]
 pub enum Symbol {
@@ -43,7 +42,7 @@ pub enum Symbol {
 }
 
 impl Symbol {
-    fn as_str(&self) -> &str {
+    pub fn as_str(&self) -> &str {
         match self {
             // Two character symbols
             Self::PlusEqual => "+=",
@@ -94,22 +93,5 @@ impl TokenMatch for Symbol {
             Token::Symbol(op) => *op == *self,
             _ => false,
         }
-    }
-}
-
-pub struct SymbolTokenizer;
-
-impl Tokenizer for SymbolTokenizer {
-    fn try_tokenize(&self, text: &str) -> Option<TryTokenizeResult> {
-        for symbol in Symbol::iter() {
-            let symbol_str = symbol.as_str();
-            if text.starts_with(symbol_str) {
-                return Some(TryTokenizeResult {
-                    token: Some(Token::Symbol(symbol)),
-                    width: TokenWidth::from(symbol_str),
-                });
-            }
-        }
-        None
     }
 }
