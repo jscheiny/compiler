@@ -26,7 +26,7 @@ pub enum Type {
 
 impl Type {
     pub fn is_assignable_to(&self, other: &Type, types: &TypeResolver) -> bool {
-        if matches!(self, Type::Error) || matches!(other, Type::Error) {
+        if self.is_error() || other.is_error() {
             return true;
         }
         if let Type::Reference(_) = other {
@@ -85,6 +85,10 @@ impl Type {
             Type::Void => matches!(other, Type::Void),
             Type::Error => true,
         }
+    }
+
+    pub fn is_error(&self) -> bool {
+        matches!(self, Type::Error)
     }
 
     pub fn is_primitive(&self, expected: PrimitiveType, types: &TypeResolver) -> bool {
