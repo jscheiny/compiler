@@ -1,23 +1,68 @@
 use crate::{
     checker::{FunctionType, RuntimeType, Scope, Type, TypeResolver},
-    parser::{ExpressionNode, Identified, IdentifierNode, Node},
+    parser::{
+        ExpressionNode, Identified, IdentifierNode, Node, NodeVec, TokenSpan, check_function_call,
+    },
 };
 
 pub struct AccessExpressionNode {
     pub left: Box<Node<ExpressionNode>>,
     pub field: Node<IdentifierNode>,
+    pub arguments: Option<NodeVec<ExpressionNode>>,
 }
 
 impl AccessExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
-        // TODO should we change the expected type here?
+        // TODO should we mutate the expected type here?
         let (scope, left_type) = self.left.check_expected(scope, expected_type);
-        let field_type = get_field(&left_type, &self.field, &scope);
-        (scope, field_type.unwrap_or(Type::Error))
+        let function_type = left_type.clone().as_function(&scope.types);
+        if let Some(function_type) = function_type {
+            return self.check_deferred(scope, function_type);
+        }
+
+        let field_type = get_field(&left_type, self.left.span, &self.field, &scope);
+        if let Some(arguments) = self.arguments.as_ref() {
+            check_function_call(scope, self.field.span, field_type, &arguments)
+        } else {
+            (scope, field_type)
+        }
+    }
+
+    pub fn check_deferred(
+        &self,
+        scope: Box<Scope>,
+        function_type: FunctionType,
+    ) -> (Box<Scope>, Type) {
+        let field_type = get_field(
+            &function_type.return_type,
+            self.left.span,
+            &self.field,
+            &scope,
+        );
+        let (scope, result_type) = if let Some(arguments) = self.arguments.as_ref() {
+            check_function_call(scope, self.field.span, field_type, &arguments)
+        } else {
+            (scope, field_type)
+        };
+
+        if result_type.is_error() {
+            return (scope, result_type);
+        }
+
+        let deferred_type = Type::Function(FunctionType {
+            parameters: function_type.parameters,
+            return_type: Box::new(result_type),
+        });
+        (scope, deferred_type)
     }
 }
 
-pub fn get_field(input_type: &Type, field: &Node<IdentifierNode>, scope: &Scope) -> Option<Type> {
+pub fn get_field(
+    input_type: &Type,
+    input_span: TokenSpan,
+    field: &Node<IdentifierNode>,
+    scope: &Scope,
+) -> Type {
     match input_type {
         Type::Enum(enum_type) => {
             let method = enum_type.methods.get(field.id());
@@ -25,7 +70,7 @@ pub fn get_field(input_type: &Type, field: &Node<IdentifierNode>, scope: &Scope)
                 if !method.public {
                     // TODO respect public/private access
                 }
-                Some(Type::Function(method.function_type.clone()))
+                Type::Function(method.function_type.clone())
             } else {
                 scope.source.print_error(
                     field.span,
@@ -36,22 +81,21 @@ pub fn get_field(input_type: &Type, field: &Node<IdentifierNode>, scope: &Scope)
                         field.id()
                     ),
                 );
-                None
+                Type::Error
             }
         }
-        Type::Function(function_type) => {
-            let result_type = get_field(&function_type.return_type, field, scope);
-            result_type.map(|result_type| {
-                Type::Function(FunctionType {
-                    parameters: function_type.parameters.clone(),
-                    return_type: Box::new(result_type),
-                })
-            })
+        Type::Function(_) => {
+            scope.source.print_error(
+                input_span,
+                "Cannot access operator on a function which returns another function",
+                &format!("returns type: `{}`", input_type.format(&scope.types)),
+            );
+            Type::Error
         }
         Type::Primitive(_) => todo!("Implement access on primitive values"),
         Type::Reference(index) => {
             let resolved_type = scope.types.get_type(*index).unwrap();
-            get_field(&resolved_type, field, scope)
+            get_field(&resolved_type, input_span, field, scope)
         }
         Type::Struct(struct_type) => {
             let member = struct_type.members.get(field.id());
@@ -59,7 +103,7 @@ pub fn get_field(input_type: &Type, field: &Node<IdentifierNode>, scope: &Scope)
                 if !member.public {
                     // TODO respect public/private access
                 }
-                Some(member.member_type.get_type())
+                member.member_type.get_type()
             } else {
                 scope.source.print_error(
                     field.span,
@@ -70,7 +114,7 @@ pub fn get_field(input_type: &Type, field: &Node<IdentifierNode>, scope: &Scope)
                         field.id()
                     ),
                 );
-                None
+                Type::Error
             }
         }
         Type::Tuple(_) => todo!("Implement access on tuples"),
@@ -81,9 +125,9 @@ pub fn get_field(input_type: &Type, field: &Node<IdentifierNode>, scope: &Scope)
                 "Access operator is not valid for this type",
                 &format!("Access on type: `{}`", input_type.format(&scope.types)),
             );
-            None
+            Type::Error
         }
-        Type::Error => None,
+        Type::Error => Type::Error,
     }
 }
 
@@ -91,16 +135,16 @@ fn get_static_field(
     runtime_type: &RuntimeType,
     field: &Node<IdentifierNode>,
     scope: &Scope,
-) -> Option<Type> {
+) -> Type {
     // TODO use reference types instead of expensive copies of self (or switch to RCs!)
     match runtime_type {
         RuntimeType::Enum(enum_type) => {
             if let Some(variant_type) = enum_type.get_variant(field.id()) {
-                Some(variant_type)
+                variant_type
             } else if let Some(method) = enum_type.methods.get(field.id()) {
                 // TODO respect public/private access
                 let self_type = get_self_type(&enum_type.identifier, &scope.types);
-                Some(method.function_type.clone().as_static_method(self_type))
+                method.function_type.clone().as_static_method(self_type)
             } else {
                 scope.source.print_error(
                     field.span,
@@ -111,7 +155,7 @@ fn get_static_field(
                         field.id()
                     ),
                 );
-                None
+                Type::Error
             }
         }
         RuntimeType::Struct(struct_type) => {
@@ -123,7 +167,7 @@ fn get_static_field(
                     .get_ref(&struct_type.identifier)
                     .map(Type::Reference)
                     .unwrap_or(Type::Error);
-                Some(member.member_type.clone().as_static_type(self_type))
+                member.member_type.clone().as_static_type(self_type)
             } else {
                 scope.source.print_error(
                     field.span,
@@ -134,7 +178,7 @@ fn get_static_field(
                         field.id()
                     ),
                 );
-                None
+                Type::Error
             }
         }
     }

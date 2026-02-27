@@ -152,10 +152,16 @@ fn binary_op_expression(
 ) -> ParseResult<Node<ExpressionNode>> {
     if operator.value == BinaryOperator::Access {
         let field = tokens.identifier(IdentifierType::Field)?;
+        let arguments = if Symbol::OpenParen.matches(tokens.peek()) {
+            Some(tokens.located(function_arguments)?)
+        } else {
+            None
+        };
         let span = left.span.expand_to(tokens);
         return Ok(span.wrap(ExpressionNode::Access(AccessExpressionNode {
             left: Box::new(left),
             field,
+            arguments,
         })));
     }
 
