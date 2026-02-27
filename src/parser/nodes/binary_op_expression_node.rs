@@ -45,6 +45,7 @@ impl BinaryOpExpressionNode {
         expected_type: Option<&Type>,
     ) -> (Box<Scope>, Type) {
         let (scope, left_type) = self.left.check(scope);
+        // TODO the expected type here should be a function from left_type -> expected_type
         let (scope, right_type) = self.right.check_expected(scope, expected_type);
         let function_type = right_type.clone().as_function(&scope.types);
 
