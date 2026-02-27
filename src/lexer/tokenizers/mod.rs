@@ -5,8 +5,6 @@ mod integer_literal_tokenizer;
 mod keyword_tokenizer;
 mod string_literal_tokenizer;
 mod symbol_tokenizer;
-mod token_match;
-mod token_width;
 mod tokenizer;
 mod whitespace_tokenizer;
 
@@ -17,7 +15,5 @@ pub use integer_literal_tokenizer::*;
 pub use keyword_tokenizer::*;
 pub use string_literal_tokenizer::*;
 pub use symbol_tokenizer::*;
-pub use token_match::*;
-pub use token_width::*;
 pub use tokenizer::*;
 pub use whitespace_tokenizer::*;
