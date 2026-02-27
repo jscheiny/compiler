@@ -1,0 +1,44 @@
+fn example() {
+    // Declare variables with let (maybe also mut in future if I want to support const-correctness)
+    let x = 5; // type is inferred
+
+    // Declarations shadow:
+    let x = true; // from here out x has type bool
+
+    // If statement
+    if x {
+        print("True");
+    } else {
+        print("False");
+    }
+
+    // If expressions
+    let value = if x then 5 else 6;
+
+    // Can create a new block to introduce a new lexical scope:
+    {
+        let x = "test";
+        print(x);
+    }
+    // x is still bool in this scope
+
+    // Blocks can also serve as expressions with their values being given by the prefix -> operator
+    let y = {
+        let x = 10;
+        -> x * x;
+    }; // y has value 100
+
+    // Arrays are denoted as [T]
+    let x: [bool] = [true, true, false];
+    x(0) == 1; // No specific subscript operator, instead call arrays like functions
+    // This means that arrays can be used as functions:
+    let array_fn: int => bool = x;
+    
+    // While loops work exactly as you'd imagine:
+    while y != 110 {
+        y += 1;
+        // Can use break and continue as normal
+    }
+}
+
+fn print(text: [char]) {}

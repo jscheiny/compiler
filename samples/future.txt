@@ -1,0 +1,61 @@
+// While the other samples here are not fully implemented either, things in this file are nowhere close to being implemented but I want to
+
+// Generics given by [T]
+enum Option[T](
+    Some(T)
+    None
+) { 
+    pub map[U](mapper: T => U): Option[U] -> match self {
+        Some(let value) -> Some(mapper(value));
+        None -> None;
+    };
+}
+
+struct Wrapper(pub value: int);
+
+fn using_it() {
+    let x: Option[Wrapper] = Some(Wrapper(5));
+    let y: Option[int] = x.map(.value);
+
+    // Option will be a special built-in type which will allow you to write this more simply as:
+    let x: Wrapper? = Some(Wrapper(5));
+
+    // Also ? will serve as a null short circuiting operator. e.g:
+    let value: int? = None;
+    let g = value? + 5; // If value exists, continue parsing the expression. If not, immediately stop and yield None.
+}
+
+// Operator overloading
+struct Coordinate(pub x: int, pub y: int) {
+    pub operator+(other: Coordinate): Coordinate
+        -> Coordinate(@x + other.x, @y + other.y);
+}
+
+struct Map[Key, Value](...) {
+    // Call operator, can treat an instance as a function now...
+    pub operator()(key: Key): Value? -> ...
+}
+
+
+fn using_it2() {
+    let left = Coordinate(1, 1);
+    let right = Coordinate(2, 2);
+    let total: Coordinate = left + right
+
+    let map: Map[int, bool] = ...
+    let value: bool? = map(5)
+}
+
+// Interfaces
+// Don't know what the syntax for this will look like fully yet, but some way to specify contracts on enums/structs
+// Her's one way it might work
+interface Stringify {
+    to_string(): [char];
+}
+
+struct Pair[T: Stringify](first: T, second: T) {
+    impl Stringify {
+        // Also string interpolation would be nice
+        pub to_string(): [char] -> "(" + @left.to_string() + ", " + @right.to_string() ")";
+    }
+}

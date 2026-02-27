@@ -1,0 +1,34 @@
+// A struct is a simple wrapper around some data
+struct IntPair(pub first: int, pub second: int);
+
+// Basic usage
+fn example1(pair: IntPair) {
+    let pair = IntPair(1, 2);
+    let first: int = pair.first;
+}
+
+// Structs can also have methods on them
+struct Coordinate(pub row: int, pub column: int) {
+    pub index(rows: int): int {
+        // Use @ to access instance members / methods
+        return @rows * row + @column;
+    }
+
+    // Methods can also be defined as expression directly:
+    pub magnitude(): int -> @row + @column;
+}
+
+// Using different parts of a struct as functions:
+fn example2() {
+    let coord = Coordinate(1, 2);
+
+    // Static methods take an instance of the struct as a parameter:
+    let row: Coordinate => int = Coordinate.row; // Coordinate.row(c) is equivalent to c.row;
+    let index: (Coordinate, int) => Coordinate = Coordinate.index;
+
+    // The struct itself can be used as a function (constructor)
+    let make_coordinate: (int, int) => Coordinate = Coordinate;
+
+    // Referencing methods on an instance binds that instance:
+    let specific_index: (int) => int = coord.index; // specific_index(i) is equivalent to coord.index(i)
+}

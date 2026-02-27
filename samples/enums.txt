@@ -1,0 +1,50 @@
+// Enums are sum types / disriminated unions
+enum Data(
+    Integer(int),
+    Character(char),
+    None
+);
+
+// Basic usage
+fn example1() {
+    let data = Data.Integer(5);
+
+    // If the context is provided, don't need to specify the enum:
+    accept_data(Character('x')); // Character() is inferred as Data.Character
+
+    // Match statements allow you to inspect enum values
+    match data {
+        Integer(let i) -> accept_int(i);
+        Character(let c) -> accept_char(c);
+        None -> { /* ... */ }
+    }
+
+    // Match statements can also be used as expressions:
+    let string = match data {
+        Integer(let i) -> "integer";
+        Character(let c) -> "character";
+        None -> "none";
+    };
+
+    // Can use else as a catch all in match statements:
+    let is_integer: bool = match data {
+        Integer(let i) -> true;
+        else -> false;
+    };
+}
+
+fn accept_data(data: Data) {}
+fn accept_int(value: int) {}
+fn accept_char(value: char) {}
+
+// Methods (very similar to structs, see structs.txt for full details)
+enum MaybeInt(
+    Some(int),
+    None
+) {
+    // Can use `self` keyword to refer to the current instance (@a is shorthand for self.a)
+    pub map(mapper: int => int): MaybeInt -> match self {
+        Some(let value) -> Some(mapper(value));
+        None -> None;
+    };
+}

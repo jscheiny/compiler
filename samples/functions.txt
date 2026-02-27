@@ -1,0 +1,61 @@
+// Get familiar with structs.txt before this
+
+struct Integer(pub value: int) {
+    pub square(): Integer -> Integer(@value * @value);
+
+    pub plus(other: int): Integer -> Integer(@value + other);
+}
+
+// Here we have a function that takes a function as an argument that maps our wrapped Integer to a native int.
+fn get_int(getter: Integer => int) {}
+
+fn closure_examples() {
+    let integer = Integer(10);
+
+    // Let's look at the different ways we can call get_int:
+    get_int(Integer.value); // As seen in structs.txt
+    get_int(i -> i.value); // Using a closure
+    // And lastly, a special syntactic sugar .b desugars to a -> a.b
+    get_int(.value); // Here the type of the implicit closure parameter is inferred from the parameter type of get_int
+    // Can also use this form as a function call:
+    get_int(.square()); // Equivalent to get_int(x -> x.square())
+
+    // If we did this without context:
+    let getter = .value; // This would yield a compile error as we can't infer the type of the implicit parameter.
+}
+
+// Functions should be usable as their return types (assuming parameter match up). Let me explain...
+fn function_arithmetic_examples() {
+    let f: int => int = a -> a + 1;
+    let g: int => int = a -> a * a;
+
+    // Given these two functions since their parameters match we can do the following:
+    let sum = f + g; // Equivalent to x -> f(x) + g(x)
+    let product = f * g // x -> f(x) * g(x)
+    // etc.
+
+    // If the parameters didn't match we wouldn't be able to do this:
+    let h: bool => int = a -> 5;
+    f + h // compile error - mismatching parameter types
+
+    // Similarly if the return types aren't compatible with the operator, this will be a compile error too
+    let i: int => bool = a -> true;
+    f + i; // compile error cannot add ints and bools
+
+    // Can apply these principles to unary operators as well:
+    let negative_f = -f; // x -> -f(x)
+    let get_integer: int -> Integer = Integer;
+    get_integer.square() // x -> get_integer(x).square()
+}
+
+fn function_call_examples() {
+    // Functions are all curry-able by default:
+    let f = (a: bool, b: bool, c: bool) -> a or b or c;
+    let g: (bool, bool) => bool = f(true); // Calling with fewer than the required arguments yields a new function
+
+    // You can also call single parameter functions with the => operator:
+    let negate = (x: int) -> -x;
+    3 => negate; // equivalent to negate(3)
+    // Not useful for single function calls, but nice for chaining:
+    3 => negate => Integer; // equivalent to Integer(negate(3))
+}
