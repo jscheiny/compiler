@@ -1,6 +1,6 @@
 use crate::{
     checker::{FunctionType, Scope, Type},
-    parser::{ExpressionNode, Node, NodeVec},
+    parser::{ExpressionNode, Node, NodeVec, TokenSpan},
 };
 
 pub struct FunctionCallExpressionNode {
@@ -11,25 +11,36 @@ pub struct FunctionCallExpressionNode {
 impl FunctionCallExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         let (scope, function_type) = self.function.check_expected(scope, expected_type);
-        let function_type = function_type.as_function(&scope.types);
-        check_function_call(scope, function_type.as_ref(), &self.arguments)
+        check_function_call(scope, self.function.span, function_type, &self.arguments)
     }
 }
 
 pub fn check_function_call(
     mut scope: Box<Scope>,
-    function_type: Option<&FunctionType>,
+    function_span: TokenSpan,
+    left_type: Type,
     argument_expressions: &NodeVec<ExpressionNode>,
 ) -> (Box<Scope>, Type) {
+    let function_type = left_type.clone().as_function(&scope.types);
     let mut arguments = vec![];
     for (index, argument) in argument_expressions.iter().enumerate() {
-        let parameter_type = function_type.and_then(|ft| ft.parameters.get(index));
+        let parameter_type = function_type
+            .as_ref()
+            .and_then(|ft| ft.parameters.get(index));
         let (new_scope, resolved_type) = argument.check_expected(scope, parameter_type);
         arguments.push(resolved_type);
         scope = new_scope;
     }
 
     if function_type.is_none() {
+        scope.source.print_error(
+            function_span,
+            "Cannot use value as a function",
+            &format!(
+                "type `{}` is not usable as a function",
+                left_type.format(&scope.types)
+            ),
+        );
         return (scope, Type::Error);
     }
 
