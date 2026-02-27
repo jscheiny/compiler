@@ -1,4 +1,4 @@
-// Enums are sum types / disriminated unions
+// Enums are sum types / discriminated unions
 enum Data(
     Integer(int),
     Character(char),
