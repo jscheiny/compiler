@@ -19,10 +19,9 @@ impl ClosureExpressionNode {
                 .body
                 .check_expected(scope, expected_return_type.as_deref());
 
-            let some_parameter_is_error_type = parameters
-                .iter()
-                .any(|parameter| matches!(parameter, Type::Error));
-            if some_parameter_is_error_type || matches!(return_type, Type::Error) {
+            let some_parameter_is_error_type =
+                parameters.iter().any(|parameter| parameter.is_error());
+            if some_parameter_is_error_type || return_type.is_error() {
                 return (scope, Type::Error);
             }
 

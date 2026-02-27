@@ -39,7 +39,7 @@ impl PrefixOpExpressionNode {
         {
             (scope, resolved_type)
         } else {
-            if !matches!(resolved_type, Type::Error) {
+            if !resolved_type.is_error() {
                 scope.source.print_error(
                     self.expression.span,
                     "Negation can only be applied to numeric types",

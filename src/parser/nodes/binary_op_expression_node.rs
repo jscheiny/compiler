@@ -76,7 +76,7 @@ impl BinaryOpExpressionNode {
 
             (scope, *function_type.return_type)
         } else {
-            if !matches!(right_type, Type::Error) {
+            if !right_type.is_error() {
                 scope.source.print_error(
                     self.right.span,
                     "Cannot apply function",

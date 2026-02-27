@@ -77,7 +77,7 @@ impl VariantMatchPattern {
                     &format!("enum `{}` has no such variant", enum_type.identifier),
                 );
             }
-        } else if !matches!(subject_type, Type::Error) {
+        } else if !subject_type.is_error() {
             scope.source.print_error(
                 self.identifier.span,
                 "Unexpected variant pattern",

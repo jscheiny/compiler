@@ -33,14 +33,16 @@ pub fn check_function_call(
     }
 
     if function_type.is_none() {
-        scope.source.print_error(
-            function_span,
-            "Cannot use value as a function",
-            &format!(
-                "type `{}` is not usable as a function",
-                left_type.format(&scope.types)
-            ),
-        );
+        if !left_type.is_error() {
+            scope.source.print_error(
+                function_span,
+                "Cannot use value as a function",
+                &format!(
+                    "type `{}` is not usable as a function",
+                    left_type.format(&scope.types)
+                ),
+            );
+        }
         return (scope, Type::Error);
     }
 

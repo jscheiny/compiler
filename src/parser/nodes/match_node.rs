@@ -62,7 +62,7 @@ impl MatchNode {
     fn check_subject(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let (scope, subject_type) = self.subject.check(scope);
         let subject_type = subject_type.as_deref(&scope.types);
-        if !matches!(subject_type, Type::Enum(_)) && !matches!(subject_type, Type::Error) {
+        if !matches!(subject_type, Type::Enum(_)) && !subject_type.is_error() {
             // TODO handle other types besides enums
             scope.source.print_error(
                 self.subject.span,
