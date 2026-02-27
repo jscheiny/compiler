@@ -87,7 +87,7 @@ pub fn get_field(
         Type::Function(_) => {
             scope.source.print_error(
                 input_span,
-                "Cannot access operator on a function which returns another function",
+                "Cannot use access operator on a function which returns another function",
                 &format!("returns type: `{}`", input_type.format(&scope.types)),
             );
             Type::Error
