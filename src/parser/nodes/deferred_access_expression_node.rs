@@ -1,8 +1,6 @@
 use crate::{
     checker::{FunctionType, Scope, Type},
-    parser::{
-        ExpressionNode, IdentifierNode, Node, NodeVec, TokenSpan, check_function_call, get_field,
-    },
+    parser::{ExpressionNode, IdentifierNode, Node, NodeVec, check_function_call, get_field},
 };
 
 pub struct DeferredAccessExpressionNode {
@@ -38,9 +36,8 @@ impl DeferredAccessExpressionNode {
             let function_type = FunctionType::new(parameter_type, result_type);
             (scope, Type::Function(function_type))
         } else {
-            let span = TokenSpan::singleton_of(self.field.span.start_index - 1);
             scope.source.print_type_error(
-                span,
+                self.field.span.previous(),
                 "Deferred access type is ambiguous",
                 "could not infer type of implicit parameter",
             );

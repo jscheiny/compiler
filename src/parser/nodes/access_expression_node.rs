@@ -1,6 +1,6 @@
 use crate::{
     checker::{FunctionType, RuntimeType, Scope, Type, TypeResolver},
-    parser::{ExpressionNode, Identified, IdentifierNode, Node, TokenSpan},
+    parser::{ExpressionNode, Identified, IdentifierNode, Node},
 };
 
 pub struct AccessExpressionNode {
@@ -76,9 +76,8 @@ pub fn get_field(input_type: &Type, field: &Node<IdentifierNode>, scope: &Scope)
         Type::Tuple(_) => todo!("Implement access on tuples"),
         Type::Type(inner_type) => get_static_field(&inner_type, field, scope),
         Type::Array(_) | Type::Void => {
-            let span = TokenSpan::singleton_of(field.span.start_index - 1);
             scope.source.print_type_error(
-                span,
+                field.span.previous(),
                 "Access operator is not valid for this type",
                 &format!("Access on type: `{}`", input_type.format(&scope.types)),
             );

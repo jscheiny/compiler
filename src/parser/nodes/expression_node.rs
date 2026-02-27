@@ -140,9 +140,8 @@ impl ExpressionNode {
                 "self type does not contain a member with this name",
             );
         } else {
-            let span = TokenSpan::singleton_of(identifier.span.start_index - 1);
             scope.source.print_type_error(
-                span,
+                identifier.span.previous(),
                 "Self reference outside of struct or enum",
                 "operator invalid outside of struct or enum",
             );
