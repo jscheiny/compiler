@@ -50,7 +50,7 @@ impl BinaryOpExpressionNode {
 
         if let Some(function_type) = function_type {
             if function_type.parameters.len() != 1 {
-                scope.source.print_type_error(
+                scope.source.print_error(
                     self.right.span,
                     "Applied function must take only one parameter",
                     &format!(
@@ -63,7 +63,7 @@ impl BinaryOpExpressionNode {
             if !function_type.parameters.is_empty()
                 && !left_type.is_assignable_to(&function_type.parameters[0], &scope.types)
             {
-                scope.source.print_type_error(
+                scope.source.print_error(
                     self.left.span,
                     "Function application argument does not match parameter type",
                     &format!(
@@ -77,7 +77,7 @@ impl BinaryOpExpressionNode {
             (scope, *function_type.return_type)
         } else {
             if !matches!(right_type, Type::Error) {
-                scope.source.print_type_error(
+                scope.source.print_error(
                     self.right.span,
                     "Cannot apply function",
                     &format!("type `{}` is not callable", right_type.format(&scope.types)),
@@ -139,7 +139,7 @@ impl BinaryOpExpressionNode {
         expected_type: &Type,
         found_type: &Type,
     ) {
-        scope.source.print_type_error(
+        scope.source.print_error(
             span,
             &format!(
                 "Operands of `{}` should be of type `{}`",

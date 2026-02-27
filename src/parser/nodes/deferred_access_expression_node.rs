@@ -13,7 +13,7 @@ impl DeferredAccessExpressionNode {
         let function_type = expected_type.and_then(|t| t.clone().as_function(&scope.types));
         if let Some(mut function_type) = function_type {
             if function_type.parameters.len() != 1 {
-                scope.source.print_type_error(
+                scope.source.print_error(
                     // TODO this span should cover the whole node...
                     self.field.span,
                     "Deferred access expression must be a single parameter function",
@@ -36,7 +36,7 @@ impl DeferredAccessExpressionNode {
             let function_type = FunctionType::new(parameter_type, result_type);
             (scope, Type::Function(function_type))
         } else {
-            scope.source.print_type_error(
+            scope.source.print_error(
                 self.field.span.previous(),
                 "Deferred access type is ambiguous",
                 "could not infer type of implicit parameter",

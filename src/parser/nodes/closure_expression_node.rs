@@ -71,7 +71,7 @@ fn get_parameter_type(
     } else if let Some(expected_type) = expected_type {
         expected_type.clone()
     } else {
-        scope.source.print_type_error(
+        scope.source.print_error(
             parameter.span,
             "Parameter type is ambiguous",
             "could not infer type of parameter",

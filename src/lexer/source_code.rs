@@ -37,7 +37,7 @@ impl SourceCode {
         TokenStream::from(self.tokens.clone())
     }
 
-    pub fn print_type_error(&self, span: TokenSpan, message: &str, inline_message: &str) {
+    pub fn print_error(&self, span: TokenSpan, message: &str, inline_message: &str) {
         println!("{} {}", "Error:".red().bold(), message,);
         self.print_token_span(span, '^', inline_message, Severity::Error);
         println!();

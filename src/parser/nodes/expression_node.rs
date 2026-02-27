@@ -94,7 +94,7 @@ impl ExpressionNode {
             match resolved_type {
                 Some(resolved_type) => (scope, resolved_type),
                 None => {
-                    scope.source.print_type_error(
+                    scope.source.print_error(
                         identifier.span,
                         "Invalid type as value",
                         "cannot use type as a value",
@@ -106,7 +106,7 @@ impl ExpressionNode {
             if let Some(variant_type) = enum_type.get_variant(identifier.id()) {
                 (scope, variant_type)
             } else {
-                scope.source.print_type_error(
+                scope.source.print_error(
                     identifier.span,
                     &format!("Could not find value `{}`", identifier.id()),
                     "no such symbol found",
@@ -114,7 +114,7 @@ impl ExpressionNode {
                 (scope, Type::Error)
             }
         } else {
-            scope.source.print_type_error(
+            scope.source.print_error(
                 identifier.span,
                 &format!("Could not find value `{}`", identifier.id()),
                 "no such symbol found",
@@ -134,13 +134,13 @@ impl ExpressionNode {
             if let Some(resolved_type) = resolved_type {
                 return (scope, resolved_type);
             }
-            scope.source.print_type_error(
+            scope.source.print_error(
                 identifier.span,
                 &format!("Could not find member `{}`", identifier.id()),
                 "self type does not contain a member with this name",
             );
         } else {
-            scope.source.print_type_error(
+            scope.source.print_error(
                 identifier.span.previous(),
                 "Self reference outside of struct or enum",
                 "operator invalid outside of struct or enum",
@@ -163,7 +163,7 @@ impl ExpressionNode {
         if let Some(index) = self_index {
             (scope, Type::Reference(index))
         } else {
-            scope.source.print_type_error(
+            scope.source.print_error(
                 span,
                 "Invalid `self` outside of struct or enum",
                 "`self` value only available inside of struct or enum",

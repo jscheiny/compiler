@@ -23,7 +23,7 @@ impl MatchPatternNode {
             MatchPatternNode::Variant(pattern) => pattern.check(scope, bindings, subject_type),
             MatchPatternNode::Binding(identifier) => {
                 if bindings.contains_key(&identifier.0) {
-                    scope.source.print_type_error(
+                    scope.source.print_error(
                         span,
                         &format!("Duplicate pattern binding of `{}`", identifier.0),
                         "a binding of this name is declared elsewhere in this pattern",
@@ -49,7 +49,7 @@ impl VariantMatchPattern {
                 if let Some(inner_type) = variant {
                     if self.inner_pattern.is_none() {
                         // TODO consider relaxing this when the subject is just an identifier...
-                        scope.source.print_type_error(
+                        scope.source.print_error(
                             self.identifier.span,
                             "Expected binding pattern",
                             &format!(
@@ -61,7 +61,7 @@ impl VariantMatchPattern {
                         return self.check_inner_pattern(scope, bindings, inner_type);
                     }
                 } else if let Some(inner_pattern) = self.inner_pattern.as_ref() {
-                    scope.source.print_type_error(
+                    scope.source.print_error(
                         inner_pattern.span,
                         "Unexpected binding pattern",
                         &format!(
@@ -71,14 +71,14 @@ impl VariantMatchPattern {
                     );
                 }
             } else {
-                scope.source.print_type_error(
+                scope.source.print_error(
                     self.identifier.span,
                     &format!("Could not find variant `{}`", self.identifier.id()),
                     &format!("enum `{}` has no such variant", enum_type.identifier),
                 );
             }
         } else if !matches!(subject_type, Type::Error) {
-            scope.source.print_type_error(
+            scope.source.print_error(
                 self.identifier.span,
                 "Unexpected variant pattern",
                 &format!(

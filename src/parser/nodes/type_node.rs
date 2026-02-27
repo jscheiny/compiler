@@ -25,7 +25,7 @@ impl TypeNode {
             Self::UserDefined(identifier) => match types.get_ref(identifier.id()) {
                 Some(resolved_type) => Type::Reference(resolved_type),
                 None => {
-                    source.print_type_error(
+                    source.print_error(
                         identifier.span,
                         &format!("Unknown type `{}`", identifier.id()),
                         "could not find this type",

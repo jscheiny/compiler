@@ -33,7 +33,7 @@ impl StructNode {
             for field in self.fields.iter() {
                 let field_type = field.get_type(&scope.types, &scope.source).clone();
                 scope.add_or(field.id(), field_type, |scope| {
-                    scope.source.print_type_error(
+                    scope.source.print_error(
                         field.identifier.span,
                         &format!("Duplicate struct member `{}`", field.id()),
                         &format!(
@@ -53,7 +53,7 @@ impl StructNode {
                             .clone(),
                     );
                     scope.add_or(method.id(), method_type, |scope| {
-                        scope.source.print_type_error(
+                        scope.source.print_error(
                             method.function.identifier.span,
                             &format!("Duplicate struct member `{}`", method.id()),
                             &format!(

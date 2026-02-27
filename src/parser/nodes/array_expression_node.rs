@@ -26,7 +26,7 @@ impl ArrayExpressionNode {
                 } else if t.is_assignable_to(&element_type, &scope.types) {
                     resolved_type = Some(element_type);
                 } else {
-                    scope.source.print_type_error(
+                    scope.source.print_error(
                         node.span,
                         "Mismatching array types",
                         &format!(
@@ -46,7 +46,7 @@ impl ArrayExpressionNode {
         } else if let Some(expected_element_type) = expected_element_type {
             (scope, Type::Array(Box::new(expected_element_type.clone())))
         } else {
-            scope.source.print_type_error(
+            scope.source.print_error(
                 self.elements.span,
                 "Empty array is ambiguous",
                 "could not infer type of empty array",

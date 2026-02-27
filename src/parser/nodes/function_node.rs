@@ -41,7 +41,7 @@ impl FunctionNode {
                     let (scope, resolved_type) =
                         expression.check_expected(scope, Some(return_type));
                     if !resolved_type.is_assignable_to(return_type, &scope.types) {
-                        scope.source.print_type_error(
+                        scope.source.print_error(
                             self.body.span,
                             &format!(
                                 "Function must return value of type `{}`",
@@ -61,7 +61,7 @@ impl FunctionNode {
         let mut param_names = HashSet::new();
         for param in self.parameters.iter() {
             if param_names.contains(param.id()) {
-                scope.source.print_type_error(
+                scope.source.print_error(
                     param.identifier.span,
                     &format!("Duplicate parameter name `{}`", param.id()),
                     "function already contains a parameter with this name",

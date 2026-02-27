@@ -13,7 +13,7 @@ impl IfExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         let (scope, predicate_type) = self.predicate.check(scope);
         if !predicate_type.is_primitive(PrimitiveType::Bool, &scope.types) {
-            scope.source.print_type_error(
+            scope.source.print_error(
                 self.predicate.span,
                 "If expression predicate expected to be bool",
                 &format!("found type: `{}`", predicate_type.format(&scope.types)),
@@ -29,7 +29,7 @@ impl IfExpressionNode {
         } else if false_type.is_assignable_to(&true_type, &scope.types) {
             (scope, true_type)
         } else {
-            scope.source.print_type_error(
+            scope.source.print_error(
                 self.if_false.span,
                 "If expression branch types don't match",
                 &format!(

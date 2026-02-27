@@ -23,7 +23,7 @@ impl DeclarationNode {
                     initializer.check_expected(scope, expected_type.as_ref());
                 if let Some(expected_type) = expected_type.as_ref() {
                     if !resolved_type.is_assignable_to(expected_type, &new_scope.types) {
-                        new_scope.source.print_type_error(
+                        new_scope.source.print_error(
                             initializer.span,
                             &format!(
                                 "Initializer not assignable to type `{}`",

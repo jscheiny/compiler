@@ -50,7 +50,7 @@ impl StatementNode {
 
 fn check_loop(keyword: Keyword, span: TokenSpan, scope: Box<Scope>) -> (Box<Scope>, Option<Type>) {
     if !scope.within(ScopeType::Loop) {
-        scope.source.print_type_error(
+        scope.source.print_error(
             span,
             &format!("Unexpected {}", keyword),
             &format!("{} is not valid outside of a loop", keyword),
@@ -77,7 +77,7 @@ fn check_function_return(
                 Some(expression) => expression.span,
                 None => statement_span,
             };
-            scope.source.print_type_error(
+            scope.source.print_error(
                 error_span,
                 &format!(
                     "Function must return value of type `{}`",
@@ -88,7 +88,7 @@ fn check_function_return(
         }
     } else {
         // TODO should this be a panic? I don't think this ought to occur
-        scope.source.print_type_error(
+        scope.source.print_error(
             statement_span,
             "Unexpected return",
             "return found outside of a function",

@@ -19,7 +19,7 @@ impl TypeResolver {
 
     pub fn declare(&mut self, identifier: &Node<IdentifierNode>, source: &SourceCode) {
         if self.lookup.contains_key(identifier.id()) {
-            source.print_type_error(
+            source.print_error(
                 identifier.span,
                 "Duplicate type name",
                 "a type already exists with this name",

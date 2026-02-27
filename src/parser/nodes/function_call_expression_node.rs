@@ -35,7 +35,7 @@ pub fn check_function_call(
 
     let function_type = function_type.unwrap();
     if arguments.len() > function_type.parameters.len() {
-        scope.source.print_type_error(
+        scope.source.print_error(
             argument_expressions.span,
             "Too many arguments",
             &format!(
@@ -54,7 +54,7 @@ pub fn check_function_call(
     let parameters_and_arguments = function_type.parameters.iter().zip(&arguments);
     for (index, (parameter, argument)) in parameters_and_arguments.enumerate() {
         if !argument.is_assignable_to(parameter, &scope.types) {
-            scope.source.print_type_error(
+            scope.source.print_error(
                 argument_expressions[index].span,
                 "Argument not assignable to parameter type",
                 &format!(

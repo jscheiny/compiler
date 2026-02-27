@@ -37,7 +37,7 @@ impl MatchNode {
                 } else if t.is_assignable_to(&case_type, &scope.types) {
                     resolved_type = Some(case_type);
                 } else {
-                    scope.source.print_type_error(
+                    scope.source.print_error(
                         case.if_match.span,
                         "Match cases types don't match",
                         &format!(
@@ -64,7 +64,7 @@ impl MatchNode {
         let subject_type = subject_type.as_deref(&scope.types);
         if !matches!(subject_type, Type::Enum(_)) && !matches!(subject_type, Type::Error) {
             // TODO handle other types besides enums
-            scope.source.print_type_error(
+            scope.source.print_error(
                 self.subject.span,
                 "Match expressions only support enums",
                 &format!("found type: `{}`", subject_type.format(&scope.types)),

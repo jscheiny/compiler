@@ -27,7 +27,7 @@ pub fn get_field(input_type: &Type, field: &Node<IdentifierNode>, scope: &Scope)
                 }
                 Some(Type::Function(method.function_type.clone()))
             } else {
-                scope.source.print_type_error(
+                scope.source.print_error(
                     field.span,
                     &format!("Could not find field `{}`", field.id()),
                     &format!(
@@ -61,7 +61,7 @@ pub fn get_field(input_type: &Type, field: &Node<IdentifierNode>, scope: &Scope)
                 }
                 Some(member.member_type.get_type())
             } else {
-                scope.source.print_type_error(
+                scope.source.print_error(
                     field.span,
                     &format!("Could not find field `{}`", field.id()),
                     &format!(
@@ -76,7 +76,7 @@ pub fn get_field(input_type: &Type, field: &Node<IdentifierNode>, scope: &Scope)
         Type::Tuple(_) => todo!("Implement access on tuples"),
         Type::Type(inner_type) => get_static_field(&inner_type, field, scope),
         Type::Array(_) | Type::Void => {
-            scope.source.print_type_error(
+            scope.source.print_error(
                 field.span.previous(),
                 "Access operator is not valid for this type",
                 &format!("Access on type: `{}`", input_type.format(&scope.types)),
@@ -102,7 +102,7 @@ fn get_static_field(
                 let self_type = get_self_type(&enum_type.identifier, &scope.types);
                 Some(method.function_type.clone().as_static_method(self_type))
             } else {
-                scope.source.print_type_error(
+                scope.source.print_error(
                     field.span,
                     &format!("Could not find field `{}`", field.id()),
                     &format!(
@@ -125,7 +125,7 @@ fn get_static_field(
                     .unwrap_or(Type::Error);
                 Some(member.member_type.clone().as_static_type(self_type))
             } else {
-                scope.source.print_type_error(
+                scope.source.print_error(
                     field.span,
                     &format!("Could not find field `{}`", field.id()),
                     &format!(

@@ -36,7 +36,7 @@ impl EnumNode {
             let mut scope_names = HashSet::new();
             for variant in self.variants.iter() {
                 if !scope_names.insert(variant.id()) {
-                    scope.source.print_type_error(
+                    scope.source.print_error(
                         variant.identifier.span,
                         &format!("Duplicate enum variant `{}`", variant.id()),
                         &format!("a variant of `{}` already exists with this name", self.id()),
@@ -47,7 +47,7 @@ impl EnumNode {
             if let Some(methods) = self.methods.as_ref() {
                 for method in methods.iter() {
                     if scope_names.contains(method.id()) {
-                        scope.source.print_type_error(
+                        scope.source.print_error(
                             method.function.identifier.span,
                             &format!("Duplicate enum member `{}`", method.id()),
                             &format!(
