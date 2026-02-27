@@ -8,7 +8,7 @@ use crate::{
 
 pub fn type_definition(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
     let inner_type = tokens.located(type_definition_impl)?;
-    if tokens.accept(Symbol::SkinnyArrow) {
+    if tokens.accept(Symbol::ThickArrow) {
         let return_type = tokens.located(type_definition)?;
         let parameters = inner_type.span.wrap(vec![inner_type]);
         Ok(TypeNode::Function(FunctionTypeNode::new(
@@ -50,7 +50,7 @@ pub fn type_definition_impl(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
 fn function_or_tuple_type(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
     tokens.next();
     let parameters = tokens.located(type_list)?;
-    if tokens.accept(Symbol::SkinnyArrow) {
+    if tokens.accept(Symbol::ThickArrow) {
         let return_type = tokens.located(type_definition)?;
         Ok(TypeNode::Function(FunctionTypeNode::new(
             parameters,

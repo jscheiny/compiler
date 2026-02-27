@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use crate::{
     checker::{RuntimeType, Type, TypeResolver},
-    lexer::Keyword,
+    lexer::{Keyword, Symbol},
 };
 
 pub struct TypeFmt<'a> {
@@ -28,7 +28,12 @@ impl Display for TypeFmt<'_> {
                 if function_type.parameters.len() != 1 {
                     write!(f, ")")?;
                 }
-                write!(f, " -> {}", function_type.return_type.format(self.types))
+                write!(
+                    f,
+                    " {} {}",
+                    Symbol::ThickArrow,
+                    function_type.return_type.format(self.types)
+                )
             }
             Type::Primitive(primitive_type) => write!(f, "{}", primitive_type),
             Type::Reference(index) => {

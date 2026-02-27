@@ -1,12 +1,11 @@
-enum E(
-    A((int, int)),
-    B
-);
+fn accept_fn(test: int => int => int) {}
 
-fn test(value: (Eadf, int)) {
-    match value {
-        A(A) -> x;
-        B(let x) -> x;
-        Crap(let x) -> x;
-    }
+fn main() {
+    accept_fn(a -> [3, 4, 5]);
+    accept_fn(a -> b -> a);
+    test(1);
 }
+
+fn test(x: bool): bool -> not x;
+
+fn test2(): int => int -> a -> a;
