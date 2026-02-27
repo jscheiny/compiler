@@ -1,17 +1,21 @@
-use crate::lexer::{TokenWidth, TryTokenizeResult};
+use crate::lexer::{TokenWidth, Tokenizer, TryTokenizeResult};
 
-pub fn try_tokenize_whitespace(text: &str) -> Option<TryTokenizeResult> {
-    let mut width = TokenWidth::new();
-    for character in text.chars() {
-        if !character.is_whitespace() {
-            break;
+pub struct WhitespaceTokenizer;
+
+impl Tokenizer for WhitespaceTokenizer {
+    fn try_tokenize(&self, text: &str) -> Option<TryTokenizeResult> {
+        let mut width = TokenWidth::new();
+        for character in text.chars() {
+            if !character.is_whitespace() {
+                break;
+            }
+            width.add_char(character);
         }
-        width.add_char(character);
-    }
 
-    if width.bytes == 0 {
-        return None;
-    }
+        if width.bytes == 0 {
+            return None;
+        }
 
-    Some(TryTokenizeResult { token: None, width })
+        Some(TryTokenizeResult { token: None, width })
+    }
 }

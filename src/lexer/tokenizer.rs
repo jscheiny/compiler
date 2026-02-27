@@ -1,9 +1,13 @@
 use crate::lexer::{
-    CharacterLocation, CharacterSpan, LocatedToken, Token, TokenWidth,
-    try_tokenize_character_literal, try_tokenize_identifier, try_tokenize_integer_literal,
-    try_tokenize_keyword, try_tokenize_multiline_comment, try_tokenize_single_line_comment,
-    try_tokenize_string_literal, try_tokenize_symbol, try_tokenize_whitespace,
+    CharacterLiteralTokenizer, CharacterLocation, CharacterSpan, IdentifierTokenizer,
+    IntegerLiteralTokenizer, KeywordTokenizer, LocatedToken, MultiLineCommentTokenizer,
+    SingleLineCommentTokenizer, StringLiteralTokenizer, SymbolTokenizer, Token, TokenWidth,
+    WhitespaceTokenizer,
 };
+
+pub trait Tokenizer {
+    fn try_tokenize(&self, text: &str) -> Option<TryTokenizeResult>;
+}
 
 pub struct TokenizerResult {
     pub tokens: Vec<LocatedToken>,
@@ -11,6 +15,17 @@ pub struct TokenizerResult {
 }
 
 pub fn tokenize(mut text: &str) -> TokenizerResult {
+    let tokenizers: &[Box<dyn Tokenizer>] = &[
+        Box::new(SingleLineCommentTokenizer),
+        Box::new(MultiLineCommentTokenizer),
+        Box::new(SymbolTokenizer),
+        Box::new(KeywordTokenizer),
+        Box::new(StringLiteralTokenizer),
+        Box::new(CharacterLiteralTokenizer),
+        Box::new(IntegerLiteralTokenizer),
+        Box::new(IdentifierTokenizer),
+        Box::new(WhitespaceTokenizer),
+    ];
     let mut errors = vec![];
     let mut tokens = vec![];
     let mut start: CharacterLocation = CharacterLocation {
@@ -20,7 +35,7 @@ pub fn tokenize(mut text: &str) -> TokenizerResult {
     };
 
     while !text.is_empty() {
-        while let Some(token) = next_token(text) {
+        while let Some(token) = next_token(text, tokenizers) {
             let NextToken { token, width, next } = token;
             let end = start.add(width);
             if let Some(token) = token {
@@ -37,7 +52,7 @@ pub fn tokenize(mut text: &str) -> TokenizerResult {
             if slice.is_empty() {
                 break;
             }
-            let token = next_token(slice);
+            let token = next_token(slice, tokenizers);
             if token.is_some() {
                 break;
             }
@@ -74,22 +89,27 @@ struct NextToken<'a> {
     pub next: &'a str,
 }
 
-fn next_token(text: &str) -> Option<NextToken<'_>> {
-    try_tokenize_single_line_comment(text)
-        .or_else(|| try_tokenize_multiline_comment(text))
-        .or_else(|| try_tokenize_symbol(text))
-        .or_else(|| try_tokenize_keyword(text))
-        .or_else(|| try_tokenize_string_literal(text))
-        .or_else(|| try_tokenize_character_literal(text))
-        .or_else(|| try_tokenize_integer_literal(text))
-        .or_else(|| try_tokenize_identifier(text))
-        .or_else(|| try_tokenize_whitespace(text))
-        .map(|result| {
-            let (_, next) = text.split_at(result.width.bytes);
-            NextToken {
-                token: result.token,
-                width: result.width,
-                next,
+fn next_token<'a>(text: &'a str, tokenizers: &[Box<dyn Tokenizer>]) -> Option<NextToken<'a>> {
+    let mut selected_token: Option<TryTokenizeResult> = None;
+    for tokenizer in tokenizers {
+        let maybe_result = tokenizer.try_tokenize(text);
+        if let Some(result) = maybe_result.as_ref() {
+            if let Some(token) = selected_token.as_ref() {
+                if result.width.bytes > token.width.bytes {
+                    selected_token = maybe_result;
+                }
+            } else {
+                selected_token = maybe_result;
             }
-        })
+        }
+    }
+
+    selected_token.map(|result| {
+        let (_, next) = text.split_at(result.width.bytes);
+        NextToken {
+            token: result.token,
+            width: result.width,
+            next,
+        }
+    })
 }

@@ -3,7 +3,7 @@ use std::fmt::Display;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use crate::lexer::{Token, TokenMatch, TokenWidth, TryTokenizeResult};
+use crate::lexer::{Token, TokenMatch, TokenWidth, Tokenizer, TryTokenizeResult};
 
 #[derive(Clone, Copy, Debug, EnumIter, PartialEq, Eq)]
 pub enum Keyword {
@@ -85,15 +85,19 @@ impl TokenMatch for Keyword {
     }
 }
 
-pub fn try_tokenize_keyword(text: &str) -> Option<TryTokenizeResult> {
-    for keyword in Keyword::iter() {
-        let keyword_str = keyword.as_str();
-        if text.starts_with(keyword_str) {
-            return Some(TryTokenizeResult {
-                token: Some(Token::Keyword(keyword)),
-                width: TokenWidth::from(keyword_str),
-            });
+pub struct KeywordTokenizer;
+
+impl Tokenizer for KeywordTokenizer {
+    fn try_tokenize(&self, text: &str) -> Option<TryTokenizeResult> {
+        for keyword in Keyword::iter() {
+            let keyword_str = keyword.as_str();
+            if text.starts_with(keyword_str) {
+                return Some(TryTokenizeResult {
+                    token: Some(Token::Keyword(keyword)),
+                    width: TokenWidth::from(keyword_str),
+                });
+            }
         }
+        None
     }
-    None
 }
