@@ -122,8 +122,7 @@ fn if_condition(tokens: &mut TokenStream) -> ParseResult<IfStatementConditionNod
 }
 
 fn block_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
-    // TODO is this an expression or a statement?? Maybe add a warning for block returns in this case?
-    let block = ExpressionNode::Block(block(tokens, BlockType::Expression)?);
+    let block = ExpressionNode::Block(block(tokens, BlockType::Statement(StatementType::Block))?);
     Ok(StatementNode::Expression(block))
 }
 

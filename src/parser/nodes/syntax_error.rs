@@ -64,6 +64,7 @@ impl Display for IdentifierType {
 
 #[derive(Clone, Copy)]
 pub enum StatementType {
+    Block,
     If,
     WhileLoop,
 }
@@ -71,6 +72,7 @@ pub enum StatementType {
 impl Display for StatementType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::Block => write!(f, "statement block"),
             Self::If => write!(f, "if statement"),
             Self::WhileLoop => write!(f, "while loop"),
         }
