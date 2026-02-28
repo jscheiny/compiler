@@ -8,7 +8,6 @@ pub struct ClosureExpressionNode {
     pub body: Box<Node<ExpressionNode>>,
 }
 
-// TODO handle duplicate parameter names
 impl ClosureExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         let function_type = get_expected_type(expected_type, &scope.types);
@@ -46,7 +45,13 @@ impl ClosureExpressionNode {
                 if let Some(parameter) = parameter {
                     let parameter_type =
                         get_parameter_type(parameter, index, expected_type, &scope);
-                    scope.add(parameter.id(), parameter_type.clone());
+                    scope.add_or(parameter.id(), parameter_type.clone(), |scope| {
+                        scope.source.print_error(
+                            parameter.identifier.span,
+                            &format!("Duplicate parameter name `{}`", parameter.id()),
+                            "closure already contains a parameter with this name",
+                        );
+                    });
                     parameter_type
                 } else {
                     Type::Error
