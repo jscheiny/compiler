@@ -27,8 +27,14 @@ fn using_it() {
 
 // Operator overloading
 struct Coordinate(pub x: int, pub y: int) {
-    pub operator+(other: Coordinate): Coordinate
-        -> Coordinate(@x + other.x, @y + other.y);
+    impl Add[Coordinate, Coordinate] {
+        operator_add(addened: Coordinate): Coordinate
+            -> Coordinate(@x + other.x, @y + other.y);
+    }
+}
+
+interface Add[Addend, Sum] {
+    operator_add(addend: Addend): Sum;
 }
 
 struct Map[Key, Value](...) {
