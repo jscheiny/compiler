@@ -67,7 +67,6 @@ fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<Match
                 .current_span()
                 .wrap(IdentifierNode(identifier.clone()));
             tokens.next();
-            // TODO accept / expect don't need to take references these are always copyable
             if tokens.accept(Symbol::OpenParen) {
                 let inner_pattern = tokens.located_with(match_pattern, false)?;
                 tokens.expect(Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
