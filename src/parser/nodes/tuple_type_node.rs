@@ -21,10 +21,10 @@ impl TupleTypeNode {
 
     pub fn get_type(&self, types: &TypeResolver, source: &SourceCode) -> &Type {
         self.resolved_type
-            .get_or_init(|| self.resolve_type(types, source))
+            .get_or_init(|| self.get_type_impl(types, source))
     }
 
-    fn resolve_type(&self, types: &TypeResolver, source: &SourceCode) -> Type {
+    fn get_type_impl(&self, types: &TypeResolver, source: &SourceCode) -> Type {
         let fields = self
             .fields
             .iter()
