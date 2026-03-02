@@ -39,7 +39,7 @@ impl Type {
             Type::Array(left) => match other {
                 Type::Array(right) => left.is_assignable_to(right, scope),
                 // TODO handle function type coercion better...
-                _ => match self.clone().as_function(&scope.types) {
+                _ => match self.clone().as_function(scope) {
                     Some(function_type) => {
                         Type::Function(function_type).is_assignable_to(other, scope)
                     }
@@ -99,8 +99,8 @@ impl Type {
         }
     }
 
-    pub fn as_function(self, types: &TypeResolver) -> Option<FunctionType> {
-        match self.as_deref(types) {
+    pub fn as_function(self, scope: &Scope) -> Option<FunctionType> {
+        match self.as_deref(&scope.types) {
             Type::Array(element_type) => Some(FunctionType::new(
                 Type::Primitive(PrimitiveType::Int),
                 element_type.as_ref().clone(),
