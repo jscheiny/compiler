@@ -45,9 +45,9 @@ impl FunctionNode {
                             self.body.span,
                             &format!(
                                 "Function must return value of type `{}`",
-                                return_type.format(&scope.types)
+                                return_type.format(&scope)
                             ),
-                            &format!("found type: `{}`", resolved_type.format(&scope.types)),
+                            &format!("found type: `{}`", resolved_type.format(&scope)),
                         );
                     }
                     scope

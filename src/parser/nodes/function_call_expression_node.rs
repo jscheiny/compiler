@@ -39,7 +39,7 @@ pub fn check_function_call(
                 "Cannot use value as a function",
                 &format!(
                     "type `{}` is not usable as a function",
-                    left_type.format(&scope.types)
+                    left_type.format(&scope)
                 ),
             );
         }
@@ -72,8 +72,8 @@ pub fn check_function_call(
                 "Argument not assignable to parameter type",
                 &format!(
                     "expected type `{}`, found type `{}`",
-                    parameter.format(&scope.types),
-                    argument.format(&scope.types),
+                    parameter.format(&scope),
+                    argument.format(&scope),
                 ),
             );
         }

@@ -1,5 +1,5 @@
 use crate::{
-    checker::{EnumType, FunctionType, Scope, StructType, TypeFmt, TypeResolver},
+    checker::{EnumType, FunctionType, Scope, StructType, TypeFmt},
     parser::PrimitiveType,
 };
 
@@ -144,10 +144,10 @@ impl Type {
         }
     }
 
-    pub fn format<'a>(&'a self, types: &'a TypeResolver) -> TypeFmt<'a> {
+    pub fn format<'a>(&'a self, scope: &'a Scope) -> TypeFmt<'a> {
         TypeFmt {
             resolved_type: self,
-            types,
+            scope,
         }
     }
 }

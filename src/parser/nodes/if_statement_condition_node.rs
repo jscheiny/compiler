@@ -15,7 +15,7 @@ impl IfStatementConditionNode {
             scope.source.print_error(
                 self.predicate.span,
                 "If statement predicate expected to be bool",
-                &format!("found type: `{}`", predicate_type.format(&scope.types)),
+                &format!("found type: `{}`", predicate_type.format(&scope)),
             );
         }
 

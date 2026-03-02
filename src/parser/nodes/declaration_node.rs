@@ -27,9 +27,9 @@ impl DeclarationNode {
                             initializer.span,
                             &format!(
                                 "Initializer not assignable to type `{}`",
-                                expected_type.format(&new_scope.types)
+                                expected_type.format(&new_scope)
                             ),
-                            &format!("found type: `{}`", resolved_type.format(&new_scope.types)),
+                            &format!("found type: `{}`", resolved_type.format(&new_scope)),
                         );
                     }
                 }

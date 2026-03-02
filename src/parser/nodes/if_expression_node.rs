@@ -16,7 +16,7 @@ impl IfExpressionNode {
             scope.source.print_error(
                 self.predicate.span,
                 "If expression predicate expected to be bool",
-                &format!("found type: `{}`", predicate_type.format(&scope.types)),
+                &format!("found type: `{}`", predicate_type.format(&scope)),
             );
         }
 
@@ -34,8 +34,8 @@ impl IfExpressionNode {
                 "If expression branch types don't match",
                 &format!(
                     "true branch type `{}` not compatible with false branch type `{}`",
-                    true_type.format(&scope.types),
-                    false_type.format(&scope.types),
+                    true_type.format(&scope),
+                    false_type.format(&scope),
                 ),
             );
             (scope, true_type)

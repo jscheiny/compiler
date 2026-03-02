@@ -1,26 +1,26 @@
 use std::fmt::Display;
 
 use crate::{
-    checker::{RuntimeType, Type, TypeResolver},
+    checker::{RuntimeType, Scope, Type},
     lexer::{Keyword, Symbol},
 };
 
 pub struct TypeFmt<'a> {
     pub resolved_type: &'a Type,
-    pub types: &'a TypeResolver,
+    pub scope: &'a Scope,
 }
 
 impl Display for TypeFmt<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.resolved_type {
-            Type::Array(element_type) => write!(f, "[{}]", element_type.format(self.types)),
+            Type::Array(element_type) => write!(f, "[{}]", element_type.format(self.scope)),
             Type::Enum(enum_type) => write!(f, "{}", enum_type.identifier),
             Type::Function(function_type) => {
                 if function_type.parameters.len() != 1 {
                     write!(f, "(")?;
                 }
                 for (index, parameter) in function_type.parameters.iter().enumerate() {
-                    write!(f, "{}", parameter.format(self.types))?;
+                    write!(f, "{}", parameter.format(self.scope))?;
                     if index != function_type.parameters.len() - 1 {
                         write!(f, ", ")?;
                     }
@@ -32,7 +32,7 @@ impl Display for TypeFmt<'_> {
                     f,
                     " {} {}",
                     Symbol::ThickArrow,
-                    function_type.return_type.format(self.types)
+                    function_type.return_type.format(self.scope)
                 )
             }
             Type::Primitive(primitive_type) => write!(f, "{}", primitive_type),
@@ -40,17 +40,18 @@ impl Display for TypeFmt<'_> {
                 write!(
                     f,
                     "{}",
-                    self.types
+                    self.scope
+                        .types
                         .get_type(*index)
                         .unwrap_or(Type::Error)
-                        .format(self.types)
+                        .format(self.scope)
                 )
             }
             Type::Struct(struct_type) => write!(f, "{}", struct_type.identifier),
             Type::Tuple(items) => {
                 write!(f, "(")?;
                 for (index, item) in items.iter().enumerate() {
-                    write!(f, "{}", item.format(self.types))?;
+                    write!(f, "{}", item.format(self.scope))?;
                     if index != items.len() - 1 {
                         write!(f, ", ")?;
                     }

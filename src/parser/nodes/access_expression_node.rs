@@ -88,7 +88,7 @@ pub fn get_field(
             scope.source.print_error(
                 input_span,
                 "Cannot use access operator on a function which returns another function",
-                &format!("returns type: `{}`", input_type.format(&scope.types)),
+                &format!("returns type: `{}`", input_type.format(scope)),
             );
             Type::Error
         }
@@ -123,7 +123,7 @@ pub fn get_field(
             scope.source.print_error(
                 field.span.previous(),
                 "Access operator is not valid for this type",
-                &format!("Access on type: `{}`", input_type.format(&scope.types)),
+                &format!("Access on type: `{}`", input_type.format(scope)),
             );
             Type::Error
         }

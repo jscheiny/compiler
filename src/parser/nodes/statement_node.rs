@@ -81,9 +81,9 @@ fn check_function_return(
                 error_span,
                 &format!(
                     "Function must return value of type `{}`",
-                    expected_type.format(&scope.types)
+                    expected_type.format(&scope)
                 ),
-                &format!("found type: `{}`", resolved_type.format(&scope.types)),
+                &format!("found type: `{}`", resolved_type.format(&scope)),
             );
         }
     } else {

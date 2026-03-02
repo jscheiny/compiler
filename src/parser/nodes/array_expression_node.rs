@@ -31,8 +31,8 @@ impl ArrayExpressionNode {
                         "Mismatching array types",
                         &format!(
                             "element of type `{}` does not match previous type `{}`",
-                            element_type.format(&scope.types),
-                            t.format(&scope.types)
+                            element_type.format(&scope),
+                            t.format(&scope)
                         ),
                     );
                 }

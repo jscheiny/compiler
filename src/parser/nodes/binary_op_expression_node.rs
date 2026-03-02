@@ -56,7 +56,7 @@ impl BinaryOpExpressionNode {
                     "Applied function must take only one parameter",
                     &format!(
                         "type: `{}`",
-                        Type::Function(function_type.clone()).format(&scope.types)
+                        Type::Function(function_type.clone()).format(&scope)
                     ),
                 );
             }
@@ -69,8 +69,8 @@ impl BinaryOpExpressionNode {
                     "Function application argument does not match parameter type",
                     &format!(
                         "expected value of type `{}`, found `{}`",
-                        left_type.format(&scope.types),
-                        function_type.parameters[0].format(&scope.types)
+                        left_type.format(&scope),
+                        function_type.parameters[0].format(&scope)
                     ),
                 );
             }
@@ -81,7 +81,7 @@ impl BinaryOpExpressionNode {
                 scope.source.print_error(
                     self.right.span,
                     "Cannot apply function",
-                    &format!("type `{}` is not callable", right_type.format(&scope.types)),
+                    &format!("type `{}` is not callable", right_type.format(&scope)),
                 );
             }
             (scope, Type::Error)
@@ -145,9 +145,9 @@ impl BinaryOpExpressionNode {
             &format!(
                 "Operands of `{}` should be of type `{}`",
                 self.operator.as_token(),
-                expected_type.format(&scope.types)
+                expected_type.format(scope)
             ),
-            &format!("found type: `{}`", found_type.format(&scope.types)),
+            &format!("found type: `{}`", found_type.format(scope)),
         );
     }
 }
