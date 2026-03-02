@@ -1,5 +1,5 @@
 use crate::{
-    checker::{FunctionType, Scope, ScopeType, Type, TypeResolver},
+    checker::{FunctionType, Scope, ScopeType, Type},
     parser::{ClosureParameterExpressionNode, ExpressionNode, Identified, Node},
 };
 
@@ -10,7 +10,7 @@ pub struct ClosureExpressionNode {
 
 impl ClosureExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
-        let function_type = get_expected_type(expected_type, &scope.types);
+        let function_type = get_expected_type(expected_type, &scope);
         scope.nest_with(ScopeType::Closure, |scope| {
             let (scope, parameters) = self.check_parameters(function_type.as_ref(), scope);
             let expected_return_type = function_type.map(|t| t.return_type);
@@ -84,10 +84,12 @@ fn get_parameter_type(
     }
 }
 
-fn get_expected_type(t: Option<&Type>, types: &TypeResolver) -> Option<FunctionType> {
+fn get_expected_type(t: Option<&Type>, scope: &Scope) -> Option<FunctionType> {
     match t {
         Some(Type::Function(function_type)) => Some(function_type.clone()),
-        Some(Type::Reference(index)) => get_expected_type(types.get_type(*index).as_ref(), types),
+        Some(Type::Reference(index)) => {
+            get_expected_type(scope.types.get_type(*index).as_ref(), scope)
+        }
         _ => None,
     }
 }

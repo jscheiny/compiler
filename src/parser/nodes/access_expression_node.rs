@@ -1,5 +1,5 @@
 use crate::{
-    checker::{FunctionType, RuntimeType, Scope, Type, TypeResolver},
+    checker::{FunctionType, RuntimeType, Scope, Type},
     parser::{
         ExpressionNode, Identified, IdentifierNode, Node, NodeVec, TokenSpan, check_function_call,
     },
@@ -143,7 +143,7 @@ fn get_static_field(
                 variant_type
             } else if let Some(method) = enum_type.methods.get(field.id()) {
                 // TODO respect public/private access
-                let self_type = get_self_type(&enum_type.identifier, &scope.types);
+                let self_type = get_self_type(&enum_type.identifier, scope);
                 method.function_type.clone().as_static_method(self_type)
             } else {
                 scope.source.print_error(
@@ -184,8 +184,9 @@ fn get_static_field(
     }
 }
 
-fn get_self_type(identifier: &String, types: &TypeResolver) -> Type {
-    types
+fn get_self_type(identifier: &String, scope: &Scope) -> Type {
+    scope
+        .types
         .get_ref(identifier)
         .map(Type::Reference)
         .unwrap_or(Type::Error)
