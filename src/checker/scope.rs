@@ -123,19 +123,19 @@ impl Scope {
         };
     }
 
-    pub fn lookup_value(&self, identifier: &String) -> Option<Type> {
-        self.lookup_value_local(identifier)
-            .or_else(|| self.lookup_value_super(identifier))
+    pub fn get_value(&self, identifier: &String) -> Option<Type> {
+        self.get_local_value(identifier)
+            .or_else(|| self.get_parent_value(identifier))
     }
 
-    pub fn lookup_value_local(&self, identifier: &String) -> Option<Type> {
+    pub fn get_local_value(&self, identifier: &String) -> Option<Type> {
         self.values.get(identifier).cloned()
     }
 
-    fn lookup_value_super(&self, identifier: &String) -> Option<Type> {
+    fn get_parent_value(&self, identifier: &String) -> Option<Type> {
         self.parent
             .as_ref()
-            .and_then(|parent| parent.lookup_value(identifier))
+            .and_then(|parent| parent.get_value(identifier))
     }
 
     pub fn get_type_ref(&self, identifier: &String) -> Option<usize> {

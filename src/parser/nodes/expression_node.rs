@@ -85,7 +85,7 @@ impl ExpressionNode {
         });
 
         // TODO disallow use of types as values
-        if let Some(resolved_type) = scope.lookup_value(identifier.id()) {
+        if let Some(resolved_type) = scope.get_value(identifier.id()) {
             (scope, resolved_type)
         } else if let Some(index) = scope.get_type_ref(identifier.id()) {
             let resolved_type = Type::Reference(index)
@@ -130,7 +130,7 @@ impl ExpressionNode {
     ) -> (Box<Scope>, Type) {
         let self_scope = scope.find_scope(|scope_type| matches!(scope_type, ScopeType::Struct(_)));
         if let Some(self_scope) = self_scope {
-            let resolved_type = self_scope.lookup_value_local(identifier.id());
+            let resolved_type = self_scope.get_local_value(identifier.id());
             if let Some(resolved_type) = resolved_type {
                 return (scope, resolved_type);
             }
