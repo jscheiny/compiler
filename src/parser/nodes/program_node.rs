@@ -17,7 +17,7 @@ impl ProgramNode {
             types.declare(definition.identifier(), &source);
         }
 
-        let mut scope = Box::new(self.get_module_scope(source, types));
+        let mut scope = self.create_scope(source, types);
         for definition in self.definitions_mut() {
             definition.resolve_type(&mut scope);
         }
@@ -27,12 +27,12 @@ impl ProgramNode {
         }
     }
 
-    pub fn get_module_scope(&self, source: Rc<SourceCode>, types: TypeResolver) -> Scope {
+    pub fn create_scope(&self, source: Rc<SourceCode>, types: TypeResolver) -> Box<Scope> {
         let mut scope = Scope::new(source, Some(types));
         for definition in self.definitions() {
             definition.add_to_scope(&mut scope);
         }
-        scope
+        Box::new(scope)
     }
 
     fn definitions(&self) -> impl Iterator<Item = &ModuleDefinitionNode> {
