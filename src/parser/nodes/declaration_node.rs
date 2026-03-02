@@ -38,7 +38,7 @@ impl DeclarationNode {
             None => (scope, Type::Error),
         };
 
-        scope.add(self.id(), resolved_type);
+        scope.add_value(self.id(), resolved_type);
         scope
     }
 }

@@ -62,7 +62,7 @@ impl EnumNode {
                                 .get_type(&scope.types, &scope.source)
                                 .clone(),
                         );
-                        scope.add(method.id(), method_type);
+                        scope.add_value(method.id(), method_type);
                         scope_names.insert(method.id());
                     }
                 }

@@ -68,7 +68,7 @@ impl FunctionNode {
                 );
             } else {
                 param_names.insert(param.id().clone());
-                scope.add(
+                scope.add_value(
                     param.id(),
                     param.get_type(&scope.types, &scope.source).clone(),
                 );

@@ -112,11 +112,11 @@ impl Scope {
         self.parent.unwrap()
     }
 
-    pub fn add(&mut self, identifier: &str, value: Type) {
+    pub fn add_value(&mut self, identifier: &str, value: Type) {
         self.values.insert(identifier.to_owned(), value);
     }
 
-    pub fn add_or(&mut self, identifier: &str, value: Type, if_present: impl Fn(&Scope)) {
+    pub fn add_value_or(&mut self, identifier: &str, value: Type, if_present: impl Fn(&Scope)) {
         let entry = self.values.entry(identifier.to_owned());
         if let Entry::Vacant(v) = entry {
             v.insert(value);
@@ -125,18 +125,18 @@ impl Scope {
         };
     }
 
-    pub fn lookup(&self, identifier: &String) -> Option<Type> {
-        self.lookup_local(identifier)
-            .or_else(|| self.lookup_super(identifier))
+    pub fn lookup_value(&self, identifier: &String) -> Option<Type> {
+        self.lookup_value_local(identifier)
+            .or_else(|| self.lookup_value_super(identifier))
     }
 
-    pub fn lookup_local(&self, identifier: &String) -> Option<Type> {
+    pub fn lookup_value_local(&self, identifier: &String) -> Option<Type> {
         self.values.get(identifier).cloned()
     }
 
-    fn lookup_super(&self, identifier: &String) -> Option<Type> {
+    fn lookup_value_super(&self, identifier: &String) -> Option<Type> {
         self.parent
             .as_ref()
-            .and_then(|parent| parent.lookup(identifier))
+            .and_then(|parent| parent.lookup_value(identifier))
     }
 }

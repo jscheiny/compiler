@@ -34,15 +34,15 @@ impl ModuleDefinitionNode {
             Self::Enum(node) => {
                 let enum_type =
                     RuntimeType::Enum(node.get_type(&scope.types, &scope.source).clone());
-                scope.add(node.id(), Type::Type(enum_type));
+                scope.add_value(node.id(), Type::Type(enum_type));
             }
             Self::Struct(node) => {
                 let struct_type =
                     RuntimeType::Struct(node.get_type(&scope.types, &scope.source).clone());
-                scope.add(node.id(), Type::Type(struct_type));
+                scope.add_value(node.id(), Type::Type(struct_type));
             }
             Self::Function(node) => {
-                scope.add(
+                scope.add_value(
                     node.id(),
                     Type::Function(node.get_type(&scope.types, &scope.source).clone()),
                 );

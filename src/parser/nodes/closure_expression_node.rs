@@ -45,7 +45,7 @@ impl ClosureExpressionNode {
                 if let Some(parameter) = parameter {
                     let parameter_type =
                         get_parameter_type(parameter, index, expected_type, &scope);
-                    scope.add_or(parameter.id(), parameter_type.clone(), |scope| {
+                    scope.add_value_or(parameter.id(), parameter_type.clone(), |scope| {
                         scope.source.print_error(
                             parameter.identifier.span,
                             &format!("Duplicate parameter name `{}`", parameter.id()),
