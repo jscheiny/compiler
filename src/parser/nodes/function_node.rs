@@ -40,7 +40,7 @@ impl FunctionNode {
                 FunctionBodyNode::Expression(expression) => {
                     let (scope, resolved_type) =
                         expression.check_expected(scope, Some(return_type));
-                    if !resolved_type.is_assignable_to(return_type, &scope.types) {
+                    if !resolved_type.is_assignable_to(return_type, &scope) {
                         scope.source.print_error(
                             self.body.span,
                             &format!(

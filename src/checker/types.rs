@@ -1,5 +1,5 @@
 use crate::{
-    checker::{EnumType, FunctionType, StructType, TypeFmt, TypeResolver},
+    checker::{EnumType, FunctionType, Scope, StructType, TypeFmt, TypeResolver},
     parser::PrimitiveType,
 };
 
@@ -25,23 +25,23 @@ pub enum Type {
 }
 
 impl Type {
-    pub fn is_assignable_to(&self, other: &Type, types: &TypeResolver) -> bool {
+    pub fn is_assignable_to(&self, other: &Type, scope: &Scope) -> bool {
         if self.is_error() || other.is_error() {
             return true;
         }
         if let Type::Reference(_) = other {
-            let resolved_other = other.deref(types);
-            return self.is_assignable_to(&resolved_other, types);
+            let resolved_other = other.deref(&scope.types);
+            return self.is_assignable_to(&resolved_other, scope);
         }
 
         // TODO this will need revisement as time goes on...
         match self {
             Type::Array(left) => match other {
-                Type::Array(right) => left.is_assignable_to(right, types),
+                Type::Array(right) => left.is_assignable_to(right, scope),
                 // TODO handle function type coercion better...
-                _ => match self.clone().as_function(types) {
+                _ => match self.clone().as_function(&scope.types) {
                     Some(function_type) => {
-                        Type::Function(function_type).is_assignable_to(other, types)
+                        Type::Function(function_type).is_assignable_to(other, scope)
                     }
                     None => false,
                 },
@@ -57,8 +57,8 @@ impl Type {
                             .parameters
                             .iter()
                             .zip(right.parameters.iter())
-                            .all(|(left, right)| left.is_assignable_to(right, types))
-                        && left.return_type.is_assignable_to(&right.return_type, types)
+                            .all(|(left, right)| left.is_assignable_to(right, scope))
+                        && left.return_type.is_assignable_to(&right.return_type, scope)
                 }
                 _ => false,
             },
@@ -66,7 +66,7 @@ impl Type {
                 Type::Primitive(right) => left == right,
                 _ => false,
             },
-            Type::Reference(_) => self.deref(types).is_assignable_to(other, types),
+            Type::Reference(_) => self.deref(&scope.types).is_assignable_to(other, scope),
             Type::Struct(left) => match other {
                 Type::Struct(right) => left.identifier == right.identifier,
                 _ => false,
@@ -77,7 +77,7 @@ impl Type {
                         && left
                             .iter()
                             .zip(right)
-                            .all(|(left, right)| left.is_assignable_to(right, types))
+                            .all(|(left, right)| left.is_assignable_to(right, scope))
                 }
                 _ => false,
             },

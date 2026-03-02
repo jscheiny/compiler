@@ -22,7 +22,7 @@ impl DeclarationNode {
                 let (new_scope, resolved_type) =
                     initializer.check_expected(scope, expected_type.as_ref());
                 if let Some(expected_type) = expected_type.as_ref() {
-                    if !resolved_type.is_assignable_to(expected_type, &new_scope.types) {
+                    if !resolved_type.is_assignable_to(expected_type, &new_scope) {
                         new_scope.source.print_error(
                             initializer.span,
                             &format!(

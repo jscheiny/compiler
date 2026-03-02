@@ -62,7 +62,7 @@ impl BinaryOpExpressionNode {
             }
 
             if !function_type.parameters.is_empty()
-                && !left_type.is_assignable_to(&function_type.parameters[0], &scope.types)
+                && !left_type.is_assignable_to(&function_type.parameters[0], &scope)
             {
                 scope.source.print_error(
                     self.left.span,

@@ -24,9 +24,9 @@ impl IfExpressionNode {
         let expected_type = expected_type.or(Some(&true_type));
         let (scope, false_type) = self.if_false.check_expected(scope, expected_type);
 
-        if true_type.is_assignable_to(&false_type, &scope.types) {
+        if true_type.is_assignable_to(&false_type, &scope) {
             (scope, false_type)
-        } else if false_type.is_assignable_to(&true_type, &scope.types) {
+        } else if false_type.is_assignable_to(&true_type, &scope) {
             (scope, true_type)
         } else {
             scope.source.print_error(

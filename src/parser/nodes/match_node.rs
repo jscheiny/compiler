@@ -32,9 +32,9 @@ impl MatchNode {
 
             // TODO dedupe with array parsing potentially
             if let Some(t) = resolved_type.as_ref() {
-                if case_type.is_assignable_to(t, &scope.types) {
+                if case_type.is_assignable_to(t, &scope) {
                     // Case type matches: no error and keep going
-                } else if t.is_assignable_to(&case_type, &scope.types) {
+                } else if t.is_assignable_to(&case_type, &scope) {
                     resolved_type = Some(case_type);
                 } else {
                     scope.source.print_error(

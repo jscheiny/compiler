@@ -72,7 +72,7 @@ fn check_function_return(
         };
         scope = new_scope;
 
-        if !resolved_type.is_assignable_to(&expected_type, &scope.types) {
+        if !resolved_type.is_assignable_to(&expected_type, &scope) {
             let error_span = match expression {
                 Some(expression) => expression.span,
                 None => statement_span,

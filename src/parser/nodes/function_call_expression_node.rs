@@ -66,7 +66,7 @@ pub fn check_function_call(
 
     let parameters_and_arguments = function_type.parameters.iter().zip(&arguments);
     for (index, (parameter, argument)) in parameters_and_arguments.enumerate() {
-        if !argument.is_assignable_to(parameter, &scope.types) {
+        if !argument.is_assignable_to(parameter, &scope) {
             scope.source.print_error(
                 argument_expressions[index].span,
                 "Argument not assignable to parameter type",
