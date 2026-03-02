@@ -79,7 +79,7 @@ impl ExpressionNode {
         scope: Box<Scope>,
         expected_type: Option<&Type>,
     ) -> (Box<Scope>, Type) {
-        let expected_enum_type = expected_type.and_then(|e| match e.deref(&scope.types) {
+        let expected_enum_type = expected_type.and_then(|e| match e.deref(&scope) {
             Type::Enum(enum_type) => Some(enum_type),
             _ => None,
         });
@@ -90,7 +90,7 @@ impl ExpressionNode {
         } else if let Some(resolved_type) =
             scope.types.get_ref(identifier.id()).map(Type::Reference)
         {
-            let resolved_type = resolved_type.as_runtime_type(&scope.types).map(Type::Type);
+            let resolved_type = resolved_type.as_runtime_type(&scope).map(Type::Type);
             match resolved_type {
                 Some(resolved_type) => (scope, resolved_type),
                 None => {

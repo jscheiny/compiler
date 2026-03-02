@@ -44,7 +44,7 @@ pub struct VariantMatchPattern {
 
 impl VariantMatchPattern {
     pub fn check(&self, scope: &Scope, bindings: &mut HashMap<String, Type>, subject_type: &Type) {
-        if let Type::Enum(enum_type) = subject_type.deref(&scope.types) {
+        if let Type::Enum(enum_type) = subject_type.deref(&scope) {
             if let Some(variant) = enum_type.variants.get(self.identifier.id()) {
                 if let Some(inner_type) = variant {
                     if self.inner_pattern.is_none() {

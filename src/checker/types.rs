@@ -30,7 +30,7 @@ impl Type {
             return true;
         }
         if let Type::Reference(_) = other {
-            let resolved_other = other.deref(&scope.types);
+            let resolved_other = other.deref(scope);
             return self.is_assignable_to(&resolved_other, scope);
         }
 
@@ -66,7 +66,7 @@ impl Type {
                 Type::Primitive(right) => left == right,
                 _ => false,
             },
-            Type::Reference(_) => self.deref(&scope.types).is_assignable_to(other, scope),
+            Type::Reference(_) => self.deref(scope).is_assignable_to(other, scope),
             Type::Struct(left) => match other {
                 Type::Struct(right) => left.identifier == right.identifier,
                 _ => false,
@@ -92,7 +92,7 @@ impl Type {
     }
 
     pub fn is_primitive(&self, expected: PrimitiveType, scope: &Scope) -> bool {
-        match self.deref(&scope.types) {
+        match self.deref(scope) {
             Self::Primitive(primitive) => primitive == expected,
             Self::Error => true,
             _ => false,
@@ -100,7 +100,7 @@ impl Type {
     }
 
     pub fn as_function(self, scope: &Scope) -> Option<FunctionType> {
-        match self.as_deref(&scope.types) {
+        match self.as_deref(scope) {
             Type::Array(element_type) => Some(FunctionType::new(
                 Type::Primitive(PrimitiveType::Int),
                 element_type.as_ref().clone(),
@@ -113,8 +113,8 @@ impl Type {
         }
     }
 
-    pub fn as_runtime_type(self, types: &TypeResolver) -> Option<RuntimeType> {
-        match self.as_deref(types) {
+    pub fn as_runtime_type(self, scope: &Scope) -> Option<RuntimeType> {
+        match self.as_deref(scope) {
             Type::Type(runtime_type) => Some(runtime_type),
             Type::Enum(enum_type) => Some(RuntimeType::Enum(enum_type)),
             Type::Struct(struct_type) => Some(RuntimeType::Struct(struct_type)),
@@ -122,16 +122,24 @@ impl Type {
         }
     }
 
-    pub fn as_deref(self, types: &TypeResolver) -> Type {
+    pub fn as_deref(self, scope: &Scope) -> Type {
         match self {
-            Type::Reference(index) => types.get_type(index).unwrap_or(Type::Error).as_deref(types),
+            Type::Reference(index) => scope
+                .types
+                .get_type(index)
+                .unwrap_or(Type::Error)
+                .as_deref(scope),
             _ => self,
         }
     }
 
-    pub fn deref(&self, types: &TypeResolver) -> Type {
+    pub fn deref(&self, scope: &Scope) -> Type {
         match self {
-            Type::Reference(index) => types.get_type(*index).unwrap_or(Type::Error).deref(types),
+            Type::Reference(index) => scope
+                .types
+                .get_type(*index)
+                .unwrap_or(Type::Error)
+                .deref(scope),
             _ => self.clone(),
         }
     }
