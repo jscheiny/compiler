@@ -32,7 +32,7 @@ impl DeferredAccessExpressionNode {
                 &scope,
             );
             let (scope, result_type) = if let Some(arguments) = self.arguments.as_ref() {
-                check_function_call(scope, self.field.span, field_type, &arguments)
+                check_function_call(scope, self.field.span, field_type, arguments)
             } else {
                 (scope, field_type)
             };

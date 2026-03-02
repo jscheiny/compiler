@@ -22,7 +22,7 @@ impl AccessExpressionNode {
 
         let field_type = get_field(&left_type, self.left.span, &self.field, &scope);
         if let Some(arguments) = self.arguments.as_ref() {
-            check_function_call(scope, self.field.span, field_type, &arguments)
+            check_function_call(scope, self.field.span, field_type, arguments)
         } else {
             (scope, field_type)
         }
@@ -40,7 +40,7 @@ impl AccessExpressionNode {
             &scope,
         );
         let (scope, result_type) = if let Some(arguments) = self.arguments.as_ref() {
-            check_function_call(scope, self.field.span, field_type, &arguments)
+            check_function_call(scope, self.field.span, field_type, arguments)
         } else {
             (scope, field_type)
         };
@@ -118,7 +118,7 @@ pub fn get_field(
             }
         }
         Type::Tuple(_) => todo!("Implement access on tuples"),
-        Type::Type(inner_type) => get_static_field(&inner_type, field, scope),
+        Type::Type(inner_type) => get_static_field(inner_type, field, scope),
         Type::Array(_) | Type::Void => {
             scope.source.print_error(
                 field.span.previous(),

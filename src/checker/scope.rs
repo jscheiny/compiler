@@ -121,7 +121,7 @@ impl Scope {
         if let Entry::Vacant(v) = entry {
             v.insert(value);
         } else {
-            if_present(&self);
+            if_present(self);
         };
     }
 
