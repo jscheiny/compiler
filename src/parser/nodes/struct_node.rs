@@ -1,8 +1,7 @@
 use std::{cell::OnceCell, collections::HashMap};
 
 use crate::{
-    checker::{Scope, ScopeType, StructType, Type, TypeResolver},
-    lexer::SourceCode,
+    checker::{Scope, ScopeType, StructType, Type},
     parser::{Identified, IdentifierNode, MethodNode, Node, NodeVec, StructFieldNode},
 };
 
@@ -28,10 +27,10 @@ impl StructNode {
     }
 
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
-        let index = scope.types.get_ref(self.id()).unwrap();
+        let index = scope.get_type_ref(self.id()).unwrap();
         scope.nest(ScopeType::Struct(index), |mut scope| {
             for field in self.fields.iter() {
-                let field_type = field.get_type(&scope.types, &scope.source).clone();
+                let field_type = field.get_type(&scope).clone();
                 scope.add_value_or(field.id(), field_type, |scope| {
                     scope.source.print_error(
                         field.identifier.span,
@@ -46,12 +45,7 @@ impl StructNode {
 
             if let Some(methods) = self.methods.as_ref() {
                 for method in methods.iter() {
-                    let method_type = Type::Function(
-                        method
-                            .function
-                            .get_type(&scope.types, &scope.source)
-                            .clone(),
-                    );
+                    let method_type = Type::Function(method.function.get_type(&scope).clone());
                     scope.add_value_or(method.id(), method_type, |scope| {
                         scope.source.print_error(
                             method.function.identifier.span,
@@ -73,23 +67,22 @@ impl StructNode {
         })
     }
 
-    pub fn get_type(&self, types: &TypeResolver, source: &SourceCode) -> &StructType {
-        self.resolved_type
-            .get_or_init(|| self.get_type_impl(types, source))
+    pub fn get_type(&self, scope: &Scope) -> &StructType {
+        self.resolved_type.get_or_init(|| self.get_type_impl(scope))
     }
 
-    pub fn get_type_impl(&self, types: &TypeResolver, source: &SourceCode) -> StructType {
+    pub fn get_type_impl(&self, scope: &Scope) -> StructType {
         let mut members = HashMap::new();
 
         for field in self.fields.iter() {
-            let member = field.get_member(types, source);
+            let member = field.get_member(scope);
             let identifier = field.id().clone();
             members.entry(identifier).or_insert(member);
         }
 
         if let Some(methods) = self.methods.as_ref() {
             for method in methods.iter() {
-                let member = method.resolve_struct_method(types, source);
+                let member = method.resolve_struct_method(scope);
                 let identifier = method.id().clone();
                 members.entry(identifier).or_insert(member);
             }

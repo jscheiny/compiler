@@ -1,6 +1,5 @@
 use crate::{
-    checker::{Type, TypeResolver},
-    lexer::SourceCode,
+    checker::{Scope, Type},
     parser::{FunctionTypeNode, Identified, IdentifierNode, Node, PrimitiveType, TupleTypeNode},
 };
 
@@ -14,18 +13,16 @@ pub enum TypeNode {
 }
 
 impl TypeNode {
-    pub fn get_type(&self, types: &TypeResolver, source: &SourceCode) -> Type {
+    pub fn get_type(&self, scope: &Scope) -> Type {
         match self {
-            Self::Array(element_type) => {
-                Type::Array(Box::new(element_type.get_type(types, source)))
-            }
+            Self::Array(element_type) => Type::Array(Box::new(element_type.get_type(scope))),
             Self::Primitive(primitive) => Type::Primitive(*primitive),
-            Self::Function(function) => Type::Function(function.get_type(types, source).clone()),
-            Self::Tuple(tuple_type) => tuple_type.get_type(types, source).clone(),
-            Self::UserDefined(identifier) => match types.get_ref(identifier.id()) {
+            Self::Function(function) => Type::Function(function.get_type(scope).clone()),
+            Self::Tuple(tuple_type) => tuple_type.get_type(scope).clone(),
+            Self::UserDefined(identifier) => match scope.get_type_ref(identifier.id()) {
                 Some(resolved_type) => Type::Reference(resolved_type),
                 None => {
-                    source.print_error(
+                    scope.source.print_error(
                         identifier.span,
                         &format!("Unknown type `{}`", identifier.id()),
                         "could not find this type",

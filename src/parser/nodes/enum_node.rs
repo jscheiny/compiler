@@ -4,8 +4,7 @@ use std::{
 };
 
 use crate::{
-    checker::{EnumType, Scope, ScopeType, Type, TypeResolver},
-    lexer::SourceCode,
+    checker::{EnumType, Scope, ScopeType, Type},
     parser::{EnumVariantNode, Identified, IdentifierNode, MethodNode, Node, NodeVec},
 };
 
@@ -31,7 +30,7 @@ impl EnumNode {
     }
 
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
-        let index = scope.types.get_ref(self.id()).unwrap();
+        let index = scope.get_type_ref(self.id()).unwrap();
         scope.nest(ScopeType::Struct(index), |mut scope| {
             let mut scope_names = HashSet::new();
             for variant in self.variants.iter() {
@@ -56,12 +55,7 @@ impl EnumNode {
                             ),
                         );
                     } else {
-                        let method_type = Type::Function(
-                            method
-                                .function
-                                .get_type(&scope.types, &scope.source)
-                                .clone(),
-                        );
+                        let method_type = Type::Function(method.function.get_type(&scope).clone());
                         scope.add_value(method.id(), method_type);
                         scope_names.insert(method.id());
                     }
@@ -76,23 +70,22 @@ impl EnumNode {
         })
     }
 
-    pub fn get_type(&self, types: &TypeResolver, source: &SourceCode) -> &EnumType {
-        self.resolved_type
-            .get_or_init(|| self.get_type_impl(types, source))
+    pub fn get_type(&self, scope: &Scope) -> &EnumType {
+        self.resolved_type.get_or_init(|| self.get_type_impl(scope))
     }
 
-    pub fn get_type_impl(&self, types: &TypeResolver, source: &SourceCode) -> EnumType {
+    pub fn get_type_impl(&self, scope: &Scope) -> EnumType {
         let mut variants = HashMap::new();
         for variant in self.variants.iter() {
             let identifier = variant.id().clone();
-            let variant = variant.get_type(types, source).cloned();
+            let variant = variant.get_type(scope).cloned();
             variants.entry(identifier).or_insert(variant);
         }
 
         let mut methods = HashMap::new();
         if let Some(methods_list) = self.methods.as_ref() {
             for method in methods_list.iter() {
-                let member = method.resolve_enum_method(types, source);
+                let member = method.resolve_enum_method(scope);
                 let identifier = method.id().clone();
                 methods.entry(identifier).or_insert(member);
             }

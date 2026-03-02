@@ -1,8 +1,7 @@
 use std::{cell::OnceCell, collections::HashSet};
 
 use crate::{
-    checker::{FunctionType, Scope, Type, TypeResolver},
-    lexer::SourceCode,
+    checker::{FunctionType, Scope, Type},
     parser::{
         FunctionBodyNode, Identified, IdentifierNode, Node, NodeVec, ParameterNode, TypeNode,
     },
@@ -33,7 +32,7 @@ impl FunctionNode {
     }
 
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
-        let return_type = &self.get_type(&scope.types, &scope.source).return_type;
+        let return_type = &self.get_type(&scope).return_type;
         scope.nest_fn(return_type, |scope| {
             let scope = self.check_params(scope);
             match &self.body.value {
@@ -68,32 +67,29 @@ impl FunctionNode {
                 );
             } else {
                 param_names.insert(param.id().clone());
-                scope.add_value(
-                    param.id(),
-                    param.get_type(&scope.types, &scope.source).clone(),
-                );
+                scope.add_value(param.id(), param.get_type(&scope).clone());
             }
         }
         scope
     }
 
-    pub fn get_type(&self, types: &TypeResolver, source: &SourceCode) -> &FunctionType {
-        self.resolved_type
-            .get_or_init(|| self.get_type_impl(types, source))
+    pub fn get_type(&self, scope: &Scope) -> &FunctionType {
+        self.resolved_type.get_or_init(|| self.get_type_impl(scope))
     }
 
-    fn get_type_impl(&self, types: &TypeResolver, source: &SourceCode) -> FunctionType {
+    fn get_type_impl(&self, scope: &Scope) -> FunctionType {
         let parameters = self
             .parameters
             .value
             .iter()
-            .map(|parameter| parameter.get_type(types, source))
+            .map(|parameter| parameter.get_type(scope))
             .cloned()
             .collect();
 
-        let return_type = self.return_type.as_ref().map_or(Type::Void, |return_type| {
-            return_type.get_type(types, source)
-        });
+        let return_type = self
+            .return_type
+            .as_ref()
+            .map_or(Type::Void, |return_type| return_type.get_type(scope));
 
         FunctionType {
             parameters,

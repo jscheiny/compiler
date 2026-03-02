@@ -1,8 +1,7 @@
 use std::cell::OnceCell;
 
 use crate::{
-    checker::{Type, TypeResolver},
-    lexer::SourceCode,
+    checker::{Scope, Type},
     parser::{Identified, IdentifierNode, Node, TypeNode},
 };
 
@@ -25,9 +24,9 @@ impl TypeAliasNode {
         // TODO check for recursion
     }
 
-    pub fn get_type(&self, types: &TypeResolver, source: &SourceCode) -> &Type {
+    pub fn get_type(&self, scope: &Scope) -> &Type {
         self.resolved_type
-            .get_or_init(|| self.type_def.get_type(types, source))
+            .get_or_init(|| self.type_def.get_type(scope))
     }
 }
 

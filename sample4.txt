@@ -1,9 +1,18 @@
+struct S(value: A) {}
+
+enum A(B, C, D);
+
 fn accept_fn(test: int => int => int) {}
 
-fn main() {
+fn main(value: S) {
     accept_fn(a -> [3, 4, 5]);
     accept_fn(a -> b -> a);
     test(1);
+    match value.value {
+        B -> 1;
+        C -> 2;
+        D -> 3;
+    }
 }
 
 fn test(x: bool): bool -> not x;

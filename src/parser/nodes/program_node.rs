@@ -17,18 +17,18 @@ impl ProgramNode {
             types.declare(definition.identifier(), &source);
         }
 
+        let mut scope = Box::new(self.get_module_scope(source, types));
         for definition in self.definitions_mut() {
-            definition.resolve_type(&mut types, &source);
+            definition.resolve_type(&mut scope);
         }
 
-        let mut scope = Box::new(self.get_module_scope(source, types));
         for definition in self.definitions() {
             scope = definition.check(scope);
         }
     }
 
     pub fn get_module_scope(&self, source: Rc<SourceCode>, types: TypeResolver) -> Scope {
-        let mut scope = Scope::new(source, Rc::new(types));
+        let mut scope = Scope::new(source, Some(types));
         for definition in self.definitions() {
             definition.add_to_scope(&mut scope);
         }

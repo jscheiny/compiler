@@ -124,22 +124,14 @@ impl Type {
 
     pub fn as_deref(self, scope: &Scope) -> Type {
         match self {
-            Type::Reference(index) => scope
-                .types
-                .get_type(index)
-                .unwrap_or(Type::Error)
-                .as_deref(scope),
+            Type::Reference(index) => scope.get_type(index).unwrap_or(Type::Error).as_deref(scope),
             _ => self,
         }
     }
 
     pub fn deref(&self, scope: &Scope) -> Type {
         match self {
-            Type::Reference(index) => scope
-                .types
-                .get_type(*index)
-                .unwrap_or(Type::Error)
-                .deref(scope),
+            Type::Reference(index) => scope.get_type(*index).unwrap_or(Type::Error).deref(scope),
             _ => self.clone(),
         }
     }

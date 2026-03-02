@@ -1,6 +1,5 @@
 use crate::{
-    checker::{RuntimeType, Scope, Type, TypeResolver},
-    lexer::SourceCode,
+    checker::{RuntimeType, Scope, Type},
     parser::{EnumNode, FunctionNode, Identified, IdentifierNode, Node, StructNode, TypeAliasNode},
 };
 
@@ -32,41 +31,36 @@ impl ModuleDefinitionNode {
     pub fn add_to_scope(&self, scope: &mut Scope) {
         match self {
             Self::Enum(node) => {
-                let enum_type =
-                    RuntimeType::Enum(node.get_type(&scope.types, &scope.source).clone());
+                let enum_type = RuntimeType::Enum(node.get_type(scope).clone());
                 scope.add_value(node.id(), Type::Type(enum_type));
             }
             Self::Struct(node) => {
-                let struct_type =
-                    RuntimeType::Struct(node.get_type(&scope.types, &scope.source).clone());
+                let struct_type = RuntimeType::Struct(node.get_type(scope).clone());
                 scope.add_value(node.id(), Type::Type(struct_type));
             }
             Self::Function(node) => {
-                scope.add_value(
-                    node.id(),
-                    Type::Function(node.get_type(&scope.types, &scope.source).clone()),
-                );
+                scope.add_value(node.id(), Type::Function(node.get_type(scope).clone()));
             }
             // TODO Consider how these are added to scope
             Self::TypeAlias(_) => {}
         }
     }
 
-    pub fn resolve_type(&mut self, types: &mut TypeResolver, source: &SourceCode) {
-        match self {
-            Self::Struct(node) => {
-                let resolved_type = Type::Struct(node.get_type(types, source).clone());
-                types.resolve(node.id(), resolved_type);
-            }
-            Self::Enum(node) => {
-                let resolved_type = Type::Enum(node.get_type(types, source).clone());
-                types.resolve(node.id(), resolved_type);
-            }
-            Self::TypeAlias(node) => {
-                let resolved_type = node.get_type(types, source).clone();
-                types.resolve(node.id(), resolved_type);
-            }
-            Self::Function(_) => {}
+    pub fn resolve_type(&mut self, scope: &mut Scope) {
+        let resolved_type = match self {
+            Self::Struct(node) => Some(Type::Struct(node.get_type(scope).clone())),
+            Self::Enum(node) => Some(Type::Enum(node.get_type(scope).clone())),
+            Self::TypeAlias(node) => Some(node.get_type(scope).clone()),
+            Self::Function(_) => None,
+        };
+
+        if let Some(resolved_type) = resolved_type {
+            // TODO can we do this without an unwrap?
+            scope
+                .types
+                .as_mut()
+                .unwrap()
+                .resolve(self.id(), resolved_type);
         }
     }
 

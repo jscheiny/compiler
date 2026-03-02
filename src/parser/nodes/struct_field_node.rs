@@ -1,8 +1,7 @@
 use std::cell::OnceCell;
 
 use crate::{
-    checker::{StructMember, StructMemberType, Type, TypeResolver},
-    lexer::SourceCode,
+    checker::{Scope, StructMember, StructMemberType, Type},
     parser::{Identified, IdentifierNode, Node, TypeNode},
 };
 
@@ -27,21 +26,20 @@ impl StructFieldNode {
         }
     }
 
-    pub fn get_member(&self, types: &TypeResolver, source: &SourceCode) -> StructMember {
+    pub fn get_member(&self, scope: &Scope) -> StructMember {
         StructMember {
             public: self.public,
-            member_type: StructMemberType::Field(self.get_type(types, source).clone()),
+            member_type: StructMemberType::Field(self.get_type(scope).clone()),
         }
     }
 
-    pub fn get_type(&self, types: &TypeResolver, source: &SourceCode) -> &Type {
-        self.resolved_type
-            .get_or_init(|| self.get_type_impl(types, source))
+    pub fn get_type(&self, scope: &Scope) -> &Type {
+        self.resolved_type.get_or_init(|| self.get_type_impl(scope))
     }
 
-    pub fn get_type_impl(&self, types: &TypeResolver, source: &SourceCode) -> Type {
+    pub fn get_type_impl(&self, scope: &Scope) -> Type {
         match self.type_def.as_ref() {
-            Some(type_def) => type_def.get_type(types, source),
+            Some(type_def) => type_def.get_type(scope),
             None => Type::Error,
         }
     }

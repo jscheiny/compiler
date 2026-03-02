@@ -71,7 +71,7 @@ fn get_parameter_type(
 ) -> Type {
     let expected_type = expected_type.and_then(|ft| ft.parameters.get(index));
     if let Some(given_type) = parameter.parameter_type.as_ref() {
-        given_type.get_type(&scope.types, &scope.source)
+        given_type.get_type(scope)
     } else if let Some(expected_type) = expected_type {
         expected_type.clone()
     } else {
@@ -87,9 +87,7 @@ fn get_parameter_type(
 fn get_expected_type(t: Option<&Type>, scope: &Scope) -> Option<FunctionType> {
     match t {
         Some(Type::Function(function_type)) => Some(function_type.clone()),
-        Some(Type::Reference(index)) => {
-            get_expected_type(scope.types.get_type(*index).as_ref(), scope)
-        }
+        Some(Type::Reference(index)) => get_expected_type(scope.get_type(*index).as_ref(), scope),
         _ => None,
     }
 }

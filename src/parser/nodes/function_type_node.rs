@@ -1,8 +1,7 @@
 use std::cell::OnceCell;
 
 use crate::{
-    checker::{FunctionType, TypeResolver},
-    lexer::SourceCode,
+    checker::{FunctionType, Scope},
     parser::{Node, NodeVec, TypeNode},
 };
 
@@ -21,20 +20,19 @@ impl FunctionTypeNode {
         }
     }
 
-    pub fn get_type(&self, types: &TypeResolver, source: &SourceCode) -> &FunctionType {
-        self.resolved_type
-            .get_or_init(|| self.get_type_impl(types, source))
+    pub fn get_type(&self, scope: &Scope) -> &FunctionType {
+        self.resolved_type.get_or_init(|| self.get_type_impl(scope))
     }
 
-    fn get_type_impl(&self, types: &TypeResolver, source: &SourceCode) -> FunctionType {
+    fn get_type_impl(&self, scope: &Scope) -> FunctionType {
         let parameters = self
             .parameters
             .value
             .iter()
-            .map(|parameter| parameter.get_type(types, source))
+            .map(|parameter| parameter.get_type(scope))
             .collect();
 
-        let return_type = Box::new(self.return_type.get_type(types, source));
+        let return_type = Box::new(self.return_type.get_type(scope));
 
         FunctionType {
             parameters,

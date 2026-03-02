@@ -94,7 +94,7 @@ pub fn get_field(
         }
         Type::Primitive(_) => todo!("Implement access on primitive values"),
         Type::Reference(index) => {
-            let resolved_type = scope.types.get_type(*index).unwrap();
+            let resolved_type = scope.get_type(*index).unwrap();
             get_field(&resolved_type, input_span, field, scope)
         }
         Type::Struct(struct_type) => {
@@ -163,8 +163,7 @@ fn get_static_field(
             if let Some(member) = member {
                 // TODO respect public/private access
                 let self_type = scope
-                    .types
-                    .get_ref(&struct_type.identifier)
+                    .get_type_ref(&struct_type.identifier)
                     .map(Type::Reference)
                     .unwrap_or(Type::Error);
                 member.member_type.clone().as_static_type(self_type)
@@ -186,8 +185,7 @@ fn get_static_field(
 
 fn get_self_type(identifier: &String, scope: &Scope) -> Type {
     scope
-        .types
-        .get_ref(identifier)
+        .get_type_ref(identifier)
         .map(Type::Reference)
         .unwrap_or(Type::Error)
 }

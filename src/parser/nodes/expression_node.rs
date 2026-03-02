@@ -87,10 +87,10 @@ impl ExpressionNode {
         // TODO disallow use of types as values
         if let Some(resolved_type) = scope.lookup_value(identifier.id()) {
             (scope, resolved_type)
-        } else if let Some(resolved_type) =
-            scope.types.get_ref(identifier.id()).map(Type::Reference)
-        {
-            let resolved_type = resolved_type.as_runtime_type(&scope).map(Type::Type);
+        } else if let Some(index) = scope.get_type_ref(identifier.id()) {
+            let resolved_type = Type::Reference(index)
+                .as_runtime_type(&scope)
+                .map(Type::Type);
             match resolved_type {
                 Some(resolved_type) => (scope, resolved_type),
                 None => {

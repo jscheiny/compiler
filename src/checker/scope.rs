@@ -20,7 +20,7 @@ pub enum ScopeType {
 }
 
 pub struct Scope {
-    pub types: Rc<TypeResolver>,
+    pub types: Option<TypeResolver>,
     pub source: Rc<SourceCode>,
     scope_type: ScopeType,
     parent: Option<Box<Scope>>,
@@ -29,7 +29,7 @@ pub struct Scope {
 }
 
 impl Scope {
-    pub fn new(source: Rc<SourceCode>, types: Rc<TypeResolver>) -> Self {
+    pub fn new(source: Rc<SourceCode>, types: Option<TypeResolver>) -> Self {
         Self {
             types,
             source,
@@ -55,11 +55,10 @@ impl Scope {
         handler: impl FnOnce(Box<Scope>) -> (Box<Scope>, T),
     ) -> (Box<Scope>, T) {
         let source = self.source.clone();
-        let types = self.types.clone();
         let scope = Box::new(Self {
             scope_type,
             parent: Some(self),
-            ..Self::new(source, types)
+            ..Self::new(source, None)
         });
         let (scope, result) = handler(scope);
         (scope.parent(), result)
@@ -71,12 +70,11 @@ impl Scope {
         handler: impl FnOnce(Box<Scope>) -> Box<Scope>,
     ) -> Box<Scope> {
         let source = self.source.clone();
-        let types = self.types.clone();
         let scope = Box::new(Self {
             scope_type: ScopeType::Function,
             parent: Some(self),
             return_type: Some(return_type.clone()),
-            ..Self::new(source, types)
+            ..Self::new(source, None)
         });
         handler(scope).parent()
     }
@@ -138,5 +136,27 @@ impl Scope {
         self.parent
             .as_ref()
             .and_then(|parent| parent.lookup_value(identifier))
+    }
+
+    pub fn get_type_ref(&self, identifier: &String) -> Option<usize> {
+        self.types
+            .as_ref()
+            .and_then(|types| types.get_ref(identifier))
+            .or_else(|| {
+                self.parent
+                    .as_ref()
+                    .and_then(|parent| parent.get_type_ref(identifier))
+            })
+    }
+
+    pub fn get_type(&self, index: usize) -> Option<Type> {
+        self.types
+            .as_ref()
+            .and_then(|types| types.get_type(index))
+            .or_else(|| {
+                self.parent
+                    .as_ref()
+                    .and_then(|parent| parent.get_type(index))
+            })
     }
 }

@@ -41,7 +41,6 @@ impl Display for TypeFmt<'_> {
                     f,
                     "{}",
                     self.scope
-                        .types
                         .get_type(*index)
                         .unwrap_or(Type::Error)
                         .format(self.scope)

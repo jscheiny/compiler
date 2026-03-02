@@ -1,8 +1,7 @@
 use std::cell::OnceCell;
 
 use crate::{
-    checker::{Type, TypeResolver},
-    lexer::SourceCode,
+    checker::{Scope, Type},
     parser::{Identified, IdentifierNode, Node, TypeNode},
 };
 
@@ -21,14 +20,14 @@ impl EnumVariantNode {
         }
     }
 
-    pub fn get_type(&self, types: &TypeResolver, source: &SourceCode) -> Option<&Type> {
+    pub fn get_type(&self, scope: &Scope) -> Option<&Type> {
         self.resolved_type
-            .get_or_init(|| self.get_type_impl(types, source))
+            .get_or_init(|| self.get_type_impl(scope))
             .as_ref()
     }
 
-    fn get_type_impl(&self, types: &TypeResolver, source: &SourceCode) -> Option<Type> {
-        self.type_def.as_ref().map(|ty| ty.get_type(types, source))
+    fn get_type_impl(&self, scope: &Scope) -> Option<Type> {
+        self.type_def.as_ref().map(|ty| ty.get_type(scope))
     }
 }
 
