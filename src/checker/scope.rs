@@ -138,14 +138,14 @@ impl Scope {
             .and_then(|parent| parent.get_value(identifier))
     }
 
-    pub fn get_type_ref(&self, identifier: &String) -> Option<usize> {
+    pub fn get_type_index(&self, identifier: &String) -> Option<usize> {
         self.types
             .as_ref()
-            .and_then(|types| types.get_ref(identifier))
+            .and_then(|types| types.get_index(identifier))
             .or_else(|| {
                 self.parent
                     .as_ref()
-                    .and_then(|parent| parent.get_type_ref(identifier))
+                    .and_then(|parent| parent.get_type_index(identifier))
             })
     }
 

@@ -32,7 +32,7 @@ impl TypeResolver {
         self.lookup.insert(identifier.id().clone(), index);
     }
 
-    pub fn get_ref(&self, identifier: &String) -> Option<usize> {
+    pub fn get_index(&self, identifier: &String) -> Option<usize> {
         self.lookup.get(identifier).copied()
     }
 
@@ -41,7 +41,7 @@ impl TypeResolver {
     }
 
     pub fn resolve(&mut self, identifier: &String, value: Type) {
-        let index = self.get_ref(identifier);
+        let index = self.get_index(identifier);
         if let Some(index) = index {
             if self.types[index].is_none() {
                 self.types[index] = Some(value);

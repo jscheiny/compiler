@@ -27,7 +27,7 @@ impl StructNode {
     }
 
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
-        let index = scope.get_type_ref(self.id()).unwrap();
+        let index = scope.get_type_index(self.id()).unwrap();
         scope.nest(ScopeType::Struct(index), |mut scope| {
             for field in self.fields.iter() {
                 let field_type = field.get_type(&scope).clone();

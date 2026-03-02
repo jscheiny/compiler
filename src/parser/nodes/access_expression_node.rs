@@ -162,10 +162,7 @@ fn get_static_field(
             let member = struct_type.members.get(field.id());
             if let Some(member) = member {
                 // TODO respect public/private access
-                let self_type = scope
-                    .get_type_ref(&struct_type.identifier)
-                    .map(Type::Reference)
-                    .unwrap_or(Type::Error);
+                let self_type = get_self_type(&struct_type.identifier, scope);
                 member.member_type.clone().as_static_type(self_type)
             } else {
                 scope.source.print_error(
@@ -185,7 +182,7 @@ fn get_static_field(
 
 fn get_self_type(identifier: &String, scope: &Scope) -> Type {
     scope
-        .get_type_ref(identifier)
+        .get_type_index(identifier)
         .map(Type::Reference)
         .unwrap_or(Type::Error)
 }

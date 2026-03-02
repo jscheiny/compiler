@@ -19,8 +19,8 @@ impl TypeNode {
             Self::Primitive(primitive) => Type::Primitive(*primitive),
             Self::Function(function) => Type::Function(function.get_type(scope).clone()),
             Self::Tuple(tuple_type) => tuple_type.get_type(scope).clone(),
-            Self::UserDefined(identifier) => match scope.get_type_ref(identifier.id()) {
-                Some(resolved_type) => Type::Reference(resolved_type),
+            Self::UserDefined(identifier) => match scope.get_type_index(identifier.id()) {
+                Some(index) => Type::Reference(index),
                 None => {
                     scope.source.print_error(
                         identifier.span,
