@@ -91,8 +91,8 @@ impl Type {
         matches!(self, Type::Error)
     }
 
-    pub fn is_primitive(&self, expected: PrimitiveType, types: &TypeResolver) -> bool {
-        match self.deref(types) {
+    pub fn is_primitive(&self, expected: PrimitiveType, scope: &Scope) -> bool {
+        match self.deref(&scope.types) {
             Self::Primitive(primitive) => primitive == expected,
             Self::Error => true,
             _ => false,

@@ -121,12 +121,12 @@ impl BinaryOpExpressionNode {
         let bool_type = Type::Primitive(PrimitiveType::Bool);
 
         let (scope, left_type) = self.left.check(scope);
-        if !left_type.is_primitive(PrimitiveType::Bool, &scope.types) {
+        if !left_type.is_primitive(PrimitiveType::Bool, &scope) {
             self.print_operand_error(&scope, self.left.span, &bool_type, &left_type);
         }
 
         let (scope, right_type) = self.right.check(scope);
-        if !right_type.is_primitive(PrimitiveType::Bool, &scope.types) {
+        if !right_type.is_primitive(PrimitiveType::Bool, &scope) {
             self.print_operand_error(&scope, self.right.span, &bool_type, &right_type);
         }
 

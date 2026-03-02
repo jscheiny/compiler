@@ -18,7 +18,7 @@ impl PrefixOpExpressionNode {
 
     fn check_logical_not(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let (scope, resolved_type) = self.expression.check(scope);
-        if !resolved_type.is_primitive(PrimitiveType::Bool, &scope.types) {
+        if !resolved_type.is_primitive(PrimitiveType::Bool, &scope) {
             scope.source.print_error(
                 self.expression.span,
                 &format!(
@@ -34,8 +34,8 @@ impl PrefixOpExpressionNode {
 
     fn check_negative(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let (scope, resolved_type) = self.expression.check(scope);
-        if resolved_type.is_primitive(PrimitiveType::Float, &scope.types)
-            || resolved_type.is_primitive(PrimitiveType::Int, &scope.types)
+        if resolved_type.is_primitive(PrimitiveType::Float, &scope)
+            || resolved_type.is_primitive(PrimitiveType::Int, &scope)
         {
             (scope, resolved_type)
         } else {
