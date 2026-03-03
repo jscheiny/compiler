@@ -7,18 +7,18 @@ use crate::{
 };
 
 #[derive(Default, Debug)]
-pub struct TypeResolver {
+pub struct TypeMap {
     pub offset: usize,
     types: Vec<Option<Type>>,
     lookup: HashMap<String, usize>,
 }
 
-impl TypeResolver {
+impl TypeMap {
     pub fn new() -> Self {
         Default::default()
     }
 
-    pub fn nest(&self) -> TypeResolver {
+    pub fn nest(&self) -> TypeMap {
         Self {
             offset: self.offset + self.types.len(),
             ..Self::new()

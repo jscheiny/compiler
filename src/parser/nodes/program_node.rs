@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    checker::{Scope, TypeResolver},
+    checker::{Scope, TypeMap},
     lexer::SourceCode,
     parser::{ExportableModuleDefinitionNode, ModuleDefinitionNode, Node},
 };
@@ -12,7 +12,7 @@ pub struct ProgramNode {
 
 impl ProgramNode {
     pub fn check(&mut self, source: Rc<SourceCode>) {
-        let mut types = TypeResolver::new();
+        let mut types = TypeMap::new();
         for definition in self.definitions() {
             types.declare(definition.identifier(), &source);
         }
@@ -27,7 +27,7 @@ impl ProgramNode {
         }
     }
 
-    pub fn create_scope(&self, source: Rc<SourceCode>, types: TypeResolver) -> Box<Scope> {
+    pub fn create_scope(&self, source: Rc<SourceCode>, types: TypeMap) -> Box<Scope> {
         let mut scope = Scope::new(source, types);
         for definition in self.definitions() {
             definition.add_to_scope(&mut scope);

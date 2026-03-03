@@ -4,7 +4,7 @@ use std::{
 };
 
 use crate::{
-    checker::{Type, TypeResolver},
+    checker::{Type, TypeMap},
     lexer::SourceCode,
 };
 
@@ -24,12 +24,12 @@ pub struct Scope {
     scope_type: ScopeType,
     parent: Option<Box<Scope>>,
     values: HashMap<String, Type>,
-    types: TypeResolver,
+    types: TypeMap,
     return_type: Option<Type>,
 }
 
 impl Scope {
-    pub fn new(source: Rc<SourceCode>, types: TypeResolver) -> Self {
+    pub fn new(source: Rc<SourceCode>, types: TypeMap) -> Self {
         Self {
             source,
             scope_type: ScopeType::Global,
