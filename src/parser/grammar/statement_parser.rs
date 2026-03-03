@@ -3,7 +3,10 @@ use crate::{
     parser::{
         DeclarationNode, ExpressionNode, IdentifierType, IfStatementConditionNode, IfStatementNode,
         Node, ParseResult, StatementNode, StatementType, SyntaxError, TokenStream, WhileLoopNode,
-        grammar::{BlockType, block, expression, match_statement, type_definition},
+        grammar::{
+            BlockType, block, expression, match_statement, type_alias_parser::type_alias,
+            type_definition,
+        },
     },
 };
 
@@ -18,6 +21,7 @@ pub fn statement(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult
             Keyword::While => while_loop(tokens),
             Keyword::If => if_statement(tokens),
             Keyword::Match => match_statement(tokens),
+            Keyword::Type => type_alias_statement(tokens),
             _ => expression_statement(tokens),
         },
         Token::Symbol(symbol) => match symbol {
@@ -138,6 +142,11 @@ fn block_return(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<
         BlockType::Expression => Ok(StatementNode::BlockReturn(expression)),
         BlockType::Statement(_) => Ok(StatementNode::Expression(expression.value)),
     }
+}
+
+fn type_alias_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
+    let type_alias = type_alias(tokens)?;
+    Ok(StatementNode::TypeAlias(type_alias))
 }
 
 fn expression_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {

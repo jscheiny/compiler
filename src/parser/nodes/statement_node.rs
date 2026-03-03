@@ -2,7 +2,8 @@ use crate::{
     checker::{Scope, ScopeType, Type},
     lexer::Keyword,
     parser::{
-        DeclarationNode, ExpressionNode, IfStatementNode, MatchNode, Node, TokenSpan, WhileLoopNode,
+        DeclarationNode, ExpressionNode, IfStatementNode, MatchNode, Node, TokenSpan,
+        TypeAliasNode, WhileLoopNode,
     },
 };
 
@@ -15,6 +16,7 @@ pub enum StatementNode {
     FunctionReturn(Option<Node<ExpressionNode>>),
     If(IfStatementNode),
     Match(MatchNode),
+    TypeAlias(TypeAliasNode),
     WhileLoop(WhileLoopNode),
 }
 
@@ -43,6 +45,7 @@ impl StatementNode {
             }
             Self::If(node) => (node.check(scope), None),
             Self::Match(node) => (node.check_statement(scope), None),
+            Self::TypeAlias(node) => (node.check_statement(scope), None),
             Self::WhileLoop(node) => (node.check(scope), None),
         }
     }

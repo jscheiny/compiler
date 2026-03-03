@@ -1,20 +1,18 @@
-struct S(value: A) {}
 
-enum A(B, C, D);
+struct S(value: int) {}
 
-fn accept_fn(test: int => int => int) {}
+type T = (int, int);
 
-fn main(value: S) {
-    accept_fn(a -> [3, 4, 5]);
-    accept_fn(a -> b -> a);
-    test(1);
-    match value.value {
-        B -> 1;
-        C -> 2;
-        D -> 3;
+fn main(value: T) {
+    type T = (T, T);
+    type SCopy = S;
+    // TODO this is broken
+    // let f: S => int = S.value;
+    let x: T = ((1, 2), (3, 4));
+    {
+        type U = int;
+        let u: U = "test";
     }
+
+    let u2: U = "test";
 }
-
-fn test(x: bool): bool -> not x;
-
-fn test2(): int => int -> a -> a;

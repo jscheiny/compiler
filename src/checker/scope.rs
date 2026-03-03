@@ -20,7 +20,7 @@ pub enum ScopeType {
 }
 
 pub struct Scope {
-    pub types: Option<TypeResolver>,
+    pub types: TypeResolver,
     pub source: Rc<SourceCode>,
     scope_type: ScopeType,
     parent: Option<Box<Scope>>,
@@ -29,7 +29,7 @@ pub struct Scope {
 }
 
 impl Scope {
-    pub fn new(source: Rc<SourceCode>, types: Option<TypeResolver>) -> Self {
+    pub fn new(source: Rc<SourceCode>, types: TypeResolver) -> Self {
         Self {
             types,
             source,
@@ -55,10 +55,11 @@ impl Scope {
         handler: impl FnOnce(Box<Scope>) -> (Box<Scope>, T),
     ) -> (Box<Scope>, T) {
         let source = self.source.clone();
+        let types = self.types.nest();
         let scope = Box::new(Self {
             scope_type,
             parent: Some(self),
-            ..Self::new(source, None)
+            ..Self::new(source, types)
         });
         let (scope, result) = handler(scope);
         (scope.parent(), result)
@@ -70,11 +71,12 @@ impl Scope {
         handler: impl FnOnce(Box<Scope>) -> Box<Scope>,
     ) -> Box<Scope> {
         let source = self.source.clone();
+        let types = self.types.nest();
         let scope = Box::new(Self {
             scope_type: ScopeType::Function,
             parent: Some(self),
             return_type: Some(return_type.clone()),
-            ..Self::new(source, None)
+            ..Self::new(source, types)
         });
         handler(scope).parent()
     }
@@ -139,24 +141,22 @@ impl Scope {
     }
 
     pub fn get_type_index(&self, identifier: &String) -> Option<usize> {
-        self.types
-            .as_ref()
-            .and_then(|types| types.get_index(identifier))
-            .or_else(|| {
-                self.parent
-                    .as_ref()
-                    .and_then(|parent| parent.get_type_index(identifier))
-            })
+        self.types.get_index(identifier).or_else(|| {
+            self.parent
+                .as_ref()
+                .and_then(|parent| parent.get_type_index(identifier))
+        })
     }
 
     pub fn get_type(&self, index: usize) -> Option<Type> {
-        self.types
-            .as_ref()
-            .and_then(|types| types.get_type(index))
-            .or_else(|| {
-                self.parent
-                    .as_ref()
-                    .and_then(|parent| parent.get_type(index))
-            })
+        self.types.get_type(index).or_else(|| {
+            self.parent
+                .as_ref()
+                .and_then(|parent| parent.get_type(index))
+        })
+    }
+
+    pub fn add_type(&mut self, identifier: &str, alias: Type) {
+        self.types.add(identifier, alias);
     }
 }

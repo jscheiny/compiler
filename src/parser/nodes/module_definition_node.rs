@@ -21,10 +21,7 @@ impl ModuleDefinitionNode {
             Self::Struct(node) => node.check(scope),
             Self::Enum(node) => node.check(scope),
             Self::Function(node) => node.check(scope),
-            Self::TypeAlias(node) => {
-                node.check();
-                scope
-            }
+            Self::TypeAlias(_) => scope, // TODO check for recursion
         }
     }
 
@@ -55,12 +52,7 @@ impl ModuleDefinitionNode {
         };
 
         if let Some(resolved_type) = resolved_type {
-            // TODO can we do this without an unwrap?
-            scope
-                .types
-                .as_mut()
-                .unwrap()
-                .resolve(self.id(), resolved_type);
+            scope.types.resolve(self.id(), resolved_type);
         }
     }
 

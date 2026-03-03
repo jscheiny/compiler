@@ -28,7 +28,7 @@ impl ProgramNode {
     }
 
     pub fn create_scope(&self, source: Rc<SourceCode>, types: TypeResolver) -> Box<Scope> {
-        let mut scope = Scope::new(source, Some(types));
+        let mut scope = Scope::new(source, types);
         for definition in self.definitions() {
             definition.add_to_scope(&mut scope);
         }

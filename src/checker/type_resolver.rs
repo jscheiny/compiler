@@ -8,6 +8,7 @@ use crate::{
 
 #[derive(Default, Debug)]
 pub struct TypeResolver {
+    pub offset: usize,
     types: Vec<Option<Type>>,
     lookup: HashMap<String, usize>,
 }
@@ -15,6 +16,13 @@ pub struct TypeResolver {
 impl TypeResolver {
     pub fn new() -> Self {
         Default::default()
+    }
+
+    pub fn nest(&self) -> TypeResolver {
+        Self {
+            offset: self.offset + self.types.len(),
+            ..Self::new()
+        }
     }
 
     pub fn declare(&mut self, identifier: &Node<IdentifierNode>, source: &SourceCode) {
@@ -33,21 +41,27 @@ impl TypeResolver {
     }
 
     pub fn get_index(&self, identifier: &String) -> Option<usize> {
-        self.lookup.get(identifier).copied()
+        self.lookup
+            .get(identifier)
+            .map(|index| *index + self.offset)
     }
 
     pub fn get_type(&self, index: usize) -> Option<Type> {
-        self.types[index].clone()
+        if index < self.offset {
+            return None;
+        }
+        self.types.get(index - self.offset).and_then(|t| t.clone())
     }
 
     pub fn resolve(&mut self, identifier: &String, value: Type) {
-        let index = self.get_index(identifier);
-        if let Some(index) = index {
-            if self.types[index].is_none() {
-                self.types[index] = Some(value);
-            }
-        } else {
-            panic!("Could not resolve {}", identifier);
+        let index = *self.lookup.get(identifier).unwrap();
+        if self.types[index].is_none() {
+            self.types[index] = Some(value);
         }
+    }
+
+    pub fn add(&mut self, identifier: &str, value: Type) {
+        self.lookup.insert(identifier.to_owned(), self.types.len());
+        self.types.push(Some(value));
     }
 }

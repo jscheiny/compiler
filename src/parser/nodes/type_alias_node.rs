@@ -20,7 +20,9 @@ impl TypeAliasNode {
         }
     }
 
-    pub fn check(&self) {
+    pub fn check_statement(&self, mut scope: Box<Scope>) -> Box<Scope> {
+        scope.add_type(self.identifier.id(), self.get_type(&scope).clone());
+        scope
         // TODO check for recursion
     }
 
