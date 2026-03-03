@@ -8,24 +8,20 @@ use crate::{
 };
 
 pub fn statement(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<StatementNode> {
+    use Keyword as K;
+    use Symbol as S;
     match tokens.peek() {
-        Token::Keyword(keyword) => match keyword {
-            Keyword::Let => declaration(tokens, false),
-            Keyword::Mut => declaration(tokens, true),
-            Keyword::Return => function_return(tokens),
-            Keyword::Break => break_statement(tokens),
-            Keyword::Continue => continue_statement(tokens),
-            Keyword::While => while_loop(tokens),
-            Keyword::If => if_statement(tokens),
-            Keyword::Match => match_statement(tokens),
-            Keyword::Type => type_alias_statement(tokens),
-            _ => expression_statement(tokens),
-        },
-        Token::Symbol(symbol) => match symbol {
-            Symbol::OpenBrace => block_statement(tokens),
-            Symbol::SkinnyArrow => block_return(tokens, block_type),
-            _ => expression_statement(tokens),
-        },
+        Token::Keyword(K::Let) => declaration(tokens, false),
+        Token::Keyword(K::Mut) => declaration(tokens, true),
+        Token::Keyword(K::Return) => function_return(tokens),
+        Token::Keyword(K::Break) => break_statement(tokens),
+        Token::Keyword(K::Continue) => continue_statement(tokens),
+        Token::Keyword(K::While) => while_loop(tokens),
+        Token::Keyword(K::If) => if_statement(tokens),
+        Token::Keyword(K::Match) => match_statement(tokens),
+        Token::Keyword(K::Type) => type_alias_statement(tokens),
+        Token::Symbol(S::OpenBrace) => block_statement(tokens),
+        Token::Symbol(S::SkinnyArrow) => block_return(tokens, block_type),
         _ => expression_statement(tokens),
     }
 }
