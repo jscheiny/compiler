@@ -1,5 +1,5 @@
 use crate::{
-    lexer::Token,
+    lexer::{EnumToken, Token},
     parser::{IdentifierNode, IdentifierType, ParseResult, SyntaxError, TokenStream},
 };
 

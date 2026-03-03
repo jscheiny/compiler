@@ -1,5 +1,6 @@
 mod character_literal_tokenizer;
 mod comment_tokenizers;
+mod enum_tokenizer;
 mod identifier_tokenizer;
 mod integer_literal_tokenizer;
 mod keyword_tokenizer;
@@ -10,6 +11,7 @@ mod whitespace_tokenizer;
 
 pub use character_literal_tokenizer::*;
 pub use comment_tokenizers::*;
+pub use enum_tokenizer::*;
 pub use identifier_tokenizer::*;
 pub use integer_literal_tokenizer::*;
 pub use keyword_tokenizer::*;

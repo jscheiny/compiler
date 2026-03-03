@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use strum_macros::EnumIter;
 
-use crate::lexer::{Token, TokenMatch};
+use crate::lexer::{EnumToken, Token, TokenMatch};
 
 #[derive(Clone, Copy, EnumIter, PartialEq, Eq)]
 pub enum Symbol {
@@ -41,8 +41,8 @@ pub enum Symbol {
     Comma,
 }
 
-impl Symbol {
-    pub fn as_str(&self) -> &str {
+impl EnumToken for Symbol {
+    fn as_str(&self) -> &str {
         match self {
             // Two character symbols
             Self::PlusEqual => "+=",

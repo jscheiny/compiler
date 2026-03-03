@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use strum_macros::EnumIter;
 
-use crate::lexer::{Token, TokenMatch};
+use crate::lexer::{EnumToken, Token, TokenMatch};
 
 #[derive(Clone, Copy, Debug, EnumIter, PartialEq, Eq)]
 pub enum Keyword {
@@ -35,8 +35,8 @@ pub enum Keyword {
     Or,
 }
 
-impl Keyword {
-    pub fn as_str(&self) -> &str {
+impl EnumToken for Keyword {
+    fn as_str(&self) -> &str {
         match self {
             Self::Continue => "continue",
             Self::Return => "return",
