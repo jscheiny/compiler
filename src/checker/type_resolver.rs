@@ -53,7 +53,7 @@ impl TypeResolver {
         self.types.get(index - self.offset).and_then(|t| t.clone())
     }
 
-    pub fn resolve(&mut self, identifier: &String, value: Type) {
+    pub fn resolve(&mut self, identifier: &str, value: Type) {
         let index = *self.lookup.get(identifier).unwrap();
         if self.types[index].is_none() {
             self.types[index] = Some(value);

@@ -20,22 +20,22 @@ pub enum ScopeType {
 }
 
 pub struct Scope {
-    pub types: TypeResolver,
     pub source: Rc<SourceCode>,
     scope_type: ScopeType,
     parent: Option<Box<Scope>>,
     values: HashMap<String, Type>,
+    types: TypeResolver,
     return_type: Option<Type>,
 }
 
 impl Scope {
     pub fn new(source: Rc<SourceCode>, types: TypeResolver) -> Self {
         Self {
-            types,
             source,
             scope_type: ScopeType::Global,
             parent: None,
             values: HashMap::new(),
+            types,
             return_type: None,
         }
     }
@@ -158,5 +158,9 @@ impl Scope {
 
     pub fn add_type(&mut self, identifier: &str, alias: Type) {
         self.types.add(identifier, alias);
+    }
+
+    pub fn resolve_type(&mut self, identifier: &str, value: Type) {
+        self.types.resolve(identifier, value);
     }
 }

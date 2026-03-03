@@ -52,7 +52,7 @@ impl ModuleDefinitionNode {
         };
 
         if let Some(resolved_type) = resolved_type {
-            scope.types.resolve(self.id(), resolved_type);
+            scope.resolve_type(self.id(), resolved_type);
         }
     }
 
