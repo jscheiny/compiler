@@ -86,7 +86,7 @@ fn next_token<'a>(text: &'a str, tokenizers: &[Box<dyn Tokenizer>]) -> Option<Ne
         let maybe_result = tokenizer.try_tokenize(text);
         if let Some(result) = maybe_result.as_ref() {
             if let Some(token) = selected_token.as_ref() {
-                if result.width.bytes > token.width.bytes {
+                if result.width.characters > token.width.characters {
                     selected_token = maybe_result;
                 }
             } else {
