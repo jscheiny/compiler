@@ -7,8 +7,8 @@ use crate::{
 
 pub struct StructNode {
     pub identifier: Node<IdentifierNode>,
-    pub fields: NodeVec<StructFieldNode>,
-    pub methods: Option<NodeVec<MethodNode>>,
+    fields: NodeVec<StructFieldNode>,
+    methods: Option<NodeVec<MethodNode>>,
     resolved_type: OnceCell<StructType>,
 }
 
@@ -48,7 +48,7 @@ impl StructNode {
                     let method_type = Type::Function(method.function.get_type(&scope).clone());
                     scope.add_value_or(method.id(), method_type, |scope| {
                         scope.source.print_error(
-                            method.function.identifier.span,
+                            method.function.signature.identifier.span,
                             &format!("Duplicate struct member `{}`", method.id()),
                             &format!(
                                 "a field or method of struct `{}` already exists with this name",

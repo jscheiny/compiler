@@ -1,8 +1,8 @@
 use crate::{
     lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
-        ExpressionNode, FunctionBodyNode, FunctionNode, IdentifierType, MethodNode, Node,
-        ParameterNode, ParseResult, SyntaxError, TokenStream,
+        ExpressionNode, FunctionBodyNode, FunctionNode, FunctionSignatureNode, IdentifierType,
+        MethodNode, Node, ParameterNode, ParseResult, SyntaxError, TokenStream,
         grammar::{
             BlockType, block, comma_separated_list, end_statement, expression, type_definition,
         },
@@ -52,6 +52,15 @@ fn function(tokens: &mut TokenStream, has_keyword: bool) -> ParseResult<Function
     } else {
         IdentifierType::Method
     };
+    let signature = function_signature(tokens, identifier_type)?;
+    let body = tokens.located(function_body)?;
+    Ok(FunctionNode::new(signature, body))
+}
+
+fn function_signature(
+    tokens: &mut TokenStream,
+    identifier_type: IdentifierType,
+) -> ParseResult<FunctionSignatureNode> {
     let identifier = tokens.identifier(identifier_type)?;
     let parameters = tokens.located(parameters)?;
     let return_type = if tokens.accept(Symbol::Colon) {
@@ -59,8 +68,12 @@ fn function(tokens: &mut TokenStream, has_keyword: bool) -> ParseResult<Function
     } else {
         None
     };
-    let body = tokens.located(function_body)?;
-    Ok(FunctionNode::new(identifier, parameters, return_type, body))
+
+    Ok(FunctionSignatureNode::new(
+        identifier,
+        parameters,
+        return_type,
+    ))
 }
 
 fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyNode> {

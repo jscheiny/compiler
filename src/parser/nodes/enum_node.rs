@@ -47,7 +47,7 @@ impl EnumNode {
                 for method in methods.iter() {
                     if scope_names.contains(method.id()) {
                         scope.source.print_error(
-                            method.function.identifier.span,
+                            method.function.signature.identifier.span,
                             &format!("Duplicate enum member `{}`", method.id()),
                             &format!(
                                 "a variant or method of `{}` already exists with this name",

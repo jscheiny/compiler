@@ -1,34 +1,18 @@
-use std::{cell::OnceCell, collections::HashSet};
+use std::collections::HashSet;
 
 use crate::{
-    checker::{FunctionType, Scope, Type},
-    parser::{
-        FunctionBodyNode, Identified, IdentifierNode, Node, NodeVec, ParameterNode, TypeNode,
-    },
+    checker::{FunctionType, Scope},
+    parser::{FunctionBodyNode, FunctionSignatureNode, Identified, Node},
 };
 
 pub struct FunctionNode {
-    pub identifier: Node<IdentifierNode>,
-    pub parameters: NodeVec<ParameterNode>,
-    pub return_type: Option<Node<TypeNode>>,
-    pub body: Node<FunctionBodyNode>,
-    resolved_type: OnceCell<FunctionType>,
+    pub signature: FunctionSignatureNode,
+    body: Node<FunctionBodyNode>,
 }
 
 impl FunctionNode {
-    pub fn new(
-        identifier: Node<IdentifierNode>,
-        parameters: NodeVec<ParameterNode>,
-        return_type: Option<Node<TypeNode>>,
-        body: Node<FunctionBodyNode>,
-    ) -> Self {
-        Self {
-            identifier,
-            parameters,
-            return_type,
-            body,
-            resolved_type: OnceCell::new(),
-        }
+    pub fn new(signature: FunctionSignatureNode, body: Node<FunctionBodyNode>) -> Self {
+        Self { signature, body }
     }
 
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
@@ -58,7 +42,7 @@ impl FunctionNode {
 
     fn check_params(&self, mut scope: Box<Scope>) -> Box<Scope> {
         let mut param_names = HashSet::new();
-        for param in self.parameters.iter() {
+        for param in self.signature.parameters.iter() {
             if param_names.contains(param.id()) {
                 scope.source.print_error(
                     param.identifier.span,
@@ -74,32 +58,12 @@ impl FunctionNode {
     }
 
     pub fn get_type(&self, scope: &Scope) -> &FunctionType {
-        self.resolved_type.get_or_init(|| self.get_type_impl(scope))
-    }
-
-    fn get_type_impl(&self, scope: &Scope) -> FunctionType {
-        let parameters = self
-            .parameters
-            .value
-            .iter()
-            .map(|parameter| parameter.get_type(scope))
-            .cloned()
-            .collect();
-
-        let return_type = self
-            .return_type
-            .as_ref()
-            .map_or(Type::Void, |return_type| return_type.get_type(scope));
-
-        FunctionType {
-            parameters,
-            return_type: Box::new(return_type),
-        }
+        self.signature.get_type(scope)
     }
 }
 
 impl Identified for FunctionNode {
     fn id(&self) -> &String {
-        self.identifier.id()
+        self.signature.identifier.id()
     }
 }
