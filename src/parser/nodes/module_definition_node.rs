@@ -26,20 +26,18 @@ impl ModuleDefinitionNode {
     }
 
     pub fn add_to_scope(&self, scope: &mut Scope) {
-        match self {
-            Self::Enum(node) => {
-                let enum_type = RuntimeType::Enum(node.get_type(scope).clone());
-                scope.add_value(node.id(), Type::Type(enum_type));
-            }
-            Self::Function(node) => {
-                scope.add_value(node.id(), Type::Function(node.get_type(scope).clone()));
-            }
-            Self::Struct(node) => {
-                let struct_type = RuntimeType::Struct(node.get_type(scope).clone());
-                scope.add_value(node.id(), Type::Type(struct_type));
-            }
+        let resolved_type = match self {
+            Self::Enum(node) => Some(Type::Type(RuntimeType::Enum(node.get_type(scope).clone()))),
+            Self::Function(node) => Some(Type::Function(node.get_type(scope).clone())),
+            Self::Struct(node) => Some(Type::Type(RuntimeType::Struct(
+                node.get_type(scope).clone(),
+            ))),
             // TODO Consider how these are added to scope
-            Self::TypeAlias(_) => {}
+            Self::TypeAlias(_) => None,
+        };
+
+        if let Some(resolved_type) = resolved_type {
+            scope.add_value(self.id(), resolved_type);
         }
     }
 
