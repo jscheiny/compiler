@@ -3,6 +3,12 @@ interface Test {
     test2(value: bool): int;
 }
 
+struct S() {
+    impl Test {
+        pub test(value: int): int -> value;
+    }
+}
+
 fn test(test: Test) {
     test.test(3);
     test.test2(false);

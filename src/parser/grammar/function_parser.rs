@@ -2,16 +2,17 @@ use crate::{
     lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
         ExpressionNode, FunctionBodyNode, FunctionNode, FunctionSignatureNode, IdentifierType,
-        MethodNode, Node, ParameterNode, ParseResult, SyntaxError, TokenStream,
+        ImplementationNode, MethodNode, Node, ParameterNode, ParseResult, SyntaxError, TokenStream,
         grammar::{
-            BlockType, block, comma_separated_list, end_statement, expression, type_definition,
+            BlockType, block, comma_separated_list, end_statement, expression,
+            interface_implementation, type_definition,
         },
     },
 };
 
-pub fn methods(tokens: &mut TokenStream) -> ParseResult<Option<Node<Vec<Node<MethodNode>>>>> {
+pub fn implementation(tokens: &mut TokenStream) -> ParseResult<Option<Node<ImplementationNode>>> {
     if Symbol::OpenBrace.matches(tokens.peek()) {
-        Ok(Some(tokens.located(methods_impl)?))
+        Ok(Some(tokens.located(implementation_impl)?))
     } else if tokens.accept(Symbol::Semicolon) {
         Ok(None)
     } else {
@@ -20,13 +21,22 @@ pub fn methods(tokens: &mut TokenStream) -> ParseResult<Option<Node<Vec<Node<Met
     }
 }
 
-fn methods_impl(tokens: &mut TokenStream) -> ParseResult<Vec<Node<MethodNode>>> {
+fn implementation_impl(tokens: &mut TokenStream) -> ParseResult<ImplementationNode> {
     tokens.next();
     let mut methods = vec![];
+    let mut interface_implementations = vec![];
     while !tokens.accept(Symbol::CloseBrace) {
-        methods.push(tokens.located(method)?);
+        if tokens.accept(Keyword::Impl) {
+            interface_implementations.push(tokens.located(interface_implementation)?);
+        } else {
+            methods.push(tokens.located(method)?);
+        }
     }
-    Ok(methods)
+
+    Ok(ImplementationNode {
+        methods,
+        interface_implementations,
+    })
 }
 
 fn method(tokens: &mut TokenStream) -> ParseResult<MethodNode> {
@@ -39,7 +49,7 @@ pub fn top_level_function(tokens: &mut TokenStream) -> ParseResult<FunctionNode>
     function(tokens, true)
 }
 
-fn nested_function(tokens: &mut TokenStream) -> ParseResult<FunctionNode> {
+pub fn nested_function(tokens: &mut TokenStream) -> ParseResult<FunctionNode> {
     function(tokens, false)
 }
 

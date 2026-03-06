@@ -141,7 +141,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             }
             E::UnexpectedTypeExpression => return write!(f, "unexpected type declaration"),
             E::UnexpectedMethodSignatureQualifier(keyword) => {
-                return write!(f, "unexpected qualifier `{}` for method signature", keyword);
+                return write!(f, "unexpected qualifier `{}` for interface method", keyword);
             }
         }?;
         write!(f, ", found ")?;
@@ -207,7 +207,7 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
                 "type declarations should only appear in closure parameter lists"
             ),
             E::UnexpectedMethodSignatureQualifier(_) => {
-                write!(f, "method signatures must not be qualified")
+                write!(f, "interface methods must not be qualified")
             }
         }
     }

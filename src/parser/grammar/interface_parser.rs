@@ -1,9 +1,9 @@
 use crate::{
-    lexer::{Keyword, Symbol},
+    lexer::{Keyword, Symbol, TokenMatch},
     parser::{
-        FunctionSignatureNode, IdentifierType, InterfaceNode, Node, ParseResult, SyntaxError,
-        TokenStream,
-        grammar::{function_parser::function_signature, statement_parser::end_statement},
+        FunctionSignatureNode, IdentifierType, InterfaceImplementationNode, InterfaceNode, Node,
+        ParseResult, SyntaxError, TokenStream,
+        grammar::{end_statement, function_signature, nested_function},
     },
 };
 
@@ -34,13 +34,41 @@ pub fn method_signatures(
 }
 
 pub fn method_signature(tokens: &mut TokenStream) -> ParseResult<FunctionSignatureNode> {
-    if tokens.accept(Keyword::Pub) {
-        tokens.push_error(SyntaxError::UnexpectedMethodSignatureQualifier(
-            Keyword::Pub,
-        ));
-    }
-
+    no_qualifiers(tokens);
     let signature = function_signature(tokens, IdentifierType::Interface)?;
     end_statement(tokens);
     Ok(signature)
+}
+
+pub fn interface_implementation(
+    tokens: &mut TokenStream,
+) -> ParseResult<InterfaceImplementationNode> {
+    let identifier = tokens.identifier(IdentifierType::Interface)?;
+    if tokens.accept(Symbol::Semicolon) {
+        Ok(InterfaceImplementationNode {
+            identifier,
+            methods: None,
+        })
+    } else if tokens.accept(Symbol::OpenBrace) {
+        let mut methods = vec![];
+        while !tokens.accept(Symbol::CloseBrace) {
+            no_qualifiers(tokens);
+            methods.push(tokens.located(nested_function)?);
+        }
+        Ok(InterfaceImplementationNode {
+            identifier,
+            methods: Some(methods),
+        })
+    } else {
+        Err(tokens.make_error(SyntaxError::ExpectedMethods))
+    }
+}
+
+fn no_qualifiers(tokens: &mut TokenStream) {
+    if Keyword::Pub.matches(tokens.peek()) {
+        tokens.push_error(SyntaxError::UnexpectedMethodSignatureQualifier(
+            Keyword::Pub,
+        ));
+        tokens.next();
+    }
 }

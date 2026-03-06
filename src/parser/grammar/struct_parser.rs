@@ -2,7 +2,7 @@ use crate::{
     lexer::{Keyword, Symbol, Token},
     parser::{
         IdentifierType, Node, ParseResult, StructFieldNode, StructNode, SyntaxError, TokenStream,
-        grammar::{comma_separated_list, methods, type_definition},
+        grammar::{comma_separated_list, implementation, type_definition},
     },
 };
 
@@ -10,9 +10,8 @@ pub fn structure(tokens: &mut TokenStream) -> ParseResult<StructNode> {
     tokens.next();
     let identifier = tokens.identifier(IdentifierType::Struct)?;
     let fields = tokens.located(fields)?;
-
-    let methods = methods(tokens)?;
-    Ok(StructNode::new(identifier, fields, methods))
+    let implementation = implementation(tokens)?;
+    Ok(StructNode::new(identifier, fields, implementation))
 }
 
 fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<Node<StructFieldNode>>> {

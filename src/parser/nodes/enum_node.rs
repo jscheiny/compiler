@@ -5,13 +5,13 @@ use std::{
 
 use crate::{
     checker::{EnumType, Scope, ScopeType, Type},
-    parser::{EnumVariantNode, Identified, IdentifierNode, MethodNode, Node, NodeVec},
+    parser::{EnumVariantNode, Identified, IdentifierNode, ImplementationNode, Node, NodeVec},
 };
 
 pub struct EnumNode {
     pub identifier: Node<IdentifierNode>,
     pub variants: NodeVec<EnumVariantNode>,
-    pub methods: Option<NodeVec<MethodNode>>,
+    pub implementation: Option<Node<ImplementationNode>>,
     resolved_type: OnceCell<EnumType>,
 }
 
@@ -19,12 +19,12 @@ impl EnumNode {
     pub fn new(
         identifier: Node<IdentifierNode>,
         variants: NodeVec<EnumVariantNode>,
-        methods: Option<NodeVec<MethodNode>>,
+        implementation: Option<Node<ImplementationNode>>,
     ) -> Self {
         Self {
             identifier,
             variants,
-            methods,
+            implementation,
             resolved_type: OnceCell::new(),
         }
     }
@@ -43,8 +43,8 @@ impl EnumNode {
                 }
             }
 
-            if let Some(methods) = self.methods.as_ref() {
-                for method in methods.iter() {
+            if let Some(implementation) = self.implementation.as_ref() {
+                for method in implementation.methods.iter() {
                     if scope_names.contains(method.id()) {
                         scope.source.print_error(
                             method.function.signature.identifier.span,
@@ -61,7 +61,7 @@ impl EnumNode {
                     }
                 }
 
-                for method in methods.iter() {
+                for method in implementation.methods.iter() {
                     scope = method.check(scope)
                 }
             }
@@ -83,8 +83,8 @@ impl EnumNode {
         }
 
         let mut methods = HashMap::new();
-        if let Some(methods_list) = self.methods.as_ref() {
-            for method in methods_list.iter() {
+        if let Some(implementation) = self.implementation.as_ref() {
+            for method in implementation.methods.iter() {
                 let member = method.resolve_enum_method(scope);
                 let identifier = method.id().clone();
                 methods.entry(identifier).or_insert(member);

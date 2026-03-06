@@ -2,13 +2,13 @@ use std::{cell::OnceCell, collections::HashMap};
 
 use crate::{
     checker::{Scope, ScopeType, StructType, Type},
-    parser::{Identified, IdentifierNode, MethodNode, Node, NodeVec, StructFieldNode},
+    parser::{Identified, IdentifierNode, ImplementationNode, Node, NodeVec, StructFieldNode},
 };
 
 pub struct StructNode {
     pub identifier: Node<IdentifierNode>,
     fields: NodeVec<StructFieldNode>,
-    methods: Option<NodeVec<MethodNode>>,
+    implementation: Option<Node<ImplementationNode>>,
     resolved_type: OnceCell<StructType>,
 }
 
@@ -16,12 +16,12 @@ impl StructNode {
     pub fn new(
         identifier: Node<IdentifierNode>,
         fields: NodeVec<StructFieldNode>,
-        methods: Option<NodeVec<MethodNode>>,
+        implementation: Option<Node<ImplementationNode>>,
     ) -> Self {
         Self {
             identifier,
             fields,
-            methods,
+            implementation,
             resolved_type: OnceCell::new(),
         }
     }
@@ -43,8 +43,8 @@ impl StructNode {
                 });
             }
 
-            if let Some(methods) = self.methods.as_ref() {
-                for method in methods.iter() {
+            if let Some(implementation) = self.implementation.as_ref() {
+                for method in implementation.methods.iter() {
                     let method_type = Type::Function(method.function.get_type(&scope).clone());
                     scope.add_value_or(method.id(), method_type, |scope| {
                         scope.source.print_error(
@@ -58,7 +58,7 @@ impl StructNode {
                     });
                 }
 
-                for method in methods.iter() {
+                for method in implementation.methods.iter() {
                     scope = method.check(scope)
                 }
             }
@@ -80,8 +80,8 @@ impl StructNode {
             members.entry(identifier).or_insert(member);
         }
 
-        if let Some(methods) = self.methods.as_ref() {
-            for method in methods.iter() {
+        if let Some(implementation) = self.implementation.as_ref() {
+            for method in implementation.methods.iter() {
                 let member = method.resolve_struct_method(scope);
                 let identifier = method.id().clone();
                 members.entry(identifier).or_insert(member);

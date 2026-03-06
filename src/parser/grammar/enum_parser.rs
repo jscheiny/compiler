@@ -2,7 +2,7 @@ use crate::{
     lexer::{Symbol, Token},
     parser::{
         EnumNode, EnumVariantNode, IdentifierType, Node, ParseResult, SyntaxError, TokenStream,
-        grammar::{comma_separated_list, methods, type_definition},
+        grammar::{comma_separated_list, implementation, type_definition},
     },
 };
 
@@ -10,8 +10,8 @@ pub fn enumeration(tokens: &mut TokenStream) -> ParseResult<EnumNode> {
     tokens.next();
     let identifier = tokens.identifier(IdentifierType::Variant)?;
     let variants = tokens.located(enum_variants)?;
-    let methods = methods(tokens)?;
-    Ok(EnumNode::new(identifier, variants, methods))
+    let implementation = implementation(tokens)?;
+    Ok(EnumNode::new(identifier, variants, implementation))
 }
 
 fn enum_variants(tokens: &mut TokenStream) -> ParseResult<Vec<Node<EnumVariantNode>>> {
