@@ -74,7 +74,7 @@ impl EnumNode {
         self.resolved_type.get_or_init(|| self.get_type_impl(scope))
     }
 
-    pub fn get_type_impl(&self, scope: &Scope) -> EnumType {
+    fn get_type_impl(&self, scope: &Scope) -> EnumType {
         let mut variants = HashMap::new();
         for variant in self.variants.iter() {
             let identifier = variant.id().clone();

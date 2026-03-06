@@ -71,7 +71,7 @@ impl StructNode {
         self.resolved_type.get_or_init(|| self.get_type_impl(scope))
     }
 
-    pub fn get_type_impl(&self, scope: &Scope) -> StructType {
+    fn get_type_impl(&self, scope: &Scope) -> StructType {
         let mut members = HashMap::new();
 
         for field in self.fields.iter() {
