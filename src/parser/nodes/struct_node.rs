@@ -1,6 +1,7 @@
 use std::{
     cell::OnceCell,
     collections::{HashMap, HashSet},
+    rc::Rc,
 };
 
 use crate::{
@@ -15,7 +16,7 @@ pub struct StructNode {
     pub identifier: Node<IdentifierNode>,
     fields: NodeVec<StructFieldNode>,
     implementation: Option<Node<ImplementationNode>>,
-    resolved_type: OnceCell<StructType>,
+    resolved_type: OnceCell<Rc<StructType>>,
 }
 
 impl StructNode {
@@ -67,11 +68,13 @@ impl StructNode {
         scope
     }
 
-    pub fn get_type(&self, scope: &Scope) -> &StructType {
-        self.resolved_type.get_or_init(|| self.get_type_impl(scope))
+    pub fn get_type(&self, scope: &Scope) -> Rc<StructType> {
+        self.resolved_type
+            .get_or_init(|| self.get_type_impl(scope))
+            .clone()
     }
 
-    fn get_type_impl(&self, scope: &Scope) -> StructType {
+    fn get_type_impl(&self, scope: &Scope) -> Rc<StructType> {
         let mut members = HashMap::new();
 
         for field in self.fields.iter() {
@@ -89,10 +92,10 @@ impl StructNode {
             }
         }
 
-        StructType {
+        Rc::new(StructType {
             identifier: self.id().clone(),
             members,
-        }
+        })
     }
 }
 

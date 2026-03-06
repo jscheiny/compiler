@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::{
     checker::{EnumType, FunctionType, InterfaceType, Scope, StructType, TypeFmt},
     parser::PrimitiveType,
@@ -6,20 +8,20 @@ use crate::{
 // TODO reconsider this name
 #[derive(Clone, Debug)]
 pub enum RuntimeType {
-    Enum(EnumType),
-    Struct(StructType),
+    Enum(Rc<EnumType>),
+    Struct(Rc<StructType>),
 }
 
 #[derive(Clone, Debug)]
 pub enum Type {
     Array(Box<Type>),
-    Enum(EnumType),
+    Enum(Rc<EnumType>),
     Function(FunctionType),
-    Interface(InterfaceType),
+    Interface(Rc<InterfaceType>),
     Primitive(PrimitiveType),
     Reference(usize),
-    Struct(StructType),
-    Tuple(Vec<Type>),
+    Struct(Rc<StructType>),
+    Tuple(Rc<Vec<Type>>),
     Type(RuntimeType),
     Void,
     Error,
@@ -30,6 +32,7 @@ impl Type {
         if self.is_error() || other.is_error() {
             return true;
         }
+
         if let Type::Reference(_) = other {
             let resolved_other = other.deref(scope);
             return self.is_assignable_to(&resolved_other, scope);
@@ -84,7 +87,7 @@ impl Type {
                     left.len() == right.len()
                         && left
                             .iter()
-                            .zip(right)
+                            .zip(right.iter())
                             .all(|(left, right)| left.is_assignable_to(right, scope))
                 }
                 _ => false,

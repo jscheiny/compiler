@@ -1,6 +1,7 @@
 use std::{
     cell::OnceCell,
     collections::{HashMap, HashSet},
+    rc::Rc,
 };
 
 use crate::{
@@ -15,7 +16,7 @@ pub struct EnumNode {
     pub identifier: Node<IdentifierNode>,
     pub variants: NodeVec<EnumVariantNode>,
     pub implementation: Option<Node<ImplementationNode>>,
-    resolved_type: OnceCell<EnumType>,
+    resolved_type: OnceCell<Rc<EnumType>>,
 }
 
 impl EnumNode {
@@ -64,11 +65,13 @@ impl EnumNode {
         scope
     }
 
-    pub fn get_type(&self, scope: &Scope) -> &EnumType {
-        self.resolved_type.get_or_init(|| self.get_type_impl(scope))
+    pub fn get_type(&self, scope: &Scope) -> Rc<EnumType> {
+        self.resolved_type
+            .get_or_init(|| self.get_type_impl(scope))
+            .clone()
     }
 
-    fn get_type_impl(&self, scope: &Scope) -> EnumType {
+    fn get_type_impl(&self, scope: &Scope) -> Rc<EnumType> {
         let mut variants = HashMap::new();
         for variant in self.variants.iter() {
             let identifier = variant.id().clone();
@@ -86,11 +89,11 @@ impl EnumNode {
             }
         }
 
-        EnumType {
+        Rc::new(EnumType {
             identifier: self.id().clone(),
             variants,
             methods,
-        }
+        })
     }
 }
 

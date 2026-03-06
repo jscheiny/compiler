@@ -1,6 +1,7 @@
 use std::{
     cell::OnceCell,
     collections::{HashMap, HashSet},
+    rc::Rc,
 };
 
 use crate::{
@@ -11,7 +12,7 @@ use crate::{
 pub struct InterfaceNode {
     pub identifier: Node<IdentifierNode>,
     method_signatures: NodeVec<FunctionSignatureNode>,
-    resolved_type: OnceCell<InterfaceType>,
+    resolved_type: OnceCell<Rc<InterfaceType>>,
 }
 
 impl InterfaceNode {
@@ -41,11 +42,13 @@ impl InterfaceNode {
         scope
     }
 
-    pub fn get_type(&self, scope: &Scope) -> &InterfaceType {
-        self.resolved_type.get_or_init(|| self.get_type_impl(scope))
+    pub fn get_type(&self, scope: &Scope) -> Rc<InterfaceType> {
+        self.resolved_type
+            .get_or_init(|| self.get_type_impl(scope))
+            .clone()
     }
 
-    fn get_type_impl(&self, scope: &Scope) -> InterfaceType {
+    fn get_type_impl(&self, scope: &Scope) -> Rc<InterfaceType> {
         let mut methods = HashMap::new();
         for method_signature in self.method_signatures.iter() {
             let id = method_signature.id().clone();
@@ -53,10 +56,10 @@ impl InterfaceNode {
             methods.entry(id).or_insert(method);
         }
 
-        InterfaceType {
+        Rc::new(InterfaceType {
             identifier: self.id().clone(),
             methods,
-        }
+        })
     }
 }
 

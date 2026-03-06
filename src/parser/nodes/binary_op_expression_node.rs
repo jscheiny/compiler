@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::{
     checker::{Scope, Type},
     parser::{BinaryOperator, ExpressionNode, Node, Operator, PrimitiveType, TokenSpan},
@@ -114,7 +116,7 @@ impl BinaryOpExpressionNode {
         let (scope, current_type) = current.check(scope);
         tuple_types.push(current_type);
 
-        (scope, Type::Tuple(tuple_types))
+        (scope, Type::Tuple(Rc::new(tuple_types)))
     }
 
     fn check_logical_op(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {

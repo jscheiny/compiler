@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, rc::Rc};
 
 use crate::checker::{FunctionType, Type};
 
@@ -10,7 +10,7 @@ pub struct EnumType {
 }
 
 impl EnumType {
-    pub fn get_variant(&self, identifier: &String) -> Option<Type> {
+    pub fn get_variant(self: &Rc<Self>, identifier: &String) -> Option<Type> {
         // TODO enum type should have a reference index on it to construct its self type here
         let self_type = Type::Enum(self.clone());
         self.variants
