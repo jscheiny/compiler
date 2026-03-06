@@ -1,4 +1,12 @@
 interface Test {
     test(value: int);
-    test2(value: bool): Test;
+    test2(value: bool): int;
 }
+
+fn test(test: Test) {
+    test.test(3);
+    test.test2(false);
+    accept(.test2(true));
+}
+
+fn accept(getter: Test => int){}
