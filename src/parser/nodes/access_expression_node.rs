@@ -92,7 +92,23 @@ pub fn get_field(
             );
             Type::Error
         }
-        Type::Interface(_) => todo!("Implement access for interfaces"),
+        Type::Interface(interface_type) => {
+            let method = interface_type.methods.get(field.id());
+            if let Some(method) = method {
+                Type::Function(method.clone())
+            } else {
+                scope.source.print_error(
+                    field.span,
+                    &format!("Could not find method `{}`", field.id()),
+                    &format!(
+                        "interface `{}` has no such method `{}`",
+                        interface_type.identifier,
+                        field.id()
+                    ),
+                );
+                Type::Error
+            }
+        }
         Type::Primitive(_) => todo!("Implement access on primitive values"),
         Type::Reference(index) => {
             let resolved_type = scope.get_type(*index).unwrap();
