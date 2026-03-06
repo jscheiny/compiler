@@ -24,6 +24,7 @@ pub enum SyntaxError {
     ExpectedMatchExpression,
     ExpectedMatchPattern,
     ExpectedMethods,
+    ExpectedMethodSignatures,
     ExpectedParameters,
     ExpectedThen,
     ExpectedTopLevelDefinition,
@@ -32,12 +33,14 @@ pub enum SyntaxError {
     UnexpectedBindingPattern,
     UnexpectedBlockReturn(StatementType),
     UnexpectedTypeExpression,
+    UnexpectedMethodSignatureQualifier(Keyword),
 }
 
 #[derive(Clone, Copy)]
 pub enum IdentifierType {
     Field,
     Function,
+    Interface,
     Method,
     Parameter,
     PatternBinding,
@@ -51,6 +54,7 @@ impl Display for IdentifierType {
         let message = match self {
             Self::Field => "field",
             Self::Function => "function",
+            Self::Interface => "interface",
             Self::Method => "method",
             Self::Parameter => "parameter",
             Self::PatternBinding => "pattern binding",
@@ -123,6 +127,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             E::ExpectedMatchExpression => write!(f, "expected expression"),
             E::ExpectedMatchPattern => write!(f, "expected match pattern"),
             E::ExpectedMethods => write!(f, "expected methods block"),
+            E::ExpectedMethodSignatures => write!(f, "expected method signatures block"),
             E::ExpectedParameters => write!(f, "expected parameters"),
             E::ExpectedThen => write!(f, "expected `{}` following predicate`", Keyword::Then),
             E::ExpectedTopLevelDefinition => write!(f, "expected struct, tuple, enum, or function"),
@@ -135,6 +140,9 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
                 return write!(f, "unexpected block return in {}", statement_type);
             }
             E::UnexpectedTypeExpression => return write!(f, "unexpected type declaration"),
+            E::UnexpectedMethodSignatureQualifier(keyword) => {
+                return write!(f, "unexpected qualifier `{}` for method signature", keyword);
+            }
         }?;
         write!(f, ", found ")?;
 
@@ -178,6 +186,7 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
             E::ExpectedMatchExpression => fmt_symbol(f, S::SkinnyArrow),
             E::ExpectedMatchPattern => write!(f, "expected pattern e.g. Variant(let binding)"),
             E::ExpectedMethods => fmt_symbols(f, S::OpenBrace, S::Semicolon),
+            E::ExpectedMethodSignatures => fmt_symbol(f, S::OpenBrace),
             E::ExpectedParameters => fmt_symbol(f, S::OpenParen),
             E::ExpectedThen => write!(f, "expected `{}`", Keyword::Then),
             E::ExpectedTopLevelDefinition => write!(f, "expected struct, tuple, enum, or function"),
@@ -197,6 +206,9 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
                 f,
                 "type declarations should only appear in closure parameter lists"
             ),
+            E::UnexpectedMethodSignatureQualifier(_) => {
+                write!(f, "method signatures must not be qualified")
+            }
         }
     }
 }

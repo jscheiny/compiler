@@ -1,5 +1,5 @@
 use crate::{
-    checker::{EnumType, FunctionType, Scope, StructType, TypeFmt},
+    checker::{EnumType, FunctionType, InterfaceType, Scope, StructType, TypeFmt},
     parser::PrimitiveType,
 };
 
@@ -15,6 +15,7 @@ pub enum Type {
     Array(Box<Type>),
     Enum(EnumType),
     Function(FunctionType),
+    Interface(InterfaceType),
     Primitive(PrimitiveType),
     Reference(usize),
     Struct(StructType),
@@ -62,6 +63,7 @@ impl Type {
                 }
                 _ => false,
             },
+            Type::Interface(_left) => todo!("Implement assignability for interfaces"),
             Type::Primitive(left) => match other {
                 Type::Primitive(right) => left == right,
                 _ => false,

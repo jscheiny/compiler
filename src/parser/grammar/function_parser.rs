@@ -57,7 +57,7 @@ fn function(tokens: &mut TokenStream, has_keyword: bool) -> ParseResult<Function
     Ok(FunctionNode::new(signature, body))
 }
 
-fn function_signature(
+pub fn function_signature(
     tokens: &mut TokenStream,
     identifier_type: IdentifierType,
 ) -> ParseResult<FunctionSignatureNode> {

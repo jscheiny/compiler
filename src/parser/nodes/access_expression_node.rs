@@ -92,6 +92,7 @@ pub fn get_field(
             );
             Type::Error
         }
+        Type::Interface(_) => todo!("Implement access for interfaces"),
         Type::Primitive(_) => todo!("Implement access on primitive values"),
         Type::Reference(index) => {
             let resolved_type = scope.get_type(*index).unwrap();

@@ -1,18 +1,4 @@
-
-struct S(value: int) {}
-
-type T = (int, int);
-
-fn main(value: T) {
-    type T = (T, T);
-    type SCopy = S;
-    // TODO this is broken
-    // let f: S => int = S.value;
-    let x: T = ((1, 2), (3, 4));
-    {
-        type U = int;
-        let u: U = "test";
-    }
-
-    let u2: U = "test";
+interface Test {
+    test(value: int);
+    test2(value: bool): Test;
 }

@@ -1,6 +1,9 @@
 use crate::{
     checker::{RuntimeType, Scope, Type},
-    parser::{EnumNode, FunctionNode, Identified, IdentifierNode, Node, StructNode, TypeAliasNode},
+    parser::{
+        EnumNode, FunctionNode, Identified, IdentifierNode, InterfaceNode, Node, StructNode,
+        TypeAliasNode,
+    },
 };
 
 pub struct ExportableModuleDefinitionNode {
@@ -11,6 +14,7 @@ pub struct ExportableModuleDefinitionNode {
 pub enum ModuleDefinitionNode {
     Enum(EnumNode),
     Function(FunctionNode),
+    Interface(InterfaceNode),
     Struct(StructNode),
     TypeAlias(TypeAliasNode),
 }
@@ -20,6 +24,7 @@ impl ModuleDefinitionNode {
         match self {
             Self::Enum(node) => node.check(scope),
             Self::Function(node) => node.check(scope),
+            Self::Interface(node) => node.check(scope),
             Self::Struct(node) => node.check(scope),
             Self::TypeAlias(_) => scope, // TODO check for recursion
         }
@@ -29,6 +34,7 @@ impl ModuleDefinitionNode {
         let resolved_type = match self {
             Self::Enum(node) => Some(Type::Type(RuntimeType::Enum(node.get_type(scope).clone()))),
             Self::Function(node) => Some(Type::Function(node.get_type(scope).clone())),
+            Self::Interface(_node) => None, // todo!("Implement add_to_scope for interface"),
             Self::Struct(node) => Some(Type::Type(RuntimeType::Struct(
                 node.get_type(scope).clone(),
             ))),
@@ -44,6 +50,7 @@ impl ModuleDefinitionNode {
     pub fn resolve_type(&mut self, scope: &mut Scope) {
         let resolved_type = match self {
             Self::Enum(node) => Some(Type::Enum(node.get_type(scope).clone())),
+            Self::Interface(_node) => None, // todo!("Implement resolve_type for interface"),
             Self::Struct(node) => Some(Type::Struct(node.get_type(scope).clone())),
             Self::TypeAlias(node) => Some(node.get_type(scope).clone()),
             Self::Function(_) => None,
@@ -57,7 +64,8 @@ impl ModuleDefinitionNode {
     pub fn identifier(&self) -> &Node<IdentifierNode> {
         match self {
             Self::Enum(node) => &node.identifier,
-            Self::Function(node) => &node.identifier,
+            Self::Function(node) => &node.signature.identifier,
+            Self::Interface(node) => &node.identifier,
             Self::Struct(node) => &node.identifier,
             Self::TypeAlias(node) => &node.identifier,
         }
@@ -66,11 +74,6 @@ impl ModuleDefinitionNode {
 
 impl Identified for ModuleDefinitionNode {
     fn id(&self) -> &String {
-        match self {
-            Self::Enum(node) => node.id(),
-            Self::Function(node) => node.id(),
-            Self::Struct(node) => node.id(),
-            Self::TypeAlias(node) => node.id(),
-        }
+        self.identifier().id()
     }
 }
