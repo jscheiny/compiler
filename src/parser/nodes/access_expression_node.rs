@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::{
     checker::{FunctionType, RuntimeType, Scope, Type},
     parser::{
@@ -31,7 +33,7 @@ impl AccessExpressionNode {
     pub fn check_deferred(
         &self,
         scope: Box<Scope>,
-        function_type: FunctionType,
+        function_type: Rc<FunctionType>,
     ) -> (Box<Scope>, Type) {
         let field_type = get_field(
             &function_type.return_type,
@@ -49,10 +51,10 @@ impl AccessExpressionNode {
             return (scope, result_type);
         }
 
-        let deferred_type = Type::Function(FunctionType {
-            parameters: function_type.parameters,
+        let deferred_type = Type::Function(Rc::new(FunctionType {
+            parameters: function_type.parameters.clone(),
             return_type: Box::new(result_type),
-        });
+        }));
         (scope, deferred_type)
     }
 }

@@ -1,4 +1,4 @@
-use std::cell::OnceCell;
+use std::{cell::OnceCell, rc::Rc};
 
 use crate::{
     checker::{FunctionType, Scope},
@@ -8,7 +8,7 @@ use crate::{
 pub struct FunctionTypeNode {
     parameters: NodeVec<TypeNode>,
     return_type: Box<Node<TypeNode>>,
-    resolved_type: OnceCell<FunctionType>,
+    resolved_type: OnceCell<Rc<FunctionType>>,
 }
 
 impl FunctionTypeNode {
@@ -20,11 +20,13 @@ impl FunctionTypeNode {
         }
     }
 
-    pub fn get_type(&self, scope: &Scope) -> &FunctionType {
-        self.resolved_type.get_or_init(|| self.get_type_impl(scope))
+    pub fn get_type(&self, scope: &Scope) -> Rc<FunctionType> {
+        self.resolved_type
+            .get_or_init(|| self.get_type_impl(scope))
+            .clone()
     }
 
-    fn get_type_impl(&self, scope: &Scope) -> FunctionType {
+    fn get_type_impl(&self, scope: &Scope) -> Rc<FunctionType> {
         let parameters = self
             .parameters
             .value
@@ -34,9 +36,9 @@ impl FunctionTypeNode {
 
         let return_type = Box::new(self.return_type.get_type(scope));
 
-        FunctionType {
+        Rc::new(FunctionType {
             parameters,
             return_type,
-        }
+        })
     }
 }

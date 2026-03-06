@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, rc::Rc};
 
 use crate::{
     checker::{FunctionType, Scope},
@@ -57,7 +57,7 @@ impl FunctionNode {
         scope
     }
 
-    pub fn get_type(&self, scope: &Scope) -> &FunctionType {
+    pub fn get_type(&self, scope: &Scope) -> Rc<FunctionType> {
         self.signature.get_type(scope)
     }
 }

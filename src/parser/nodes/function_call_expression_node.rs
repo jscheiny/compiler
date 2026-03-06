@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::{
     checker::{FunctionType, Scope, Type},
     parser::{ExpressionNode, Node, NodeVec, TokenSpan},
@@ -81,10 +83,10 @@ pub fn check_function_call(
 
     if arguments.len() < function_type.parameters.len() {
         let remaining_parameters = &function_type.parameters[arguments.len()..];
-        let result_type = Type::Function(FunctionType {
+        let result_type = Type::Function(Rc::new(FunctionType {
             parameters: remaining_parameters.to_vec(),
             return_type: function_type.return_type.clone(),
-        });
+        }));
         (scope, result_type)
     } else {
         (scope, *function_type.return_type.clone())

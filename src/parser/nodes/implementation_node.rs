@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, rc::Rc};
 
 use crate::{
     checker::{FunctionType, Scope, Type},
@@ -46,7 +46,7 @@ impl ImplementationNode {
     }
 
     // TODO get a better API for this
-    pub fn get_methods(&self, scope: &Scope) -> Vec<(String, bool, FunctionType)> {
+    pub fn get_methods(&self, scope: &Scope) -> Vec<(String, bool, Rc<FunctionType>)> {
         let mut methods = vec![];
         for entry in self.entries.iter() {
             match &entry.value {
@@ -58,8 +58,6 @@ impl ImplementationNode {
                     ));
                 }
                 ImplementationEntryNode::Interface(implementation) => {
-                    println!("impl {}", implementation.id());
-                    println!("{:?}", scope.get_type_index(implementation.id()));
                     let interface_type = scope
                         .get_type_index(implementation.id())
                         .map(Type::Reference)

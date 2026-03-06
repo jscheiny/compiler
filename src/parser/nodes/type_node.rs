@@ -17,7 +17,7 @@ impl TypeNode {
         match self {
             Self::Array(element_type) => Type::Array(Box::new(element_type.get_type(scope))),
             Self::Primitive(primitive) => Type::Primitive(*primitive),
-            Self::Function(function) => Type::Function(function.get_type(scope).clone()),
+            Self::Function(function) => Type::Function(function.get_type(scope)),
             Self::Tuple(tuple_type) => tuple_type.get_type(scope),
             Self::UserDefined(identifier) => match scope.get_type_index(identifier.id()) {
                 Some(index) => Type::Reference(index),

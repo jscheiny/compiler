@@ -77,7 +77,7 @@ impl BinaryOpExpressionNode {
                 );
             }
 
-            (scope, *function_type.return_type)
+            (scope, *function_type.return_type.clone())
         } else {
             if !right_type.is_error() {
                 scope.source.print_error(

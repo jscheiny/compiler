@@ -16,7 +16,7 @@ pub enum RuntimeType {
 pub enum Type {
     Array(Box<Type>),
     Enum(Rc<EnumType>),
-    Function(FunctionType),
+    Function(Rc<FunctionType>),
     Interface(Rc<InterfaceType>),
     Primitive(PrimitiveType),
     Reference(usize),
@@ -110,13 +110,13 @@ impl Type {
         }
     }
 
-    pub fn as_function(self, scope: &Scope) -> Option<FunctionType> {
+    pub fn as_function(self, scope: &Scope) -> Option<Rc<FunctionType>> {
         match self.as_deref(scope) {
             Type::Array(element_type) => Some(FunctionType::new(
                 Type::Primitive(PrimitiveType::Int),
                 element_type.as_ref().clone(),
             )),
-            Type::Function(function_type) => Some(function_type.clone()),
+            Type::Function(function_type) => Some(function_type),
             Type::Type(RuntimeType::Struct(_)) => {
                 todo!("Implement call operator for types (constructor)")
             }

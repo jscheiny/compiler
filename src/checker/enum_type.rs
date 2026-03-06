@@ -2,7 +2,7 @@ use std::{collections::HashMap, rc::Rc};
 
 use crate::checker::{FunctionType, Type};
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Debug)]
 pub struct EnumType {
     pub identifier: String,
     pub variants: HashMap<String, Option<Type>>,
@@ -27,5 +27,5 @@ impl EnumType {
 #[derive(Clone, Debug)]
 pub struct EnumMethod {
     pub public: bool,
-    pub function_type: FunctionType,
+    pub function_type: Rc<FunctionType>,
 }

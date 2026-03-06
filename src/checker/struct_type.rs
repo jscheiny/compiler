@@ -1,8 +1,8 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, rc::Rc};
 
 use crate::checker::{FunctionType, Type};
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct StructType {
     pub identifier: String,
     pub members: HashMap<String, StructMember>,
@@ -17,7 +17,7 @@ pub struct StructMember {
 #[derive(Clone, Debug)]
 pub enum StructMemberType {
     Field(Type),
-    Method(FunctionType),
+    Method(Rc<FunctionType>),
 }
 
 impl StructMemberType {

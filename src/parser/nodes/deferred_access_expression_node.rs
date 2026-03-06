@@ -11,7 +11,7 @@ pub struct DeferredAccessExpressionNode {
 impl DeferredAccessExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         let function_type = expected_type.and_then(|t| t.clone().as_function(&scope));
-        if let Some(mut function_type) = function_type {
+        if let Some(function_type) = function_type {
             if function_type.parameters.len() != 1 {
                 scope.source.print_error(
                     // TODO this span should cover the whole node...
@@ -24,7 +24,7 @@ impl DeferredAccessExpressionNode {
                 );
             }
 
-            let parameter_type = function_type.parameters.swap_remove(0);
+            let parameter_type = function_type.parameters[0].clone();
             let field_type = get_field(
                 &parameter_type,
                 self.field.span.previous(),
