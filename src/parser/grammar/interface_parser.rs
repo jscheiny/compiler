@@ -1,8 +1,8 @@
 use crate::{
     lexer::{Keyword, Symbol, TokenMatch},
     parser::{
-        FunctionSignatureNode, IdentifierType, InterfaceImplementationNode, InterfaceNode, Node,
-        ParseResult, SyntaxError, TokenStream,
+        FunctionSignatureNode, IdentifierType, ImplementationEntryNode,
+        InterfaceImplementationNode, InterfaceNode, Node, ParseResult, SyntaxError, TokenStream,
         grammar::{end_statement, function_signature, nested_function},
     },
 };
@@ -40,25 +40,27 @@ pub fn method_signature(tokens: &mut TokenStream) -> ParseResult<FunctionSignatu
     Ok(signature)
 }
 
-pub fn interface_implementation(
-    tokens: &mut TokenStream,
-) -> ParseResult<InterfaceImplementationNode> {
+pub fn interface_implementation(tokens: &mut TokenStream) -> ParseResult<ImplementationEntryNode> {
     let identifier = tokens.identifier(IdentifierType::Interface)?;
     if tokens.accept(Symbol::Semicolon) {
-        Ok(InterfaceImplementationNode {
-            identifier,
-            methods: None,
-        })
+        Ok(ImplementationEntryNode::Interface(
+            InterfaceImplementationNode {
+                identifier,
+                methods: None,
+            },
+        ))
     } else if tokens.accept(Symbol::OpenBrace) {
         let mut methods = vec![];
         while !tokens.accept(Symbol::CloseBrace) {
             no_qualifiers(tokens);
             methods.push(tokens.located(nested_function)?);
         }
-        Ok(InterfaceImplementationNode {
-            identifier,
-            methods: Some(methods),
-        })
+        Ok(ImplementationEntryNode::Interface(
+            InterfaceImplementationNode {
+                identifier,
+                methods: Some(methods),
+            },
+        ))
     } else {
         Err(tokens.make_error(SyntaxError::ExpectedMethods))
     }

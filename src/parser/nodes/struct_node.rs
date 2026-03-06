@@ -4,7 +4,7 @@ use std::{
 };
 
 use crate::{
-    checker::{Scope, ScopeType, StructType},
+    checker::{Scope, ScopeType, StructMember, StructMemberType, StructType},
     parser::{
         Identified, IdentifierNode, ImplementationNode, ImplementationNodeType, Node, NodeVec,
         StructFieldNode,
@@ -81,10 +81,11 @@ impl StructNode {
         }
 
         if let Some(implementation) = self.implementation.as_ref() {
-            for method in implementation.methods.iter() {
-                let member = method.resolve_struct_method(scope);
-                let identifier = method.id().clone();
-                members.entry(identifier).or_insert(member);
+            for (identifier, public, function_type) in implementation.get_methods(scope) {
+                members.entry(identifier).or_insert(StructMember {
+                    public,
+                    member_type: StructMemberType::Method(function_type),
+                });
             }
         }
 

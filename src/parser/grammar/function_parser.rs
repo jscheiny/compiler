@@ -2,7 +2,8 @@ use crate::{
     lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
         ExpressionNode, FunctionBodyNode, FunctionNode, FunctionSignatureNode, IdentifierType,
-        ImplementationNode, MethodNode, Node, ParameterNode, ParseResult, SyntaxError, TokenStream,
+        ImplementationEntryNode, ImplementationNode, MethodNode, Node, ParameterNode, ParseResult,
+        SyntaxError, TokenStream,
         grammar::{
             BlockType, block, comma_separated_list, end_statement, expression,
             interface_implementation, type_definition,
@@ -23,26 +24,25 @@ pub fn implementation(tokens: &mut TokenStream) -> ParseResult<Option<Node<Imple
 
 fn implementation_impl(tokens: &mut TokenStream) -> ParseResult<ImplementationNode> {
     tokens.next();
-    let mut methods = vec![];
-    let mut interface_implementations = vec![];
+    let mut entries = vec![];
     while !tokens.accept(Symbol::CloseBrace) {
         if tokens.accept(Keyword::Impl) {
-            interface_implementations.push(tokens.located(interface_implementation)?);
+            entries.push(tokens.located(interface_implementation)?);
         } else {
-            methods.push(tokens.located(method)?);
+            entries.push(tokens.located(method)?);
         }
     }
 
-    Ok(ImplementationNode {
-        methods,
-        interface_implementations,
-    })
+    Ok(ImplementationNode { entries })
 }
 
-fn method(tokens: &mut TokenStream) -> ParseResult<MethodNode> {
+fn method(tokens: &mut TokenStream) -> ParseResult<ImplementationEntryNode> {
     let public = tokens.accept(Keyword::Pub);
     let function = tokens.located(nested_function)?;
-    Ok(MethodNode { public, function })
+    Ok(ImplementationEntryNode::Method(MethodNode {
+        public,
+        function,
+    }))
 }
 
 pub fn top_level_function(tokens: &mut TokenStream) -> ParseResult<FunctionNode> {

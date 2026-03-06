@@ -4,7 +4,7 @@ use std::{
 };
 
 use crate::{
-    checker::{EnumType, Scope, ScopeType},
+    checker::{EnumMethod, EnumType, Scope, ScopeType},
     parser::{
         EnumVariantNode, Identified, IdentifierNode, ImplementationNode, ImplementationNodeType,
         Node, NodeVec,
@@ -78,10 +78,11 @@ impl EnumNode {
 
         let mut methods = HashMap::new();
         if let Some(implementation) = self.implementation.as_ref() {
-            for method in implementation.methods.iter() {
-                let member = method.resolve_enum_method(scope);
-                let identifier = method.id().clone();
-                methods.entry(identifier).or_insert(member);
+            for (identifier, public, function_type) in implementation.get_methods(scope) {
+                methods.entry(identifier).or_insert(EnumMethod {
+                    public,
+                    function_type,
+                });
             }
         }
 

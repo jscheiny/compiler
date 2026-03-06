@@ -1,18 +1,15 @@
-interface Test {
-    test(value: int);
-    test2(value: bool): int;
+interface ToString {
+    to_string(): [char];
 }
 
-struct S() {
-    impl Test {
-        pub test(value: int): int -> value;
-    }
+struct Neato(value: int) {
+    to_int(param: bool): int -> @value;
+
+    impl ToString {}
 }
 
-fn test(test: Test) {
-    test.test(3);
-    test.test2(false);
-    accept(.test2(true));
+fn test(value: Neato) {
+    let x: int = value.value;
+    let y: int = value.to_int(true);
+    let z: [char] = value.to_string();
 }
-
-fn accept(getter: Test => int){}
