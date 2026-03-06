@@ -63,7 +63,13 @@ impl Type {
                 }
                 _ => false,
             },
-            Type::Interface(_left) => todo!("Implement assignability for interfaces"),
+            Type::Interface(left) => match other {
+                Type::Interface(right) => left.identifier == right.identifier,
+                Type::Enum(_) | Type::Struct(_) => {
+                    todo!("Implement assignability for interfaces to enums/structs")
+                }
+                _ => false,
+            },
             Type::Primitive(left) => match other {
                 Type::Primitive(right) => left == right,
                 _ => false,
