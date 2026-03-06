@@ -31,43 +31,45 @@ impl EnumNode {
 
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
         let index = scope.get_type_index(self.id()).unwrap();
-        scope.nest(ScopeType::Struct(index), |mut scope| {
-            let mut scope_names = HashSet::new();
-            for variant in self.variants.iter() {
-                if !scope_names.insert(variant.id()) {
+        scope.nest(ScopeType::Struct(index), |scope| self.check_nested(scope))
+    }
+
+    fn check_nested(&self, mut scope: Box<Scope>) -> Box<Scope> {
+        let mut scope_names = HashSet::new();
+        for variant in self.variants.iter() {
+            if !scope_names.insert(variant.id()) {
+                scope.source.print_error(
+                    variant.identifier.span,
+                    &format!("Duplicate enum variant `{}`", variant.id()),
+                    &format!("a variant of `{}` already exists with this name", self.id()),
+                );
+            }
+        }
+
+        if let Some(implementation) = self.implementation.as_ref() {
+            for method in implementation.methods.iter() {
+                if scope_names.contains(method.id()) {
                     scope.source.print_error(
-                        variant.identifier.span,
-                        &format!("Duplicate enum variant `{}`", variant.id()),
-                        &format!("a variant of `{}` already exists with this name", self.id()),
+                        method.function.signature.identifier.span,
+                        &format!("Duplicate enum member `{}`", method.id()),
+                        &format!(
+                            "a variant or method of `{}` already exists with this name",
+                            self.id()
+                        ),
                     );
+                } else {
+                    let method_type = Type::Function(method.function.get_type(&scope).clone());
+                    scope.add_value(method.id(), method_type);
+                    scope_names.insert(method.id());
                 }
             }
 
-            if let Some(implementation) = self.implementation.as_ref() {
-                for method in implementation.methods.iter() {
-                    if scope_names.contains(method.id()) {
-                        scope.source.print_error(
-                            method.function.signature.identifier.span,
-                            &format!("Duplicate enum member `{}`", method.id()),
-                            &format!(
-                                "a variant or method of `{}` already exists with this name",
-                                self.id()
-                            ),
-                        );
-                    } else {
-                        let method_type = Type::Function(method.function.get_type(&scope).clone());
-                        scope.add_value(method.id(), method_type);
-                        scope_names.insert(method.id());
-                    }
-                }
-
-                for method in implementation.methods.iter() {
-                    scope = method.check(scope)
-                }
+            for method in implementation.methods.iter() {
+                scope = method.check(scope)
             }
+        }
 
-            scope
-        })
+        scope
     }
 
     pub fn get_type(&self, scope: &Scope) -> &EnumType {
