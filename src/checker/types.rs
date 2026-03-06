@@ -6,13 +6,13 @@ use crate::{
 };
 
 // TODO reconsider this name
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub enum RuntimeType {
     Enum(Rc<EnumType>),
     Struct(Rc<StructType>),
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub enum Type {
     Array(Box<Type>),
     Enum(Rc<EnumType>),
@@ -51,7 +51,7 @@ impl Type {
                 },
             },
             Type::Enum(left) => match other {
-                Type::Enum(right) => left.identifier == right.identifier,
+                Type::Enum(right) => left.id() == right.id(),
                 _ => false,
             },
             Type::Function(left) => match other {

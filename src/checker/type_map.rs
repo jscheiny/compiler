@@ -6,7 +6,7 @@ use crate::{
     parser::{Identified, IdentifierNode, Node},
 };
 
-#[derive(Default, Debug)]
+#[derive(Default)]
 pub struct TypeMap {
     pub offset: usize,
     types: Vec<Option<Type>>,

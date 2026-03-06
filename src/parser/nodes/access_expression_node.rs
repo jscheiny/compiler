@@ -79,7 +79,7 @@ pub fn get_field(
                     &format!("Could not find field `{}`", field.id()),
                     &format!(
                         "enum `{}` has no such method `{}`",
-                        enum_type.identifier,
+                        enum_type.id(),
                         field.id()
                     ),
                 );
@@ -162,7 +162,7 @@ fn get_static_field(
                 variant_type
             } else if let Some(method) = enum_type.methods.get(field.id()) {
                 // TODO respect public/private access
-                let self_type = get_self_type(&enum_type.identifier, scope);
+                let self_type = get_self_type(&enum_type.id(), scope);
                 method.function_type.clone().as_static_method(self_type)
             } else {
                 scope.source.print_error(
@@ -170,7 +170,7 @@ fn get_static_field(
                     &format!("Could not find field `{}`", field.id()),
                     &format!(
                         "enum `{}` has no such method or variant `{}`",
-                        enum_type.identifier,
+                        enum_type.id(),
                         field.id()
                     ),
                 );

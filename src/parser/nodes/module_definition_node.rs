@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::{
     checker::{RuntimeType, Scope, Type},
     parser::{
@@ -12,10 +14,10 @@ pub struct ExportableModuleDefinitionNode {
 }
 
 pub enum ModuleDefinitionNode {
-    Enum(EnumNode),
+    Enum(Rc<EnumNode>),
     Function(FunctionNode),
-    Interface(InterfaceNode),
-    Struct(StructNode),
+    Interface(Rc<InterfaceNode>),
+    Struct(Rc<StructNode>),
     TypeAlias(TypeAliasNode),
 }
 

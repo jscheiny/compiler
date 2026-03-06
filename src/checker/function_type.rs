@@ -2,7 +2,6 @@ use std::rc::Rc;
 
 use crate::checker::Type;
 
-#[derive(Debug)]
 pub struct FunctionType {
     pub parameters: Vec<Type>,
     pub return_type: Box<Type>,

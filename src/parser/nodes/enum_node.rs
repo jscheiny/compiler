@@ -1,11 +1,7 @@
-use std::{
-    cell::OnceCell,
-    collections::{HashMap, HashSet},
-    rc::Rc,
-};
+use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{EnumMethod, EnumType, Scope, ScopeType},
+    checker::{EnumType, Scope, ScopeType},
     parser::{
         EnumVariantNode, Identified, IdentifierNode, ImplementationNode, ImplementationNodeType,
         Node, NodeVec,
@@ -65,35 +61,10 @@ impl EnumNode {
         scope
     }
 
-    pub fn get_type(&self, scope: &Scope) -> Rc<EnumType> {
+    pub fn get_type(self: &Rc<Self>, scope: &Scope) -> Rc<EnumType> {
         self.resolved_type
-            .get_or_init(|| self.get_type_impl(scope))
+            .get_or_init(|| EnumType::from(self.clone(), scope))
             .clone()
-    }
-
-    fn get_type_impl(&self, scope: &Scope) -> Rc<EnumType> {
-        let mut variants = HashMap::new();
-        for variant in self.variants.iter() {
-            let identifier = variant.id().clone();
-            let variant = variant.get_type(scope).cloned();
-            variants.entry(identifier).or_insert(variant);
-        }
-
-        let mut methods = HashMap::new();
-        if let Some(implementation) = self.implementation.as_ref() {
-            for (identifier, public, function_type) in implementation.get_methods(scope) {
-                methods.entry(identifier).or_insert(EnumMethod {
-                    public,
-                    function_type,
-                });
-            }
-        }
-
-        Rc::new(EnumType {
-            identifier: self.id().clone(),
-            variants,
-            methods,
-        })
     }
 }
 

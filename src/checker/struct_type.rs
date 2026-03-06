@@ -2,19 +2,18 @@ use std::{collections::HashMap, rc::Rc};
 
 use crate::checker::{FunctionType, Type};
 
-#[derive(Debug)]
 pub struct StructType {
     pub identifier: String,
     pub members: HashMap<String, StructMember>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct StructMember {
     pub public: bool,
     pub member_type: StructMemberType,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub enum StructMemberType {
     Field(Type),
     Method(Rc<FunctionType>),
