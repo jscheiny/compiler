@@ -1,8 +1,14 @@
-use std::{cell::OnceCell, collections::HashMap};
+use std::{
+    cell::OnceCell,
+    collections::{HashMap, HashSet},
+};
 
 use crate::{
-    checker::{Scope, ScopeType, StructType, Type},
-    parser::{Identified, IdentifierNode, ImplementationNode, Node, NodeVec, StructFieldNode},
+    checker::{Scope, ScopeType, StructType},
+    parser::{
+        Identified, IdentifierNode, ImplementationNode, ImplementationNodeType, Node, NodeVec,
+        StructFieldNode,
+    },
 };
 
 pub struct StructNode {
@@ -32,38 +38,30 @@ impl StructNode {
     }
 
     fn check_nested(&self, mut scope: Box<Scope>) -> Box<Scope> {
+        let mut scope_names = HashSet::new();
         for field in self.fields.iter() {
-            let field_type = field.get_type(&scope).clone();
-            scope.add_value_or(field.id(), field_type, |scope| {
+            if !scope_names.insert(field.id().clone()) {
                 scope.source.print_error(
                     field.identifier.span,
                     &format!("Duplicate struct member `{}`", field.id()),
                     &format!(
-                        "a field of struct `{}` already exists with this name",
+                        "struct `{}` already contains a field with this name",
                         self.id()
                     ),
                 );
-            });
+            } else {
+                let field_type = field.get_type(&scope).clone();
+                scope.add_value(field.id(), field_type);
+            }
         }
 
         if let Some(implementation) = self.implementation.as_ref() {
-            for method in implementation.methods.iter() {
-                let method_type = Type::Function(method.function.get_type(&scope).clone());
-                scope.add_value_or(method.id(), method_type, |scope| {
-                    scope.source.print_error(
-                        method.function.signature.identifier.span,
-                        &format!("Duplicate struct member `{}`", method.id()),
-                        &format!(
-                            "a field or method of struct `{}` already exists with this name",
-                            self.id()
-                        ),
-                    );
-                });
-            }
-
-            for method in implementation.methods.iter() {
-                scope = method.check(scope)
-            }
+            return implementation.check(
+                scope,
+                ImplementationNodeType::Struct,
+                self.id(),
+                scope_names,
+            );
         }
 
         scope

@@ -4,8 +4,11 @@ use std::{
 };
 
 use crate::{
-    checker::{EnumType, Scope, ScopeType, Type},
-    parser::{EnumVariantNode, Identified, IdentifierNode, ImplementationNode, Node, NodeVec},
+    checker::{EnumType, Scope, ScopeType},
+    parser::{
+        EnumVariantNode, Identified, IdentifierNode, ImplementationNode, ImplementationNodeType,
+        Node, NodeVec,
+    },
 };
 
 pub struct EnumNode {
@@ -34,39 +37,28 @@ impl EnumNode {
         scope.nest(ScopeType::Struct(index), |scope| self.check_nested(scope))
     }
 
-    fn check_nested(&self, mut scope: Box<Scope>) -> Box<Scope> {
+    fn check_nested(&self, scope: Box<Scope>) -> Box<Scope> {
         let mut scope_names = HashSet::new();
         for variant in self.variants.iter() {
-            if !scope_names.insert(variant.id()) {
+            if !scope_names.insert(variant.id().clone()) {
                 scope.source.print_error(
                     variant.identifier.span,
                     &format!("Duplicate enum variant `{}`", variant.id()),
-                    &format!("a variant of `{}` already exists with this name", self.id()),
+                    &format!(
+                        "enum `{}` already contains a variant with this name",
+                        self.id()
+                    ),
                 );
             }
         }
 
         if let Some(implementation) = self.implementation.as_ref() {
-            for method in implementation.methods.iter() {
-                if scope_names.contains(method.id()) {
-                    scope.source.print_error(
-                        method.function.signature.identifier.span,
-                        &format!("Duplicate enum member `{}`", method.id()),
-                        &format!(
-                            "a variant or method of `{}` already exists with this name",
-                            self.id()
-                        ),
-                    );
-                } else {
-                    let method_type = Type::Function(method.function.get_type(&scope).clone());
-                    scope.add_value(method.id(), method_type);
-                    scope_names.insert(method.id());
-                }
-            }
-
-            for method in implementation.methods.iter() {
-                scope = method.check(scope)
-            }
+            return implementation.check(
+                scope,
+                ImplementationNodeType::Enum,
+                self.id(),
+                scope_names,
+            );
         }
 
         scope
