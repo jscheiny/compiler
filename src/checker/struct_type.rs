@@ -7,13 +7,11 @@ pub struct StructType {
     pub members: HashMap<String, StructMember>,
 }
 
-#[derive(Clone)]
 pub struct StructMember {
     pub public: bool,
     pub member_type: StructMemberType,
 }
 
-#[derive(Clone)]
 pub enum StructMemberType {
     Field(Type),
     Method(Rc<FunctionType>),
@@ -27,10 +25,12 @@ impl StructMemberType {
         }
     }
 
-    pub fn as_static_type(self, self_type: Type) -> Type {
+    pub fn as_static_type(&self, self_type: Type) -> Type {
         match self {
-            Self::Field(field_type) => Type::Function(FunctionType::new(self_type, field_type)),
-            Self::Method(function_type) => function_type.as_static_method(self_type),
+            Self::Field(field_type) => {
+                Type::Function(FunctionType::new(self_type, field_type.clone()))
+            }
+            Self::Method(function_type) => function_type.clone().as_static_method(self_type),
         }
     }
 }

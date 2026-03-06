@@ -182,7 +182,7 @@ fn get_static_field(
             if let Some(member) = member {
                 // TODO respect public/private access
                 let self_type = get_self_type(&struct_type.identifier, scope);
-                member.member_type.clone().as_static_type(self_type)
+                member.member_type.as_static_type(self_type)
             } else {
                 scope.source.print_error(
                     field.span,

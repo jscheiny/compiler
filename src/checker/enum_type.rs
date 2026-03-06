@@ -54,7 +54,6 @@ impl EnumType {
     }
 }
 
-#[derive(Clone)]
 pub struct EnumMethod {
     pub public: bool,
     pub function_type: Rc<FunctionType>,

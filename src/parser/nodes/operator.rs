@@ -15,7 +15,7 @@ where
     }
 }
 
-#[derive(Copy, Clone, Debug, EnumIter)]
+#[derive(Clone, Copy, Debug, EnumIter)]
 pub enum PostfixOperator {
     NullShortCircuit, // ?
 }
