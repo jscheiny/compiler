@@ -1,14 +1,17 @@
-// use std::cell::OnceCell;
+use std::{
+    cell::OnceCell,
+    collections::{HashMap, HashSet},
+};
 
 use crate::{
-    checker::Scope,
-    parser::{FunctionSignatureNode, IdentifierNode, Node, NodeVec},
+    checker::{InterfaceType, Scope},
+    parser::{FunctionSignatureNode, Identified, IdentifierNode, Node, NodeVec},
 };
 
 pub struct InterfaceNode {
     pub identifier: Node<IdentifierNode>,
     method_signatures: NodeVec<FunctionSignatureNode>,
-    // resolved_type: OnceCell<i64>,
+    resolved_type: OnceCell<InterfaceType>,
 }
 
 impl InterfaceNode {
@@ -19,11 +22,46 @@ impl InterfaceNode {
         Self {
             identifier,
             method_signatures,
-            // resolved_type: OnceCell::new(),
+            resolved_type: OnceCell::new(),
         }
     }
 
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
-        todo!("Implement type checking for interfaces")
+        let mut method_names = HashSet::new();
+        for method in self.method_signatures.iter() {
+            if !method_names.insert(method.id()) {
+                scope.source.print_error(
+                    method.identifier.span,
+                    &format!("Duplicate method signature `{}`", method.id()),
+                    &format!("a method of `{}` already exists with this name", self.id()),
+                );
+            }
+        }
+
+        scope
+    }
+
+    pub fn get_type(&self, scope: &Scope) -> &InterfaceType {
+        self.resolved_type.get_or_init(|| self.get_type_impl(scope))
+    }
+
+    fn get_type_impl(&self, scope: &Scope) -> InterfaceType {
+        let mut methods = HashMap::new();
+        for method_signature in self.method_signatures.iter() {
+            let id = method_signature.id().clone();
+            let method = method_signature.get_type(scope).clone();
+            methods.entry(id).or_insert(method);
+        }
+
+        InterfaceType {
+            identifier: self.id().clone(),
+            methods,
+        }
+    }
+}
+
+impl Identified for InterfaceNode {
+    fn id(&self) -> &String {
+        self.identifier.id()
     }
 }

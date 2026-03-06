@@ -34,12 +34,11 @@ impl ModuleDefinitionNode {
         let resolved_type = match self {
             Self::Enum(node) => Some(Type::Type(RuntimeType::Enum(node.get_type(scope).clone()))),
             Self::Function(node) => Some(Type::Function(node.get_type(scope).clone())),
-            Self::Interface(_node) => None, // todo!("Implement add_to_scope for interface"),
             Self::Struct(node) => Some(Type::Type(RuntimeType::Struct(
                 node.get_type(scope).clone(),
             ))),
             // TODO Consider how these are added to scope
-            Self::TypeAlias(_) => None,
+            Self::Interface(_) | Self::TypeAlias(_) => None,
         };
 
         if let Some(resolved_type) = resolved_type {
@@ -50,7 +49,7 @@ impl ModuleDefinitionNode {
     pub fn resolve_type(&mut self, scope: &mut Scope) {
         let resolved_type = match self {
             Self::Enum(node) => Some(Type::Enum(node.get_type(scope).clone())),
-            Self::Interface(_node) => None, // todo!("Implement resolve_type for interface"),
+            Self::Interface(node) => Some(Type::Interface(node.get_type(scope).clone())),
             Self::Struct(node) => Some(Type::Struct(node.get_type(scope).clone())),
             Self::TypeAlias(node) => Some(node.get_type(scope).clone()),
             Self::Function(_) => None,
