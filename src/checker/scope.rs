@@ -111,7 +111,7 @@ impl Scope {
     pub fn global(&self) -> &Scope {
         match self.parent.as_ref() {
             Some(parent) => parent.global(),
-            None => &self,
+            None => self,
         }
     }
 

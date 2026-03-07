@@ -162,7 +162,7 @@ fn get_static_field(
                 variant_type
             } else if let Some(method) = enum_type.get_method(scope, field.id()) {
                 // TODO respect public/private access
-                let self_type = get_self_type(&enum_type.id(), scope);
+                let self_type = get_self_type(enum_type.id(), scope);
                 method.function_type.clone().as_static_method(self_type)
             } else {
                 scope.source.print_error(
@@ -181,7 +181,7 @@ fn get_static_field(
             let member = struct_type.get_member(scope, field.id());
             if let Some(member) = member {
                 // TODO respect public/private access
-                let self_type = get_self_type(&struct_type.id(), scope);
+                let self_type = get_self_type(struct_type.id(), scope);
                 member.member_type.as_static_type(self_type)
             } else {
                 scope.source.print_error(

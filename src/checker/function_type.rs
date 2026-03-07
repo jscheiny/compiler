@@ -19,7 +19,7 @@ impl FunctionType {
         let mut parameters = self.parameters.clone();
         parameters.insert(0, self_type.clone());
         Type::Function(Rc::new(FunctionType {
-            parameters: parameters,
+            parameters,
             return_type: Box::new(self_type),
         }))
     }

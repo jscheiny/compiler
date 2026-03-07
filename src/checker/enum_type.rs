@@ -49,7 +49,7 @@ impl EnumType {
             .get(identifier)
     }
 
-    pub fn init_methods(&self, scope: &Scope) -> HashMap<String, EnumMethod> {
+    fn init_methods(&self, scope: &Scope) -> HashMap<String, EnumMethod> {
         let scope = scope.global();
         let mut methods = HashMap::new();
         if let Some(implementation) = self.node.implementation.as_ref() {

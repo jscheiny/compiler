@@ -28,7 +28,7 @@ impl StructType {
             .get(identifier)
     }
 
-    pub fn init_members(&self, scope: &Scope) -> HashMap<String, StructMember> {
+    fn init_members(&self, scope: &Scope) -> HashMap<String, StructMember> {
         let scope = scope.global();
         let mut members = HashMap::new();
         for field in self.node.fields.iter() {

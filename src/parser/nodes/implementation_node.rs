@@ -83,9 +83,9 @@ fn check_method_duplicate(
     scope_names: &mut HashSet<String>,
 ) {
     if scope_names.contains(method.id()) {
-        print_duplicate_member_error(&scope, implementation_type, container_name, method);
+        print_duplicate_member_error(scope, implementation_type, container_name, method);
     } else {
-        let method_type = Type::Function(method.function.get_type(&scope).clone());
+        let method_type = Type::Function(method.function.get_type(scope).clone());
         scope.add_value(method.id(), method_type);
         scope_names.insert(method.id().clone());
     }
