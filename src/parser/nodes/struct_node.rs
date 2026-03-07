@@ -64,9 +64,9 @@ impl StructNode {
         scope
     }
 
-    pub fn get_type(self: &Rc<Self>, scope: &Scope) -> Rc<StructType> {
+    pub fn get_type(self: &Rc<Self>) -> Rc<StructType> {
         self.resolved_type
-            .get_or_init(|| StructType::from(self.clone(), scope))
+            .get_or_init(|| StructType::from(self.clone()))
             .clone()
     }
 }

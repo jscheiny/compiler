@@ -1,4 +1,4 @@
-use std::{collections::HashMap, rc::Rc};
+use std::{cell::OnceCell, collections::HashMap, rc::Rc};
 
 use crate::{
     checker::{FunctionType, Scope, Type},
@@ -8,7 +8,7 @@ use crate::{
 pub struct EnumType {
     node: Rc<EnumNode>,
     pub variants: HashMap<String, Option<Type>>,
-    pub methods: HashMap<String, EnumMethod>,
+    pub methods: OnceCell<HashMap<String, EnumMethod>>,
 }
 
 impl EnumType {
@@ -20,20 +20,10 @@ impl EnumType {
             variants.entry(identifier).or_insert(variant);
         }
 
-        let mut methods = HashMap::new();
-        if let Some(implementation) = node.implementation.as_ref() {
-            for (identifier, public, function_type) in implementation.get_methods(scope) {
-                methods.entry(identifier).or_insert(EnumMethod {
-                    public,
-                    function_type,
-                });
-            }
-        }
-
         Rc::new(EnumType {
-            variants,
-            methods,
             node,
+            variants,
+            methods: OnceCell::new(),
         })
     }
 
@@ -51,6 +41,27 @@ impl EnumType {
                 }
                 None => self_type,
             })
+    }
+
+    pub fn get_method(&self, scope: &Scope, identifier: &String) -> Option<&EnumMethod> {
+        self.methods
+            .get_or_init(|| self.init_methods(scope))
+            .get(identifier)
+    }
+
+    pub fn init_methods(&self, scope: &Scope) -> HashMap<String, EnumMethod> {
+        let scope = scope.global();
+        let mut methods = HashMap::new();
+        if let Some(implementation) = self.node.implementation.as_ref() {
+            for (identifier, public, function_type) in implementation.get_methods(scope) {
+                methods.entry(identifier).or_insert(EnumMethod {
+                    public,
+                    function_type,
+                });
+            }
+        }
+
+        methods
     }
 }
 

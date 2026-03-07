@@ -67,7 +67,7 @@ pub fn get_field(
 ) -> Type {
     match input_type {
         Type::Enum(enum_type) => {
-            let method = enum_type.methods.get(field.id());
+            let method = enum_type.get_method(scope, field.id());
             if let Some(method) = method {
                 if !method.public {
                     // TODO respect public/private access
@@ -117,7 +117,7 @@ pub fn get_field(
             get_field(&resolved_type, input_span, field, scope)
         }
         Type::Struct(struct_type) => {
-            let member = struct_type.members.get(field.id());
+            let member = struct_type.get_member(scope, field.id());
             if let Some(member) = member {
                 if !member.public {
                     // TODO respect public/private access
@@ -160,7 +160,7 @@ fn get_static_field(
         RuntimeType::Enum(enum_type) => {
             if let Some(variant_type) = enum_type.get_variant(field.id()) {
                 variant_type
-            } else if let Some(method) = enum_type.methods.get(field.id()) {
+            } else if let Some(method) = enum_type.get_method(scope, field.id()) {
                 // TODO respect public/private access
                 let self_type = get_self_type(&enum_type.id(), scope);
                 method.function_type.clone().as_static_method(self_type)
@@ -178,7 +178,7 @@ fn get_static_field(
             }
         }
         RuntimeType::Struct(struct_type) => {
-            let member = struct_type.members.get(field.id());
+            let member = struct_type.get_member(scope, field.id());
             if let Some(member) = member {
                 // TODO respect public/private access
                 let self_type = get_self_type(&struct_type.id(), scope);

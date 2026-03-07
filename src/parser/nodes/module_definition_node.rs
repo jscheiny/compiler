@@ -36,7 +36,7 @@ impl ModuleDefinitionNode {
         let resolved_type = match self {
             Self::Enum(node) => Some(Type::Type(RuntimeType::Enum(node.get_type(scope)))),
             Self::Function(node) => Some(Type::Function(node.get_type(scope).clone())),
-            Self::Struct(node) => Some(Type::Type(RuntimeType::Struct(node.get_type(scope)))),
+            Self::Struct(node) => Some(Type::Type(RuntimeType::Struct(node.get_type()))),
             // TODO Consider how these are added to scope
             Self::Interface(_) | Self::TypeAlias(_) => None,
         };
@@ -50,7 +50,7 @@ impl ModuleDefinitionNode {
         let resolved_type = match self {
             Self::Enum(node) => Some(Type::Enum(node.get_type(scope))),
             Self::Interface(node) => Some(Type::Interface(node.get_type(scope))),
-            Self::Struct(node) => Some(Type::Struct(node.get_type(scope))),
+            Self::Struct(node) => Some(Type::Struct(node.get_type())),
             Self::TypeAlias(node) => Some(node.get_type(scope).clone()),
             Self::Function(_) => None,
         };

@@ -1,15 +1,22 @@
+fn test(value: Neato) {
+    type T = bool;
+    let e = E.A;
+    let x: [char] = e.to_string();
+}
+
+type T = [char];
+
 interface ToString {
-    to_string(): [char];
+    to_string(): T;
 }
 
 struct Neato(value: int) {
     to_int(param: bool): int -> @value;
+    a(): T -> "hello world";
 
     impl ToString {}
 }
 
-fn test(value: Neato) {
-    let x: int = value.value;
-    let y: int = value.to_int(true);
-    let z: [char] = value.to_string();
+enum E(A, B, C) {
+    impl ToString;
 }

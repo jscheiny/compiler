@@ -1,4 +1,4 @@
-use std::{collections::HashMap, rc::Rc};
+use std::{cell::OnceCell, collections::HashMap, rc::Rc};
 
 use crate::{
     checker::{FunctionType, Scope, Type},
@@ -7,19 +7,37 @@ use crate::{
 
 pub struct StructType {
     node: Rc<StructNode>,
-    pub members: HashMap<String, StructMember>,
+    members: OnceCell<HashMap<String, StructMember>>,
 }
 
 impl StructType {
-    pub fn from(node: Rc<StructNode>, scope: &Scope) -> Rc<StructType> {
+    pub fn from(node: Rc<StructNode>) -> Rc<StructType> {
+        Rc::new(StructType {
+            node,
+            members: OnceCell::new(),
+        })
+    }
+
+    pub fn id(&self) -> &String {
+        self.node.identifier.id()
+    }
+
+    pub fn get_member(&self, scope: &Scope, identifier: &String) -> Option<&StructMember> {
+        self.members
+            .get_or_init(|| self.init_members(scope))
+            .get(identifier)
+    }
+
+    pub fn init_members(&self, scope: &Scope) -> HashMap<String, StructMember> {
+        let scope = scope.global();
         let mut members = HashMap::new();
-        for field in node.fields.iter() {
+        for field in self.node.fields.iter() {
             let member = field.get_member(scope);
             let identifier = field.id().clone();
             members.entry(identifier).or_insert(member);
         }
 
-        if let Some(implementation) = node.implementation.as_ref() {
+        if let Some(implementation) = self.node.implementation.as_ref() {
             for (identifier, public, function_type) in implementation.get_methods(scope) {
                 members.entry(identifier).or_insert(StructMember {
                     public,
@@ -28,11 +46,7 @@ impl StructType {
             }
         }
 
-        Rc::new(StructType { node, members })
-    }
-
-    pub fn id(&self) -> &String {
-        self.node.identifier.id()
+        members
     }
 }
 

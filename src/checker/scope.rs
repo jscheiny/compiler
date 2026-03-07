@@ -108,6 +108,13 @@ impl Scope {
         }
     }
 
+    pub fn global(&self) -> &Scope {
+        match self.parent.as_ref() {
+            Some(parent) => parent.global(),
+            None => &self,
+        }
+    }
+
     fn parent(self) -> Box<Scope> {
         self.parent.unwrap()
     }
