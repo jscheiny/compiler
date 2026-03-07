@@ -129,7 +129,7 @@ pub fn get_field(
                     &format!("Could not find field `{}`", field.id()),
                     &format!(
                         "struct `{}` has no such field or method `{}`",
-                        struct_type.identifier,
+                        struct_type.id(),
                         field.id()
                     ),
                 );
@@ -181,7 +181,7 @@ fn get_static_field(
             let member = struct_type.members.get(field.id());
             if let Some(member) = member {
                 // TODO respect public/private access
-                let self_type = get_self_type(&struct_type.identifier, scope);
+                let self_type = get_self_type(&struct_type.id(), scope);
                 member.member_type.as_static_type(self_type)
             } else {
                 scope.source.print_error(
@@ -189,7 +189,7 @@ fn get_static_field(
                     &format!("Could not find field `{}`", field.id()),
                     &format!(
                         "struct `{}` has no such field or method `{}`",
-                        struct_type.identifier,
+                        struct_type.id(),
                         field.id()
                     ),
                 );

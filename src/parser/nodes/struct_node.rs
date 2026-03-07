@@ -1,11 +1,7 @@
-use std::{
-    cell::OnceCell,
-    collections::{HashMap, HashSet},
-    rc::Rc,
-};
+use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{Scope, ScopeType, StructMember, StructMemberType, StructType},
+    checker::{Scope, ScopeType, StructType},
     parser::{
         Identified, IdentifierNode, ImplementationNode, ImplementationNodeType, Node, NodeVec,
         StructFieldNode,
@@ -14,8 +10,8 @@ use crate::{
 
 pub struct StructNode {
     pub identifier: Node<IdentifierNode>,
-    fields: NodeVec<StructFieldNode>,
-    implementation: Option<Node<ImplementationNode>>,
+    pub fields: NodeVec<StructFieldNode>,
+    pub implementation: Option<Node<ImplementationNode>>,
     resolved_type: OnceCell<Rc<StructType>>,
 }
 
@@ -68,34 +64,10 @@ impl StructNode {
         scope
     }
 
-    pub fn get_type(&self, scope: &Scope) -> Rc<StructType> {
+    pub fn get_type(self: &Rc<Self>, scope: &Scope) -> Rc<StructType> {
         self.resolved_type
-            .get_or_init(|| self.get_type_impl(scope))
+            .get_or_init(|| StructType::from(self.clone(), scope))
             .clone()
-    }
-
-    fn get_type_impl(&self, scope: &Scope) -> Rc<StructType> {
-        let mut members = HashMap::new();
-
-        for field in self.fields.iter() {
-            let member = field.get_member(scope);
-            let identifier = field.id().clone();
-            members.entry(identifier).or_insert(member);
-        }
-
-        if let Some(implementation) = self.implementation.as_ref() {
-            for (identifier, public, function_type) in implementation.get_methods(scope) {
-                members.entry(identifier).or_insert(StructMember {
-                    public,
-                    member_type: StructMemberType::Method(function_type),
-                });
-            }
-        }
-
-        Rc::new(StructType {
-            identifier: self.id().clone(),
-            members,
-        })
     }
 }
 

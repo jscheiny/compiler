@@ -47,7 +47,7 @@ impl Display for TypeFmt<'_> {
                         .format(self.scope)
                 )
             }
-            Type::Struct(struct_type) => write!(f, "{}", struct_type.identifier),
+            Type::Struct(struct_type) => write!(f, "{}", struct_type.id()),
             Type::Tuple(items) => {
                 write!(f, "(")?;
                 for (index, item) in items.iter().enumerate() {
@@ -63,7 +63,7 @@ impl Display for TypeFmt<'_> {
                 "Runtime({})",
                 match runtime_type {
                     RuntimeType::Enum(enum_type) => enum_type.id(),
-                    RuntimeType::Struct(struct_type) => &struct_type.identifier,
+                    RuntimeType::Struct(struct_type) => struct_type.id(),
                 }
             ),
             Type::Void => write!(f, "{}", Keyword::Void),

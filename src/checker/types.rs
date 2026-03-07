@@ -79,7 +79,7 @@ impl Type {
             },
             Type::Reference(_) => self.deref(scope).is_assignable_to(other, scope),
             Type::Struct(left) => match other {
-                Type::Struct(right) => left.identifier == right.identifier,
+                Type::Struct(right) => left.id() == right.id(),
                 _ => false,
             },
             Type::Tuple(left) => match other {

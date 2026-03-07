@@ -1,10 +1,39 @@
 use std::{collections::HashMap, rc::Rc};
 
-use crate::checker::{FunctionType, Type};
+use crate::{
+    checker::{FunctionType, Scope, Type},
+    parser::{Identified, StructNode},
+};
 
 pub struct StructType {
-    pub identifier: String,
+    node: Rc<StructNode>,
     pub members: HashMap<String, StructMember>,
+}
+
+impl StructType {
+    pub fn from(node: Rc<StructNode>, scope: &Scope) -> Rc<StructType> {
+        let mut members = HashMap::new();
+        for field in node.fields.iter() {
+            let member = field.get_member(scope);
+            let identifier = field.id().clone();
+            members.entry(identifier).or_insert(member);
+        }
+
+        if let Some(implementation) = node.implementation.as_ref() {
+            for (identifier, public, function_type) in implementation.get_methods(scope) {
+                members.entry(identifier).or_insert(StructMember {
+                    public,
+                    member_type: StructMemberType::Method(function_type),
+                });
+            }
+        }
+
+        Rc::new(StructType { node, members })
+    }
+
+    pub fn id(&self) -> &String {
+        self.node.identifier.id()
+    }
 }
 
 pub struct StructMember {
