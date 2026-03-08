@@ -1,14 +1,14 @@
 use std::{cell::OnceCell, collections::HashMap, rc::Rc};
 
 use crate::{
-    checker::{FunctionType, Scope, Type},
+    checker::{FunctionType, InterfaceType, Scope, Type},
     parser::{EnumNode, Identified},
 };
 
 pub struct EnumType {
     node: Rc<EnumNode>,
     pub variants: HashMap<String, Option<Type>>,
-    pub methods: OnceCell<HashMap<String, EnumMethod>>,
+    methods: OnceCell<HashMap<String, EnumMethod>>,
 }
 
 impl EnumType {
@@ -62,6 +62,14 @@ impl EnumType {
         }
 
         methods
+    }
+
+    pub fn implements(&self, scope: &Scope, interface_type: &Rc<InterfaceType>) -> bool {
+        self.node
+            .implementation
+            .as_ref()
+            .map(|implementation| implementation.implements(scope, interface_type))
+            .unwrap_or(false)
     }
 }
 

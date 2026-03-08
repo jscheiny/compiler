@@ -33,7 +33,7 @@ fn implementation_impl(tokens: &mut TokenStream) -> ParseResult<ImplementationNo
         }
     }
 
-    Ok(ImplementationNode { entries })
+    Ok(ImplementationNode::new(entries))
 }
 
 fn method(tokens: &mut TokenStream) -> ParseResult<ImplementationEntryNode> {

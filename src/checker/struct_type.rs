@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, collections::HashMap, rc::Rc};
 
 use crate::{
-    checker::{FunctionType, Scope, Type},
+    checker::{FunctionType, InterfaceType, Scope, Type},
     parser::{Identified, StructNode},
 };
 
@@ -47,6 +47,14 @@ impl StructType {
         }
 
         members
+    }
+
+    pub fn implements(&self, scope: &Scope, interface_type: &Rc<InterfaceType>) -> bool {
+        self.node
+            .implementation
+            .as_ref()
+            .map(|implementation| implementation.implements(scope, interface_type))
+            .unwrap_or(false)
     }
 }
 

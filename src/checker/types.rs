@@ -52,6 +52,7 @@ impl Type {
             },
             Type::Enum(left) => match other {
                 Type::Enum(right) => left.id() == right.id(),
+                Type::Interface(right) => left.implements(scope, right),
                 _ => false,
             },
             Type::Function(left) => match other {
@@ -68,9 +69,6 @@ impl Type {
             },
             Type::Interface(left) => match other {
                 Type::Interface(right) => left.identifier == right.identifier,
-                Type::Enum(_) | Type::Struct(_) => {
-                    todo!("Implement assignability for interfaces to enums/structs")
-                }
                 _ => false,
             },
             Type::Primitive(left) => match other {
@@ -80,6 +78,7 @@ impl Type {
             Type::Reference(_) => self.deref(scope).is_assignable_to(other, scope),
             Type::Struct(left) => match other {
                 Type::Struct(right) => left.id() == right.id(),
+                Type::Interface(right) => left.implements(scope, right),
                 _ => false,
             },
             Type::Tuple(left) => match other {

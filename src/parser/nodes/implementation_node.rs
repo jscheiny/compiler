@@ -1,12 +1,13 @@
-use std::{collections::HashSet, rc::Rc};
+use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{FunctionType, Scope, Type},
+    checker::{FunctionType, InterfaceType, Scope, Type},
     parser::{Identified, ImplementationEntryNode, MethodNode, Node},
 };
 
 pub struct ImplementationNode {
     pub entries: Vec<Node<ImplementationEntryNode>>,
+    implemented_interfaces: OnceCell<HashSet<usize>>,
 }
 
 #[derive(Clone, Copy)]
@@ -16,6 +17,13 @@ pub enum ImplementationNodeType {
 }
 
 impl ImplementationNode {
+    pub fn new(entries: Vec<Node<ImplementationEntryNode>>) -> Self {
+        Self {
+            entries,
+            implemented_interfaces: OnceCell::new(),
+        }
+    }
+
     pub fn check(
         &self,
         mut scope: Box<Scope>,
@@ -72,6 +80,31 @@ impl ImplementationNode {
         }
 
         methods
+    }
+
+    pub fn implements(&self, scope: &Scope, interface_type: &Rc<InterfaceType>) -> bool {
+        let index = scope.global().get_type_index(&interface_type.identifier);
+        match index {
+            Some(index) => self
+                .implemented_interfaces
+                .get_or_init(|| self.init_implemented_interfaces(scope))
+                .contains(&index),
+            None => false,
+        }
+    }
+
+    fn init_implemented_interfaces(&self, scope: &Scope) -> HashSet<usize> {
+        let mut result = HashSet::new();
+        for entry in self.entries.iter() {
+            if let ImplementationEntryNode::Interface(node) = &entry.value {
+                let index = scope.get_type_index(node.id());
+                if let Some(index) = index {
+                    result.insert(index);
+                }
+            }
+        }
+
+        result
     }
 }
 
