@@ -155,7 +155,6 @@ fn get_static_field(
     field: &Node<IdentifierNode>,
     scope: &Scope,
 ) -> Type {
-    // TODO use reference types instead of expensive copies of self (or switch to RCs!)
     match runtime_type {
         RuntimeType::Enum(enum_type) => {
             if let Some(variant_type) = enum_type.get_variant(field.id()) {
