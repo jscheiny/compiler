@@ -1,16 +1,15 @@
 interface ToString {
-    to_string(): [char];
+    to_string(value: int): [char];
+    to_other_string(): [char];
 }
 
 type G = ToString;
 
-struct Test(to_string: [char]){
-    impl ToString {
-        to_string(): [char] -> "Test";
-    }
+type T = (bool, bool);
 
-    impl G {
-        to_string(): [char] -> "neat";
+struct Test(){
+    impl ToString {
+        to_string(value: bool, neato: bool): int -> 5;
     }
 }
 
@@ -19,4 +18,4 @@ fn main(value: Test) {
     value.to_string();
 }
 
-fn stringify(value: ToString): [char] -> value.to_string();
+fn stringify(value: ToString): [char] -> value.to_string(3);

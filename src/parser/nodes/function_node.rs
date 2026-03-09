@@ -7,7 +7,7 @@ use crate::{
 
 pub struct FunctionNode {
     pub signature: FunctionSignatureNode,
-    body: Node<FunctionBodyNode>,
+    pub body: Node<FunctionBodyNode>,
 }
 
 impl FunctionNode {

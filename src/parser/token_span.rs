@@ -14,6 +14,13 @@ impl TokenSpan {
         }
     }
 
+    pub fn start(&self) -> TokenSpan {
+        TokenSpan {
+            start_index: self.start_index,
+            end_index: self.start_index,
+        }
+    }
+
     pub fn previous(&self) -> TokenSpan {
         let index = self.start_index - 1;
         TokenSpan {

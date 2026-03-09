@@ -28,6 +28,10 @@ pub enum Type {
 }
 
 impl Type {
+    pub fn is_equivalent_to(&self, other: &Type, scope: &Scope) -> bool {
+        self.is_assignable_to(other, scope) && other.is_assignable_to(self, scope)
+    }
+
     pub fn is_assignable_to(&self, other: &Type, scope: &Scope) -> bool {
         if self.is_error() || other.is_error() {
             return true;
