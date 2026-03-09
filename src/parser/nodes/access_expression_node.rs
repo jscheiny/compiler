@@ -70,7 +70,7 @@ pub fn get_field(
             let method = enum_type.get_method(scope, field.id());
             if let Some(method) = method {
                 if !method.public {
-                    // TODO respect public/private access
+                    check_private_access(scope, input_type, field);
                 }
                 Type::Function(method.function_type.clone())
             } else {
@@ -120,7 +120,7 @@ pub fn get_field(
             let member = struct_type.get_member(scope, field.id());
             if let Some(member) = member {
                 if !member.public {
-                    // TODO respect public/private access
+                    check_private_access(scope, input_type, field);
                 }
                 member.member_type.get_type()
             } else {
@@ -160,9 +160,11 @@ fn get_static_field(
             if let Some(variant_type) = enum_type.get_variant(field.id()) {
                 variant_type
             } else if let Some(method) = enum_type.get_method(scope, field.id()) {
-                // TODO respect public/private access
-                let self_type = get_self_type(enum_type.id(), scope);
-                method.function_type.clone().as_static_method(self_type)
+                let receiver_type = Type::Enum(enum_type.clone());
+                if !method.public {
+                    check_private_access(scope, &receiver_type, field);
+                }
+                method.function_type.clone().as_static_method(receiver_type)
             } else {
                 scope.source.print_error(
                     field.span,
@@ -179,9 +181,11 @@ fn get_static_field(
         RuntimeType::Struct(struct_type) => {
             let member = struct_type.get_member(scope, field.id());
             if let Some(member) = member {
-                // TODO respect public/private access
-                let self_type = get_self_type(struct_type.id(), scope);
-                member.member_type.as_static_type(self_type)
+                let receiver_type = Type::Struct(struct_type.clone());
+                if !member.public {
+                    check_private_access(scope, &receiver_type, field);
+                }
+                member.member_type.as_static_type(receiver_type)
             } else {
                 scope.source.print_error(
                     field.span,
@@ -198,9 +202,29 @@ fn get_static_field(
     }
 }
 
-fn get_self_type(identifier: &String, scope: &Scope) -> Type {
-    scope
-        .get_type_index(identifier)
-        .map(Type::Reference)
-        .unwrap_or(Type::Error)
+fn check_private_access(scope: &Scope, receiver_type: &Type, field: &Node<IdentifierNode>) {
+    if is_external_private_access(scope, receiver_type) {
+        scope.source.print_error(
+            field.span,
+            &format!("Cannot access private member `{}`", field.id()),
+            &format!(
+                "this member is private to `{}`",
+                receiver_type.format(scope),
+            ),
+        );
+    }
+}
+
+fn is_external_private_access(scope: &Scope, receiver_type: &Type) -> bool {
+    let self_type = scope.get_self_type();
+    if let Some(self_type) = self_type {
+        let self_type = self_type.as_deref(scope);
+        if !self_type.is_equivalent_to(receiver_type, scope) {
+            return true;
+        }
+    } else {
+        return true;
+    }
+
+    return false;
 }

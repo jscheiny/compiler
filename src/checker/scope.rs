@@ -163,6 +163,16 @@ impl Scope {
         })
     }
 
+    pub fn get_self_type(&self) -> Option<Type> {
+        if let ScopeType::Struct(index) = self.scope_type {
+            return self.get_type(index);
+        } else {
+            self.parent
+                .as_ref()
+                .and_then(|parent| parent.get_self_type())
+        }
+    }
+
     pub fn add_type(&mut self, identifier: &str, alias: Type) {
         self.types.add(identifier, alias);
     }

@@ -1,21 +1,17 @@
-struct Test(pub value: int) {
-    pub get_value(v: int): bool {
-        return true;
+struct A(pub integer: int, boolean: bool) {
+    test(value: A): bool {
+        return value.boolean;
     }
 }
 
-type T = Test;
-type U = bool;
-
-struct Array(pub values: [T]) {
-    pub map(mapper: T -> U): [U] {}
+enum B() {
+    test(value: A): bool {
+        value.test(value);
+        return value.boolean;
+    }
 }
 
-// fn test(x): A -> B => (a) -> x + a
-
-fn main(array: Array) {
-    //array.map(t => t.value);
-    // array.map(Test.value);
-    array.map(.get_value());
-    // let x: Test -> bool = .value;
+fn test(a: A) {
+    a.integer;
+    a.boolean or false;
 }
