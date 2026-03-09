@@ -2,9 +2,15 @@ interface ToString {
     to_string(): [char];
 }
 
-struct Test(value: [char]){
-    impl ToString {
+type G = ToString;
 
+struct Test(to_string: [char]){
+    impl ToString {
+        to_string(): [char] -> "Test";
+    }
+
+    impl G {
+        to_string(): [char] -> "neat";
     }
 }
 

@@ -2,7 +2,9 @@ use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
     checker::{FunctionType, InterfaceType, Scope, Type},
-    parser::{Identified, ImplementationEntryNode, MethodNode, Node},
+    parser::{
+        FunctionNode, Identified, ImplementationEntryNode, InterfaceImplementationNode, Node,
+    },
 };
 
 pub struct ImplementationNode {
@@ -31,18 +33,24 @@ impl ImplementationNode {
         container_name: &str,
         mut scope_names: HashSet<String>,
     ) -> Box<Scope> {
+        let mut implemented_interfaces = HashSet::new();
         for entry in self.entries.iter() {
             match &entry.value {
-                ImplementationEntryNode::Method(method) => check_method_duplicate(
-                    method,
+                ImplementationEntryNode::Interface(interface) => check_duplicate_interface(
+                    interface,
+                    &mut scope,
+                    implementation_type,
+                    container_name,
+                    &mut scope_names,
+                    &mut implemented_interfaces,
+                ),
+                ImplementationEntryNode::Method(method) => check_duplicate_method(
+                    &method.function,
                     &mut scope,
                     implementation_type,
                     container_name,
                     &mut scope_names,
                 ),
-                ImplementationEntryNode::Interface(_) => {
-                    // TODO Handle duplication checking for interface implementations
-                }
             };
         }
 
@@ -108,8 +116,49 @@ impl ImplementationNode {
     }
 }
 
-fn check_method_duplicate(
-    method: &MethodNode,
+fn check_duplicate_interface(
+    interface_implementation: &InterfaceImplementationNode,
+    scope: &mut Scope,
+    implementation_type: ImplementationNodeType,
+    container_name: &str,
+    scope_names: &mut HashSet<String>,
+    implemented_interfaces: &mut HashSet<String>,
+) {
+    let implemented_type = scope
+        .get_type_index(interface_implementation.id())
+        .map(|t| Type::Reference(t).as_deref(scope));
+    if let Some(Type::Interface(interface_type)) = implemented_type {
+        if !implemented_interfaces.insert(interface_type.identifier.clone()) {
+            scope.source.print_error(
+                interface_implementation.identifier.span,
+                &format!(
+                    "Duplicate implementation of `{}`",
+                    interface_type.identifier
+                ),
+                &format!(
+                    "{} `{}` already implements this interface",
+                    get_container_type(implementation_type),
+                    container_name
+                ),
+            );
+        }
+    }
+
+    if let Some(methods) = interface_implementation.methods.as_ref() {
+        for method in methods.iter() {
+            check_duplicate_method(
+                method,
+                scope,
+                implementation_type,
+                container_name,
+                scope_names,
+            );
+        }
+    }
+}
+
+fn check_duplicate_method(
+    method: &FunctionNode,
     scope: &mut Scope,
     implementation_type: ImplementationNodeType,
     container_name: &str,
@@ -118,7 +167,7 @@ fn check_method_duplicate(
     if scope_names.contains(method.id()) {
         print_duplicate_member_error(scope, implementation_type, container_name, method);
     } else {
-        let method_type = Type::Function(method.function.get_type(scope).clone());
+        let method_type = Type::Function(method.get_type(scope).clone());
         scope.add_value(method.id(), method_type);
         scope_names.insert(method.id().clone());
     }
@@ -128,15 +177,12 @@ fn print_duplicate_member_error(
     scope: &Scope,
     implementation_type: ImplementationNodeType,
     container_name: &str,
-    method: &MethodNode,
+    method: &FunctionNode,
 ) {
     use ImplementationNodeType as I;
-    let container_type = match implementation_type {
-        I::Enum => "enum",
-        I::Struct => "struct",
-    };
+    let container_type = get_container_type(implementation_type);
     scope.source.print_error(
-        method.function.signature.identifier.span,
+        method.signature.identifier.span,
         &format!("Duplicate {} member `{}`", container_type, method.id()),
         &format!(
             "{} `{}` already contains a {} with this name",
@@ -148,4 +194,11 @@ fn print_duplicate_member_error(
             }
         ),
     );
+}
+
+fn get_container_type(implementation_type: ImplementationNodeType) -> &'static str {
+    match implementation_type {
+        ImplementationNodeType::Enum => "enum",
+        ImplementationNodeType::Struct => "struct",
+    }
 }
