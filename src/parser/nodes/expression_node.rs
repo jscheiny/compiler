@@ -141,7 +141,7 @@ impl ExpressionNode {
             );
         } else {
             scope.source.print_error(
-                identifier.span.previous(),
+                identifier.span.before(),
                 "Self reference outside of struct or enum",
                 "operator invalid outside of struct or enum",
             );

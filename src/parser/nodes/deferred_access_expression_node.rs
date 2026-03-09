@@ -27,7 +27,7 @@ impl DeferredAccessExpressionNode {
             let parameter_type = function_type.parameters[0].clone();
             let field_type = get_field(
                 &parameter_type,
-                self.field.span.previous(),
+                self.field.span.before(),
                 &self.field,
                 &scope,
             );
@@ -41,7 +41,7 @@ impl DeferredAccessExpressionNode {
             (scope, Type::Function(function_type))
         } else {
             scope.source.print_error(
-                self.field.span.previous(),
+                self.field.span.before(),
                 "Deferred access type is ambiguous",
                 "could not infer type of implicit parameter",
             );

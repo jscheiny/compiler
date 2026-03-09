@@ -140,7 +140,7 @@ pub fn get_field(
         Type::Type(inner_type) => get_static_field(inner_type, field, scope),
         Type::Array(_) | Type::Void => {
             scope.source.print_error(
-                field.span.previous(),
+                field.span.before(),
                 "Access operator is not valid for this type",
                 &format!("Access on type: `{}`", input_type.format(scope)),
             );
