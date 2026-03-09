@@ -39,10 +39,10 @@ fn implementation_impl(tokens: &mut TokenStream) -> ParseResult<ImplementationNo
 fn method(tokens: &mut TokenStream) -> ParseResult<ImplementationEntryNode> {
     let public = tokens.accept(Keyword::Pub);
     let function = tokens.located(nested_function)?;
-    Ok(ImplementationEntryNode::Method(MethodNode {
+    Ok(ImplementationEntryNode::Method(Box::new(MethodNode {
         public,
         function,
-    }))
+    })))
 }
 
 pub fn top_level_function(tokens: &mut TokenStream) -> ParseResult<FunctionNode> {

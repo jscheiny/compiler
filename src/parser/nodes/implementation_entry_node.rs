@@ -4,7 +4,7 @@ use crate::{
 };
 
 pub enum ImplementationEntryNode {
-    Method(MethodNode),
+    Method(Box<MethodNode>),
     Interface(InterfaceImplementationNode),
 }
 
