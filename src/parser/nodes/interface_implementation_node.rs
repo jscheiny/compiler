@@ -1,7 +1,7 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{FunctionType, Scope, Type},
+    checker::{EnumType, FunctionType, Scope, Type},
     lexer::Symbol,
     parser::{FunctionNode, Identified, IdentifierNode, Node},
 };
@@ -42,19 +42,19 @@ impl InterfaceImplementationNode {
                 scope = check_method(scope, method, implemented_type.as_ref());
                 method_names.insert(method.id());
             }
-        }
 
-        if let Some(Type::Interface(interface_type)) = implemented_type.as_ref() {
-            for (method, _) in interface_type.methods.iter() {
-                if !method_names.contains(method) {
-                    scope.source.print_error(
-                        self.identifier.span,
-                        &format!(
-                            "Implementation of `{}` is incomplete",
-                            interface_type.identifier
-                        ),
-                        &format!("does not implement method `{}`", method),
-                    );
+            if let Some(Type::Interface(interface_type)) = implemented_type.as_ref() {
+                for (method, _) in interface_type.methods.iter() {
+                    if !method_names.contains(method) {
+                        scope.source.print_error(
+                            self.identifier.span,
+                            &format!(
+                                "Implementation of `{}` is incomplete",
+                                interface_type.identifier
+                            ),
+                            &format!("does not implement method `{}`", method),
+                        );
+                    }
                 }
             }
         }
@@ -66,15 +66,51 @@ impl InterfaceImplementationNode {
                     &format!("Cannot infer interface implementation for structs"),
                     &format!("expected `{}`", Symbol::OpenBrace),
                 ),
-                Type::Enum(_) => {
-                    todo!("Type checking for enum default implementation of interfaces")
-                }
+                Type::Enum(enum_type) => self.check_enum_default_implementation(
+                    &scope,
+                    enum_type,
+                    implemented_type.as_ref(),
+                ),
                 _ => panic!("Interface implementation node for non struct/enum"),
             }
         }
 
-        // TODO check for empty implementation in invalid contexts
         scope
+    }
+
+    fn check_enum_default_implementation(
+        &self,
+        scope: &Scope,
+        enum_type: &Rc<EnumType>,
+        implemented_type: Option<&Type>,
+    ) {
+        if let Some(Type::Interface(interface_type)) = implemented_type {
+            for (variant_name, variant_type) in enum_type.variants.iter() {
+                if let Some(variant_type) = variant_type {
+                    let implements_interface = match variant_type.clone().as_deref(scope) {
+                        Type::Enum(e) => e.implements(scope, interface_type),
+                        Type::Struct(s) => s.implements(scope, interface_type),
+                        _ => false,
+                    };
+                    if !implements_interface {
+                        scope.source.print_error(
+                            self.identifier.span,
+                            "Cannot infer interface implementation",
+                            &format!(
+                                "variant `{}` does not implement `{}`",
+                                variant_name, interface_type.identifier
+                            ),
+                        );
+                    }
+                } else {
+                    scope.source.print_error(
+                        self.identifier.span,
+                        "Cannot infer interface implementation",
+                        &format!("variant `{}` is untyped", variant_name),
+                    );
+                }
+            }
+        }
     }
 }
 
