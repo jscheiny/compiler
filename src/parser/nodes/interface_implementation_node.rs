@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use crate::{
     checker::{FunctionType, Scope, Type},
+    lexer::Symbol,
     parser::{FunctionNode, Identified, IdentifierNode, Node},
 };
 
@@ -11,7 +12,7 @@ pub struct InterfaceImplementationNode {
 }
 
 impl InterfaceImplementationNode {
-    pub fn check(&self, mut scope: Box<Scope>) -> Box<Scope> {
+    pub fn check(&self, mut scope: Box<Scope>, self_type: &Type) -> Box<Scope> {
         let implemented_type = scope
             .get_type_index(self.id())
             .map(|t| Type::Reference(t).as_deref(&scope));
@@ -43,7 +44,7 @@ impl InterfaceImplementationNode {
             }
         }
 
-        if let Some(Type::Interface(interface_type)) = implemented_type {
+        if let Some(Type::Interface(interface_type)) = implemented_type.as_ref() {
             for (method, _) in interface_type.methods.iter() {
                 if !method_names.contains(method) {
                     scope.source.print_error(
@@ -55,6 +56,20 @@ impl InterfaceImplementationNode {
                         &format!("does not implement method `{}`", method),
                     );
                 }
+            }
+        }
+
+        if self.methods.is_none() {
+            match self_type {
+                Type::Struct(_) => scope.source.print_error(
+                    self.identifier.span.after(),
+                    &format!("Cannot infer interface implementation for structs"),
+                    &format!("expected `{}`", Symbol::OpenBrace),
+                ),
+                Type::Enum(_) => {
+                    todo!("Type checking for enum default implementation of interfaces")
+                }
+                _ => panic!("Interface implementation node for non struct/enum"),
             }
         }
 

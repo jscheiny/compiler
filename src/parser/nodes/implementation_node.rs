@@ -12,12 +12,6 @@ pub struct ImplementationNode {
     implemented_interfaces: OnceCell<HashSet<usize>>,
 }
 
-#[derive(Clone, Copy)]
-pub enum ImplementationNodeType {
-    Struct,
-    Enum,
-}
-
 impl ImplementationNode {
     pub fn new(entries: Vec<Node<ImplementationEntryNode>>) -> Self {
         Self {
@@ -29,8 +23,7 @@ impl ImplementationNode {
     pub fn check(
         &self,
         mut scope: Box<Scope>,
-        implementation_type: ImplementationNodeType,
-        container_name: &str,
+        self_type: &Type,
         mut scope_names: HashSet<String>,
     ) -> Box<Scope> {
         let mut implemented_interfaces = HashSet::new();
@@ -39,23 +32,21 @@ impl ImplementationNode {
                 ImplementationEntryNode::Interface(interface) => check_duplicate_interface(
                     interface,
                     &mut scope,
-                    implementation_type,
-                    container_name,
+                    self_type,
                     &mut scope_names,
                     &mut implemented_interfaces,
                 ),
                 ImplementationEntryNode::Method(method) => check_duplicate_method(
                     &method.function,
                     &mut scope,
-                    implementation_type,
-                    container_name,
+                    self_type,
                     &mut scope_names,
                 ),
             };
         }
 
         for entry in self.entries.iter() {
-            scope = entry.check(scope);
+            scope = entry.check(scope, self_type);
         }
 
         scope
@@ -119,8 +110,7 @@ impl ImplementationNode {
 fn check_duplicate_interface(
     interface_implementation: &InterfaceImplementationNode,
     scope: &mut Scope,
-    implementation_type: ImplementationNodeType,
-    container_name: &str,
+    self_type: &Type,
     scope_names: &mut HashSet<String>,
     implemented_interfaces: &mut HashSet<String>,
 ) {
@@ -137,8 +127,8 @@ fn check_duplicate_interface(
                 ),
                 &format!(
                     "{} `{}` already implements this interface",
-                    get_container_type(implementation_type),
-                    container_name
+                    get_container_type(self_type),
+                    self_type.format(scope),
                 ),
             );
         }
@@ -146,13 +136,7 @@ fn check_duplicate_interface(
 
     if let Some(methods) = interface_implementation.methods.as_ref() {
         for method in methods.iter() {
-            check_duplicate_method(
-                method,
-                scope,
-                implementation_type,
-                container_name,
-                scope_names,
-            );
+            check_duplicate_method(method, scope, self_type, scope_names);
         }
     }
 }
@@ -160,12 +144,11 @@ fn check_duplicate_interface(
 fn check_duplicate_method(
     method: &FunctionNode,
     scope: &mut Scope,
-    implementation_type: ImplementationNodeType,
-    container_name: &str,
+    self_type: &Type,
     scope_names: &mut HashSet<String>,
 ) {
     if scope_names.contains(method.id()) {
-        print_duplicate_member_error(scope, implementation_type, container_name, method);
+        print_duplicate_member_error(scope, self_type, method);
     } else {
         let method_type = Type::Function(method.get_type(scope).clone());
         scope.add_value(method.id(), method_type);
@@ -173,32 +156,28 @@ fn check_duplicate_method(
     }
 }
 
-fn print_duplicate_member_error(
-    scope: &Scope,
-    implementation_type: ImplementationNodeType,
-    container_name: &str,
-    method: &FunctionNode,
-) {
-    use ImplementationNodeType as I;
-    let container_type = get_container_type(implementation_type);
+fn print_duplicate_member_error(scope: &Scope, self_type: &Type, method: &FunctionNode) {
+    let container_type = get_container_type(self_type);
     scope.source.print_error(
         method.signature.identifier.span,
         &format!("Duplicate {} member `{}`", container_type, method.id()),
         &format!(
             "{} `{}` already contains a {} with this name",
             container_type,
-            container_name,
-            match implementation_type {
-                I::Enum => "variant or method",
-                I::Struct => "field or method",
+            self_type.format(scope),
+            match self_type {
+                Type::Enum(_) => "variant or method",
+                Type::Struct(_) => "field or method",
+                _ => panic!("Implementation node for non struct/enum"),
             }
         ),
     );
 }
 
-fn get_container_type(implementation_type: ImplementationNodeType) -> &'static str {
-    match implementation_type {
-        ImplementationNodeType::Enum => "enum",
-        ImplementationNodeType::Struct => "struct",
+fn get_container_type(self_type: &Type) -> &'static str {
+    match self_type {
+        Type::Enum(_) => "enum",
+        Type::Struct(_) => "struct",
+        _ => panic!("Implementation node for non struct/enum"),
     }
 }

@@ -1,11 +1,8 @@
 use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{EnumType, Scope, ScopeType},
-    parser::{
-        EnumVariantNode, Identified, IdentifierNode, ImplementationNode, ImplementationNodeType,
-        Node, NodeVec,
-    },
+    checker::{EnumType, Scope, ScopeType, Type},
+    parser::{EnumVariantNode, Identified, IdentifierNode, ImplementationNode, Node, NodeVec},
 };
 
 pub struct EnumNode {
@@ -29,12 +26,12 @@ impl EnumNode {
         }
     }
 
-    pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
+    pub fn check(self: &Rc<Self>, scope: Box<Scope>) -> Box<Scope> {
         let index = scope.get_type_index(self.id()).unwrap();
         scope.nest(ScopeType::Struct(index), |scope| self.check_nested(scope))
     }
 
-    fn check_nested(&self, scope: Box<Scope>) -> Box<Scope> {
+    fn check_nested(self: &Rc<Self>, scope: Box<Scope>) -> Box<Scope> {
         let mut scope_names = HashSet::new();
         for variant in self.variants.iter() {
             if !scope_names.insert(variant.id().clone()) {
@@ -50,12 +47,8 @@ impl EnumNode {
         }
 
         if let Some(implementation) = self.implementation.as_ref() {
-            return implementation.check(
-                scope,
-                ImplementationNodeType::Enum,
-                self.id(),
-                scope_names,
-            );
+            let self_type = Type::Enum(self.get_type(&scope));
+            return implementation.check(scope, &self_type, scope_names);
         }
 
         scope

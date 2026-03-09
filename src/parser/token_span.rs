@@ -21,8 +21,17 @@ impl TokenSpan {
         }
     }
 
+    // TODO rename to before
     pub fn previous(&self) -> TokenSpan {
         let index = self.start_index - 1;
+        TokenSpan {
+            start_index: index,
+            end_index: index,
+        }
+    }
+
+    pub fn after(&self) -> TokenSpan {
+        let index = self.start_index + 1;
         TokenSpan {
             start_index: index,
             end_index: index,

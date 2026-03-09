@@ -7,10 +7,15 @@ type G = ToString;
 
 type T = (bool, bool);
 
+interface Other {}
+
 struct Test(){
+    impl Other;
     impl ToString {
         to_string(value: bool, neato: bool): int -> 5;
     }
+
+    impl Other;
 }
 
 fn main(value: Test) {

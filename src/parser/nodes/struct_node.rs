@@ -1,11 +1,8 @@
 use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{Scope, ScopeType, StructType},
-    parser::{
-        Identified, IdentifierNode, ImplementationNode, ImplementationNodeType, Node, NodeVec,
-        StructFieldNode,
-    },
+    checker::{Scope, ScopeType, StructType, Type},
+    parser::{Identified, IdentifierNode, ImplementationNode, Node, NodeVec, StructFieldNode},
 };
 
 pub struct StructNode {
@@ -29,12 +26,12 @@ impl StructNode {
         }
     }
 
-    pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
+    pub fn check(self: &Rc<Self>, scope: Box<Scope>) -> Box<Scope> {
         let index = scope.get_type_index(self.id()).unwrap();
         scope.nest(ScopeType::Struct(index), |scope| self.check_nested(scope))
     }
 
-    fn check_nested(&self, mut scope: Box<Scope>) -> Box<Scope> {
+    fn check_nested(self: &Rc<Self>, mut scope: Box<Scope>) -> Box<Scope> {
         let mut scope_names = HashSet::new();
         for field in self.fields.iter() {
             if !scope_names.insert(field.id().clone()) {
@@ -53,12 +50,8 @@ impl StructNode {
         }
 
         if let Some(implementation) = self.implementation.as_ref() {
-            return implementation.check(
-                scope,
-                ImplementationNodeType::Struct,
-                self.id(),
-                scope_names,
-            );
+            let self_type = Type::Struct(self.get_type());
+            return implementation.check(scope, &self_type, scope_names);
         }
 
         scope
