@@ -1,8 +1,20 @@
+struct Coordinate(pub row: int, pub column: int) {
+    pub neato(value: int): Coordinate {}
+}
+
 fn test(value: int, value2: bool): bool {
 
 }
 
 fn main() {
-    let x: bool -> bool = test(3);
-    let y: bool = test();
+    let x: bool => bool = test(3);
+    let y: bool = test(3, true);
+    let z: Coordinate => int = Coordinate.row;
+    let a: (Coordinate, bool) => Coordinate = Coordinate.neato;
+
+    test2([true, true]);
+}
+
+fn test2(value: int => bool) {
+
 }
