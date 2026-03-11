@@ -33,56 +33,55 @@ impl Type {
     }
 
     pub fn is_assignable_to(&self, other: &Type, scope: &Scope) -> bool {
-        if self.is_error() || other.is_error() {
+        other.is_assignable_from(self, scope)
+    }
+
+    fn is_assignable_from(&self, other: &Type, scope: &Scope) -> bool {
+        if other.is_error() {
             return true;
         }
 
         if let Type::Reference(_) = other {
             let resolved_other = other.deref(scope);
-            return self.is_assignable_to(&resolved_other, scope);
+            return self.is_assignable_from(&resolved_other, scope);
         }
 
-        // TODO this will need revisement as time goes on...
         match self {
             Type::Array(left) => match other {
-                Type::Array(right) => left.is_assignable_to(right, scope),
-                // TODO handle function type coercion better...
-                _ => match self.clone().as_function(scope) {
-                    Some(function_type) => {
-                        Type::Function(function_type).is_assignable_to(other, scope)
-                    }
-                    None => false,
-                },
+                Type::Array(right) => left.is_assignable_from(right, scope),
+                _ => false,
             },
             Type::Enum(left) => match other {
                 Type::Enum(right) => left.id() == right.id(),
-                Type::Interface(right) => left.implements(scope, right),
                 _ => false,
             },
-            Type::Function(left) => match other {
-                Type::Function(right) => {
+            Type::Function(left) => match other.clone().as_function(scope) {
+                Some(right) => {
                     left.parameters.len() == right.parameters.len()
                         && left
                             .parameters
                             .iter()
                             .zip(right.parameters.iter())
-                            .all(|(left, right)| left.is_assignable_to(right, scope))
-                        && left.return_type.is_assignable_to(&right.return_type, scope)
+                            .all(|(left, right)| left.is_assignable_from(right, scope))
+                        && left
+                            .return_type
+                            .is_assignable_from(&right.return_type, scope)
                 }
-                _ => false,
+                None => false,
             },
             Type::Interface(left) => match other {
                 Type::Interface(right) => left.identifier == right.identifier,
+                Type::Enum(right) => right.implements(scope, left),
+                Type::Struct(right) => right.implements(scope, left),
                 _ => false,
             },
             Type::Primitive(left) => match other {
                 Type::Primitive(right) => left == right,
                 _ => false,
             },
-            Type::Reference(_) => self.deref(scope).is_assignable_to(other, scope),
+            Type::Reference(_) => self.deref(scope).is_assignable_from(other, scope),
             Type::Struct(left) => match other {
                 Type::Struct(right) => left.id() == right.id(),
-                Type::Interface(right) => left.implements(scope, right),
                 _ => false,
             },
             Type::Tuple(left) => match other {
@@ -91,7 +90,7 @@ impl Type {
                         && left
                             .iter()
                             .zip(right.iter())
-                            .all(|(left, right)| left.is_assignable_to(right, scope))
+                            .all(|(left, right)| left.is_assignable_from(right, scope))
                 }
                 _ => false,
             },
@@ -121,7 +120,8 @@ impl Type {
             )),
             Type::Function(function_type) => Some(function_type),
             Type::Type(RuntimeType::Struct(_)) => {
-                todo!("Implement call operator for types (constructor)")
+                // TODO implement call operator for struct constructors
+                None
             }
             _ => None,
         }
