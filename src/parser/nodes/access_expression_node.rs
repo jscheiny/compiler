@@ -17,7 +17,7 @@ impl AccessExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         // TODO should we mutate the expected type here?
         let (scope, left_type) = self.left.check_expected(scope, expected_type);
-        let function_type = left_type.clone().as_function(&scope);
+        let function_type = left_type.to_function(&scope);
         if let Some(function_type) = function_type {
             return self.check_deferred(scope, function_type);
         }

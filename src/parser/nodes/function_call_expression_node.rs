@@ -23,7 +23,7 @@ pub fn check_function_call(
     left_type: Type,
     argument_expressions: &NodeVec<ExpressionNode>,
 ) -> (Box<Scope>, Type) {
-    let function_type = left_type.clone().as_function(&scope);
+    let function_type = left_type.to_function(&scope);
     let mut arguments = vec![];
     for (index, argument) in argument_expressions.iter().enumerate() {
         let parameter_type = function_type

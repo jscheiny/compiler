@@ -55,7 +55,7 @@ impl Type {
                 Type::Enum(right) => left.id() == right.id(),
                 _ => false,
             },
-            Type::Function(left) => match other.clone().as_function(scope) {
+            Type::Function(left) => match other.to_function(scope) {
                 Some(right) => {
                     left.parameters.len() == right.parameters.len()
                         && left
@@ -112,8 +112,8 @@ impl Type {
         }
     }
 
-    pub fn as_function(self, scope: &Scope) -> Option<Rc<FunctionType>> {
-        match self.as_deref(scope) {
+    pub fn to_function(&self, scope: &Scope) -> Option<Rc<FunctionType>> {
+        match self.deref(scope) {
             Type::Array(element_type) => Some(FunctionType::new(
                 Type::Primitive(PrimitiveType::Int),
                 element_type.as_ref().clone(),
