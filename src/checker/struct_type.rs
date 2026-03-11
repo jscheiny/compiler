@@ -7,6 +7,7 @@ use crate::{
 
 pub struct StructType {
     node: Rc<StructNode>,
+    constructor: OnceCell<Rc<FunctionType>>,
     members: OnceCell<HashMap<String, StructMember>>,
 }
 
@@ -14,12 +15,35 @@ impl StructType {
     pub fn from(node: Rc<StructNode>) -> Rc<StructType> {
         Rc::new(StructType {
             node,
+            constructor: OnceCell::new(),
             members: OnceCell::new(),
         })
     }
 
     pub fn id(&self) -> &String {
         self.node.identifier.id()
+    }
+
+    pub fn get_constructor(self: &Rc<Self>, scope: &Scope) -> Rc<FunctionType> {
+        self.constructor
+            .get_or_init(|| self.init_constructor(scope))
+            .clone()
+    }
+
+    fn init_constructor(self: &Rc<Self>, scope: &Scope) -> Rc<FunctionType> {
+        let scope = scope.global();
+        let parameters = self
+            .node
+            .fields
+            .iter()
+            .map(|field| field.get_type(scope).clone())
+            .collect();
+        let return_type = Type::Struct(self.clone());
+
+        Rc::new(FunctionType {
+            parameters,
+            return_type: Box::new(return_type),
+        })
     }
 
     pub fn get_member(&self, scope: &Scope, identifier: &String) -> Option<&StructMember> {

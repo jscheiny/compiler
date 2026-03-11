@@ -119,9 +119,9 @@ impl Type {
                 element_type.as_ref().clone(),
             )),
             Type::Function(function_type) => Some(function_type),
-            Type::Type(RuntimeType::Struct(_)) => {
-                // TODO implement call operator for struct constructors
-                None
+            Type::Type(RuntimeType::Struct(struct_type)) => {
+                // TODO respect privacy!!!
+                Some(struct_type.get_constructor(scope))
             }
             _ => None,
         }
