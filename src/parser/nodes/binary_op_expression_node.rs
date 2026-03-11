@@ -15,23 +15,23 @@ impl BinaryOpExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         use BinaryOperator as O;
         match *self.operator {
-            O::Add => todo!("Implement type checking for +"),
-            O::AddAssign => todo!("Implement type checking for +="),
-            O::Subtract => todo!("Implement type checking for -"),
-            O::SubtractAssign => todo!("Implement type checking for -="),
-            O::Multiply => todo!("Implement type checking for *"),
-            O::MultiplyAssign => todo!("Implement type checking for *="),
-            O::Divide => todo!("Implement type checking for /"),
-            O::DivideAssign => todo!("Implement type checking for /="),
-            O::Mod => todo!("Implement type checking for %"),
-            O::ModAssign => todo!("Implement type checking for %="),
-            O::Assign => todo!("Implement type checking for ="),
-            O::Equal => todo!("Implement type checking for =="),
-            O::NotEqual => todo!("Implement type checking for !="),
-            O::LessThan => todo!("Implement type checking for <"),
-            O::LessThanOrEqual => todo!("Implement type checking for <="),
-            O::GreaterThan => todo!("Implement type checking for >"),
-            O::GreaterThanOrEqual => todo!("Implement type checking for >="),
+            O::Add => todo_unimplemented_operator(scope),
+            O::AddAssign => todo_unimplemented_operator(scope),
+            O::Subtract => todo_unimplemented_operator(scope),
+            O::SubtractAssign => todo_unimplemented_operator(scope),
+            O::Multiply => todo_unimplemented_operator(scope),
+            O::MultiplyAssign => todo_unimplemented_operator(scope),
+            O::Divide => todo_unimplemented_operator(scope),
+            O::DivideAssign => todo_unimplemented_operator(scope),
+            O::Mod => todo_unimplemented_operator(scope),
+            O::ModAssign => todo_unimplemented_operator(scope),
+            O::Assign => todo_unimplemented_operator(scope),
+            O::Equal => todo_unimplemented_operator(scope),
+            O::NotEqual => todo_unimplemented_operator(scope),
+            O::LessThan => todo_unimplemented_operator(scope),
+            O::LessThanOrEqual => todo_unimplemented_operator(scope),
+            O::GreaterThan => todo_unimplemented_operator(scope),
+            O::GreaterThanOrEqual => todo_unimplemented_operator(scope),
             O::FunctionApplication => self.check_function_application(scope, expected_type),
             O::Comma => self.check_comma(scope),
             O::LogicalAnd => self.check_logical_op(scope),
@@ -152,4 +152,8 @@ impl BinaryOpExpressionNode {
             &format!("found type: `{}`", found_type.format(scope)),
         );
     }
+}
+
+fn todo_unimplemented_operator(scope: Box<Scope>) -> (Box<Scope>, Type) {
+    (scope, Type::Error)
 }
