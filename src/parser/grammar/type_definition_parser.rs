@@ -1,8 +1,8 @@
 use crate::{
     lexer::{Keyword, Symbol, Token},
     parser::{
-        FunctionTypeNode, IdentifierNode, Node, ParseResult, PrimitiveType, SyntaxError, TokenSpan,
-        TokenStream, TupleTypeNode, TypeNode, grammar::comma_separated_list,
+        FunctionTypeNode, IdentifierType, Node, ParseResult, PrimitiveType, SyntaxError,
+        TokenStream, TupleTypeNode, TypeNode, UserDefinedTypeNode, grammar::comma_separated_list,
     },
 };
 
@@ -23,12 +23,7 @@ pub fn type_definition(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
 pub fn type_definition_impl(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
     let token = tokens.peek();
     match token {
-        Token::Identifier(identifier) => {
-            let span = TokenSpan::singleton(tokens);
-            let identifier = identifier.clone();
-            tokens.next();
-            Ok(TypeNode::UserDefined(span.wrap(IdentifierNode(identifier))))
-        }
+        Token::Identifier(_) => Ok(TypeNode::UserDefined(user_defined_type(tokens)?)),
         Token::Keyword(Keyword::Void) => {
             tokens.next();
             Ok(TypeNode::Void)
@@ -45,6 +40,11 @@ pub fn type_definition_impl(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
         Token::Symbol(Symbol::OpenBracket) => array_type(tokens),
         _ => Err(tokens.make_error(SyntaxError::ExpectedType)),
     }
+}
+
+fn user_defined_type(tokens: &mut TokenStream) -> ParseResult<UserDefinedTypeNode> {
+    let identifier = tokens.identifier(IdentifierType::Type)?;
+    Ok(UserDefinedTypeNode::new(identifier))
 }
 
 fn function_or_tuple_type(tokens: &mut TokenStream) -> ParseResult<TypeNode> {

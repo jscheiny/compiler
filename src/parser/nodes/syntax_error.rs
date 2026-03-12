@@ -45,6 +45,7 @@ pub enum IdentifierType {
     Parameter,
     PatternBinding,
     Struct,
+    Type,
     Variable,
     Variant,
 }
@@ -59,6 +60,7 @@ impl Display for IdentifierType {
             Self::Parameter => "parameter",
             Self::PatternBinding => "pattern binding",
             Self::Struct => "struct",
+            Self::Type => "type",
             Self::Variable => "variable",
             Self::Variant => "variant",
         };
