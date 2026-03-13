@@ -1,6 +1,6 @@
 use crate::lexer::{
-    CharacterLiteralTokenizer, CharacterLocation, CharacterSpan, IdentifierTokenizer,
-    IntegerLiteralTokenizer, KeywordTokenizer, LocatedToken, MultiLineCommentTokenizer,
+    CharacterLiteralTokenizer, CharacterLocation, CharacterSpan, IntegerLiteralTokenizer,
+    KeywordTokenizer, LocatedToken, MultiLineCommentTokenizer, NameTokenizer,
     SingleLineCommentTokenizer, StringLiteralTokenizer, SymbolTokenizer, Token, TokenWidth,
     Tokenizer, TryTokenizeResult, WhitespaceTokenizer,
 };
@@ -19,7 +19,7 @@ pub fn tokenize(mut text: &str) -> TokenizerResult {
         Box::new(StringLiteralTokenizer),
         Box::new(CharacterLiteralTokenizer),
         Box::new(IntegerLiteralTokenizer),
-        Box::new(IdentifierTokenizer),
+        Box::new(NameTokenizer),
         Box::new(WhitespaceTokenizer),
     ];
     let mut errors = vec![];

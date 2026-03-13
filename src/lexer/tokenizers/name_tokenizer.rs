@@ -1,8 +1,8 @@
 use crate::lexer::{Token, TokenWidth, Tokenizer, TryTokenizeResult};
 
-pub struct IdentifierTokenizer;
+pub struct NameTokenizer;
 
-impl Tokenizer for IdentifierTokenizer {
+impl Tokenizer for NameTokenizer {
     fn try_tokenize(&self, text: &str) -> Option<TryTokenizeResult> {
         let mut width = TokenWidth::new();
         let mut identifier = String::from("");
