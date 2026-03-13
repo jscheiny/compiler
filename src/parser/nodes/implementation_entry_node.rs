@@ -21,7 +21,7 @@ impl Named for ImplementationEntryNode {
     fn name(&self) -> &String {
         match self {
             Self::Method(node) => node.name(),
-            Self::Interface(node) => node.name(),
+            Self::Interface(node) => &node.name,
         }
     }
 }

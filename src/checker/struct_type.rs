@@ -2,7 +2,7 @@ use std::{cell::OnceCell, collections::HashMap, rc::Rc};
 
 use crate::{
     checker::{FunctionType, InterfaceType, Scope, Type},
-    parser::{Named, StructNode},
+    parser::StructNode,
 };
 
 pub struct StructType {
@@ -57,7 +57,7 @@ impl StructType {
         let mut members = HashMap::new();
         for field in self.node.fields.iter() {
             let member = field.get_member(scope);
-            let name = field.name().clone();
+            let name = field.name.clone();
             members.entry(name).or_insert(member);
         }
 

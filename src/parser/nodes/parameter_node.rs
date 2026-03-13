@@ -2,7 +2,7 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{Scope, Type},
-    parser::{NameNode, Named, Node, TypeNode},
+    parser::{NameNode, Node, TypeNode},
 };
 
 pub struct ParameterNode {
@@ -29,11 +29,5 @@ impl ParameterNode {
             Some(type_def) => type_def.get_type(scope),
             None => Type::Error,
         }
-    }
-}
-
-impl Named for ParameterNode {
-    fn name(&self) -> &String {
-        &self.name
     }
 }

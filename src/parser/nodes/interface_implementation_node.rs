@@ -14,7 +14,7 @@ pub struct InterfaceImplementationNode {
 impl InterfaceImplementationNode {
     pub fn check(&self, mut scope: Box<Scope>, self_type: &Type) -> Box<Scope> {
         let implemented_type = scope
-            .get_type_index(self.name())
+            .get_type_index(&self.name)
             .map(|t| Type::Reference(t).as_deref(&scope));
 
         if let Some(implemented_type) = implemented_type.as_ref() {
@@ -208,11 +208,5 @@ fn check_method_equivalence(
                 implemented_type.return_type.format(scope)
             ),
         );
-    }
-}
-
-impl Named for InterfaceImplementationNode {
-    fn name(&self) -> &String {
-        &self.name
     }
 }

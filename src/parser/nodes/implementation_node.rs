@@ -64,7 +64,7 @@ impl ImplementationNode {
                 }
                 ImplementationEntryNode::Interface(implementation) => {
                     let interface_type = scope
-                        .get_type_index(implementation.name())
+                        .get_type_index(&implementation.name)
                         .map(Type::Reference)
                         .map(|t| t.as_deref(scope));
                     if let Some(Type::Interface(interface_type)) = interface_type {
@@ -94,7 +94,7 @@ impl ImplementationNode {
         let mut result = HashSet::new();
         for entry in self.entries.iter() {
             if let ImplementationEntryNode::Interface(node) = &entry.value {
-                let index = scope.get_type_index(node.name());
+                let index = scope.get_type_index(&node.name);
                 if let Some(index) = index {
                     result.insert(index);
                 }
@@ -113,7 +113,7 @@ fn check_duplicate_interface(
     implemented_interfaces: &mut HashSet<String>,
 ) {
     let implemented_type = scope
-        .get_type_index(interface_implementation.name())
+        .get_type_index(&interface_implementation.name)
         .map(|t| Type::Reference(t).as_deref(scope));
     if let Some(Type::Interface(interface_type)) = implemented_type {
         if !implemented_interfaces.insert(interface_type.name.clone()) {

@@ -1,6 +1,6 @@
 use crate::{
     checker::{Scope, Type},
-    parser::{ExpressionNode, NameNode, Named, Node, TypeNode},
+    parser::{ExpressionNode, NameNode, Node, TypeNode},
 };
 
 pub struct DeclarationNode {
@@ -38,13 +38,7 @@ impl DeclarationNode {
             None => (scope, Type::Error),
         };
 
-        scope.add_value(self.name(), resolved_type);
+        scope.add_value(&self.name, resolved_type);
         scope
-    }
-}
-
-impl Named for DeclarationNode {
-    fn name(&self) -> &String {
-        &self.name
     }
 }

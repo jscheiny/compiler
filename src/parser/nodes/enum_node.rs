@@ -2,7 +2,7 @@ use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
     checker::{EnumType, Scope, ScopeType, Type},
-    parser::{EnumVariantNode, ImplementationNode, NameNode, Named, Node, NodeVec},
+    parser::{EnumVariantNode, ImplementationNode, NameNode, Node, NodeVec},
 };
 
 pub struct EnumNode {
@@ -27,20 +27,20 @@ impl EnumNode {
     }
 
     pub fn check(self: &Rc<Self>, scope: Box<Scope>) -> Box<Scope> {
-        let index = scope.get_type_index(self.name()).unwrap();
+        let index = scope.get_type_index(&self.name).unwrap();
         scope.nest(ScopeType::Struct(index), |scope| self.check_nested(scope))
     }
 
     fn check_nested(self: &Rc<Self>, scope: Box<Scope>) -> Box<Scope> {
         let mut scope_names = HashSet::new();
         for variant in self.variants.iter() {
-            if !scope_names.insert(variant.name().clone()) {
+            if !scope_names.insert(variant.name.clone()) {
                 scope.source.print_error(
                     variant.name.span,
-                    &format!("Duplicate enum variant `{}`", variant.name()),
+                    &format!("Duplicate enum variant `{}`", variant.name),
                     &format!(
                         "enum `{}` already contains a variant with this name",
-                        self.name()
+                        self.name
                     ),
                 );
             }
@@ -58,11 +58,5 @@ impl EnumNode {
         self.resolved_type
             .get_or_init(|| EnumType::from(self.clone(), scope))
             .clone()
-    }
-}
-
-impl Named for EnumNode {
-    fn name(&self) -> &String {
-        &self.name
     }
 }

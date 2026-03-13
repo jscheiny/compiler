@@ -2,7 +2,7 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{Scope, Type},
-    parser::{NameNode, Named, Node, TypeNode},
+    parser::{NameNode, Node, TypeNode},
 };
 
 pub struct TypeAliasNode {
@@ -21,7 +21,7 @@ impl TypeAliasNode {
     }
 
     pub fn check_statement(&self, mut scope: Box<Scope>) -> Box<Scope> {
-        scope.add_type(&self.name.value, self.get_type(&scope).clone());
+        scope.add_type(&self.name, self.get_type(&scope).clone());
         scope
         // TODO check for recursion
     }
@@ -29,11 +29,5 @@ impl TypeAliasNode {
     pub fn get_type(&self, scope: &Scope) -> &Type {
         self.resolved_type
             .get_or_init(|| self.type_def.get_type(scope))
-    }
-}
-
-impl Named for TypeAliasNode {
-    fn name(&self) -> &String {
-        &self.name
     }
 }

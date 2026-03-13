@@ -2,7 +2,7 @@ use std::{cell::OnceCell, rc::Rc};
 
 use crate::{
     checker::{FunctionType, Scope, Type},
-    parser::{NameNode, Named, Node, NodeVec, ParameterNode, TypeNode},
+    parser::{NameNode, Node, NodeVec, ParameterNode, TypeNode},
 };
 
 pub struct FunctionSignatureNode {
@@ -50,11 +50,5 @@ impl FunctionSignatureNode {
             parameters,
             return_type: Box::new(return_type),
         })
-    }
-}
-
-impl Named for FunctionSignatureNode {
-    fn name(&self) -> &String {
-        &self.name
     }
 }

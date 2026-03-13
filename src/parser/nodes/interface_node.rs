@@ -6,7 +6,7 @@ use std::{
 
 use crate::{
     checker::{InterfaceType, Scope},
-    parser::{FunctionSignatureNode, NameNode, Named, NodeVec},
+    parser::{FunctionSignatureNode, NameNode, NodeVec},
 };
 
 pub struct InterfaceNode {
@@ -27,14 +27,11 @@ impl InterfaceNode {
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
         let mut method_names = HashSet::new();
         for method in self.method_signatures.iter() {
-            if !method_names.insert(method.name()) {
+            if !method_names.insert(&method.name.value) {
                 scope.source.print_error(
                     method.name.span,
-                    &format!("Duplicate method signature `{}`", method.name()),
-                    &format!(
-                        "a method of `{}` already exists with this name",
-                        self.name()
-                    ),
+                    &format!("Duplicate method signature `{}`", method.name),
+                    &format!("a method of `{}` already exists with this name", self.name),
                 );
             }
         }
@@ -51,20 +48,14 @@ impl InterfaceNode {
     fn get_type_impl(&self, scope: &Scope) -> Rc<InterfaceType> {
         let mut methods = HashMap::new();
         for method_signature in self.method_signatures.iter() {
-            let id = method_signature.name().clone();
+            let name = method_signature.name.clone();
             let method = method_signature.get_type(scope).clone();
-            methods.entry(id).or_insert(method);
+            methods.entry(name).or_insert(method);
         }
 
         Rc::new(InterfaceType {
-            name: self.name().clone(),
+            name: self.name.clone(),
             methods,
         })
-    }
-}
-
-impl Named for InterfaceNode {
-    fn name(&self) -> &String {
-        &self.name
     }
 }

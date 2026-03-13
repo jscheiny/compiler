@@ -2,7 +2,7 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{Scope, Type},
-    parser::{NameNode, Named},
+    parser::NameNode,
 };
 
 pub struct UserDefinedTypeNode {
@@ -25,22 +25,16 @@ impl UserDefinedTypeNode {
     }
 
     fn get_type_impl(&self, scope: &Scope) -> Type {
-        let index = scope.get_type_index(self.name());
+        let index = scope.get_type_index(&self.name);
         if let Some(index) = index {
             return Type::Reference(index);
         }
 
         scope.source.print_error(
             self.name.span,
-            &format!("Unknown type `{}`", self.name()),
+            &format!("Unknown type `{}`", self.name),
             "could not find a type with this name",
         );
         Type::Error
-    }
-}
-
-impl Named for UserDefinedTypeNode {
-    fn name(&self) -> &String {
-        &self.name
     }
 }

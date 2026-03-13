@@ -2,7 +2,7 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{Scope, Type},
-    parser::{NameNode, Named, Node, TypeNode},
+    parser::{NameNode, Node, TypeNode},
 };
 
 pub struct EnumVariantNode {
@@ -28,11 +28,5 @@ impl EnumVariantNode {
 
     fn get_type_impl(&self, scope: &Scope) -> Option<Type> {
         self.type_def.as_ref().map(|ty| ty.get_type(scope))
-    }
-}
-
-impl Named for EnumVariantNode {
-    fn name(&self) -> &String {
-        &self.name
     }
 }

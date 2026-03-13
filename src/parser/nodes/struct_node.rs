@@ -2,7 +2,7 @@ use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
     checker::{Scope, ScopeType, StructType, Type},
-    parser::{ImplementationNode, NameNode, Named, Node, NodeVec, StructFieldNode},
+    parser::{ImplementationNode, NameNode, Node, NodeVec, StructFieldNode},
 };
 
 pub struct StructNode {
@@ -27,25 +27,25 @@ impl StructNode {
     }
 
     pub fn check(self: &Rc<Self>, scope: Box<Scope>) -> Box<Scope> {
-        let index = scope.get_type_index(self.name()).unwrap();
+        let index = scope.get_type_index(&self.name).unwrap();
         scope.nest(ScopeType::Struct(index), |scope| self.check_nested(scope))
     }
 
     fn check_nested(self: &Rc<Self>, mut scope: Box<Scope>) -> Box<Scope> {
         let mut scope_names = HashSet::new();
         for field in self.fields.iter() {
-            if !scope_names.insert(field.name().clone()) {
+            if !scope_names.insert(field.name.clone()) {
                 scope.source.print_error(
                     field.name.span,
-                    &format!("Duplicate struct member `{}`", field.name()),
+                    &format!("Duplicate struct member `{}`", field.name),
                     &format!(
                         "struct `{}` already contains a field with this name",
-                        self.name()
+                        self.name
                     ),
                 );
             } else {
                 let field_type = field.get_type(&scope).clone();
-                scope.add_value(field.name(), field_type);
+                scope.add_value(&field.name, field_type);
             }
         }
 
@@ -61,11 +61,5 @@ impl StructNode {
         self.resolved_type
             .get_or_init(|| StructType::from(self.clone()))
             .clone()
-    }
-}
-
-impl Named for StructNode {
-    fn name(&self) -> &String {
-        &self.name
     }
 }

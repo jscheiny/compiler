@@ -2,7 +2,7 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{Scope, StructMember, StructMemberType, Type},
-    parser::{NameNode, Named, Node, TypeNode},
+    parser::{NameNode, Node, TypeNode},
 };
 
 pub struct StructFieldNode {
@@ -38,11 +38,5 @@ impl StructFieldNode {
             Some(type_def) => type_def.get_type(scope),
             None => Type::Error,
         }
-    }
-}
-
-impl Named for StructFieldNode {
-    fn name(&self) -> &String {
-        &self.name
     }
 }

@@ -43,15 +43,15 @@ impl FunctionNode {
     fn check_params(&self, mut scope: Box<Scope>) -> Box<Scope> {
         let mut param_names = HashSet::new();
         for param in self.signature.parameters.iter() {
-            if param_names.contains(param.name()) {
+            if param_names.contains(&param.name.value) {
                 scope.source.print_error(
                     param.name.span,
-                    &format!("Duplicate parameter name `{}`", param.name()),
+                    &format!("Duplicate parameter name `{}`", param.name),
                     "function already contains a parameter with this name",
                 );
             } else {
-                param_names.insert(param.name().clone());
-                scope.add_value(param.name(), param.get_type(&scope).clone());
+                param_names.insert(param.name.clone());
+                scope.add_value(&param.name, param.get_type(&scope).clone());
             }
         }
         scope
