@@ -31,10 +31,10 @@ impl EnumType {
         self.node.name.name()
     }
 
-    pub fn get_variant(self: &Rc<Self>, identifier: &String) -> Option<Type> {
+    pub fn get_variant(self: &Rc<Self>, name: &String) -> Option<Type> {
         let self_type = Type::Enum(self.clone());
         self.variants
-            .get(identifier)
+            .get(name)
             .map(|variant_type| match variant_type {
                 Some(inner_type) => {
                     Type::Function(FunctionType::new(inner_type.clone(), self_type))
@@ -43,10 +43,10 @@ impl EnumType {
             })
     }
 
-    pub fn get_method(&self, scope: &Scope, identifier: &String) -> Option<&EnumMethod> {
+    pub fn get_method(&self, scope: &Scope, name: &String) -> Option<&EnumMethod> {
         self.methods
             .get_or_init(|| self.init_methods(scope))
-            .get(identifier)
+            .get(name)
     }
 
     fn init_methods(&self, scope: &Scope) -> HashMap<String, EnumMethod> {

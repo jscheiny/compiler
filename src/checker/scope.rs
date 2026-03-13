@@ -119,12 +119,12 @@ impl Scope {
         self.parent.unwrap()
     }
 
-    pub fn add_value(&mut self, identifier: &str, value: Type) {
-        self.values.insert(identifier.to_owned(), value);
+    pub fn add_value(&mut self, name: &str, value: Type) {
+        self.values.insert(name.to_owned(), value);
     }
 
-    pub fn add_value_or(&mut self, identifier: &str, value: Type, if_present: impl Fn(&Scope)) {
-        let entry = self.values.entry(identifier.to_owned());
+    pub fn add_value_or(&mut self, name: &str, value: Type, if_present: impl Fn(&Scope)) {
+        let entry = self.values.entry(name.to_owned());
         if let Entry::Vacant(v) = entry {
             v.insert(value);
         } else {
@@ -132,26 +132,26 @@ impl Scope {
         };
     }
 
-    pub fn get_value(&self, identifier: &String) -> Option<Type> {
-        self.get_local_value(identifier)
-            .or_else(|| self.get_parent_value(identifier))
+    pub fn get_value(&self, name: &String) -> Option<Type> {
+        self.get_local_value(name)
+            .or_else(|| self.get_parent_value(name))
     }
 
-    pub fn get_local_value(&self, identifier: &String) -> Option<Type> {
-        self.values.get(identifier).cloned()
+    pub fn get_local_value(&self, name: &String) -> Option<Type> {
+        self.values.get(name).cloned()
     }
 
-    fn get_parent_value(&self, identifier: &String) -> Option<Type> {
+    fn get_parent_value(&self, name: &String) -> Option<Type> {
         self.parent
             .as_ref()
-            .and_then(|parent| parent.get_value(identifier))
+            .and_then(|parent| parent.get_value(name))
     }
 
-    pub fn get_type_index(&self, identifier: &String) -> Option<usize> {
-        self.types.get_index(identifier).or_else(|| {
+    pub fn get_type_index(&self, name: &String) -> Option<usize> {
+        self.types.get_index(name).or_else(|| {
             self.parent
                 .as_ref()
-                .and_then(|parent| parent.get_type_index(identifier))
+                .and_then(|parent| parent.get_type_index(name))
         })
     }
 
@@ -173,11 +173,11 @@ impl Scope {
         }
     }
 
-    pub fn add_type(&mut self, identifier: &str, alias: Type) {
-        self.types.add(identifier, alias);
+    pub fn add_type(&mut self, name: &str, alias: Type) {
+        self.types.add(name, alias);
     }
 
-    pub fn resolve_type(&mut self, identifier: &str, value: Type) {
-        self.types.resolve(identifier, value);
+    pub fn resolve_type(&mut self, name: &str, value: Type) {
+        self.types.resolve(name, value);
     }
 }

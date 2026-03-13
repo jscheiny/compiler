@@ -75,7 +75,7 @@ impl ExpressionNode {
 
     fn check_identifier(
         &self,
-        identifier: &Node<NameNode>,
+        name: &Node<NameNode>,
         scope: Box<Scope>,
         expected_type: Option<&Type>,
     ) -> (Box<Scope>, Type) {
@@ -85,9 +85,9 @@ impl ExpressionNode {
         });
 
         // TODO disallow use of types as values
-        if let Some(resolved_type) = scope.get_value(identifier.name()) {
+        if let Some(resolved_type) = scope.get_value(name.name()) {
             (scope, resolved_type)
-        } else if let Some(index) = scope.get_type_index(identifier.name()) {
+        } else if let Some(index) = scope.get_type_index(name.name()) {
             let resolved_type = Type::Reference(index)
                 .as_runtime_type(&scope)
                 .map(Type::Type);
@@ -95,7 +95,7 @@ impl ExpressionNode {
                 Some(resolved_type) => (scope, resolved_type),
                 None => {
                     scope.source.print_error(
-                        identifier.span,
+                        name.span,
                         "Invalid type as value",
                         "cannot use type as a value",
                     );
@@ -103,41 +103,41 @@ impl ExpressionNode {
                 }
             }
         } else if let Some(enum_type) = expected_enum_type {
-            if let Some(variant_type) = enum_type.get_variant(identifier.name()) {
+            if let Some(variant_type) = enum_type.get_variant(name.name()) {
                 (scope, variant_type)
             } else {
                 scope.source.print_error(
-                    identifier.span,
-                    &format!("Could not find value `{}`", identifier.name()),
+                    name.span,
+                    &format!("Could not find value `{}`", name.name()),
                     "no such symbol found",
                 );
                 (scope, Type::Error)
             }
         } else {
             scope.source.print_error(
-                identifier.span,
-                &format!("Could not find value `{}`", identifier.name()),
+                name.span,
+                &format!("Could not find value `{}`", name.name()),
                 "no such symbol found",
             );
             (scope, Type::Error)
         }
     }
 
-    fn check_self_ref(&self, identifier: &Node<NameNode>, scope: Box<Scope>) -> (Box<Scope>, Type) {
+    fn check_self_ref(&self, name: &Node<NameNode>, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let self_scope = scope.find_scope(|scope_type| matches!(scope_type, ScopeType::Struct(_)));
         if let Some(self_scope) = self_scope {
-            let resolved_type = self_scope.get_local_value(identifier.name());
+            let resolved_type = self_scope.get_local_value(name.name());
             if let Some(resolved_type) = resolved_type {
                 return (scope, resolved_type);
             }
             scope.source.print_error(
-                identifier.span,
-                &format!("Could not find member `{}`", identifier.name()),
+                name.span,
+                &format!("Could not find member `{}`", name.name()),
                 "self type does not contain a member with this name",
             );
         } else {
             scope.source.print_error(
-                identifier.span.before(),
+                name.span.before(),
                 "Self reference outside of struct or enum",
                 "operator invalid outside of struct or enum",
             );

@@ -25,10 +25,10 @@ impl TypeMap {
         }
     }
 
-    pub fn declare(&mut self, identifier: &Node<NameNode>, source: &SourceCode) {
-        if self.lookup.contains_key(identifier.name()) {
+    pub fn declare(&mut self, name: &Node<NameNode>, source: &SourceCode) {
+        if self.lookup.contains_key(name.name()) {
             source.print_error(
-                identifier.span,
+                name.span,
                 "Duplicate type name",
                 "a type already exists with this name",
             );
@@ -37,13 +37,11 @@ impl TypeMap {
 
         let index = self.types.len();
         self.types.push(None);
-        self.lookup.insert(identifier.name().clone(), index);
+        self.lookup.insert(name.name().clone(), index);
     }
 
-    pub fn get_index(&self, identifier: &String) -> Option<usize> {
-        self.lookup
-            .get(identifier)
-            .map(|index| *index + self.offset)
+    pub fn get_index(&self, name: &String) -> Option<usize> {
+        self.lookup.get(name).map(|index| *index + self.offset)
     }
 
     pub fn get_type(&self, index: usize) -> Option<Type> {
@@ -53,15 +51,15 @@ impl TypeMap {
         self.types.get(index - self.offset).and_then(|t| t.clone())
     }
 
-    pub fn resolve(&mut self, identifier: &str, value: Type) {
-        let index = *self.lookup.get(identifier).unwrap();
+    pub fn resolve(&mut self, name: &str, value: Type) {
+        let index = *self.lookup.get(name).unwrap();
         if self.types[index].is_none() {
             self.types[index] = Some(value);
         }
     }
 
-    pub fn add(&mut self, identifier: &str, value: Type) {
-        self.lookup.insert(identifier.to_owned(), self.types.len());
+    pub fn add(&mut self, name: &str, value: Type) {
+        self.lookup.insert(name.to_owned(), self.types.len());
         self.types.push(Some(value));
     }
 }

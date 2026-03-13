@@ -46,10 +46,10 @@ impl StructType {
         })
     }
 
-    pub fn get_member(&self, scope: &Scope, identifier: &String) -> Option<&StructMember> {
+    pub fn get_member(&self, scope: &Scope, name: &String) -> Option<&StructMember> {
         self.members
             .get_or_init(|| self.init_members(scope))
-            .get(identifier)
+            .get(name)
     }
 
     fn init_members(&self, scope: &Scope) -> HashMap<String, StructMember> {
