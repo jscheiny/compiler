@@ -117,7 +117,7 @@ fn closure_parameter(
     context: ExpressionContext,
 ) -> ParseResult<Node<ExpressionNode>> {
     if context.allow_types {
-        if let ExpressionNode::Identifier(identifier) = left.value {
+        if let ExpressionNode::Name(identifier) = left.value {
             let parameter_type = Some(tokens.located(type_definition)?);
             let parameter_span = left.span.expand_to(tokens);
             return Ok(parameter_span.wrap(ExpressionNode::ClosureParameter(
@@ -216,7 +216,7 @@ fn simple_closure(
 ) -> ParseResult<Node<ExpressionNode>> {
     tokens.next();
     let parameter = match left.value {
-        ExpressionNode::Identifier(identifier) => Ok(ExpressionNode::ClosureParameter(
+        ExpressionNode::Name(identifier) => Ok(ExpressionNode::ClosureParameter(
             ClosureParameterExpressionNode {
                 name: identifier,
                 parameter_type: None,
@@ -260,7 +260,7 @@ fn expression_atom(
             let span = TokenSpan::singleton(tokens);
             let identifier = span.wrap(NameNode(identifier.clone()));
             tokens.next();
-            Ok(ExpressionNode::Identifier(identifier))
+            Ok(ExpressionNode::Name(identifier))
         }
         Token::CharacterLiteral(literal) => {
             let literal = literal.clone();
@@ -376,7 +376,7 @@ fn closure(
     let parameters = parameters
         .into_iter()
         .map(|parameter| {
-            if let ExpressionNode::Identifier(identifier) = parameter.value {
+            if let ExpressionNode::Name(identifier) = parameter.value {
                 Some(parameter.span.wrap(ClosureParameterExpressionNode {
                     name: identifier,
                     parameter_type: None,

@@ -19,10 +19,10 @@ pub enum ExpressionNode {
     ClosureParameter(ClosureParameterExpressionNode),
     DeferredAccess(DeferredAccessExpressionNode),
     FunctionCall(FunctionCallExpressionNode),
-    Identifier(Node<NameNode>),
     IfExpression(IfExpressionNode),
     IntegerLiteral(i64),
     Match(MatchNode),
+    Name(Node<NameNode>),
     PostfixOp(PostfixOpExpressionNode),
     PrefixOp(PrefixOpExpressionNode),
     SelfRef(Node<NameNode>),
@@ -57,10 +57,10 @@ impl ExpressionNode {
             }
             Self::DeferredAccess(node) => node.check(scope, expected_type),
             Self::FunctionCall(node) => node.check(scope, expected_type),
-            Self::Identifier(identifier) => self.check_identifier(identifier, scope, expected_type),
             Self::IfExpression(node) => node.check(scope, expected_type),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
             Self::Match(node) => node.check(scope, expected_type),
+            Self::Name(identifier) => self.check_name(identifier, scope, expected_type),
             Self::PostfixOp(node) => node.check(scope),
             Self::PrefixOp(node) => node.check(scope),
             Self::SelfRef(identifier) => self.check_self_ref(identifier, scope),
@@ -73,7 +73,7 @@ impl ExpressionNode {
         }
     }
 
-    fn check_identifier(
+    fn check_name(
         &self,
         name: &Node<NameNode>,
         scope: Box<Scope>,
