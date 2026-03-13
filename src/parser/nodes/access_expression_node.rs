@@ -102,7 +102,7 @@ pub fn get_field(
                     &format!("Could not find method `{}`", field.name()),
                     &format!(
                         "interface `{}` has no such method `{}`",
-                        interface_type.identifier,
+                        interface_type.name,
                         field.name()
                     ),
                 );

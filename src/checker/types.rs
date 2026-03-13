@@ -70,7 +70,7 @@ impl Type {
                 None => false,
             },
             Type::Interface(left) => match other {
-                Type::Interface(right) => left.identifier == right.identifier,
+                Type::Interface(right) => left.name == right.name,
                 Type::Enum(right) => right.implements(scope, left),
                 Type::Struct(right) => right.implements(scope, left),
                 _ => false,

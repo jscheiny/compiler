@@ -4,6 +4,6 @@ use crate::checker::FunctionType;
 
 #[derive(Default)]
 pub struct InterfaceType {
-    pub identifier: String,
+    pub name: String,
     pub methods: HashMap<String, Rc<FunctionType>>,
 }

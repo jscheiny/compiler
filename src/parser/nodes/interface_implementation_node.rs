@@ -48,10 +48,7 @@ impl InterfaceImplementationNode {
                     if !method_names.contains(method) {
                         scope.source.print_error(
                             self.name.span,
-                            &format!(
-                                "Implementation of `{}` is incomplete",
-                                interface_type.identifier
-                            ),
+                            &format!("Implementation of `{}` is incomplete", interface_type.name),
                             &format!("does not implement method `{}`", method),
                         );
                     }
@@ -98,7 +95,7 @@ impl InterfaceImplementationNode {
                             "Cannot infer interface implementation",
                             &format!(
                                 "variant `{}` does not implement `{}`",
-                                variant_name, interface_type.identifier
+                                variant_name, interface_type.name
                             ),
                         );
                     }

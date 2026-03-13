@@ -57,7 +57,7 @@ impl InterfaceNode {
         }
 
         Rc::new(InterfaceType {
-            identifier: self.name().clone(),
+            name: self.name().clone(),
             methods,
         })
     }

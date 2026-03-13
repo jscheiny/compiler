@@ -80,7 +80,7 @@ impl ImplementationNode {
     }
 
     pub fn implements(&self, scope: &Scope, interface_type: &Rc<InterfaceType>) -> bool {
-        let index = scope.global().get_type_index(&interface_type.identifier);
+        let index = scope.global().get_type_index(&interface_type.name);
         match index {
             Some(index) => self
                 .implemented_interfaces
@@ -116,13 +116,10 @@ fn check_duplicate_interface(
         .get_type_index(interface_implementation.name())
         .map(|t| Type::Reference(t).as_deref(scope));
     if let Some(Type::Interface(interface_type)) = implemented_type {
-        if !implemented_interfaces.insert(interface_type.identifier.clone()) {
+        if !implemented_interfaces.insert(interface_type.name.clone()) {
             scope.source.print_error(
                 interface_implementation.name.span,
-                &format!(
-                    "Duplicate implementation of `{}`",
-                    interface_type.identifier
-                ),
+                &format!("Duplicate implementation of `{}`", interface_type.name),
                 &format!(
                     "{} `{}` already implements this interface",
                     get_container_type(self_type),
