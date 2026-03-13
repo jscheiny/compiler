@@ -165,7 +165,7 @@ impl Scope {
 
     pub fn get_self_type(&self) -> Option<Type> {
         if let ScopeType::Struct(index) = self.scope_type {
-            return self.get_type(index);
+            self.get_type(index)
         } else {
             self.parent
                 .as_ref()

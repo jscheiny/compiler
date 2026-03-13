@@ -204,6 +204,7 @@ fn check_private_access(scope: &Scope, receiver_type: &Type, field: &NameNode) {
     }
 }
 
+// TODO use let else here
 fn is_external_private_access(scope: &Scope, receiver_type: &Type) -> bool {
     let self_type = scope.get_self_type();
     if let Some(self_type) = self_type {
@@ -215,5 +216,5 @@ fn is_external_private_access(scope: &Scope, receiver_type: &Type) -> bool {
         return true;
     }
 
-    return false;
+    false
 }

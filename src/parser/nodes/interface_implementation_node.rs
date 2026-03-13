@@ -60,7 +60,7 @@ impl InterfaceImplementationNode {
             match self_type {
                 Type::Struct(_) => scope.source.print_error(
                     self.name.span.after(),
-                    &format!("Cannot infer interface implementation for structs"),
+                    "Cannot infer interface implementation for structs",
                     &format!("expected `{}`", Symbol::OpenBrace),
                 ),
                 Type::Enum(enum_type) => self.check_enum_default_implementation(
