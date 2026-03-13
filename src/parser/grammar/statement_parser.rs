@@ -28,7 +28,7 @@ pub fn statement(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult
 
 fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<StatementNode> {
     tokens.next();
-    let identifier = tokens.identifier(IdentifierType::Variable)?;
+    let identifier = tokens.name(IdentifierType::Variable)?;
     let type_def = if tokens.accept(Symbol::Colon) {
         Some(tokens.located(type_definition)?)
     } else {

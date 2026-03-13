@@ -8,7 +8,7 @@ use crate::{
 
 pub fn structure(tokens: &mut TokenStream) -> ParseResult<StructNode> {
     tokens.next();
-    let identifier = tokens.identifier(IdentifierType::Struct)?;
+    let identifier = tokens.name(IdentifierType::Struct)?;
     let fields = tokens.located(fields)?;
     let implementation = implementation(tokens)?;
     Ok(StructNode::new(identifier, fields, implementation))
@@ -30,7 +30,7 @@ fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<Node<StructFieldNode>>> {
 
 fn field(tokens: &mut TokenStream) -> ParseResult<StructFieldNode> {
     let public = tokens.accept(Keyword::Pub);
-    let identifier = tokens.identifier(IdentifierType::Field)?;
+    let identifier = tokens.name(IdentifierType::Field)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {
         Token::Symbol(Symbol::Colon) => {

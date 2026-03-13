@@ -71,7 +71,7 @@ pub fn function_signature(
     tokens: &mut TokenStream,
     identifier_type: IdentifierType,
 ) -> ParseResult<FunctionSignatureNode> {
-    let identifier = tokens.identifier(identifier_type)?;
+    let identifier = tokens.name(identifier_type)?;
     let parameters = tokens.located(parameters)?;
     let return_type = if tokens.accept(Symbol::Colon) {
         Some(tokens.located(type_definition)?)
@@ -123,7 +123,7 @@ pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<Node<ParameterNod
 }
 
 fn parameter(tokens: &mut TokenStream) -> ParseResult<ParameterNode> {
-    let identifier = tokens.identifier(IdentifierType::Parameter)?;
+    let identifier = tokens.name(IdentifierType::Parameter)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {
         Token::Symbol(Symbol::Colon) => {

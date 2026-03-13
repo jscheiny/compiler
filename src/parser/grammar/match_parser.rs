@@ -84,7 +84,7 @@ fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<Match
                 tokens.push_error(SyntaxError::UnexpectedBindingPattern);
             }
             tokens.next();
-            let identifier = tokens.identifier(IdentifierType::PatternBinding)?;
+            let identifier = tokens.name(IdentifierType::PatternBinding)?;
             Ok(MatchPatternNode::Binding(identifier.value))
         }
         _ => Err(tokens.make_error(SyntaxError::ExpectedMatchPattern)),

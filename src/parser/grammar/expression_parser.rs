@@ -151,7 +151,7 @@ fn binary_op_expression(
     context: ExpressionContext,
 ) -> ParseResult<Node<ExpressionNode>> {
     if operator.value == BinaryOperator::Access {
-        let field = tokens.identifier(IdentifierType::Field)?;
+        let field = tokens.name(IdentifierType::Field)?;
         let arguments = if Symbol::OpenParen.matches(tokens.peek()) {
             Some(tokens.located(function_arguments)?)
         } else {
@@ -284,7 +284,7 @@ fn expression_atom(
         }
         Token::Symbol(Symbol::At) => {
             tokens.next();
-            let identifier = tokens.identifier(IdentifierType::Field)?;
+            let identifier = tokens.name(IdentifierType::Field)?;
             Ok(ExpressionNode::SelfRef(identifier))
         }
         Token::Symbol(Symbol::Dot) => deferred_access(tokens),
@@ -340,7 +340,7 @@ pub fn block(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<Blo
 
 fn deferred_access(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
     tokens.next();
-    let field = tokens.identifier(IdentifierType::Field)?;
+    let field = tokens.name(IdentifierType::Field)?;
     let arguments = if Symbol::OpenParen.matches(tokens.peek()) {
         Some(tokens.located(function_arguments)?)
     } else {
