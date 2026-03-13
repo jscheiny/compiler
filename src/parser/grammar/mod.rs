@@ -1,9 +1,9 @@
 mod enum_parser;
 mod expression_parser;
 mod function_parser;
-mod identifier_parser;
 mod interface_parser;
 mod match_parser;
+mod name_parser;
 mod program_parser;
 mod statement_parser;
 mod struct_parser;
@@ -22,5 +22,5 @@ use type_alias_parser::*;
 use type_definition_parser::*;
 use utils::*;
 
-pub use identifier_parser::*;
+pub use name_parser::*;
 pub use program_parser::*;
