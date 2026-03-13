@@ -2,9 +2,7 @@ use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
     checker::{FunctionType, InterfaceType, Scope, Type},
-    parser::{
-        FunctionNode, Named, ImplementationEntryNode, InterfaceImplementationNode, Node,
-    },
+    parser::{FunctionNode, ImplementationEntryNode, InterfaceImplementationNode, Named, Node},
 };
 
 pub struct ImplementationNode {
@@ -59,14 +57,14 @@ impl ImplementationNode {
             match &entry.value {
                 ImplementationEntryNode::Method(method) => {
                     methods.push((
-                        method.id().clone(),
+                        method.name().clone(),
                         method.public,
                         method.function.get_type(scope).clone(),
                     ));
                 }
                 ImplementationEntryNode::Interface(implementation) => {
                     let interface_type = scope
-                        .get_type_index(implementation.id())
+                        .get_type_index(implementation.name())
                         .map(Type::Reference)
                         .map(|t| t.as_deref(scope));
                     if let Some(Type::Interface(interface_type)) = interface_type {
@@ -96,7 +94,7 @@ impl ImplementationNode {
         let mut result = HashSet::new();
         for entry in self.entries.iter() {
             if let ImplementationEntryNode::Interface(node) = &entry.value {
-                let index = scope.get_type_index(node.id());
+                let index = scope.get_type_index(node.name());
                 if let Some(index) = index {
                     result.insert(index);
                 }
@@ -115,7 +113,7 @@ fn check_duplicate_interface(
     implemented_interfaces: &mut HashSet<String>,
 ) {
     let implemented_type = scope
-        .get_type_index(interface_implementation.id())
+        .get_type_index(interface_implementation.name())
         .map(|t| Type::Reference(t).as_deref(scope));
     if let Some(Type::Interface(interface_type)) = implemented_type {
         if !implemented_interfaces.insert(interface_type.identifier.clone()) {
@@ -147,12 +145,12 @@ fn check_duplicate_method(
     self_type: &Type,
     scope_names: &mut HashSet<String>,
 ) {
-    if scope_names.contains(method.id()) {
+    if scope_names.contains(method.name()) {
         print_duplicate_member_error(scope, self_type, method);
     } else {
         let method_type = Type::Function(method.get_type(scope).clone());
-        scope.add_value(method.id(), method_type);
-        scope_names.insert(method.id().clone());
+        scope.add_value(method.name(), method_type);
+        scope_names.insert(method.name().clone());
     }
 }
 
@@ -160,7 +158,7 @@ fn print_duplicate_member_error(scope: &Scope, self_type: &Type, method: &Functi
     let container_type = get_container_type(self_type);
     scope.source.print_error(
         method.signature.identifier.span,
-        &format!("Duplicate {} member `{}`", container_type, method.id()),
+        &format!("Duplicate {} member `{}`", container_type, method.name()),
         &format!(
             "{} `{}` already contains a {} with this name",
             container_type,

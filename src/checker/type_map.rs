@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{
     checker::Type,
     lexer::SourceCode,
-    parser::{Named, NameNode, Node},
+    parser::{NameNode, Named, Node},
 };
 
 #[derive(Default)]
@@ -26,7 +26,7 @@ impl TypeMap {
     }
 
     pub fn declare(&mut self, identifier: &Node<NameNode>, source: &SourceCode) {
-        if self.lookup.contains_key(identifier.id()) {
+        if self.lookup.contains_key(identifier.name()) {
             source.print_error(
                 identifier.span,
                 "Duplicate type name",
@@ -37,7 +37,7 @@ impl TypeMap {
 
         let index = self.types.len();
         self.types.push(None);
-        self.lookup.insert(identifier.id().clone(), index);
+        self.lookup.insert(identifier.name().clone(), index);
     }
 
     pub fn get_index(&self, identifier: &String) -> Option<usize> {

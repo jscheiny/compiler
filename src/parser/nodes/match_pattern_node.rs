@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{
     checker::{Scope, Type},
-    parser::{Named, NameNode, Node, TokenSpan},
+    parser::{NameNode, Named, Node, TokenSpan},
 };
 
 pub enum MatchPatternNode {
@@ -45,7 +45,7 @@ pub struct VariantMatchPattern {
 impl VariantMatchPattern {
     pub fn check(&self, scope: &Scope, bindings: &mut HashMap<String, Type>, subject_type: &Type) {
         if let Type::Enum(enum_type) = subject_type.deref(scope) {
-            if let Some(variant) = enum_type.variants.get(self.identifier.id()) {
+            if let Some(variant) = enum_type.variants.get(self.identifier.name()) {
                 if let Some(inner_type) = variant {
                     if self.inner_pattern.is_none() {
                         // TODO consider relaxing this when the subject is just an identifier...
@@ -54,7 +54,7 @@ impl VariantMatchPattern {
                             "Expected binding pattern",
                             &format!(
                                 "typed variant `{}` must have a binding pattern",
-                                self.identifier.id()
+                                self.identifier.name()
                             ),
                         );
                     } else {
@@ -66,14 +66,14 @@ impl VariantMatchPattern {
                         "Unexpected binding pattern",
                         &format!(
                             "untyped variant `{}` cannot use a binding pattern",
-                            self.identifier.id()
+                            self.identifier.name()
                         ),
                     );
                 }
             } else {
                 scope.source.print_error(
                     self.identifier.span,
-                    &format!("Could not find variant `{}`", self.identifier.id()),
+                    &format!("Could not find variant `{}`", self.identifier.name()),
                     &format!("enum `{}` has no such variant", enum_type.id()),
                 );
             }

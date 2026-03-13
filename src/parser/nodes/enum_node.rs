@@ -27,20 +27,20 @@ impl EnumNode {
     }
 
     pub fn check(self: &Rc<Self>, scope: Box<Scope>) -> Box<Scope> {
-        let index = scope.get_type_index(self.id()).unwrap();
+        let index = scope.get_type_index(self.name()).unwrap();
         scope.nest(ScopeType::Struct(index), |scope| self.check_nested(scope))
     }
 
     fn check_nested(self: &Rc<Self>, scope: Box<Scope>) -> Box<Scope> {
         let mut scope_names = HashSet::new();
         for variant in self.variants.iter() {
-            if !scope_names.insert(variant.id().clone()) {
+            if !scope_names.insert(variant.name().clone()) {
                 scope.source.print_error(
                     variant.identifier.span,
-                    &format!("Duplicate enum variant `{}`", variant.id()),
+                    &format!("Duplicate enum variant `{}`", variant.name()),
                     &format!(
                         "enum `{}` already contains a variant with this name",
-                        self.id()
+                        self.name()
                     ),
                 );
             }
@@ -62,7 +62,7 @@ impl EnumNode {
 }
 
 impl Named for EnumNode {
-    fn id(&self) -> &String {
-        self.identifier.id()
+    fn name(&self) -> &String {
+        self.identifier.name()
     }
 }

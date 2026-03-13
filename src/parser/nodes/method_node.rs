@@ -15,7 +15,7 @@ impl MethodNode {
 }
 
 impl Named for MethodNode {
-    fn id(&self) -> &String {
-        self.function.id()
+    fn name(&self) -> &String {
+        self.function.name()
     }
 }

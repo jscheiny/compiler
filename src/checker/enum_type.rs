@@ -15,7 +15,7 @@ impl EnumType {
     pub fn from(node: Rc<EnumNode>, scope: &Scope) -> Rc<EnumType> {
         let mut variants = HashMap::new();
         for variant in node.variants.iter() {
-            let identifier = variant.id().clone();
+            let identifier = variant.name().clone();
             let variant = variant.get_type(scope).cloned();
             variants.entry(identifier).or_insert(variant);
         }
@@ -28,7 +28,7 @@ impl EnumType {
     }
 
     pub fn id(&self) -> &String {
-        self.node.identifier.id()
+        self.node.identifier.name()
     }
 
     pub fn get_variant(self: &Rc<Self>, identifier: &String) -> Option<Type> {

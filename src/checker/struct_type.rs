@@ -21,7 +21,7 @@ impl StructType {
     }
 
     pub fn id(&self) -> &String {
-        self.node.identifier.id()
+        self.node.identifier.name()
     }
 
     pub fn get_constructor(self: &Rc<Self>, scope: &Scope) -> Rc<FunctionType> {
@@ -57,7 +57,7 @@ impl StructType {
         let mut members = HashMap::new();
         for field in self.node.fields.iter() {
             let member = field.get_member(scope);
-            let identifier = field.id().clone();
+            let identifier = field.name().clone();
             members.entry(identifier).or_insert(member);
         }
 

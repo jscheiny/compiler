@@ -3,7 +3,7 @@ use crate::{
     parser::{
         AccessExpressionNode, ArrayExpressionNode, BinaryOpExpressionNode, BlockNode,
         ClosureExpressionNode, ClosureParameterExpressionNode, DeferredAccessExpressionNode,
-        FunctionCallExpressionNode, Named, IfExpressionNode, MatchNode, NameNode, Node,
+        FunctionCallExpressionNode, IfExpressionNode, MatchNode, NameNode, Named, Node,
         PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType, TokenSpan,
     },
 };
@@ -85,9 +85,9 @@ impl ExpressionNode {
         });
 
         // TODO disallow use of types as values
-        if let Some(resolved_type) = scope.get_value(identifier.id()) {
+        if let Some(resolved_type) = scope.get_value(identifier.name()) {
             (scope, resolved_type)
-        } else if let Some(index) = scope.get_type_index(identifier.id()) {
+        } else if let Some(index) = scope.get_type_index(identifier.name()) {
             let resolved_type = Type::Reference(index)
                 .as_runtime_type(&scope)
                 .map(Type::Type);
@@ -103,12 +103,12 @@ impl ExpressionNode {
                 }
             }
         } else if let Some(enum_type) = expected_enum_type {
-            if let Some(variant_type) = enum_type.get_variant(identifier.id()) {
+            if let Some(variant_type) = enum_type.get_variant(identifier.name()) {
                 (scope, variant_type)
             } else {
                 scope.source.print_error(
                     identifier.span,
-                    &format!("Could not find value `{}`", identifier.id()),
+                    &format!("Could not find value `{}`", identifier.name()),
                     "no such symbol found",
                 );
                 (scope, Type::Error)
@@ -116,7 +116,7 @@ impl ExpressionNode {
         } else {
             scope.source.print_error(
                 identifier.span,
-                &format!("Could not find value `{}`", identifier.id()),
+                &format!("Could not find value `{}`", identifier.name()),
                 "no such symbol found",
             );
             (scope, Type::Error)
@@ -126,13 +126,13 @@ impl ExpressionNode {
     fn check_self_ref(&self, identifier: &Node<NameNode>, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let self_scope = scope.find_scope(|scope_type| matches!(scope_type, ScopeType::Struct(_)));
         if let Some(self_scope) = self_scope {
-            let resolved_type = self_scope.get_local_value(identifier.id());
+            let resolved_type = self_scope.get_local_value(identifier.name());
             if let Some(resolved_type) = resolved_type {
                 return (scope, resolved_type);
             }
             scope.source.print_error(
                 identifier.span,
-                &format!("Could not find member `{}`", identifier.id()),
+                &format!("Could not find member `{}`", identifier.name()),
                 "self type does not contain a member with this name",
             );
         } else {

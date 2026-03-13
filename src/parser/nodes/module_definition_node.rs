@@ -3,8 +3,7 @@ use std::rc::Rc;
 use crate::{
     checker::{RuntimeType, Scope, Type},
     parser::{
-        EnumNode, FunctionNode, Named, InterfaceNode, NameNode, Node, StructNode,
-        TypeAliasNode,
+        EnumNode, FunctionNode, InterfaceNode, NameNode, Named, Node, StructNode, TypeAliasNode,
     },
 };
 
@@ -42,7 +41,7 @@ impl ModuleDefinitionNode {
         };
 
         if let Some(resolved_type) = resolved_type {
-            scope.add_value(self.id(), resolved_type);
+            scope.add_value(self.name(), resolved_type);
         }
     }
 
@@ -56,7 +55,7 @@ impl ModuleDefinitionNode {
         };
 
         if let Some(resolved_type) = resolved_type {
-            scope.resolve_type(self.id(), resolved_type);
+            scope.resolve_type(self.name(), resolved_type);
         }
     }
 
@@ -72,7 +71,7 @@ impl ModuleDefinitionNode {
 }
 
 impl Named for ModuleDefinitionNode {
-    fn id(&self) -> &String {
-        self.identifier().id()
+    fn name(&self) -> &String {
+        self.identifier().name()
     }
 }

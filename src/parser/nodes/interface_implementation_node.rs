@@ -3,7 +3,7 @@ use std::{collections::HashSet, rc::Rc};
 use crate::{
     checker::{EnumType, FunctionType, Scope, Type},
     lexer::Symbol,
-    parser::{FunctionNode, Named, NameNode, Node},
+    parser::{FunctionNode, NameNode, Named, Node},
 };
 
 pub struct InterfaceImplementationNode {
@@ -14,7 +14,7 @@ pub struct InterfaceImplementationNode {
 impl InterfaceImplementationNode {
     pub fn check(&self, mut scope: Box<Scope>, self_type: &Type) -> Box<Scope> {
         let implemented_type = scope
-            .get_type_index(self.id())
+            .get_type_index(self.name())
             .map(|t| Type::Reference(t).as_deref(&scope));
 
         if let Some(implemented_type) = implemented_type.as_ref() {
@@ -31,7 +31,7 @@ impl InterfaceImplementationNode {
         } else {
             scope.source.print_error(
                 self.identifier.span,
-                &format!("Unknown type `{}`", self.identifier.id()),
+                &format!("Unknown type `{}`", self.identifier.name()),
                 "could not find this type",
             );
         }
@@ -40,7 +40,7 @@ impl InterfaceImplementationNode {
         if let Some(methods) = self.methods.as_ref() {
             for method in methods.iter() {
                 scope = check_method(scope, method, implemented_type.as_ref());
-                method_names.insert(method.id());
+                method_names.insert(method.name());
             }
 
             if let Some(Type::Interface(interface_type)) = implemented_type.as_ref() {
@@ -120,7 +120,7 @@ fn check_method(
     implemented_type: Option<&Type>,
 ) -> Box<Scope> {
     if let Some(Type::Interface(interface_type)) = implemented_type {
-        let interface_method = interface_type.methods.get(method.id());
+        let interface_method = interface_type.methods.get(method.name());
         if let Some(interface_method) = interface_method {
             check_method_equivalence(&scope, interface_method, method);
         }
@@ -140,7 +140,7 @@ fn check_method_equivalence(
             implemented_method.signature.parameters.span,
             &format!(
                 "Implementation of `{}` contains {} parameters",
-                implemented_method.id(),
+                implemented_method.name(),
                 if implemented_type.parameters.len() > interface_type.parameters.len() {
                     "too many"
                 } else {
@@ -178,7 +178,7 @@ fn check_method_equivalence(
                 &format!(
                     "Parameter {} of `{}` does not match expected type from interface",
                     index + 1,
-                    implemented_method.id(),
+                    implemented_method.name(),
                 ),
                 &format!(
                     "expected type `{}`, found type: `{}`",
@@ -203,7 +203,7 @@ fn check_method_equivalence(
             error_span,
             &format!(
                 "Return type of `{}` does not match expected type from interface",
-                implemented_method.id(),
+                implemented_method.name(),
             ),
             &format!(
                 "expected type `{}`, found type: `{}`",
@@ -215,7 +215,7 @@ fn check_method_equivalence(
 }
 
 impl Named for InterfaceImplementationNode {
-    fn id(&self) -> &String {
-        self.identifier.id()
+    fn name(&self) -> &String {
+        self.identifier.name()
     }
 }
