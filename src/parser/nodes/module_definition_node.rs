@@ -2,9 +2,7 @@ use std::rc::Rc;
 
 use crate::{
     checker::{RuntimeType, Scope, Type},
-    parser::{
-        EnumNode, FunctionNode, InterfaceNode, NameNode, Named, Node, StructNode, TypeAliasNode,
-    },
+    parser::{EnumNode, FunctionNode, InterfaceNode, NameNode, StructNode, TypeAliasNode},
 };
 
 pub struct ExportableModuleDefinitionNode {
@@ -41,7 +39,7 @@ impl ModuleDefinitionNode {
         };
 
         if let Some(resolved_type) = resolved_type {
-            scope.add_value(self.name().name(), resolved_type);
+            scope.add_value(self.name(), resolved_type);
         }
     }
 
@@ -55,11 +53,11 @@ impl ModuleDefinitionNode {
         };
 
         if let Some(resolved_type) = resolved_type {
-            scope.resolve_type(self.name().name(), resolved_type);
+            scope.resolve_type(self.name(), resolved_type);
         }
     }
 
-    pub fn name(&self) -> &Node<NameNode> {
+    pub fn name(&self) -> &NameNode {
         match self {
             Self::Enum(node) => &node.name,
             Self::Function(node) => &node.signature.name,

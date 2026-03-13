@@ -1,8 +1,8 @@
 use crate::{
     lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
-        ExpressionNode, MatchCaseNode, MatchNode, MatchPatternNode, NameNode, NameType,
-        ParseResult, StatementNode, SyntaxError, TokenStream, VariantMatchPattern,
+        ExpressionNode, MatchCaseNode, MatchNode, MatchPatternNode, NameType, ParseResult,
+        StatementNode, SyntaxError, TokenStream, VariantMatchPattern,
         grammar::{expression_parser::expression, statement_parser::end_statement},
     },
 };
@@ -63,7 +63,7 @@ fn match_case(tokens: &mut TokenStream) -> ParseResult<MatchCaseNode> {
 fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<MatchPatternNode> {
     match tokens.peek() {
         Token::Name(name) => {
-            let name = tokens.current_span().wrap(NameNode(name.clone()));
+            let name = tokens.current_span().wrap(name.clone());
             tokens.next();
             if tokens.accept(Symbol::OpenParen) {
                 let inner_pattern = tokens.located_with(match_pattern, false)?;
@@ -85,7 +85,7 @@ fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<Match
             }
             tokens.next();
             let name = tokens.name(NameType::PatternBinding)?;
-            Ok(MatchPatternNode::Binding(name.value))
+            Ok(MatchPatternNode::Binding(name))
         }
         _ => Err(tokens.make_error(SyntaxError::ExpectedMatchPattern)),
     }

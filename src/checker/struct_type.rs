@@ -21,7 +21,7 @@ impl StructType {
     }
 
     pub fn name(&self) -> &String {
-        self.node.name.name()
+        &self.node.name
     }
 
     pub fn get_constructor(self: &Rc<Self>, scope: &Scope) -> Rc<FunctionType> {

@@ -6,7 +6,7 @@ use crate::{
 };
 
 pub struct StructNode {
-    pub name: Node<NameNode>,
+    pub name: NameNode,
     pub fields: NodeVec<StructFieldNode>,
     pub implementation: Option<Node<ImplementationNode>>,
     resolved_type: OnceCell<Rc<StructType>>,
@@ -14,7 +14,7 @@ pub struct StructNode {
 
 impl StructNode {
     pub fn new(
-        name: Node<NameNode>,
+        name: NameNode,
         fields: NodeVec<StructFieldNode>,
         implementation: Option<Node<ImplementationNode>>,
     ) -> Self {
@@ -66,6 +66,6 @@ impl StructNode {
 
 impl Named for StructNode {
     fn name(&self) -> &String {
-        self.name.name()
+        &self.name
     }
 }

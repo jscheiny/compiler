@@ -2,16 +2,16 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{Scope, Type},
-    parser::{NameNode, Named, Node},
+    parser::{NameNode, Named},
 };
 
 pub struct UserDefinedTypeNode {
-    pub name: Node<NameNode>,
+    pub name: NameNode,
     resolved_type: OnceCell<Type>,
 }
 
 impl UserDefinedTypeNode {
-    pub fn new(name: Node<NameNode>) -> Self {
+    pub fn new(name: NameNode) -> Self {
         Self {
             name,
             resolved_type: OnceCell::new(),
@@ -41,6 +41,6 @@ impl UserDefinedTypeNode {
 
 impl Named for UserDefinedTypeNode {
     fn name(&self) -> &String {
-        self.name.name()
+        &self.name
     }
 }

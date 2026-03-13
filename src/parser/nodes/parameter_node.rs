@@ -6,13 +6,13 @@ use crate::{
 };
 
 pub struct ParameterNode {
-    pub name: Node<NameNode>,
+    pub name: NameNode,
     pub type_def: Option<Node<TypeNode>>,
     resolved_type: OnceCell<Type>,
 }
 
 impl ParameterNode {
-    pub fn new(name: Node<NameNode>, type_def: Option<Node<TypeNode>>) -> Self {
+    pub fn new(name: NameNode, type_def: Option<Node<TypeNode>>) -> Self {
         Self {
             name,
             type_def,
@@ -34,6 +34,6 @@ impl ParameterNode {
 
 impl Named for ParameterNode {
     fn name(&self) -> &String {
-        self.name.name()
+        &self.name
     }
 }

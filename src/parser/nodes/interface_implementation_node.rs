@@ -7,7 +7,7 @@ use crate::{
 };
 
 pub struct InterfaceImplementationNode {
-    pub name: Node<NameNode>,
+    pub name: NameNode,
     pub methods: Option<Vec<Node<FunctionNode>>>,
 }
 
@@ -31,7 +31,7 @@ impl InterfaceImplementationNode {
         } else {
             scope.source.print_error(
                 self.name.span,
-                &format!("Unknown type `{}`", self.name.name()),
+                &format!("Unknown type `{}`", self.name),
                 "could not find this type",
             );
         }
@@ -213,6 +213,6 @@ fn check_method_equivalence(
 
 impl Named for InterfaceImplementationNode {
     fn name(&self) -> &String {
-        self.name.name()
+        &self.name
     }
 }

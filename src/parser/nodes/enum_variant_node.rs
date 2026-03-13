@@ -6,13 +6,13 @@ use crate::{
 };
 
 pub struct EnumVariantNode {
-    pub name: Node<NameNode>,
+    pub name: NameNode,
     pub type_def: Option<Node<TypeNode>>,
     resolved_type: OnceCell<Option<Type>>,
 }
 
 impl EnumVariantNode {
-    pub fn new(name: Node<NameNode>, type_def: Option<Node<TypeNode>>) -> Self {
+    pub fn new(name: NameNode, type_def: Option<Node<TypeNode>>) -> Self {
         Self {
             name,
             type_def,
@@ -33,6 +33,6 @@ impl EnumVariantNode {
 
 impl Named for EnumVariantNode {
     fn name(&self) -> &String {
-        self.name.name()
+        &self.name
     }
 }

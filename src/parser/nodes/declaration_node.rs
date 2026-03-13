@@ -5,7 +5,7 @@ use crate::{
 
 pub struct DeclarationNode {
     pub mutable: bool,
-    pub name: Node<NameNode>,
+    pub name: NameNode,
     pub type_def: Option<Node<TypeNode>>,
     pub initializer: Option<Node<ExpressionNode>>,
 }
@@ -45,6 +45,6 @@ impl DeclarationNode {
 
 impl Named for DeclarationNode {
     fn name(&self) -> &String {
-        self.name.name()
+        &self.name
     }
 }

@@ -64,6 +64,6 @@ impl FunctionNode {
 
 impl Named for FunctionNode {
     fn name(&self) -> &String {
-        self.signature.name.name()
+        &self.signature.name
     }
 }

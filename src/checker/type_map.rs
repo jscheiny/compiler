@@ -1,10 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{
-    checker::Type,
-    lexer::SourceCode,
-    parser::{NameNode, Named, Node},
-};
+use crate::{checker::Type, lexer::SourceCode, parser::NameNode};
 
 #[derive(Default)]
 pub struct TypeMap {
@@ -25,8 +21,8 @@ impl TypeMap {
         }
     }
 
-    pub fn declare(&mut self, name: &Node<NameNode>, source: &SourceCode) {
-        if self.lookup.contains_key(name.name()) {
+    pub fn declare(&mut self, name: &NameNode, source: &SourceCode) {
+        if self.lookup.contains_key(&name.value) {
             source.print_error(
                 name.span,
                 "Duplicate type name",
@@ -37,7 +33,7 @@ impl TypeMap {
 
         let index = self.types.len();
         self.types.push(None);
-        self.lookup.insert(name.name().clone(), index);
+        self.lookup.insert(name.value.clone(), index);
     }
 
     pub fn get_index(&self, name: &String) -> Option<usize> {

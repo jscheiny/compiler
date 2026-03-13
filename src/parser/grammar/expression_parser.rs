@@ -4,9 +4,9 @@ use crate::{
         AccessExpressionNode, ArrayExpressionNode, Associativity, BinaryOpExpressionNode,
         BinaryOperator, BlockNode, ClosureExpressionNode, ClosureParameterExpressionNode,
         DeferredAccessExpressionNode, ExpressionNode, FunctionCallExpressionNode, IfExpressionNode,
-        LocatedSyntaxError, NameNode, NameType, Node, Operator, ParseResult,
-        PostfixOpExpressionNode, PostfixOperator, PrefixOpExpressionNode, PrefixOperator,
-        StatementNode, StatementType, SyntaxError, TokenSpan, TokenStream,
+        LocatedSyntaxError, NameType, Node, Operator, ParseResult, PostfixOpExpressionNode,
+        PostfixOperator, PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType,
+        SyntaxError, TokenSpan, TokenStream,
         grammar::{match_expression, statement, type_definition},
     },
 };
@@ -258,7 +258,7 @@ fn expression_atom(
         }
         Token::Name(name) => {
             let span = TokenSpan::singleton(tokens);
-            let name = span.wrap(NameNode(name.clone()));
+            let name = span.wrap(name.clone());
             tokens.next();
             Ok(ExpressionNode::Name(name))
         }

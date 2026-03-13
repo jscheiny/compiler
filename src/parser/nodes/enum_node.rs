@@ -6,7 +6,7 @@ use crate::{
 };
 
 pub struct EnumNode {
-    pub name: Node<NameNode>,
+    pub name: NameNode,
     pub variants: NodeVec<EnumVariantNode>,
     pub implementation: Option<Node<ImplementationNode>>,
     resolved_type: OnceCell<Rc<EnumType>>,
@@ -14,7 +14,7 @@ pub struct EnumNode {
 
 impl EnumNode {
     pub fn new(
-        name: Node<NameNode>,
+        name: NameNode,
         variants: NodeVec<EnumVariantNode>,
         implementation: Option<Node<ImplementationNode>>,
     ) -> Self {
@@ -63,6 +63,6 @@ impl EnumNode {
 
 impl Named for EnumNode {
     fn name(&self) -> &String {
-        self.name.name()
+        &self.name
     }
 }

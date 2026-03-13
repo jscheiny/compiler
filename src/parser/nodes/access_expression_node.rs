@@ -2,12 +2,12 @@ use std::rc::Rc;
 
 use crate::{
     checker::{FunctionType, RuntimeType, Scope, Type},
-    parser::{ExpressionNode, NameNode, Named, Node, NodeVec, TokenSpan, check_function_call},
+    parser::{ExpressionNode, NameNode, Node, NodeVec, TokenSpan, check_function_call},
 };
 
 pub struct AccessExpressionNode {
     pub left: Box<Node<ExpressionNode>>,
-    pub field: Node<NameNode>,
+    pub field: NameNode,
     pub arguments: Option<NodeVec<ExpressionNode>>,
 }
 
@@ -60,12 +60,12 @@ impl AccessExpressionNode {
 pub fn get_field(
     input_type: &Type,
     input_span: TokenSpan,
-    field: &Node<NameNode>,
+    field: &NameNode,
     scope: &Scope,
 ) -> Type {
     match input_type {
         Type::Enum(enum_type) => {
-            let method = enum_type.get_method(scope, field.name());
+            let method = enum_type.get_method(scope, field);
             if let Some(method) = method {
                 if !method.public {
                     check_private_access(scope, input_type, field);
@@ -74,12 +74,8 @@ pub fn get_field(
             } else {
                 scope.source.print_error(
                     field.span,
-                    &format!("Could not find field `{}`", field.name()),
-                    &format!(
-                        "enum `{}` has no such method `{}`",
-                        enum_type.name(),
-                        field.name()
-                    ),
+                    &format!("Could not find field `{}`", field),
+                    &format!("enum `{}` has no such method `{}`", enum_type.name(), field),
                 );
                 Type::Error
             }
@@ -93,17 +89,16 @@ pub fn get_field(
             Type::Error
         }
         Type::Interface(interface_type) => {
-            let method = interface_type.methods.get(field.name());
+            let method = interface_type.methods.get(&field.value);
             if let Some(method) = method {
                 Type::Function(method.clone())
             } else {
                 scope.source.print_error(
                     field.span,
-                    &format!("Could not find method `{}`", field.name()),
+                    &format!("Could not find method `{}`", field),
                     &format!(
                         "interface `{}` has no such method `{}`",
-                        interface_type.name,
-                        field.name()
+                        interface_type.name, field
                     ),
                 );
                 Type::Error
@@ -115,7 +110,7 @@ pub fn get_field(
             get_field(&resolved_type, input_span, field, scope)
         }
         Type::Struct(struct_type) => {
-            let member = struct_type.get_member(scope, field.name());
+            let member = struct_type.get_member(scope, field);
             if let Some(member) = member {
                 if !member.public {
                     check_private_access(scope, input_type, field);
@@ -124,11 +119,11 @@ pub fn get_field(
             } else {
                 scope.source.print_error(
                     field.span,
-                    &format!("Could not find field `{}`", field.name()),
+                    &format!("Could not find field `{}`", field),
                     &format!(
                         "struct `{}` has no such field or method `{}`",
                         struct_type.name(),
-                        field.name()
+                        field
                     ),
                 );
                 Type::Error
@@ -148,12 +143,12 @@ pub fn get_field(
     }
 }
 
-fn get_static_field(runtime_type: &RuntimeType, field: &Node<NameNode>, scope: &Scope) -> Type {
+fn get_static_field(runtime_type: &RuntimeType, field: &NameNode, scope: &Scope) -> Type {
     match runtime_type {
         RuntimeType::Enum(enum_type) => {
-            if let Some(variant_type) = enum_type.get_variant(field.name()) {
+            if let Some(variant_type) = enum_type.get_variant(field) {
                 variant_type
-            } else if let Some(method) = enum_type.get_method(scope, field.name()) {
+            } else if let Some(method) = enum_type.get_method(scope, field) {
                 let receiver_type = Type::Enum(enum_type.clone());
                 if !method.public {
                     check_private_access(scope, &receiver_type, field);
@@ -162,18 +157,18 @@ fn get_static_field(runtime_type: &RuntimeType, field: &Node<NameNode>, scope: &
             } else {
                 scope.source.print_error(
                     field.span,
-                    &format!("Could not find field `{}`", field.name()),
+                    &format!("Could not find field `{}`", field),
                     &format!(
                         "enum `{}` has no such method or variant `{}`",
                         enum_type.name(),
-                        field.name()
+                        field
                     ),
                 );
                 Type::Error
             }
         }
         RuntimeType::Struct(struct_type) => {
-            let member = struct_type.get_member(scope, field.name());
+            let member = struct_type.get_member(scope, field);
             if let Some(member) = member {
                 let receiver_type = Type::Struct(struct_type.clone());
                 if !member.public {
@@ -183,11 +178,11 @@ fn get_static_field(runtime_type: &RuntimeType, field: &Node<NameNode>, scope: &
             } else {
                 scope.source.print_error(
                     field.span,
-                    &format!("Could not find field `{}`", field.name()),
+                    &format!("Could not find field `{}`", field),
                     &format!(
                         "struct `{}` has no such field or method `{}`",
                         struct_type.name(),
-                        field.name()
+                        field
                     ),
                 );
                 Type::Error
@@ -196,11 +191,11 @@ fn get_static_field(runtime_type: &RuntimeType, field: &Node<NameNode>, scope: &
     }
 }
 
-fn check_private_access(scope: &Scope, receiver_type: &Type, field: &Node<NameNode>) {
+fn check_private_access(scope: &Scope, receiver_type: &Type, field: &NameNode) {
     if is_external_private_access(scope, receiver_type) {
         scope.source.print_error(
             field.span,
-            &format!("Cannot access private member `{}`", field.name()),
+            &format!("Cannot access private member `{}`", field),
             &format!(
                 "this member is private to `{}`",
                 receiver_type.format(scope),
