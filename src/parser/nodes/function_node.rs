@@ -2,7 +2,7 @@ use std::{collections::HashSet, rc::Rc};
 
 use crate::{
     checker::{FunctionType, Scope},
-    parser::{FunctionBodyNode, FunctionSignatureNode, Named, Node},
+    parser::{FunctionBodyNode, FunctionSignatureNode, Node},
 };
 
 pub struct FunctionNode {
@@ -60,10 +60,8 @@ impl FunctionNode {
     pub fn get_type(&self, scope: &Scope) -> Rc<FunctionType> {
         self.signature.get_type(scope)
     }
-}
 
-impl Named for FunctionNode {
-    fn name(&self) -> &String {
+    pub fn name(&self) -> &String {
         &self.signature.name
     }
 }

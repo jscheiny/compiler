@@ -1,6 +1,6 @@
 use crate::{
     checker::Scope,
-    parser::{FunctionNode, Named, Node},
+    parser::{FunctionNode, Node},
 };
 
 pub struct MethodNode {
@@ -11,11 +11,5 @@ pub struct MethodNode {
 impl MethodNode {
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
         self.function.check(scope)
-    }
-}
-
-impl Named for MethodNode {
-    fn name(&self) -> &String {
-        self.function.name()
     }
 }

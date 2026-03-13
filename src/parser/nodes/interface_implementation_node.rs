@@ -3,7 +3,7 @@ use std::{collections::HashSet, rc::Rc};
 use crate::{
     checker::{EnumType, FunctionType, Scope, Type},
     lexer::Symbol,
-    parser::{FunctionNode, NameNode, Named, Node},
+    parser::{FunctionNode, NameNode, Node},
 };
 
 pub struct InterfaceImplementationNode {

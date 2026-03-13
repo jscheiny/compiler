@@ -2,7 +2,7 @@ use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
     checker::{FunctionType, InterfaceType, Scope, Type},
-    parser::{FunctionNode, ImplementationEntryNode, InterfaceImplementationNode, Named, Node},
+    parser::{FunctionNode, ImplementationEntryNode, InterfaceImplementationNode, Node},
 };
 
 pub struct ImplementationNode {
@@ -57,7 +57,7 @@ impl ImplementationNode {
             match &entry.value {
                 ImplementationEntryNode::Method(method) => {
                     methods.push((
-                        method.name().clone(),
+                        method.function.name().clone(),
                         method.public,
                         method.function.get_type(scope).clone(),
                     ));
