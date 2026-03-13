@@ -41,7 +41,7 @@ impl ModuleDefinitionNode {
         };
 
         if let Some(resolved_type) = resolved_type {
-            scope.add_value(self.name(), resolved_type);
+            scope.add_value(self.name().name(), resolved_type);
         }
     }
 
@@ -55,11 +55,11 @@ impl ModuleDefinitionNode {
         };
 
         if let Some(resolved_type) = resolved_type {
-            scope.resolve_type(self.name(), resolved_type);
+            scope.resolve_type(self.name().name(), resolved_type);
         }
     }
 
-    pub fn identifier(&self) -> &Node<NameNode> {
+    pub fn name(&self) -> &Node<NameNode> {
         match self {
             Self::Enum(node) => &node.name,
             Self::Function(node) => &node.signature.name,
@@ -67,11 +67,5 @@ impl ModuleDefinitionNode {
             Self::Struct(node) => &node.name,
             Self::TypeAlias(node) => &node.name,
         }
-    }
-}
-
-impl Named for ModuleDefinitionNode {
-    fn name(&self) -> &String {
-        self.identifier().name()
     }
 }

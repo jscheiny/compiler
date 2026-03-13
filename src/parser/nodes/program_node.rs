@@ -14,7 +14,7 @@ impl ProgramNode {
     pub fn check(&mut self, source: Rc<SourceCode>) {
         let mut types = TypeMap::new();
         for definition in self.definitions() {
-            types.declare(definition.identifier(), &source);
+            types.declare(definition.name(), &source);
         }
 
         let mut scope = self.create_scope(source, types);
