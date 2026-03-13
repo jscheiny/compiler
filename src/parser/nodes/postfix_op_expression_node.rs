@@ -9,11 +9,8 @@ pub struct PostfixOpExpressionNode {
 }
 
 impl PostfixOpExpressionNode {
-    pub fn check(&self, _scope: Box<Scope>) -> (Box<Scope>, Type) {
-        match *self.operator {
-            PostfixOperator::NullShortCircuit => {
-                todo!("Implement type checking for prefix op NullShortCircuit")
-            }
-        }
+    pub fn check(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        // TODO implement type checking for postfix ops
+        (scope, Type::Error)
     }
 }
