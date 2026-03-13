@@ -3,22 +3,19 @@ use crate::{
     parser::{IdentifierType, NameNode, ParseResult, SyntaxError, TokenStream},
 };
 
-pub fn identifier(
-    tokens: &mut TokenStream,
-    identifier_type: IdentifierType,
-) -> ParseResult<NameNode> {
+pub fn name(tokens: &mut TokenStream, identifier_type: IdentifierType) -> ParseResult<NameNode> {
     let token = tokens.peek();
     match token {
-        Token::Name(identifier) => {
-            let identifier = identifier.clone();
+        Token::Name(name) => {
+            let name = name.clone();
             tokens.next();
-            Ok(NameNode(identifier))
+            Ok(NameNode(name))
         }
         Token::Keyword(keyword) => {
-            let identifier = keyword.as_str().to_owned();
+            let name = keyword.as_str().to_owned();
             tokens.push_error(SyntaxError::ExpectedIdentifier(identifier_type));
             tokens.next();
-            Ok(NameNode(identifier))
+            Ok(NameNode(name))
         }
         _ => Err(tokens.make_error(SyntaxError::ExpectedIdentifier(identifier_type))),
     }

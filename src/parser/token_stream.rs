@@ -4,7 +4,7 @@ use crate::{
     lexer::{LocatedToken, Token, TokenMatch},
     parser::{
         IdentifierType, LocatedSyntaxError, NameNode, Node, ParseResult, SyntaxError, TokenSpan,
-        identifier,
+        name,
     },
 };
 
@@ -55,7 +55,7 @@ impl TokenStream {
 
     pub fn name(&mut self, id_type: IdentifierType) -> ParseResult<Node<NameNode>> {
         let start_index = self.index;
-        let value = identifier(self, id_type)?;
+        let value = name(self, id_type)?;
         Ok(self.close(value, start_index))
     }
 
