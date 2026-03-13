@@ -52,7 +52,7 @@ impl Type {
                 _ => false,
             },
             Type::Enum(left) => match other {
-                Type::Enum(right) => left.id() == right.id(),
+                Type::Enum(right) => left.name() == right.name(),
                 _ => false,
             },
             Type::Function(left) => match other.to_function(scope) {
@@ -81,7 +81,7 @@ impl Type {
             },
             Type::Reference(_) => self.deref(scope).is_assignable_from(other, scope),
             Type::Struct(left) => match other {
-                Type::Struct(right) => left.id() == right.id(),
+                Type::Struct(right) => left.name() == right.name(),
                 _ => false,
             },
             Type::Tuple(left) => match other {

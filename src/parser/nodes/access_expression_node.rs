@@ -77,7 +77,7 @@ pub fn get_field(
                     &format!("Could not find field `{}`", field.name()),
                     &format!(
                         "enum `{}` has no such method `{}`",
-                        enum_type.id(),
+                        enum_type.name(),
                         field.name()
                     ),
                 );
@@ -127,7 +127,7 @@ pub fn get_field(
                     &format!("Could not find field `{}`", field.name()),
                     &format!(
                         "struct `{}` has no such field or method `{}`",
-                        struct_type.id(),
+                        struct_type.name(),
                         field.name()
                     ),
                 );
@@ -165,7 +165,7 @@ fn get_static_field(runtime_type: &RuntimeType, field: &Node<NameNode>, scope: &
                     &format!("Could not find field `{}`", field.name()),
                     &format!(
                         "enum `{}` has no such method or variant `{}`",
-                        enum_type.id(),
+                        enum_type.name(),
                         field.name()
                     ),
                 );
@@ -186,7 +186,7 @@ fn get_static_field(runtime_type: &RuntimeType, field: &Node<NameNode>, scope: &
                     &format!("Could not find field `{}`", field.name()),
                     &format!(
                         "struct `{}` has no such field or method `{}`",
-                        struct_type.id(),
+                        struct_type.name(),
                         field.name()
                     ),
                 );

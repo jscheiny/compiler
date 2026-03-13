@@ -14,7 +14,7 @@ impl Display for TypeFmt<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.resolved_type {
             Type::Array(element_type) => write!(f, "[{}]", element_type.format(self.scope)),
-            Type::Enum(enum_type) => write!(f, "{}", enum_type.id()),
+            Type::Enum(enum_type) => write!(f, "{}", enum_type.name()),
             Type::Function(function_type) => {
                 if function_type.parameters.len() != 1 {
                     write!(f, "(")?;
@@ -47,7 +47,7 @@ impl Display for TypeFmt<'_> {
                         .format(self.scope)
                 )
             }
-            Type::Struct(struct_type) => write!(f, "{}", struct_type.id()),
+            Type::Struct(struct_type) => write!(f, "{}", struct_type.name()),
             Type::Tuple(items) => {
                 write!(f, "(")?;
                 for (index, item) in items.iter().enumerate() {
@@ -62,8 +62,8 @@ impl Display for TypeFmt<'_> {
                 f,
                 "Runtime({})",
                 match runtime_type {
-                    RuntimeType::Enum(enum_type) => enum_type.id(),
-                    RuntimeType::Struct(struct_type) => struct_type.id(),
+                    RuntimeType::Enum(enum_type) => enum_type.name(),
+                    RuntimeType::Struct(struct_type) => struct_type.name(),
                 }
             ),
             Type::Void => write!(f, "{}", Keyword::Void),

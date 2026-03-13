@@ -74,7 +74,7 @@ impl VariantMatchPattern {
                 scope.source.print_error(
                     self.identifier.span,
                     &format!("Could not find variant `{}`", self.identifier.name()),
-                    &format!("enum `{}` has no such variant", enum_type.id()),
+                    &format!("enum `{}` has no such variant", enum_type.name()),
                 );
             }
         } else if !subject_type.is_error() {

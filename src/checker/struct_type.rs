@@ -20,7 +20,7 @@ impl StructType {
         })
     }
 
-    pub fn id(&self) -> &String {
+    pub fn name(&self) -> &String {
         self.node.identifier.name()
     }
 
