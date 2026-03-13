@@ -7,16 +7,16 @@ use crate::{
 
 pub struct StructFieldNode {
     pub public: bool,
-    pub identifier: Node<NameNode>,
+    pub name: Node<NameNode>,
     pub type_def: Option<Node<TypeNode>>,
     resolved_type: OnceCell<Type>,
 }
 
 impl StructFieldNode {
-    pub fn new(public: bool, identifier: Node<NameNode>, type_def: Option<Node<TypeNode>>) -> Self {
+    pub fn new(public: bool, name: Node<NameNode>, type_def: Option<Node<TypeNode>>) -> Self {
         Self {
             public,
-            identifier,
+            name,
             type_def,
             resolved_type: OnceCell::new(),
         }
@@ -43,6 +43,6 @@ impl StructFieldNode {
 
 impl Named for StructFieldNode {
     fn name(&self) -> &String {
-        self.identifier.name()
+        self.name.name()
     }
 }

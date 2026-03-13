@@ -45,7 +45,7 @@ pub fn interface_implementation(tokens: &mut TokenStream) -> ParseResult<Impleme
     if tokens.accept(Symbol::Semicolon) {
         Ok(ImplementationEntryNode::Interface(
             InterfaceImplementationNode {
-                identifier,
+                name: identifier,
                 methods: None,
             },
         ))
@@ -57,7 +57,7 @@ pub fn interface_implementation(tokens: &mut TokenStream) -> ParseResult<Impleme
         }
         Ok(ImplementationEntryNode::Interface(
             InterfaceImplementationNode {
-                identifier,
+                name: identifier,
                 methods: Some(methods),
             },
         ))

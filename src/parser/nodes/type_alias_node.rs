@@ -6,22 +6,22 @@ use crate::{
 };
 
 pub struct TypeAliasNode {
-    pub identifier: Node<NameNode>,
+    pub name: Node<NameNode>,
     pub type_def: Node<TypeNode>,
     resolved_type: OnceCell<Type>,
 }
 
 impl TypeAliasNode {
-    pub fn new(identifier: Node<NameNode>, type_def: Node<TypeNode>) -> Self {
+    pub fn new(name: Node<NameNode>, type_def: Node<TypeNode>) -> Self {
         Self {
-            identifier,
+            name,
             type_def,
             resolved_type: OnceCell::new(),
         }
     }
 
     pub fn check_statement(&self, mut scope: Box<Scope>) -> Box<Scope> {
-        scope.add_type(self.identifier.name(), self.get_type(&scope).clone());
+        scope.add_type(self.name.name(), self.get_type(&scope).clone());
         scope
         // TODO check for recursion
     }
@@ -34,6 +34,6 @@ impl TypeAliasNode {
 
 impl Named for TypeAliasNode {
     fn name(&self) -> &String {
-        self.identifier.name()
+        self.name.name()
     }
 }

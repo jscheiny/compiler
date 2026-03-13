@@ -6,7 +6,7 @@ use crate::{
 };
 
 pub struct EnumNode {
-    pub identifier: Node<NameNode>,
+    pub name: Node<NameNode>,
     pub variants: NodeVec<EnumVariantNode>,
     pub implementation: Option<Node<ImplementationNode>>,
     resolved_type: OnceCell<Rc<EnumType>>,
@@ -14,12 +14,12 @@ pub struct EnumNode {
 
 impl EnumNode {
     pub fn new(
-        identifier: Node<NameNode>,
+        name: Node<NameNode>,
         variants: NodeVec<EnumVariantNode>,
         implementation: Option<Node<ImplementationNode>>,
     ) -> Self {
         Self {
-            identifier,
+            name,
             variants,
             implementation,
             resolved_type: OnceCell::new(),
@@ -36,7 +36,7 @@ impl EnumNode {
         for variant in self.variants.iter() {
             if !scope_names.insert(variant.name().clone()) {
                 scope.source.print_error(
-                    variant.identifier.span,
+                    variant.name.span,
                     &format!("Duplicate enum variant `{}`", variant.name()),
                     &format!(
                         "enum `{}` already contains a variant with this name",
@@ -63,6 +63,6 @@ impl EnumNode {
 
 impl Named for EnumNode {
     fn name(&self) -> &String {
-        self.identifier.name()
+        self.name.name()
     }
 }

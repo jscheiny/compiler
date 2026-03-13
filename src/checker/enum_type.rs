@@ -28,7 +28,7 @@ impl EnumType {
     }
 
     pub fn name(&self) -> &String {
-        self.node.identifier.name()
+        self.node.name.name()
     }
 
     pub fn get_variant(self: &Rc<Self>, identifier: &String) -> Option<Type> {

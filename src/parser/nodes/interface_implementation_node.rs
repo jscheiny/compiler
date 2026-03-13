@@ -7,7 +7,7 @@ use crate::{
 };
 
 pub struct InterfaceImplementationNode {
-    pub identifier: Node<NameNode>,
+    pub name: Node<NameNode>,
     pub methods: Option<Vec<Node<FunctionNode>>>,
 }
 
@@ -20,7 +20,7 @@ impl InterfaceImplementationNode {
         if let Some(implemented_type) = implemented_type.as_ref() {
             if !matches!(implemented_type, Type::Interface(_)) {
                 scope.source.print_error(
-                    self.identifier.span,
+                    self.name.span,
                     "Can only implement interfaces",
                     &format!(
                         "found non interface type: `{}`",
@@ -30,8 +30,8 @@ impl InterfaceImplementationNode {
             }
         } else {
             scope.source.print_error(
-                self.identifier.span,
-                &format!("Unknown type `{}`", self.identifier.name()),
+                self.name.span,
+                &format!("Unknown type `{}`", self.name.name()),
                 "could not find this type",
             );
         }
@@ -47,7 +47,7 @@ impl InterfaceImplementationNode {
                 for (method, _) in interface_type.methods.iter() {
                     if !method_names.contains(method) {
                         scope.source.print_error(
-                            self.identifier.span,
+                            self.name.span,
                             &format!(
                                 "Implementation of `{}` is incomplete",
                                 interface_type.identifier
@@ -62,7 +62,7 @@ impl InterfaceImplementationNode {
         if self.methods.is_none() {
             match self_type {
                 Type::Struct(_) => scope.source.print_error(
-                    self.identifier.span.after(),
+                    self.name.span.after(),
                     &format!("Cannot infer interface implementation for structs"),
                     &format!("expected `{}`", Symbol::OpenBrace),
                 ),
@@ -94,7 +94,7 @@ impl InterfaceImplementationNode {
                     };
                     if !implements_interface {
                         scope.source.print_error(
-                            self.identifier.span,
+                            self.name.span,
                             "Cannot infer interface implementation",
                             &format!(
                                 "variant `{}` does not implement `{}`",
@@ -104,7 +104,7 @@ impl InterfaceImplementationNode {
                     }
                 } else {
                     scope.source.print_error(
-                        self.identifier.span,
+                        self.name.span,
                         "Cannot infer interface implementation",
                         &format!("variant `{}` is untyped", variant_name),
                     );
@@ -216,6 +216,6 @@ fn check_method_equivalence(
 
 impl Named for InterfaceImplementationNode {
     fn name(&self) -> &String {
-        self.identifier.name()
+        self.name.name()
     }
 }

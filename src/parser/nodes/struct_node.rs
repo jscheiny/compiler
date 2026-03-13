@@ -6,7 +6,7 @@ use crate::{
 };
 
 pub struct StructNode {
-    pub identifier: Node<NameNode>,
+    pub name: Node<NameNode>,
     pub fields: NodeVec<StructFieldNode>,
     pub implementation: Option<Node<ImplementationNode>>,
     resolved_type: OnceCell<Rc<StructType>>,
@@ -14,12 +14,12 @@ pub struct StructNode {
 
 impl StructNode {
     pub fn new(
-        identifier: Node<NameNode>,
+        name: Node<NameNode>,
         fields: NodeVec<StructFieldNode>,
         implementation: Option<Node<ImplementationNode>>,
     ) -> Self {
         Self {
-            identifier,
+            name,
             fields,
             implementation,
             resolved_type: OnceCell::new(),
@@ -36,7 +36,7 @@ impl StructNode {
         for field in self.fields.iter() {
             if !scope_names.insert(field.name().clone()) {
                 scope.source.print_error(
-                    field.identifier.span,
+                    field.name.span,
                     &format!("Duplicate struct member `{}`", field.name()),
                     &format!(
                         "struct `{}` already contains a field with this name",
@@ -66,6 +66,6 @@ impl StructNode {
 
 impl Named for StructNode {
     fn name(&self) -> &String {
-        self.identifier.name()
+        self.name.name()
     }
 }

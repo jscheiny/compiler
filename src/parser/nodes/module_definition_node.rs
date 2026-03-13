@@ -61,11 +61,11 @@ impl ModuleDefinitionNode {
 
     pub fn identifier(&self) -> &Node<NameNode> {
         match self {
-            Self::Enum(node) => &node.identifier,
-            Self::Function(node) => &node.signature.identifier,
-            Self::Interface(node) => &node.identifier,
-            Self::Struct(node) => &node.identifier,
-            Self::TypeAlias(node) => &node.identifier,
+            Self::Enum(node) => &node.name,
+            Self::Function(node) => &node.signature.name,
+            Self::Interface(node) => &node.name,
+            Self::Struct(node) => &node.name,
+            Self::TypeAlias(node) => &node.name,
         }
     }
 }

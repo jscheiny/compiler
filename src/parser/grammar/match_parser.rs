@@ -69,12 +69,12 @@ fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<Match
                 let inner_pattern = tokens.located_with(match_pattern, false)?;
                 tokens.expect(Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
                 Ok(MatchPatternNode::Variant(VariantMatchPattern {
-                    identifier,
+                    name: identifier,
                     inner_pattern: Some(Box::new(inner_pattern)),
                 }))
             } else {
                 Ok(MatchPatternNode::Variant(VariantMatchPattern {
-                    identifier,
+                    name: identifier,
                     inner_pattern: None,
                 }))
             }

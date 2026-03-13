@@ -38,23 +38,23 @@ impl MatchPatternNode {
 }
 
 pub struct VariantMatchPattern {
-    pub identifier: Node<NameNode>,
+    pub name: Node<NameNode>,
     pub inner_pattern: Option<Box<Node<MatchPatternNode>>>,
 }
 
 impl VariantMatchPattern {
     pub fn check(&self, scope: &Scope, bindings: &mut HashMap<String, Type>, subject_type: &Type) {
         if let Type::Enum(enum_type) = subject_type.deref(scope) {
-            if let Some(variant) = enum_type.variants.get(self.identifier.name()) {
+            if let Some(variant) = enum_type.variants.get(self.name.name()) {
                 if let Some(inner_type) = variant {
                     if self.inner_pattern.is_none() {
                         // TODO consider relaxing this when the subject is just an identifier...
                         scope.source.print_error(
-                            self.identifier.span,
+                            self.name.span,
                             "Expected binding pattern",
                             &format!(
                                 "typed variant `{}` must have a binding pattern",
-                                self.identifier.name()
+                                self.name.name()
                             ),
                         );
                     } else {
@@ -66,20 +66,20 @@ impl VariantMatchPattern {
                         "Unexpected binding pattern",
                         &format!(
                             "untyped variant `{}` cannot use a binding pattern",
-                            self.identifier.name()
+                            self.name.name()
                         ),
                     );
                 }
             } else {
                 scope.source.print_error(
-                    self.identifier.span,
-                    &format!("Could not find variant `{}`", self.identifier.name()),
+                    self.name.span,
+                    &format!("Could not find variant `{}`", self.name.name()),
                     &format!("enum `{}` has no such variant", enum_type.name()),
                 );
             }
         } else if !subject_type.is_error() {
             scope.source.print_error(
-                self.identifier.span,
+                self.name.span,
                 "Unexpected variant pattern",
                 &format!(
                     "cannot use variant pattern on non-enum type `{}`",

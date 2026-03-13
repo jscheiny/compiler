@@ -118,7 +118,7 @@ fn check_duplicate_interface(
     if let Some(Type::Interface(interface_type)) = implemented_type {
         if !implemented_interfaces.insert(interface_type.identifier.clone()) {
             scope.source.print_error(
-                interface_implementation.identifier.span,
+                interface_implementation.name.span,
                 &format!(
                     "Duplicate implementation of `{}`",
                     interface_type.identifier
@@ -157,7 +157,7 @@ fn check_duplicate_method(
 fn print_duplicate_member_error(scope: &Scope, self_type: &Type, method: &FunctionNode) {
     let container_type = get_container_type(self_type);
     scope.source.print_error(
-        method.signature.identifier.span,
+        method.signature.name.span,
         &format!("Duplicate {} member `{}`", container_type, method.name()),
         &format!(
             "{} `{}` already contains a {} with this name",

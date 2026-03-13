@@ -45,7 +45,7 @@ impl FunctionNode {
         for param in self.signature.parameters.iter() {
             if param_names.contains(param.name()) {
                 scope.source.print_error(
-                    param.identifier.span,
+                    param.name.span,
                     &format!("Duplicate parameter name `{}`", param.name()),
                     "function already contains a parameter with this name",
                 );
@@ -64,6 +64,6 @@ impl FunctionNode {
 
 impl Named for FunctionNode {
     fn name(&self) -> &String {
-        self.signature.identifier.name()
+        self.signature.name.name()
     }
 }

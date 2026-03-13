@@ -6,14 +6,14 @@ use crate::{
 };
 
 pub struct UserDefinedTypeNode {
-    pub identifier: Node<NameNode>,
+    pub name: Node<NameNode>,
     resolved_type: OnceCell<Type>,
 }
 
 impl UserDefinedTypeNode {
-    pub fn new(identifier: Node<NameNode>) -> Self {
+    pub fn new(name: Node<NameNode>) -> Self {
         Self {
-            identifier,
+            name,
             resolved_type: OnceCell::new(),
         }
     }
@@ -31,7 +31,7 @@ impl UserDefinedTypeNode {
         }
 
         scope.source.print_error(
-            self.identifier.span,
+            self.name.span,
             &format!("Unknown type `{}`", self.name()),
             "could not find a type with this name",
         );
@@ -41,6 +41,6 @@ impl UserDefinedTypeNode {
 
 impl Named for UserDefinedTypeNode {
     fn name(&self) -> &String {
-        self.identifier.name()
+        self.name.name()
     }
 }

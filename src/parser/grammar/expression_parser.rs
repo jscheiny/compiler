@@ -122,7 +122,7 @@ fn closure_parameter(
             let parameter_span = left.span.expand_to(tokens);
             return Ok(parameter_span.wrap(ExpressionNode::ClosureParameter(
                 ClosureParameterExpressionNode {
-                    identifier,
+                    name: identifier,
                     parameter_type,
                 },
             )));
@@ -218,7 +218,7 @@ fn simple_closure(
     let parameter = match left.value {
         ExpressionNode::Identifier(identifier) => Ok(ExpressionNode::ClosureParameter(
             ClosureParameterExpressionNode {
-                identifier,
+                name: identifier,
                 parameter_type: None,
             },
         )),
@@ -378,7 +378,7 @@ fn closure(
         .map(|parameter| {
             if let ExpressionNode::Identifier(identifier) = parameter.value {
                 Some(parameter.span.wrap(ClosureParameterExpressionNode {
-                    identifier,
+                    name: identifier,
                     parameter_type: None,
                 }))
             } else if let ExpressionNode::ClosureParameter(param) = parameter.value {

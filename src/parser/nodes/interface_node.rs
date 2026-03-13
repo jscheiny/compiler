@@ -10,18 +10,15 @@ use crate::{
 };
 
 pub struct InterfaceNode {
-    pub identifier: Node<NameNode>,
+    pub name: Node<NameNode>,
     method_signatures: NodeVec<FunctionSignatureNode>,
     resolved_type: OnceCell<Rc<InterfaceType>>,
 }
 
 impl InterfaceNode {
-    pub fn new(
-        identifier: Node<NameNode>,
-        method_signatures: NodeVec<FunctionSignatureNode>,
-    ) -> Self {
+    pub fn new(name: Node<NameNode>, method_signatures: NodeVec<FunctionSignatureNode>) -> Self {
         Self {
-            identifier,
+            name,
             method_signatures,
             resolved_type: OnceCell::new(),
         }
@@ -32,7 +29,7 @@ impl InterfaceNode {
         for method in self.method_signatures.iter() {
             if !method_names.insert(method.name()) {
                 scope.source.print_error(
-                    method.identifier.span,
+                    method.name.span,
                     &format!("Duplicate method signature `{}`", method.name()),
                     &format!(
                         "a method of `{}` already exists with this name",
@@ -68,6 +65,6 @@ impl InterfaceNode {
 
 impl Named for InterfaceNode {
     fn name(&self) -> &String {
-        self.identifier.name()
+        self.name.name()
     }
 }

@@ -39,7 +39,7 @@ fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<Statement
     end_statement(tokens);
     Ok(StatementNode::Declaration(DeclarationNode {
         mutable,
-        identifier,
+        name: identifier,
         type_def,
         initializer,
     }))

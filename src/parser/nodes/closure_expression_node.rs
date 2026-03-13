@@ -49,7 +49,7 @@ impl ClosureExpressionNode {
                         get_parameter_type(parameter, index, expected_type.clone(), &scope);
                     scope.add_value_or(parameter.name(), parameter_type.clone(), |scope| {
                         scope.source.print_error(
-                            parameter.identifier.span,
+                            parameter.name.span,
                             &format!("Duplicate parameter name `{}`", parameter.name()),
                             "closure already contains a parameter with this name",
                         );

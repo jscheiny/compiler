@@ -6,7 +6,7 @@ use crate::{
 };
 
 pub struct FunctionSignatureNode {
-    pub identifier: Node<NameNode>,
+    pub name: Node<NameNode>,
     pub parameters: NodeVec<ParameterNode>,
     pub return_type: Option<Node<TypeNode>>,
     resolved_type: OnceCell<Rc<FunctionType>>,
@@ -14,12 +14,12 @@ pub struct FunctionSignatureNode {
 
 impl FunctionSignatureNode {
     pub fn new(
-        identifier: Node<NameNode>,
+        name: Node<NameNode>,
         parameters: NodeVec<ParameterNode>,
         return_type: Option<Node<TypeNode>>,
     ) -> Self {
         Self {
-            identifier,
+            name,
             parameters,
             return_type,
             resolved_type: OnceCell::new(),
@@ -55,6 +55,6 @@ impl FunctionSignatureNode {
 
 impl Named for FunctionSignatureNode {
     fn name(&self) -> &String {
-        self.identifier.name()
+        self.name.name()
     }
 }
