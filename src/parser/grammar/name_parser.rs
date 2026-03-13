@@ -1,9 +1,9 @@
 use crate::{
     lexer::{EnumToken, Token},
-    parser::{IdentifierType, NameNode, ParseResult, SyntaxError, TokenStream},
+    parser::{NameNode, NameType, ParseResult, SyntaxError, TokenStream},
 };
 
-pub fn name(tokens: &mut TokenStream, identifier_type: IdentifierType) -> ParseResult<NameNode> {
+pub fn name(tokens: &mut TokenStream, identifier_type: NameType) -> ParseResult<NameNode> {
     let token = tokens.peek();
     match token {
         Token::Name(name) => {
@@ -13,10 +13,10 @@ pub fn name(tokens: &mut TokenStream, identifier_type: IdentifierType) -> ParseR
         }
         Token::Keyword(keyword) => {
             let name = keyword.as_str().to_owned();
-            tokens.push_error(SyntaxError::ExpectedIdentifier(identifier_type));
+            tokens.push_error(SyntaxError::ExpectedName(identifier_type));
             tokens.next();
             Ok(NameNode(name))
         }
-        _ => Err(tokens.make_error(SyntaxError::ExpectedIdentifier(identifier_type))),
+        _ => Err(tokens.make_error(SyntaxError::ExpectedName(identifier_type))),
     }
 }

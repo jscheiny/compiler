@@ -1,9 +1,9 @@
 use crate::{
     lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
-        ExpressionNode, FunctionBodyNode, FunctionNode, FunctionSignatureNode, IdentifierType,
-        ImplementationEntryNode, ImplementationNode, MethodNode, Node, ParameterNode, ParseResult,
-        SyntaxError, TokenStream,
+        ExpressionNode, FunctionBodyNode, FunctionNode, FunctionSignatureNode,
+        ImplementationEntryNode, ImplementationNode, MethodNode, NameType, Node, ParameterNode,
+        ParseResult, SyntaxError, TokenStream,
         grammar::{
             BlockType, block, comma_separated_list, end_statement, expression,
             interface_implementation, type_definition,
@@ -58,9 +58,9 @@ fn function(tokens: &mut TokenStream, has_keyword: bool) -> ParseResult<Function
         tokens.next();
     }
     let identifier_type = if has_keyword {
-        IdentifierType::Function
+        NameType::Function
     } else {
-        IdentifierType::Method
+        NameType::Method
     };
     let signature = function_signature(tokens, identifier_type)?;
     let body = tokens.located(function_body)?;
@@ -69,7 +69,7 @@ fn function(tokens: &mut TokenStream, has_keyword: bool) -> ParseResult<Function
 
 pub fn function_signature(
     tokens: &mut TokenStream,
-    identifier_type: IdentifierType,
+    identifier_type: NameType,
 ) -> ParseResult<FunctionSignatureNode> {
     let identifier = tokens.name(identifier_type)?;
     let parameters = tokens.located(parameters)?;
@@ -123,7 +123,7 @@ pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<Node<ParameterNod
 }
 
 fn parameter(tokens: &mut TokenStream) -> ParseResult<ParameterNode> {
-    let identifier = tokens.name(IdentifierType::Parameter)?;
+    let identifier = tokens.name(NameType::Parameter)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {
         Token::Symbol(Symbol::Colon) => {

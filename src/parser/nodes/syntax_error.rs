@@ -18,13 +18,13 @@ pub enum SyntaxError {
     ExpectedExpression,
     ExpectedFields,
     ExpectedFunctionBody,
-    ExpectedIdentifier(IdentifierType),
     ExpectedInitializer,
     ExpectedMatchBlock,
     ExpectedMatchExpression,
     ExpectedMatchPattern,
     ExpectedMethods,
     ExpectedMethodSignatures,
+    ExpectedName(NameType),
     ExpectedParameters,
     ExpectedThen,
     ExpectedTopLevelDefinition,
@@ -37,7 +37,7 @@ pub enum SyntaxError {
 }
 
 #[derive(Clone, Copy)]
-pub enum IdentifierType {
+pub enum NameType {
     Field,
     Function,
     Interface,
@@ -50,7 +50,7 @@ pub enum IdentifierType {
     Variant,
 }
 
-impl Display for IdentifierType {
+impl Display for NameType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
             Self::Field => "field",
@@ -123,13 +123,13 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             E::ExpectedExpression => write!(f, "expected expression"),
             E::ExpectedFields => write!(f, "expected fields"),
             E::ExpectedFunctionBody => write!(f, "expected function body"),
-            E::ExpectedIdentifier(id_type) => write!(f, "expected {}", id_type),
             E::ExpectedInitializer => write!(f, "expected initializer"),
             E::ExpectedMatchBlock => write!(f, "expected match block"),
             E::ExpectedMatchExpression => write!(f, "expected expression"),
             E::ExpectedMatchPattern => write!(f, "expected match pattern"),
             E::ExpectedMethods => write!(f, "expected methods block"),
             E::ExpectedMethodSignatures => write!(f, "expected method signatures block"),
+            E::ExpectedName(name_type) => write!(f, "expected {}", name_type),
             E::ExpectedParameters => write!(f, "expected parameters"),
             E::ExpectedThen => write!(f, "expected `{}` following predicate`", Keyword::Then),
             E::ExpectedTopLevelDefinition => write!(f, "expected struct, tuple, enum, or function"),
@@ -152,7 +152,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
         use Token as T;
         match token {
             T::CharacterLiteral(_) => write!(f, "character literal"),
-            T::Name(identifier) => write!(f, "identifier `{}`", identifier),
+            T::Name(name) => write!(f, "name `{}`", name),
             T::IntegerLiteral(literal) => write!(f, "integer literal `{}`", literal),
             T::StringLiteral(literal) => write!(f, "string literal {}", literal),
             T::Symbol(symbol) => write!(f, "`{}`", symbol),
@@ -182,13 +182,13 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
             E::ExpectedExpression => write!(f, "expected expression"),
             E::ExpectedFields => fmt_symbol(f, S::OpenParen),
             E::ExpectedFunctionBody => fmt_symbols(f, S::SkinnyArrow, S::OpenBrace),
-            E::ExpectedIdentifier(id_type) => write!(f, "expected {}", id_type),
             E::ExpectedInitializer => fmt_symbol(f, S::Equal),
             E::ExpectedMatchBlock => fmt_symbol(f, S::OpenBrace),
             E::ExpectedMatchExpression => fmt_symbol(f, S::SkinnyArrow),
             E::ExpectedMatchPattern => write!(f, "expected pattern e.g. Variant(let binding)"),
             E::ExpectedMethods => fmt_symbols(f, S::OpenBrace, S::Semicolon),
             E::ExpectedMethodSignatures => fmt_symbol(f, S::OpenBrace),
+            E::ExpectedName(name_type) => write!(f, "expected {}", name_type),
             E::ExpectedParameters => fmt_symbol(f, S::OpenParen),
             E::ExpectedThen => write!(f, "expected `{}`", Keyword::Then),
             E::ExpectedTopLevelDefinition => write!(f, "expected struct, tuple, enum, or function"),

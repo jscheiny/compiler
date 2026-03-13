@@ -1,7 +1,7 @@
 use crate::{
     lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
-        ExpressionNode, IdentifierType, MatchCaseNode, MatchNode, MatchPatternNode, NameNode,
+        ExpressionNode, MatchCaseNode, MatchNode, MatchPatternNode, NameNode, NameType,
         ParseResult, StatementNode, SyntaxError, TokenStream, VariantMatchPattern,
         grammar::{expression_parser::expression, statement_parser::end_statement},
     },
@@ -84,7 +84,7 @@ fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<Match
                 tokens.push_error(SyntaxError::UnexpectedBindingPattern);
             }
             tokens.next();
-            let identifier = tokens.name(IdentifierType::PatternBinding)?;
+            let identifier = tokens.name(NameType::PatternBinding)?;
             Ok(MatchPatternNode::Binding(identifier.value))
         }
         _ => Err(tokens.make_error(SyntaxError::ExpectedMatchPattern)),

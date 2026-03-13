@@ -1,8 +1,8 @@
 use crate::{
     lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
-        DeclarationNode, ExpressionNode, IdentifierType, IfStatementConditionNode, IfStatementNode,
-        Node, ParseResult, StatementNode, StatementType, SyntaxError, TokenStream, WhileLoopNode,
+        DeclarationNode, ExpressionNode, IfStatementConditionNode, IfStatementNode, NameType, Node,
+        ParseResult, StatementNode, StatementType, SyntaxError, TokenStream, WhileLoopNode,
         grammar::{BlockType, block, expression, match_statement, type_alias, type_definition},
     },
 };
@@ -28,7 +28,7 @@ pub fn statement(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult
 
 fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<StatementNode> {
     tokens.next();
-    let identifier = tokens.name(IdentifierType::Variable)?;
+    let identifier = tokens.name(NameType::Variable)?;
     let type_def = if tokens.accept(Symbol::Colon) {
         Some(tokens.located(type_definition)?)
     } else {
