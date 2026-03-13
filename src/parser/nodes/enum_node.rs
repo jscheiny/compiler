@@ -2,7 +2,7 @@ use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
     checker::{EnumType, Scope, ScopeType, Type},
-    parser::{EnumVariantNode, Identified, ImplementationNode, NameNode, Node, NodeVec},
+    parser::{EnumVariantNode, ImplementationNode, NameNode, Named, Node, NodeVec},
 };
 
 pub struct EnumNode {
@@ -61,7 +61,7 @@ impl EnumNode {
     }
 }
 
-impl Identified for EnumNode {
+impl Named for EnumNode {
     fn id(&self) -> &String {
         self.identifier.id()
     }

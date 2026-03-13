@@ -2,7 +2,7 @@ use std::{cell::OnceCell, collections::HashMap, rc::Rc};
 
 use crate::{
     checker::{FunctionType, InterfaceType, Scope, Type},
-    parser::{Identified, StructNode},
+    parser::{Named, StructNode},
 };
 
 pub struct StructType {

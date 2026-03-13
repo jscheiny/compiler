@@ -6,7 +6,7 @@ use std::{
 
 use crate::{
     checker::{InterfaceType, Scope},
-    parser::{FunctionSignatureNode, Identified, NameNode, Node, NodeVec},
+    parser::{FunctionSignatureNode, Named, NameNode, Node, NodeVec},
 };
 
 pub struct InterfaceNode {
@@ -63,7 +63,7 @@ impl InterfaceNode {
     }
 }
 
-impl Identified for InterfaceNode {
+impl Named for InterfaceNode {
     fn id(&self) -> &String {
         self.identifier.id()
     }

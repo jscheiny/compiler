@@ -2,7 +2,7 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{Scope, Type},
-    parser::{Identified, NameNode, Node, TypeNode},
+    parser::{Named, NameNode, Node, TypeNode},
 };
 
 pub struct EnumVariantNode {
@@ -31,7 +31,7 @@ impl EnumVariantNode {
     }
 }
 
-impl Identified for EnumVariantNode {
+impl Named for EnumVariantNode {
     fn id(&self) -> &String {
         self.identifier.id()
     }

@@ -2,7 +2,7 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{Scope, Type},
-    parser::{Identified, NameNode, Node, TypeNode},
+    parser::{Named, NameNode, Node, TypeNode},
 };
 
 pub struct ParameterNode {
@@ -32,7 +32,7 @@ impl ParameterNode {
     }
 }
 
-impl Identified for ParameterNode {
+impl Named for ParameterNode {
     fn id(&self) -> &String {
         self.identifier.id()
     }

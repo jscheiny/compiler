@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::{
     checker::{RuntimeType, Scope, Type},
     parser::{
-        EnumNode, FunctionNode, Identified, InterfaceNode, NameNode, Node, StructNode,
+        EnumNode, FunctionNode, Named, InterfaceNode, NameNode, Node, StructNode,
         TypeAliasNode,
     },
 };
@@ -71,7 +71,7 @@ impl ModuleDefinitionNode {
     }
 }
 
-impl Identified for ModuleDefinitionNode {
+impl Named for ModuleDefinitionNode {
     fn id(&self) -> &String {
         self.identifier().id()
     }

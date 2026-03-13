@@ -1,6 +1,6 @@
 use crate::{
     checker::{Scope, Type},
-    parser::{ExpressionNode, Identified, NameNode, Node, TypeNode},
+    parser::{ExpressionNode, Named, NameNode, Node, TypeNode},
 };
 
 pub struct DeclarationNode {
@@ -43,7 +43,7 @@ impl DeclarationNode {
     }
 }
 
-impl Identified for DeclarationNode {
+impl Named for DeclarationNode {
     fn id(&self) -> &String {
         self.identifier.id()
     }

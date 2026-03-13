@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::{
     checker::{FunctionType, RuntimeType, Scope, Type},
-    parser::{ExpressionNode, Identified, NameNode, Node, NodeVec, TokenSpan, check_function_call},
+    parser::{ExpressionNode, Named, NameNode, Node, NodeVec, TokenSpan, check_function_call},
 };
 
 pub struct AccessExpressionNode {

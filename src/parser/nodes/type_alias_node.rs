@@ -2,7 +2,7 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{Scope, Type},
-    parser::{Identified, NameNode, Node, TypeNode},
+    parser::{Named, NameNode, Node, TypeNode},
 };
 
 pub struct TypeAliasNode {
@@ -32,7 +32,7 @@ impl TypeAliasNode {
     }
 }
 
-impl Identified for TypeAliasNode {
+impl Named for TypeAliasNode {
     fn id(&self) -> &String {
         self.identifier.id()
     }

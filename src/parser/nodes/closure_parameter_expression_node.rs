@@ -1,11 +1,11 @@
-use crate::parser::{Identified, NameNode, Node, TypeNode};
+use crate::parser::{Named, NameNode, Node, TypeNode};
 
 pub struct ClosureParameterExpressionNode {
     pub identifier: Node<NameNode>,
     pub parameter_type: Option<Node<TypeNode>>,
 }
 
-impl Identified for ClosureParameterExpressionNode {
+impl Named for ClosureParameterExpressionNode {
     fn id(&self) -> &String {
         self.identifier.id()
     }

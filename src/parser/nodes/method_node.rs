@@ -1,6 +1,6 @@
 use crate::{
     checker::Scope,
-    parser::{FunctionNode, Identified, Node},
+    parser::{FunctionNode, Named, Node},
 };
 
 pub struct MethodNode {
@@ -14,7 +14,7 @@ impl MethodNode {
     }
 }
 
-impl Identified for MethodNode {
+impl Named for MethodNode {
     fn id(&self) -> &String {
         self.function.id()
     }

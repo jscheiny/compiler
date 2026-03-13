@@ -2,7 +2,7 @@ use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
     checker::{Scope, ScopeType, StructType, Type},
-    parser::{Identified, ImplementationNode, NameNode, Node, NodeVec, StructFieldNode},
+    parser::{Named, ImplementationNode, NameNode, Node, NodeVec, StructFieldNode},
 };
 
 pub struct StructNode {
@@ -64,7 +64,7 @@ impl StructNode {
     }
 }
 
-impl Identified for StructNode {
+impl Named for StructNode {
     fn id(&self) -> &String {
         self.identifier.id()
     }

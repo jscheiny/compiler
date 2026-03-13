@@ -3,7 +3,7 @@ use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 use crate::{
     checker::{FunctionType, InterfaceType, Scope, Type},
     parser::{
-        FunctionNode, Identified, ImplementationEntryNode, InterfaceImplementationNode, Node,
+        FunctionNode, Named, ImplementationEntryNode, InterfaceImplementationNode, Node,
     },
 };
 

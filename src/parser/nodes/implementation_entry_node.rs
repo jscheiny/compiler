@@ -1,6 +1,6 @@
 use crate::{
     checker::{Scope, Type},
-    parser::{Identified, InterfaceImplementationNode, MethodNode},
+    parser::{Named, InterfaceImplementationNode, MethodNode},
 };
 
 pub enum ImplementationEntryNode {
@@ -17,7 +17,7 @@ impl ImplementationEntryNode {
     }
 }
 
-impl Identified for ImplementationEntryNode {
+impl Named for ImplementationEntryNode {
     fn id(&self) -> &String {
         match self {
             Self::Method(node) => node.id(),

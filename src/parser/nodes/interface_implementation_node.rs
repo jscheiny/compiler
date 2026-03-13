@@ -3,7 +3,7 @@ use std::{collections::HashSet, rc::Rc};
 use crate::{
     checker::{EnumType, FunctionType, Scope, Type},
     lexer::Symbol,
-    parser::{FunctionNode, Identified, NameNode, Node},
+    parser::{FunctionNode, Named, NameNode, Node},
 };
 
 pub struct InterfaceImplementationNode {
@@ -214,7 +214,7 @@ fn check_method_equivalence(
     }
 }
 
-impl Identified for InterfaceImplementationNode {
+impl Named for InterfaceImplementationNode {
     fn id(&self) -> &String {
         self.identifier.id()
     }

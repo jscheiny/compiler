@@ -2,7 +2,7 @@ use std::{collections::HashSet, rc::Rc};
 
 use crate::{
     checker::{FunctionType, Scope},
-    parser::{FunctionBodyNode, FunctionSignatureNode, Identified, Node},
+    parser::{FunctionBodyNode, FunctionSignatureNode, Named, Node},
 };
 
 pub struct FunctionNode {
@@ -62,7 +62,7 @@ impl FunctionNode {
     }
 }
 
-impl Identified for FunctionNode {
+impl Named for FunctionNode {
     fn id(&self) -> &String {
         self.signature.identifier.id()
     }

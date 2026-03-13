@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{
     checker::Type,
     lexer::SourceCode,
-    parser::{Identified, NameNode, Node},
+    parser::{Named, NameNode, Node},
 };
 
 #[derive(Default)]

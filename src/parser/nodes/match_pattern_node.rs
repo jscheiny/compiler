@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{
     checker::{Scope, Type},
-    parser::{Identified, NameNode, Node, TokenSpan},
+    parser::{Named, NameNode, Node, TokenSpan},
 };
 
 pub enum MatchPatternNode {

@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::{
     checker::{FunctionType, Scope, ScopeType, Type},
-    parser::{ClosureParameterExpressionNode, ExpressionNode, Identified, Node},
+    parser::{ClosureParameterExpressionNode, ExpressionNode, Named, Node},
 };
 
 pub struct ClosureExpressionNode {
