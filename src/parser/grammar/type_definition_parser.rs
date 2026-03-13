@@ -23,7 +23,7 @@ pub fn type_definition(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
 pub fn type_definition_impl(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
     let token = tokens.peek();
     match token {
-        Token::Identifier(_) => Ok(TypeNode::UserDefined(user_defined_type(tokens)?)),
+        Token::Name(_) => Ok(TypeNode::UserDefined(user_defined_type(tokens)?)),
         Token::Keyword(Keyword::Void) => {
             tokens.next();
             Ok(TypeNode::Void)

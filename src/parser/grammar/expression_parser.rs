@@ -256,7 +256,7 @@ fn expression_atom(
             tokens.next();
             Ok(ExpressionNode::SelfValue(span))
         }
-        Token::Identifier(identifier) => {
+        Token::Name(identifier) => {
             let span = TokenSpan::singleton(tokens);
             let identifier = span.wrap(NameNode(identifier.clone()));
             tokens.next();

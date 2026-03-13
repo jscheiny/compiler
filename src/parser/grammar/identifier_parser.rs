@@ -9,7 +9,7 @@ pub fn identifier(
 ) -> ParseResult<NameNode> {
     let token = tokens.peek();
     match token {
-        Token::Identifier(identifier) => {
+        Token::Name(identifier) => {
             let identifier = identifier.clone();
             tokens.next();
             Ok(NameNode(identifier))

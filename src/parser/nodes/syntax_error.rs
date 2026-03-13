@@ -152,7 +152,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
         use Token as T;
         match token {
             T::CharacterLiteral(_) => write!(f, "character literal"),
-            T::Identifier(identifier) => write!(f, "identifier `{}`", identifier),
+            T::Name(identifier) => write!(f, "identifier `{}`", identifier),
             T::IntegerLiteral(literal) => write!(f, "integer literal `{}`", literal),
             T::StringLiteral(literal) => write!(f, "string literal {}", literal),
             T::Symbol(symbol) => write!(f, "`{}`", symbol),

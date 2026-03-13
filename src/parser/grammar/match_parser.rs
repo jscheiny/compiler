@@ -62,7 +62,7 @@ fn match_case(tokens: &mut TokenStream) -> ParseResult<MatchCaseNode> {
 
 fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<MatchPatternNode> {
     match tokens.peek() {
-        Token::Identifier(identifier) => {
+        Token::Name(identifier) => {
             let identifier = tokens.current_span().wrap(NameNode(identifier.clone()));
             tokens.next();
             if tokens.accept(Symbol::OpenParen) {

@@ -16,7 +16,7 @@ impl Display for LocatedToken {
 #[derive(PartialEq, Eq)]
 pub enum Token {
     CharacterLiteral(String),
-    Identifier(String),
+    Name(String),
     IntegerLiteral(i64),
     StringLiteral(String),
     Symbol(Symbol),
@@ -28,7 +28,7 @@ impl Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::CharacterLiteral(literal) => write!(f, "{}", literal),
-            Self::Identifier(identifier) => write!(f, "{}", identifier),
+            Self::Name(identifier) => write!(f, "{}", identifier),
             Self::IntegerLiteral(literal) => write!(f, "{}", literal),
             Self::StringLiteral(literal) => write!(f, "\"{}\"", literal),
             Self::Symbol(symbol) => write!(f, "{}", symbol),

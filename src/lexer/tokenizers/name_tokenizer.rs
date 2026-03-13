@@ -21,7 +21,7 @@ impl Tokenizer for NameTokenizer {
         }
 
         Some(TryTokenizeResult {
-            token: Some(Token::Identifier(identifier)),
+            token: Some(Token::Name(identifier)),
             width,
         })
     }
