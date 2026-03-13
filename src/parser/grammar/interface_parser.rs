@@ -9,10 +9,10 @@ use crate::{
 
 pub fn interface(tokens: &mut TokenStream) -> ParseResult<InterfaceNode> {
     tokens.next();
-    let identifier = tokens.name(NameType::Interface)?;
+    let name = tokens.name(NameType::Interface)?;
     let method_signatures = tokens.located(method_signatures)?;
 
-    Ok(InterfaceNode::new(identifier, method_signatures))
+    Ok(InterfaceNode::new(name, method_signatures))
 }
 
 pub fn method_signatures(
@@ -41,11 +41,11 @@ pub fn method_signature(tokens: &mut TokenStream) -> ParseResult<FunctionSignatu
 }
 
 pub fn interface_implementation(tokens: &mut TokenStream) -> ParseResult<ImplementationEntryNode> {
-    let identifier = tokens.name(NameType::Interface)?;
+    let name = tokens.name(NameType::Interface)?;
     if tokens.accept(Symbol::Semicolon) {
         Ok(ImplementationEntryNode::Interface(
             InterfaceImplementationNode {
-                name: identifier,
+                name,
                 methods: None,
             },
         ))
@@ -57,7 +57,7 @@ pub fn interface_implementation(tokens: &mut TokenStream) -> ParseResult<Impleme
         }
         Ok(ImplementationEntryNode::Interface(
             InterfaceImplementationNode {
-                name: identifier,
+                name,
                 methods: Some(methods),
             },
         ))

@@ -21,15 +21,15 @@ impl MatchPatternNode {
     ) {
         match self {
             MatchPatternNode::Variant(pattern) => pattern.check(scope, bindings, subject_type),
-            MatchPatternNode::Binding(identifier) => {
-                if bindings.contains_key(&identifier.0) {
+            MatchPatternNode::Binding(name) => {
+                if bindings.contains_key(&name.0) {
                     scope.source.print_error(
                         span,
-                        &format!("Duplicate pattern binding of `{}`", identifier.0),
+                        &format!("Duplicate pattern binding of `{}`", name.0),
                         "a binding of this name is declared elsewhere in this pattern",
                     );
                 } else {
-                    bindings.insert(identifier.0.clone(), subject_type.clone());
+                    bindings.insert(name.0.clone(), subject_type.clone());
                 }
             }
             MatchPatternNode::Else => {}
@@ -48,7 +48,7 @@ impl VariantMatchPattern {
             if let Some(variant) = enum_type.variants.get(self.name.name()) {
                 if let Some(inner_type) = variant {
                     if self.inner_pattern.is_none() {
-                        // TODO consider relaxing this when the subject is just an identifier...
+                        // TODO consider relaxing this when the subject is just a name...
                         scope.source.print_error(
                             self.name.span,
                             "Expected binding pattern",

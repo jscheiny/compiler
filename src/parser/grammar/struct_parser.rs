@@ -8,10 +8,10 @@ use crate::{
 
 pub fn structure(tokens: &mut TokenStream) -> ParseResult<StructNode> {
     tokens.next();
-    let identifier = tokens.name(NameType::Struct)?;
+    let name = tokens.name(NameType::Struct)?;
     let fields = tokens.located(fields)?;
     let implementation = implementation(tokens)?;
-    Ok(StructNode::new(identifier, fields, implementation))
+    Ok(StructNode::new(name, fields, implementation))
 }
 
 fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<Node<StructFieldNode>>> {
@@ -30,17 +30,17 @@ fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<Node<StructFieldNode>>> {
 
 fn field(tokens: &mut TokenStream) -> ParseResult<StructFieldNode> {
     let public = tokens.accept(Keyword::Pub);
-    let identifier = tokens.name(NameType::Field)?;
+    let name = tokens.name(NameType::Field)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {
         Token::Symbol(Symbol::Colon) => {
             tokens.next();
             let type_def = Some(tokens.located(type_definition)?);
-            Ok(StructFieldNode::new(public, identifier, type_def))
+            Ok(StructFieldNode::new(public, name, type_def))
         }
         Token::Symbol(Symbol::Comma) | Token::Symbol(Symbol::CloseParen) => {
             tokens.push_error(error);
-            Ok(StructFieldNode::new(public, identifier, None))
+            Ok(StructFieldNode::new(public, name, None))
         }
         _ => Err(tokens.make_error(error)),
     }

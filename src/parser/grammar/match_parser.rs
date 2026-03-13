@@ -62,19 +62,19 @@ fn match_case(tokens: &mut TokenStream) -> ParseResult<MatchCaseNode> {
 
 fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<MatchPatternNode> {
     match tokens.peek() {
-        Token::Name(identifier) => {
-            let identifier = tokens.current_span().wrap(NameNode(identifier.clone()));
+        Token::Name(name) => {
+            let name = tokens.current_span().wrap(NameNode(name.clone()));
             tokens.next();
             if tokens.accept(Symbol::OpenParen) {
                 let inner_pattern = tokens.located_with(match_pattern, false)?;
                 tokens.expect(Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
                 Ok(MatchPatternNode::Variant(VariantMatchPattern {
-                    name: identifier,
+                    name,
                     inner_pattern: Some(Box::new(inner_pattern)),
                 }))
             } else {
                 Ok(MatchPatternNode::Variant(VariantMatchPattern {
-                    name: identifier,
+                    name,
                     inner_pattern: None,
                 }))
             }
@@ -84,8 +84,8 @@ fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<Match
                 tokens.push_error(SyntaxError::UnexpectedBindingPattern);
             }
             tokens.next();
-            let identifier = tokens.name(NameType::PatternBinding)?;
-            Ok(MatchPatternNode::Binding(identifier.value))
+            let name = tokens.name(NameType::PatternBinding)?;
+            Ok(MatchPatternNode::Binding(name.value))
         }
         _ => Err(tokens.make_error(SyntaxError::ExpectedMatchPattern)),
     }

@@ -21,8 +21,8 @@ impl MatchCaseNode {
         self.pattern
             .check(&scope, self.pattern.span, &mut bindings, subject_type);
         scope.nest_with(ScopeType::MatchCase, |mut scope| {
-            for (identifier, bound_type) in bindings {
-                scope.add_value(identifier.as_str(), bound_type);
+            for (name, bound_type) in bindings {
+                scope.add_value(name.as_str(), bound_type);
             }
             // TODO handle pattern checking
             let (scope, resolved_type) = self.if_match.check_expected(scope, expected_type);

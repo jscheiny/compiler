@@ -60,10 +60,11 @@ impl ExpressionNode {
             Self::IfExpression(node) => node.check(scope, expected_type),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
             Self::Match(node) => node.check(scope, expected_type),
-            Self::Name(identifier) => self.check_name(identifier, scope, expected_type),
+            // TODO consider pulling check name out into the impl of NameNode
+            Self::Name(name) => self.check_name(name, scope, expected_type),
             Self::PostfixOp(node) => node.check(scope),
             Self::PrefixOp(node) => node.check(scope),
-            Self::SelfRef(identifier) => self.check_self_ref(identifier, scope),
+            Self::SelfRef(name) => self.check_self_ref(name, scope),
             Self::SelfValue(span) => self.check_self_value(*span, scope),
             Self::StringLiteral(_) => (
                 scope,

@@ -15,9 +15,9 @@ impl EnumType {
     pub fn from(node: Rc<EnumNode>, scope: &Scope) -> Rc<EnumType> {
         let mut variants = HashMap::new();
         for variant in node.variants.iter() {
-            let identifier = variant.name().clone();
+            let name = variant.name().clone();
             let variant = variant.get_type(scope).cloned();
-            variants.entry(identifier).or_insert(variant);
+            variants.entry(name).or_insert(variant);
         }
 
         Rc::new(EnumType {
@@ -53,8 +53,8 @@ impl EnumType {
         let scope = scope.global();
         let mut methods = HashMap::new();
         if let Some(implementation) = self.node.implementation.as_ref() {
-            for (identifier, public, function_type) in implementation.get_methods(scope) {
-                methods.entry(identifier).or_insert(EnumMethod {
+            for (name, public, function_type) in implementation.get_methods(scope) {
+                methods.entry(name).or_insert(EnumMethod {
                     public,
                     function_type,
                 });

@@ -57,21 +57,21 @@ fn function(tokens: &mut TokenStream, has_keyword: bool) -> ParseResult<Function
     if has_keyword {
         tokens.next();
     }
-    let identifier_type = if has_keyword {
+    let name_type = if has_keyword {
         NameType::Function
     } else {
         NameType::Method
     };
-    let signature = function_signature(tokens, identifier_type)?;
+    let signature = function_signature(tokens, name_type)?;
     let body = tokens.located(function_body)?;
     Ok(FunctionNode::new(signature, body))
 }
 
 pub fn function_signature(
     tokens: &mut TokenStream,
-    identifier_type: NameType,
+    name_type: NameType,
 ) -> ParseResult<FunctionSignatureNode> {
-    let identifier = tokens.name(identifier_type)?;
+    let name = tokens.name(name_type)?;
     let parameters = tokens.located(parameters)?;
     let return_type = if tokens.accept(Symbol::Colon) {
         Some(tokens.located(type_definition)?)
@@ -79,11 +79,7 @@ pub fn function_signature(
         None
     };
 
-    Ok(FunctionSignatureNode::new(
-        identifier,
-        parameters,
-        return_type,
-    ))
+    Ok(FunctionSignatureNode::new(name, parameters, return_type))
 }
 
 fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyNode> {
@@ -123,17 +119,17 @@ pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<Node<ParameterNod
 }
 
 fn parameter(tokens: &mut TokenStream) -> ParseResult<ParameterNode> {
-    let identifier = tokens.name(NameType::Parameter)?;
+    let name = tokens.name(NameType::Parameter)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {
         Token::Symbol(Symbol::Colon) => {
             tokens.next();
             let type_def = Some(tokens.located(type_definition)?);
-            Ok(ParameterNode::new(identifier, type_def))
+            Ok(ParameterNode::new(name, type_def))
         }
         Token::Symbol(Symbol::Comma) | Token::Symbol(Symbol::CloseParen) => {
             tokens.push_error(error);
-            Ok(ParameterNode::new(identifier, None))
+            Ok(ParameterNode::new(name, None))
         }
         _ => Err(tokens.make_error(error)),
     }

@@ -57,13 +57,13 @@ impl StructType {
         let mut members = HashMap::new();
         for field in self.node.fields.iter() {
             let member = field.get_member(scope);
-            let identifier = field.name().clone();
-            members.entry(identifier).or_insert(member);
+            let name = field.name().clone();
+            members.entry(name).or_insert(member);
         }
 
         if let Some(implementation) = self.node.implementation.as_ref() {
-            for (identifier, public, function_type) in implementation.get_methods(scope) {
-                members.entry(identifier).or_insert(StructMember {
+            for (name, public, function_type) in implementation.get_methods(scope) {
+                members.entry(name).or_insert(StructMember {
                     public,
                     member_type: StructMemberType::Method(function_type),
                 });

@@ -28,7 +28,7 @@ pub fn statement(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult
 
 fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<StatementNode> {
     tokens.next();
-    let identifier = tokens.name(NameType::Variable)?;
+    let name = tokens.name(NameType::Variable)?;
     let type_def = if tokens.accept(Symbol::Colon) {
         Some(tokens.located(type_definition)?)
     } else {
@@ -39,7 +39,7 @@ fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<Statement
     end_statement(tokens);
     Ok(StatementNode::Declaration(DeclarationNode {
         mutable,
-        name: identifier,
+        name,
         type_def,
         initializer,
     }))

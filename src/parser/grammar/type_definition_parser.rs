@@ -43,8 +43,8 @@ pub fn type_definition_impl(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
 }
 
 pub fn user_defined_type(tokens: &mut TokenStream) -> ParseResult<UserDefinedTypeNode> {
-    let identifier = tokens.name(NameType::Type)?;
-    Ok(UserDefinedTypeNode::new(identifier))
+    let name = tokens.name(NameType::Type)?;
+    Ok(UserDefinedTypeNode::new(name))
 }
 
 fn function_or_tuple_type(tokens: &mut TokenStream) -> ParseResult<TypeNode> {

@@ -117,12 +117,12 @@ fn closure_parameter(
     context: ExpressionContext,
 ) -> ParseResult<Node<ExpressionNode>> {
     if context.allow_types {
-        if let ExpressionNode::Name(identifier) = left.value {
+        if let ExpressionNode::Name(name) = left.value {
             let parameter_type = Some(tokens.located(type_definition)?);
             let parameter_span = left.span.expand_to(tokens);
             return Ok(parameter_span.wrap(ExpressionNode::ClosureParameter(
                 ClosureParameterExpressionNode {
-                    name: identifier,
+                    name,
                     parameter_type,
                 },
             )));
@@ -216,9 +216,9 @@ fn simple_closure(
 ) -> ParseResult<Node<ExpressionNode>> {
     tokens.next();
     let parameter = match left.value {
-        ExpressionNode::Name(identifier) => Ok(ExpressionNode::ClosureParameter(
+        ExpressionNode::Name(name) => Ok(ExpressionNode::ClosureParameter(
             ClosureParameterExpressionNode {
-                name: identifier,
+                name,
                 parameter_type: None,
             },
         )),
@@ -256,11 +256,11 @@ fn expression_atom(
             tokens.next();
             Ok(ExpressionNode::SelfValue(span))
         }
-        Token::Name(identifier) => {
+        Token::Name(name) => {
             let span = TokenSpan::singleton(tokens);
-            let identifier = span.wrap(NameNode(identifier.clone()));
+            let name = span.wrap(NameNode(name.clone()));
             tokens.next();
-            Ok(ExpressionNode::Name(identifier))
+            Ok(ExpressionNode::Name(name))
         }
         Token::CharacterLiteral(literal) => {
             let literal = literal.clone();
@@ -284,8 +284,8 @@ fn expression_atom(
         }
         Token::Symbol(Symbol::At) => {
             tokens.next();
-            let identifier = tokens.name(NameType::Field)?;
-            Ok(ExpressionNode::SelfRef(identifier))
+            let name = tokens.name(NameType::Field)?;
+            Ok(ExpressionNode::SelfRef(name))
         }
         Token::Symbol(Symbol::Dot) => deferred_access(tokens),
         Token::Symbol(Symbol::OpenParen) => closure_or_tuple(tokens),
@@ -376,9 +376,9 @@ fn closure(
     let parameters = parameters
         .into_iter()
         .map(|parameter| {
-            if let ExpressionNode::Name(identifier) = parameter.value {
+            if let ExpressionNode::Name(name) = parameter.value {
                 Some(parameter.span.wrap(ClosureParameterExpressionNode {
-                    name: identifier,
+                    name,
                     parameter_type: None,
                 }))
             } else if let ExpressionNode::ClosureParameter(param) = parameter.value {

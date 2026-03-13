@@ -8,10 +8,10 @@ use crate::{
 
 pub fn enumeration(tokens: &mut TokenStream) -> ParseResult<EnumNode> {
     tokens.next();
-    let identifier = tokens.name(NameType::Variant)?;
+    let name = tokens.name(NameType::Variant)?;
     let variants = tokens.located(enum_variants)?;
     let implementation = implementation(tokens)?;
-    Ok(EnumNode::new(identifier, variants, implementation))
+    Ok(EnumNode::new(name, variants, implementation))
 }
 
 fn enum_variants(tokens: &mut TokenStream) -> ParseResult<Vec<Node<EnumVariantNode>>> {
@@ -29,7 +29,7 @@ fn enum_variants(tokens: &mut TokenStream) -> ParseResult<Vec<Node<EnumVariantNo
 }
 
 fn enum_variant(tokens: &mut TokenStream) -> ParseResult<EnumVariantNode> {
-    let identifier = tokens.name(NameType::Variant)?;
+    let name = tokens.name(NameType::Variant)?;
     let type_def = if tokens.accept(Symbol::OpenParen) {
         let type_def = tokens.located(type_definition)?;
         tokens.expect(Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
@@ -37,5 +37,5 @@ fn enum_variant(tokens: &mut TokenStream) -> ParseResult<EnumVariantNode> {
     } else {
         None
     };
-    Ok(EnumVariantNode::new(identifier, type_def))
+    Ok(EnumVariantNode::new(name, type_def))
 }
