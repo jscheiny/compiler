@@ -28,7 +28,7 @@ impl Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::CharacterLiteral(literal) => write!(f, "{}", literal),
-            Self::Name(identifier) => write!(f, "{}", identifier),
+            Self::Name(name) => write!(f, "{}", name),
             Self::IntegerLiteral(literal) => write!(f, "{}", literal),
             Self::StringLiteral(literal) => write!(f, "\"{}\"", literal),
             Self::Symbol(symbol) => write!(f, "{}", symbol),
