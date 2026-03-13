@@ -1,11 +1,11 @@
 use crate::{
     checker::{Scope, Type},
-    parser::{ExpressionNode, Identified, IdentifierNode, Node, TypeNode},
+    parser::{ExpressionNode, Identified, NameNode, Node, TypeNode},
 };
 
 pub struct DeclarationNode {
     pub mutable: bool,
-    pub identifier: Node<IdentifierNode>,
+    pub identifier: Node<NameNode>,
     pub type_def: Option<Node<TypeNode>>,
     pub initializer: Option<Node<ExpressionNode>>,
 }

@@ -2,11 +2,11 @@ use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
     checker::{Scope, ScopeType, StructType, Type},
-    parser::{Identified, IdentifierNode, ImplementationNode, Node, NodeVec, StructFieldNode},
+    parser::{Identified, ImplementationNode, NameNode, Node, NodeVec, StructFieldNode},
 };
 
 pub struct StructNode {
-    pub identifier: Node<IdentifierNode>,
+    pub identifier: Node<NameNode>,
     pub fields: NodeVec<StructFieldNode>,
     pub implementation: Option<Node<ImplementationNode>>,
     resolved_type: OnceCell<Rc<StructType>>,
@@ -14,7 +14,7 @@ pub struct StructNode {
 
 impl StructNode {
     pub fn new(
-        identifier: Node<IdentifierNode>,
+        identifier: Node<NameNode>,
         fields: NodeVec<StructFieldNode>,
         implementation: Option<Node<ImplementationNode>>,
     ) -> Self {

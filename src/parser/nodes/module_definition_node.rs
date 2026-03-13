@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::{
     checker::{RuntimeType, Scope, Type},
     parser::{
-        EnumNode, FunctionNode, Identified, IdentifierNode, InterfaceNode, Node, StructNode,
+        EnumNode, FunctionNode, Identified, InterfaceNode, NameNode, Node, StructNode,
         TypeAliasNode,
     },
 };
@@ -60,7 +60,7 @@ impl ModuleDefinitionNode {
         }
     }
 
-    pub fn identifier(&self) -> &Node<IdentifierNode> {
+    pub fn identifier(&self) -> &Node<NameNode> {
         match self {
             Self::Enum(node) => &node.identifier,
             Self::Function(node) => &node.signature.identifier,

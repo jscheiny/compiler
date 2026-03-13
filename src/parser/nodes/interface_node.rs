@@ -6,18 +6,18 @@ use std::{
 
 use crate::{
     checker::{InterfaceType, Scope},
-    parser::{FunctionSignatureNode, Identified, IdentifierNode, Node, NodeVec},
+    parser::{FunctionSignatureNode, Identified, NameNode, Node, NodeVec},
 };
 
 pub struct InterfaceNode {
-    pub identifier: Node<IdentifierNode>,
+    pub identifier: Node<NameNode>,
     method_signatures: NodeVec<FunctionSignatureNode>,
     resolved_type: OnceCell<Rc<InterfaceType>>,
 }
 
 impl InterfaceNode {
     pub fn new(
-        identifier: Node<IdentifierNode>,
+        identifier: Node<NameNode>,
         method_signatures: NodeVec<FunctionSignatureNode>,
     ) -> Self {
         Self {

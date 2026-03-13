@@ -1,10 +1,10 @@
 use crate::{
     checker::{FunctionType, Scope, Type},
-    parser::{ExpressionNode, IdentifierNode, Node, NodeVec, check_function_call, get_field},
+    parser::{ExpressionNode, NameNode, Node, NodeVec, check_function_call, get_field},
 };
 
 pub struct DeferredAccessExpressionNode {
-    pub field: Node<IdentifierNode>,
+    pub field: Node<NameNode>,
     pub arguments: Option<NodeVec<ExpressionNode>>,
 }
 

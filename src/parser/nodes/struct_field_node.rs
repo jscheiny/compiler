@@ -2,22 +2,18 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{Scope, StructMember, StructMemberType, Type},
-    parser::{Identified, IdentifierNode, Node, TypeNode},
+    parser::{Identified, NameNode, Node, TypeNode},
 };
 
 pub struct StructFieldNode {
     pub public: bool,
-    pub identifier: Node<IdentifierNode>,
+    pub identifier: Node<NameNode>,
     pub type_def: Option<Node<TypeNode>>,
     resolved_type: OnceCell<Type>,
 }
 
 impl StructFieldNode {
-    pub fn new(
-        public: bool,
-        identifier: Node<IdentifierNode>,
-        type_def: Option<Node<TypeNode>>,
-    ) -> Self {
+    pub fn new(public: bool, identifier: Node<NameNode>, type_def: Option<Node<TypeNode>>) -> Self {
         Self {
             public,
             identifier,

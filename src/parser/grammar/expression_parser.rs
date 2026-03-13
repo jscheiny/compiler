@@ -3,8 +3,8 @@ use crate::{
     parser::{
         AccessExpressionNode, ArrayExpressionNode, Associativity, BinaryOpExpressionNode,
         BinaryOperator, BlockNode, ClosureExpressionNode, ClosureParameterExpressionNode,
-        DeferredAccessExpressionNode, ExpressionNode, FunctionCallExpressionNode, IdentifierNode,
-        IdentifierType, IfExpressionNode, LocatedSyntaxError, Node, Operator, ParseResult,
+        DeferredAccessExpressionNode, ExpressionNode, FunctionCallExpressionNode, IdentifierType,
+        IfExpressionNode, LocatedSyntaxError, NameNode, Node, Operator, ParseResult,
         PostfixOpExpressionNode, PostfixOperator, PrefixOpExpressionNode, PrefixOperator,
         StatementNode, StatementType, SyntaxError, TokenSpan, TokenStream,
         grammar::{match_expression, statement, type_definition},
@@ -258,7 +258,7 @@ fn expression_atom(
         }
         Token::Identifier(identifier) => {
             let span = TokenSpan::singleton(tokens);
-            let identifier = span.wrap(IdentifierNode(identifier.clone()));
+            let identifier = span.wrap(NameNode(identifier.clone()));
             tokens.next();
             Ok(ExpressionNode::Identifier(identifier))
         }

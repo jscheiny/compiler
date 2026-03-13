@@ -2,14 +2,12 @@ use std::rc::Rc;
 
 use crate::{
     checker::{FunctionType, RuntimeType, Scope, Type},
-    parser::{
-        ExpressionNode, Identified, IdentifierNode, Node, NodeVec, TokenSpan, check_function_call,
-    },
+    parser::{ExpressionNode, Identified, NameNode, Node, NodeVec, TokenSpan, check_function_call},
 };
 
 pub struct AccessExpressionNode {
     pub left: Box<Node<ExpressionNode>>,
-    pub field: Node<IdentifierNode>,
+    pub field: Node<NameNode>,
     pub arguments: Option<NodeVec<ExpressionNode>>,
 }
 
@@ -62,7 +60,7 @@ impl AccessExpressionNode {
 pub fn get_field(
     input_type: &Type,
     input_span: TokenSpan,
-    field: &Node<IdentifierNode>,
+    field: &Node<NameNode>,
     scope: &Scope,
 ) -> Type {
     match input_type {
@@ -150,11 +148,7 @@ pub fn get_field(
     }
 }
 
-fn get_static_field(
-    runtime_type: &RuntimeType,
-    field: &Node<IdentifierNode>,
-    scope: &Scope,
-) -> Type {
+fn get_static_field(runtime_type: &RuntimeType, field: &Node<NameNode>, scope: &Scope) -> Type {
     match runtime_type {
         RuntimeType::Enum(enum_type) => {
             if let Some(variant_type) = enum_type.get_variant(field.id()) {
@@ -202,7 +196,7 @@ fn get_static_field(
     }
 }
 
-fn check_private_access(scope: &Scope, receiver_type: &Type, field: &Node<IdentifierNode>) {
+fn check_private_access(scope: &Scope, receiver_type: &Type, field: &Node<NameNode>) {
     if is_external_private_access(scope, receiver_type) {
         scope.source.print_error(
             field.span,

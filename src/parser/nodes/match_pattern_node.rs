@@ -2,12 +2,12 @@ use std::collections::HashMap;
 
 use crate::{
     checker::{Scope, Type},
-    parser::{Identified, IdentifierNode, Node, TokenSpan},
+    parser::{Identified, NameNode, Node, TokenSpan},
 };
 
 pub enum MatchPatternNode {
     Variant(VariantMatchPattern),
-    Binding(IdentifierNode),
+    Binding(NameNode),
     Else,
 }
 
@@ -38,7 +38,7 @@ impl MatchPatternNode {
 }
 
 pub struct VariantMatchPattern {
-    pub identifier: Node<IdentifierNode>,
+    pub identifier: Node<NameNode>,
     pub inner_pattern: Option<Box<Node<MatchPatternNode>>>,
 }
 

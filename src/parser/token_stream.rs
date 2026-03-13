@@ -3,8 +3,8 @@ use std::rc::Rc;
 use crate::{
     lexer::{LocatedToken, Token, TokenMatch},
     parser::{
-        IdentifierNode, IdentifierType, LocatedSyntaxError, Node, ParseResult, SyntaxError,
-        TokenSpan, identifier,
+        IdentifierType, LocatedSyntaxError, NameNode, Node, ParseResult, SyntaxError, TokenSpan,
+        identifier,
     },
 };
 
@@ -53,7 +53,7 @@ impl TokenStream {
         self.index >= self.tokens.len() - 1
     }
 
-    pub fn identifier(&mut self, id_type: IdentifierType) -> ParseResult<Node<IdentifierNode>> {
+    pub fn identifier(&mut self, id_type: IdentifierType) -> ParseResult<Node<NameNode>> {
         let start_index = self.index;
         let value = identifier(self, id_type)?;
         Ok(self.close(value, start_index))

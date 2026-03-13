@@ -2,17 +2,17 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{Scope, Type},
-    parser::{Identified, IdentifierNode, Node, TypeNode},
+    parser::{Identified, NameNode, Node, TypeNode},
 };
 
 pub struct ParameterNode {
-    pub identifier: Node<IdentifierNode>,
+    pub identifier: Node<NameNode>,
     pub type_def: Option<Node<TypeNode>>,
     resolved_type: OnceCell<Type>,
 }
 
 impl ParameterNode {
-    pub fn new(identifier: Node<IdentifierNode>, type_def: Option<Node<TypeNode>>) -> Self {
+    pub fn new(identifier: Node<NameNode>, type_def: Option<Node<TypeNode>>) -> Self {
         Self {
             identifier,
             type_def,

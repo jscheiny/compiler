@@ -2,11 +2,11 @@ use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
     checker::{EnumType, Scope, ScopeType, Type},
-    parser::{EnumVariantNode, Identified, IdentifierNode, ImplementationNode, Node, NodeVec},
+    parser::{EnumVariantNode, Identified, ImplementationNode, NameNode, Node, NodeVec},
 };
 
 pub struct EnumNode {
-    pub identifier: Node<IdentifierNode>,
+    pub identifier: Node<NameNode>,
     pub variants: NodeVec<EnumVariantNode>,
     pub implementation: Option<Node<ImplementationNode>>,
     resolved_type: OnceCell<Rc<EnumType>>,
@@ -14,7 +14,7 @@ pub struct EnumNode {
 
 impl EnumNode {
     pub fn new(
-        identifier: Node<IdentifierNode>,
+        identifier: Node<NameNode>,
         variants: NodeVec<EnumVariantNode>,
         implementation: Option<Node<ImplementationNode>>,
     ) -> Self {

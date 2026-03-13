@@ -2,11 +2,11 @@ use std::{cell::OnceCell, rc::Rc};
 
 use crate::{
     checker::{FunctionType, Scope, Type},
-    parser::{Identified, IdentifierNode, Node, NodeVec, ParameterNode, TypeNode},
+    parser::{Identified, NameNode, Node, NodeVec, ParameterNode, TypeNode},
 };
 
 pub struct FunctionSignatureNode {
-    pub identifier: Node<IdentifierNode>,
+    pub identifier: Node<NameNode>,
     pub parameters: NodeVec<ParameterNode>,
     pub return_type: Option<Node<TypeNode>>,
     resolved_type: OnceCell<Rc<FunctionType>>,
@@ -14,7 +14,7 @@ pub struct FunctionSignatureNode {
 
 impl FunctionSignatureNode {
     pub fn new(
-        identifier: Node<IdentifierNode>,
+        identifier: Node<NameNode>,
         parameters: NodeVec<ParameterNode>,
         return_type: Option<Node<TypeNode>>,
     ) -> Self {

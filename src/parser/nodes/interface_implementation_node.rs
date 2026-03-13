@@ -3,11 +3,11 @@ use std::{collections::HashSet, rc::Rc};
 use crate::{
     checker::{EnumType, FunctionType, Scope, Type},
     lexer::Symbol,
-    parser::{FunctionNode, Identified, IdentifierNode, Node},
+    parser::{FunctionNode, Identified, NameNode, Node},
 };
 
 pub struct InterfaceImplementationNode {
-    pub identifier: Node<IdentifierNode>,
+    pub identifier: Node<NameNode>,
     pub methods: Option<Vec<Node<FunctionNode>>>,
 }
 

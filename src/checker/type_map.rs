@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{
     checker::Type,
     lexer::SourceCode,
-    parser::{Identified, IdentifierNode, Node},
+    parser::{Identified, NameNode, Node},
 };
 
 #[derive(Default)]
@@ -25,7 +25,7 @@ impl TypeMap {
         }
     }
 
-    pub fn declare(&mut self, identifier: &Node<IdentifierNode>, source: &SourceCode) {
+    pub fn declare(&mut self, identifier: &Node<NameNode>, source: &SourceCode) {
         if self.lookup.contains_key(identifier.id()) {
             source.print_error(
                 identifier.span,

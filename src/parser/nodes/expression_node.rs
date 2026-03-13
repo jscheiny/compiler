@@ -3,7 +3,7 @@ use crate::{
     parser::{
         AccessExpressionNode, ArrayExpressionNode, BinaryOpExpressionNode, BlockNode,
         ClosureExpressionNode, ClosureParameterExpressionNode, DeferredAccessExpressionNode,
-        FunctionCallExpressionNode, Identified, IdentifierNode, IfExpressionNode, MatchNode, Node,
+        FunctionCallExpressionNode, Identified, IfExpressionNode, MatchNode, NameNode, Node,
         PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType, TokenSpan,
     },
 };
@@ -19,13 +19,13 @@ pub enum ExpressionNode {
     ClosureParameter(ClosureParameterExpressionNode),
     DeferredAccess(DeferredAccessExpressionNode),
     FunctionCall(FunctionCallExpressionNode),
-    Identifier(Node<IdentifierNode>),
+    Identifier(Node<NameNode>),
     IfExpression(IfExpressionNode),
     IntegerLiteral(i64),
     Match(MatchNode),
     PostfixOp(PostfixOpExpressionNode),
     PrefixOp(PrefixOpExpressionNode),
-    SelfRef(Node<IdentifierNode>),
+    SelfRef(Node<NameNode>),
     SelfValue(TokenSpan),
     StringLiteral(String),
     Error,
@@ -75,7 +75,7 @@ impl ExpressionNode {
 
     fn check_identifier(
         &self,
-        identifier: &Node<IdentifierNode>,
+        identifier: &Node<NameNode>,
         scope: Box<Scope>,
         expected_type: Option<&Type>,
     ) -> (Box<Scope>, Type) {
@@ -123,11 +123,7 @@ impl ExpressionNode {
         }
     }
 
-    fn check_self_ref(
-        &self,
-        identifier: &Node<IdentifierNode>,
-        scope: Box<Scope>,
-    ) -> (Box<Scope>, Type) {
+    fn check_self_ref(&self, identifier: &Node<NameNode>, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let self_scope = scope.find_scope(|scope_type| matches!(scope_type, ScopeType::Struct(_)));
         if let Some(self_scope) = self_scope {
             let resolved_type = self_scope.get_local_value(identifier.id());
