@@ -60,8 +60,7 @@ impl ExpressionNode {
             Self::IfExpression(node) => node.check(scope, expected_type),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
             Self::Match(node) => node.check(scope, expected_type),
-            // TODO consider pulling check name out into the impl of NameNode
-            Self::Name(name) => self.check_name(name, scope, expected_type),
+            Self::Name(node) => node.check(scope, expected_type),
             Self::PostfixOp(node) => node.check(scope),
             Self::PrefixOp(node) => node.check(scope),
             Self::SelfRef(name) => self.check_self_ref(name, scope),
@@ -71,56 +70,6 @@ impl ExpressionNode {
                 Type::Array(Box::new(Type::Primitive(PrimitiveType::Char))),
             ),
             Self::Error => (scope, Type::Error),
-        }
-    }
-
-    fn check_name(
-        &self,
-        name: &NameNode,
-        scope: Box<Scope>,
-        expected_type: Option<&Type>,
-    ) -> (Box<Scope>, Type) {
-        let expected_enum_type = expected_type.and_then(|e| match e.deref(&scope) {
-            Type::Enum(enum_type) => Some(enum_type),
-            _ => None,
-        });
-
-        // TODO disallow use of types as values
-        if let Some(resolved_type) = scope.get_value(name) {
-            (scope, resolved_type)
-        } else if let Some(index) = scope.get_type_index(name) {
-            let resolved_type = Type::Reference(index)
-                .as_runtime_type(&scope)
-                .map(Type::Type);
-            match resolved_type {
-                Some(resolved_type) => (scope, resolved_type),
-                None => {
-                    scope.source.print_error(
-                        name.span,
-                        "Invalid type as value",
-                        "cannot use type as a value",
-                    );
-                    (scope, Type::Error)
-                }
-            }
-        } else if let Some(enum_type) = expected_enum_type {
-            if let Some(variant_type) = enum_type.get_variant(name) {
-                (scope, variant_type)
-            } else {
-                scope.source.print_error(
-                    name.span,
-                    &format!("Could not find value `{}`", name),
-                    "no such symbol found",
-                );
-                (scope, Type::Error)
-            }
-        } else {
-            scope.source.print_error(
-                name.span,
-                &format!("Could not find value `{}`", name),
-                "no such symbol found",
-            );
-            (scope, Type::Error)
         }
     }
 
