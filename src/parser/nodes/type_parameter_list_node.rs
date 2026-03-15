@@ -48,7 +48,6 @@ impl TypeParameterListNode {
 
     fn init_types(&self) -> HashMap<String, Rc<TypeParameter>> {
         let mut types = HashMap::new();
-        // TODO make sure this is selecting the first item
         for type_param in self.list.iter() {
             types
                 .entry(type_param.name.value.clone())
