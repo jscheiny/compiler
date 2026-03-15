@@ -64,6 +64,14 @@ pub fn get_field(
     scope: &Scope,
 ) -> Type {
     match input_type {
+        Type::Array(_) | Type::Void => {
+            scope.source.print_error(
+                field.span.before(),
+                "Access operator is not valid for this type",
+                &format!("Access on type: `{}`", input_type.format(scope)),
+            );
+            Type::Error
+        }
         Type::Enum(enum_type) => {
             let method = enum_type.get_method(scope, field);
             if let Some(method) = method {
@@ -132,15 +140,6 @@ pub fn get_field(
         Type::Tuple(_) => todo!("Implement access on tuples"),
         Type::Type(inner_type) => get_static_field(inner_type, field, scope),
         Type::TypeParameter(_) => todo!("Implement access for type parameters"),
-        // TODO alphabetize
-        Type::Array(_) | Type::Void => {
-            scope.source.print_error(
-                field.span.before(),
-                "Access operator is not valid for this type",
-                &format!("Access on type: `{}`", input_type.format(scope)),
-            );
-            Type::Error
-        }
         Type::Error => Type::Error,
     }
 }
