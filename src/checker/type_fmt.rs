@@ -35,6 +35,7 @@ impl Display for TypeFmt<'_> {
                     function_type.return_type.format(self.scope)
                 )
             }
+            Type::Generic(generic_type) => write!(f, "{}", generic_type.name),
             Type::Interface(interface_type) => write!(f, "{}", interface_type.name),
             Type::Primitive(primitive_type) => write!(f, "{}", primitive_type),
             Type::Reference(index) => {

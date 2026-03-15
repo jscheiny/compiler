@@ -16,6 +16,7 @@ pub enum ScopeType {
     Block,
     MatchCase,
     Loop,
+    Type,
     Struct(usize),
 }
 

@@ -42,6 +42,7 @@ mod syntax_error;
 mod tuple_type_node;
 mod type_alias_node;
 mod type_node;
+mod type_parameter_node;
 mod user_defined_type_node;
 mod while_loop_node;
 
@@ -89,5 +90,6 @@ pub use syntax_error::*;
 pub use tuple_type_node::*;
 pub use type_alias_node::*;
 pub use type_node::*;
+pub use type_parameter_node::*;
 pub use user_defined_type_node::*;
 pub use while_loop_node::*;

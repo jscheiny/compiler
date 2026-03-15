@@ -1,5 +1,6 @@
 mod enum_type;
 mod function_type;
+mod generic_type;
 mod interface_type;
 mod scope;
 mod struct_type;
@@ -9,6 +10,7 @@ mod types;
 
 pub use enum_type::*;
 pub use function_type::*;
+pub use generic_type::*;
 pub use interface_type::*;
 pub use scope::*;
 pub use struct_type::*;

@@ -11,7 +11,7 @@ enum B() {
     }
 }
 
-fn test(a: A) {
+fn test(a: Aasdfa) {
     a.integer;
     a.boolean or false;
 }

@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    checker::{EnumType, FunctionType, InterfaceType, Scope, StructType, TypeFmt},
+    checker::{EnumType, FunctionType, GenericType, InterfaceType, Scope, StructType, TypeFmt},
     parser::PrimitiveType,
 };
 
@@ -17,6 +17,7 @@ pub enum Type {
     Array(Box<Type>),
     Enum(Rc<EnumType>),
     Function(Rc<FunctionType>),
+    Generic(Rc<GenericType>),
     Interface(Rc<InterfaceType>),
     Primitive(PrimitiveType),
     Reference(usize),
@@ -53,6 +54,10 @@ impl Type {
             },
             Type::Enum(left) => match other {
                 Type::Enum(right) => left.name() == right.name(),
+                _ => false,
+            },
+            Type::Generic(left) => match other {
+                Type::Generic(right) => left.name == right.name,
                 _ => false,
             },
             Type::Function(left) => match other.to_function(scope) {

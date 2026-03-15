@@ -88,6 +88,7 @@ pub fn get_field(
             );
             Type::Error
         }
+        Type::Generic(_) => todo!("Implement access for generic types"),
         Type::Interface(interface_type) => {
             let method = interface_type.methods.get(&field.value);
             if let Some(method) = method {

@@ -25,3 +25,5 @@ enum Test(
 ) {
     impl ToString;
 }
+
+fn test(): [int] -> [];

@@ -25,7 +25,7 @@ impl ModuleDefinitionNode {
             Self::Function(node) => node.check(scope),
             Self::Interface(node) => node.check(scope),
             Self::Struct(node) => node.check(scope),
-            Self::TypeAlias(_) => scope, // TODO check for recursion
+            Self::TypeAlias(node) => node.check(scope).0,
         }
     }
 
@@ -48,7 +48,7 @@ impl ModuleDefinitionNode {
             Self::Enum(node) => Some(Type::Enum(node.get_type(scope))),
             Self::Interface(node) => Some(Type::Interface(node.get_type(scope))),
             Self::Struct(node) => Some(Type::Struct(node.get_type())),
-            Self::TypeAlias(node) => Some(node.get_type(scope).clone()),
+            Self::TypeAlias(node) => Some(node.get_type(scope, None).clone()),
             Self::Function(_) => None,
         };
 

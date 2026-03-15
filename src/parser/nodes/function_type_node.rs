@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, rc::Rc};
 
 use crate::{
-    checker::{FunctionType, Scope},
+    checker::{FunctionType, Generics, Scope},
     parser::{Node, NodeVec, TypeNode},
 };
 
@@ -20,21 +20,21 @@ impl FunctionTypeNode {
         }
     }
 
-    pub fn get_type(&self, scope: &Scope) -> Rc<FunctionType> {
+    pub fn get_type(&self, scope: &Scope, generics: Generics<'_>) -> Rc<FunctionType> {
         self.resolved_type
-            .get_or_init(|| self.get_type_impl(scope))
+            .get_or_init(|| self.get_type_impl(scope, generics))
             .clone()
     }
 
-    fn get_type_impl(&self, scope: &Scope) -> Rc<FunctionType> {
+    fn get_type_impl(&self, scope: &Scope, generics: Generics<'_>) -> Rc<FunctionType> {
         let parameters = self
             .parameters
             .value
             .iter()
-            .map(|parameter| parameter.get_type(scope))
+            .map(|parameter| parameter.get_type(scope, generics))
             .collect();
 
-        let return_type = Box::new(self.return_type.get_type(scope));
+        let return_type = Box::new(self.return_type.get_type(scope, generics));
 
         Rc::new(FunctionType {
             parameters,
