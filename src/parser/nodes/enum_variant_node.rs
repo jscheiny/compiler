@@ -22,11 +22,11 @@ impl EnumVariantNode {
 
     pub fn get_type(&self, scope: &Scope) -> Option<&Type> {
         self.resolved_type
-            .get_or_init(|| self.get_type_impl(scope))
+            .get_or_init(|| self.init_type(scope))
             .as_ref()
     }
 
-    fn get_type_impl(&self, scope: &Scope) -> Option<Type> {
+    fn init_type(&self, scope: &Scope) -> Option<Type> {
         self.type_def.as_ref().map(|ty| ty.get_type(scope, None))
     }
 }

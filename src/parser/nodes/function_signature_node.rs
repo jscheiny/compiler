@@ -28,11 +28,11 @@ impl FunctionSignatureNode {
 
     pub fn get_type(&self, scope: &Scope) -> Rc<FunctionType> {
         self.resolved_type
-            .get_or_init(|| self.get_type_impl(scope))
+            .get_or_init(|| self.init_type(scope))
             .clone()
     }
 
-    fn get_type_impl(&self, scope: &Scope) -> Rc<FunctionType> {
+    fn init_type(&self, scope: &Scope) -> Rc<FunctionType> {
         let parameters = self
             .parameters
             .value

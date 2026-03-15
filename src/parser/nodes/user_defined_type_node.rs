@@ -20,11 +20,11 @@ impl UserDefinedTypeNode {
 
     pub fn get_type(&self, scope: &Scope, type_parameters: Option<&TypeParameters>) -> Type {
         self.resolved_type
-            .get_or_init(|| self.get_type_impl(scope, type_parameters))
+            .get_or_init(|| self.init_type(scope, type_parameters))
             .clone()
     }
 
-    fn get_type_impl(&self, scope: &Scope, type_parameters: Option<&TypeParameters>) -> Type {
+    fn init_type(&self, scope: &Scope, type_parameters: Option<&TypeParameters>) -> Type {
         let type_parameter = type_parameters.and_then(|t| t.get(&self.name.value));
         if let Some(type_parameter) = type_parameter {
             return Type::TypeParameter(type_parameter.clone());

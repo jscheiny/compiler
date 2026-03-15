@@ -26,15 +26,11 @@ impl FunctionTypeNode {
         type_params: Option<&TypeParameters>,
     ) -> Rc<FunctionType> {
         self.resolved_type
-            .get_or_init(|| self.get_type_impl(scope, type_params))
+            .get_or_init(|| self.init_type(scope, type_params))
             .clone()
     }
 
-    fn get_type_impl(
-        &self,
-        scope: &Scope,
-        type_params: Option<&TypeParameters>,
-    ) -> Rc<FunctionType> {
+    fn init_type(&self, scope: &Scope, type_params: Option<&TypeParameters>) -> Rc<FunctionType> {
         let parameters = self
             .parameters
             .value

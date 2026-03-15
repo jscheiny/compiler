@@ -30,10 +30,10 @@ impl StructFieldNode {
     }
 
     pub fn get_type(&self, scope: &Scope) -> &Type {
-        self.resolved_type.get_or_init(|| self.get_type_impl(scope))
+        self.resolved_type.get_or_init(|| self.init_type(scope))
     }
 
-    fn get_type_impl(&self, scope: &Scope) -> Type {
+    fn init_type(&self, scope: &Scope) -> Type {
         match self.type_def.as_ref() {
             Some(type_def) => type_def.get_type(scope, None),
             None => Type::Error,
