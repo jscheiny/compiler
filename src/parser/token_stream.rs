@@ -52,11 +52,8 @@ impl TokenStream {
         self.index >= self.tokens.len() - 1
     }
 
-    // TODO this should use located_with under the hood
-    pub fn name(&mut self, id_type: NameType) -> ParseResult<NameNode> {
-        let start_index = self.index;
-        let value = name(self, id_type)?;
-        Ok(self.close(value, start_index))
+    pub fn name(&mut self, name_type: NameType) -> ParseResult<NameNode> {
+        self.located_with(name, name_type)
     }
 
     pub fn located<P, E>(
