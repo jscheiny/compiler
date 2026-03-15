@@ -1,6 +1,7 @@
 mod enum_parser;
 mod expression_parser;
 mod function_parser;
+mod generics_parser;
 mod interface_parser;
 mod match_parser;
 mod name_parser;
@@ -14,6 +15,7 @@ mod utils;
 use enum_parser::*;
 use expression_parser::*;
 use function_parser::*;
+use generics_parser::*;
 use interface_parser::*;
 use match_parser::*;
 use statement_parser::*;

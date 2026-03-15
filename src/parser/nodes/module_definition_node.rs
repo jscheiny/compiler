@@ -25,7 +25,7 @@ impl ModuleDefinitionNode {
             Self::Function(node) => node.check(scope),
             Self::Interface(node) => node.check(scope),
             Self::Struct(node) => node.check(scope),
-            Self::TypeAlias(_) => scope, // TODO check for recursion
+            Self::TypeAlias(node) => node.check(scope).0,
         }
     }
 

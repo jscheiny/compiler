@@ -27,6 +27,6 @@ impl EnumVariantNode {
     }
 
     fn get_type_impl(&self, scope: &Scope) -> Option<Type> {
-        self.type_def.as_ref().map(|ty| ty.get_type(scope))
+        self.type_def.as_ref().map(|ty| ty.get_type(scope, None))
     }
 }

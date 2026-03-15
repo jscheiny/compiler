@@ -44,7 +44,7 @@ impl FunctionSignatureNode {
         let return_type = self
             .return_type
             .as_ref()
-            .map_or(Type::Void, |return_type| return_type.get_type(scope));
+            .map_or(Type::Void, |return_type| return_type.get_type(scope, None));
 
         Rc::new(FunctionType {
             parameters,

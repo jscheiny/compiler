@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    checker::{EnumType, FunctionType, InterfaceType, Scope, StructType, TypeFmt},
+    checker::{EnumType, FunctionType, InterfaceType, Scope, StructType, TypeFmt, TypeParameter},
     parser::PrimitiveType,
 };
 
@@ -23,6 +23,7 @@ pub enum Type {
     Struct(Rc<StructType>),
     Tuple(Rc<Vec<Type>>),
     Type(RuntimeType),
+    TypeParameter(Rc<TypeParameter>),
     Void,
     Error,
 }
@@ -95,6 +96,10 @@ impl Type {
                 _ => false,
             },
             Type::Type(_) => todo!("Implement assignability for runtime types"),
+            Type::TypeParameter(left) => match other {
+                Type::TypeParameter(right) => Rc::ptr_eq(left, right),
+                _ => false,
+            },
             Type::Void => matches!(other, Type::Void),
             Type::Error => true,
         }

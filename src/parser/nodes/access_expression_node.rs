@@ -131,6 +131,8 @@ pub fn get_field(
         }
         Type::Tuple(_) => todo!("Implement access on tuples"),
         Type::Type(inner_type) => get_static_field(inner_type, field, scope),
+        Type::TypeParameter(_) => todo!("Implement access for type parameters"),
+        // TODO alphabetize
         Type::Array(_) | Type::Void => {
             scope.source.print_error(
                 field.span.before(),

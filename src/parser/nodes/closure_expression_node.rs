@@ -73,7 +73,7 @@ fn get_parameter_type(
 ) -> Type {
     let expected_type = expected_type.and_then(|ft| ft.parameters.get(index).cloned());
     if let Some(given_type) = parameter.parameter_type.as_ref() {
-        given_type.get_type(scope)
+        given_type.get_type(scope, None)
     } else if let Some(expected_type) = expected_type {
         expected_type.clone()
     } else {

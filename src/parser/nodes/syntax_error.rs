@@ -46,6 +46,7 @@ pub enum NameType {
     PatternBinding,
     Struct,
     Type,
+    TypeParameter,
     Variable,
     Variant,
 }
@@ -61,6 +62,7 @@ impl Display for NameType {
             Self::PatternBinding => "pattern binding",
             Self::Struct => "struct",
             Self::Type => "type",
+            Self::TypeParameter => "generic type parameter",
             Self::Variable => "variable",
             Self::Variant => "variant",
         };

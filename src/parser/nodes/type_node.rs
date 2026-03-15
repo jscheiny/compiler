@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, Type},
+    checker::{Scope, Type, TypeParameters},
     parser::{FunctionTypeNode, PrimitiveType, TupleTypeNode, UserDefinedTypeNode},
 };
 
@@ -13,13 +13,13 @@ pub enum TypeNode {
 }
 
 impl TypeNode {
-    pub fn get_type(&self, scope: &Scope) -> Type {
+    pub fn get_type(&self, scope: &Scope, type_params: Option<&TypeParameters>) -> Type {
         match self {
-            Self::Array(node) => Type::Array(Box::new(node.get_type(scope))),
+            Self::Array(node) => Type::Array(Box::new(node.get_type(scope, type_params))),
             Self::Primitive(primitive) => Type::Primitive(*primitive),
-            Self::Function(node) => Type::Function(node.get_type(scope)),
-            Self::Tuple(node) => node.get_type(scope),
-            Self::UserDefined(node) => node.get_type(scope),
+            Self::Function(node) => Type::Function(node.get_type(scope, type_params)),
+            Self::Tuple(node) => node.get_type(scope, type_params),
+            Self::UserDefined(node) => node.get_type(scope, type_params),
             Self::Void => Type::Void,
         }
     }

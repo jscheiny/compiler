@@ -66,6 +66,7 @@ impl Display for TypeFmt<'_> {
                     RuntimeType::Struct(struct_type) => struct_type.name(),
                 }
             ),
+            Type::TypeParameter(type_parameter) => write!(f, "{}", type_parameter.name),
             Type::Void => write!(f, "{}", Keyword::Void),
             Type::Error => write!(f, "<error-type>"),
         }

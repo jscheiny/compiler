@@ -35,7 +35,7 @@ impl StructFieldNode {
 
     fn get_type_impl(&self, scope: &Scope) -> Type {
         match self.type_def.as_ref() {
-            Some(type_def) => type_def.get_type(scope),
+            Some(type_def) => type_def.get_type(scope, None),
             None => Type::Error,
         }
     }
