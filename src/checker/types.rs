@@ -2,8 +2,8 @@ use std::rc::Rc;
 
 use crate::{
     checker::{
-        EnumType, FunctionType, GenericType, InterfaceType, Scope, StructType, TypeBindings,
-        TypeFmt, TypeParameter,
+        EnumType, FunctionType, GenericType, InterfaceType, Scope, StructType, TypeFmt,
+        TypeParameter, TypeParameterBindings,
     },
     parser::PrimitiveType,
 };
@@ -110,7 +110,7 @@ impl Type {
         }
     }
 
-    pub fn bind(&self, scope: &Scope, bindings: &TypeBindings) -> Type {
+    pub fn bind(&self, scope: &Scope, bindings: &TypeParameterBindings) -> Type {
         match self {
             Type::Array(t) => Type::Array(Box::new(t.bind(scope, bindings))),
             // TODO implement bind for enums

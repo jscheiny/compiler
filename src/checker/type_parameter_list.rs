@@ -2,7 +2,7 @@ use std::{ops::Deref, rc::Rc};
 
 use crate::checker::{Type, TypeParameter};
 
-pub type TypeBindings = Vec<(Rc<TypeParameter>, Type)>;
+pub type TypeParameterBindings = Vec<(Rc<TypeParameter>, Type)>;
 
 #[derive(Clone)]
 pub struct TypeParameterList {
@@ -14,8 +14,8 @@ impl TypeParameterList {
         Self { list }
     }
 
-    pub fn get_bindings(&self, bound_types: &[Type]) -> TypeBindings {
-        let mut bindings: TypeBindings = vec![];
+    pub fn get_bindings(&self, bound_types: &[Type]) -> TypeParameterBindings {
+        let mut bindings: TypeParameterBindings = vec![];
         for (index, type_parameter) in self.list.iter().enumerate() {
             let bound_type = bound_types.get(index).cloned().unwrap_or(Type::Error);
             bindings.push((type_parameter.clone(), bound_type));

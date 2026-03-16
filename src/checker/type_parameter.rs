@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fmt::Display, rc::Rc};
 
-use crate::checker::{Type, TypeBindings};
+use crate::checker::{Type, TypeParameterBindings};
 
 pub type TypeParameterMap = HashMap<String, Rc<TypeParameter>>;
 
@@ -9,7 +9,7 @@ pub struct TypeParameter {
 }
 
 impl TypeParameter {
-    pub fn bind(self: &Rc<Self>, bindings: &TypeBindings) -> Type {
+    pub fn bind(self: &Rc<Self>, bindings: &TypeParameterBindings) -> Type {
         for (type_parameter, bound_type) in bindings {
             if Rc::ptr_eq(self, type_parameter) {
                 return bound_type.clone();
