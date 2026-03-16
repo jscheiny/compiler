@@ -1,8 +1,8 @@
 use std::{collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{FunctionType, Scope},
-    parser::{FunctionBodyNode, FunctionSignatureNode, Node},
+    checker::{FunctionType, Scope, Type},
+    parser::{ExpressionNode, FunctionBodyNode, FunctionSignatureNode, Node},
 };
 
 pub struct FunctionNode {
@@ -21,23 +21,31 @@ impl FunctionNode {
             let scope = self.check_params(scope);
             match &self.body.value {
                 FunctionBodyNode::Expression(expression) => {
-                    let (scope, resolved_type) =
-                        expression.check_expected(scope, Some(return_type));
-                    if !resolved_type.is_assignable_to(return_type, &scope) {
-                        scope.source.print_error(
-                            self.body.span,
-                            &format!(
-                                "Function must return value of type `{}`",
-                                return_type.format(&scope)
-                            ),
-                            &format!("found type: `{}`", resolved_type.format(&scope)),
-                        );
-                    }
-                    scope
+                    self.check_expression_body(scope, return_type, expression)
                 }
                 FunctionBodyNode::Block(block) => block.check(scope, Some(return_type)).0,
             }
         })
+    }
+
+    fn check_expression_body(
+        &self,
+        scope: Box<Scope>,
+        return_type: &Type,
+        body: &ExpressionNode,
+    ) -> Box<Scope> {
+        let (scope, resolved_type) = body.check_expected(scope, Some(return_type));
+        if !resolved_type.is_assignable_to(return_type, &scope) {
+            scope.source.print_error(
+                self.body.span,
+                &format!(
+                    "Function must return value of type `{}`",
+                    return_type.format(&scope)
+                ),
+                &format!("found type: `{}`", resolved_type.format(&scope)),
+            );
+        }
+        scope
     }
 
     fn check_params(&self, mut scope: Box<Scope>) -> Box<Scope> {
