@@ -55,8 +55,16 @@ impl TypeParameterListNode {
         scope
     }
 
-    pub fn get_types(&self) -> &TypeParameters {
-        &self.types.get_or_init(|| self.init_types()).types_map
+    pub fn get_types_list(&self) -> &Vec<Rc<TypeParameter>> {
+        &self.get_data().types_list
+    }
+
+    pub fn get_types_map(&self) -> &TypeParameters {
+        &self.get_data().types_map
+    }
+
+    fn get_data(&self) -> &TypeParameterListNodeData {
+        self.types.get_or_init(|| self.init_types())
     }
 
     fn init_types(&self) -> TypeParameterListNodeData {

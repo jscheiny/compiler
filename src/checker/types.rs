@@ -1,7 +1,10 @@
 use std::rc::Rc;
 
 use crate::{
-    checker::{EnumType, FunctionType, InterfaceType, Scope, StructType, TypeFmt, TypeParameter},
+    checker::{
+        EnumType, FunctionType, GenericType, InterfaceType, Scope, StructType, TypeBindings,
+        TypeFmt, TypeParameter,
+    },
     parser::PrimitiveType,
 };
 
@@ -17,6 +20,7 @@ pub enum Type {
     Array(Box<Type>),
     Enum(Rc<EnumType>),
     Function(Rc<FunctionType>),
+    Generic(Rc<GenericType>),
     Interface(Rc<InterfaceType>),
     Primitive(PrimitiveType),
     Reference(usize),
@@ -70,6 +74,7 @@ impl Type {
                 }
                 None => false,
             },
+            Type::Generic(_) => panic!("It should not be possible to produce a generic type"),
             Type::Interface(left) => match other {
                 Type::Interface(right) => left.name == right.name,
                 Type::Enum(right) => right.implements(scope, left),
@@ -102,6 +107,29 @@ impl Type {
             },
             Type::Void => matches!(other, Type::Void),
             Type::Error => true,
+        }
+    }
+
+    pub fn bind(&self, scope: &Scope, bindings: &TypeBindings) -> Type {
+        match self {
+            Type::Array(t) => Type::Array(Box::new(t.bind(scope, bindings))),
+            // TODO implement bind for enums
+            Type::Enum(t) => Type::Enum(t.clone()),
+            Type::Function(t) => Type::Function(t.bind(scope, bindings)),
+            Type::Generic(_) => panic!("It should not be possible to bind a generic type"),
+            // TODO implement bind for interfaces
+            Type::Interface(t) => Type::Interface(t.clone()),
+            Type::Primitive(t) => Type::Primitive(*t),
+            Type::Reference(_) => self.deref(scope).bind(scope, bindings),
+            // TODO implement bind for structs
+            Type::Struct(t) => Type::Struct(t.clone()),
+            Type::Tuple(types) => Type::Tuple(Rc::new(
+                types.iter().map(|t| t.bind(scope, bindings)).collect(),
+            )),
+            Type::Type(t) => Type::Type(t.clone()),
+            Type::TypeParameter(t) => t.bind(bindings),
+            Type::Void => Type::Void,
+            Type::Error => Type::Error,
         }
     }
 

@@ -44,7 +44,16 @@ pub fn type_definition_impl(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
 
 pub fn user_defined_type(tokens: &mut TokenStream) -> ParseResult<UserDefinedTypeNode> {
     let name = tokens.name(NameType::Type)?;
-    Ok(UserDefinedTypeNode::new(name))
+    let bound_type_parameters = if tokens.accept(Symbol::OpenBracket) {
+        Some(tokens.located(bound_type_parameters)?)
+    } else {
+        None
+    };
+    Ok(UserDefinedTypeNode::new(name, bound_type_parameters))
+}
+
+fn bound_type_parameters(tokens: &mut TokenStream) -> ParseResult<Vec<Node<TypeNode>>> {
+    comma_separated_list(tokens, Symbol::CloseBracket, type_definition)
 }
 
 fn function_or_tuple_type(tokens: &mut TokenStream) -> ParseResult<TypeNode> {

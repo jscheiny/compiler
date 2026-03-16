@@ -10,6 +10,7 @@ pub struct TypeFmt<'a> {
     pub scope: &'a Scope,
 }
 
+// TODO function for lists of items
 impl Display for TypeFmt<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.resolved_type {
@@ -34,6 +35,16 @@ impl Display for TypeFmt<'_> {
                     Symbol::ThickArrow,
                     function_type.return_type.format(self.scope)
                 )
+            }
+            Type::Generic(generic_type) => {
+                write!(f, "{}[", generic_type.name)?;
+                for (index, type_param) in generic_type.parameter_list.iter().enumerate() {
+                    write!(f, "{}", type_param.name)?;
+                    if index != generic_type.parameter_list.len() - 1 {
+                        write!(f, ", ")?;
+                    }
+                }
+                write!(f, "]")
             }
             Type::Interface(interface_type) => write!(f, "{}", interface_type.name),
             Type::Primitive(primitive_type) => write!(f, "{}", primitive_type),

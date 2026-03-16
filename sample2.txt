@@ -1,6 +1,8 @@
 type Identity[T] = T => T;
+type Mapper[A, B] = A => Identity[B];
 
 fn test() {
-    let x: Identity = a -> a;
-    x(4);
+    let x: Mapper = a -> true;
+    let x: Mapper[int, bool] = a -> b -> b;
+    x(true)(5);
 }

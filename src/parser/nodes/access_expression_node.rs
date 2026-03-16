@@ -96,6 +96,7 @@ pub fn get_field(
             );
             Type::Error
         }
+        Type::Generic(_) => panic!("It should not be possible to produce an unbound generic type"),
         Type::Interface(interface_type) => {
             let method = interface_type.methods.get(&field.value);
             if let Some(method) = method {

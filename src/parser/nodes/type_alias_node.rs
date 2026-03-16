@@ -1,7 +1,7 @@
-use std::cell::OnceCell;
+use std::{cell::OnceCell, rc::Rc};
 
 use crate::{
-    checker::{Scope, ScopeType, Type},
+    checker::{GenericType, Scope, ScopeType, Type},
     parser::{NameNode, Node, TypeNode, TypeParameterListNode},
 };
 
@@ -29,7 +29,7 @@ impl TypeAliasNode {
     pub fn check(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
         scope.nest_with(ScopeType::Type, |mut scope| {
             if let Some(type_parameters) = self.type_parameters.as_ref() {
-                scope = type_parameters.check(scope);
+                scope = type_parameters.check(scope, type_parameters.span);
             }
             let resolved_type = self.get_type(&scope).clone();
             (scope, resolved_type)
@@ -45,8 +45,18 @@ impl TypeAliasNode {
 
     pub fn get_type(&self, scope: &Scope) -> &Type {
         self.resolved_type.get_or_init(|| {
-            let type_parameters = self.type_parameters.as_ref().map(|t| t.get_types());
-            self.type_def.get_type(scope, type_parameters)
+            let type_params = self.type_parameters.as_ref().map(|t| t.get_types_map());
+            let base_type = self.type_def.get_type(scope, type_params);
+            let Some(type_parameters) = self.type_parameters.as_ref() else {
+                return base_type;
+            };
+
+            Type::Generic(Rc::new(GenericType {
+                name: self.name.clone(),
+                base_type,
+                parameter_list: type_parameters.get_types_list().clone(),
+                parameter_map: type_parameters.get_types_map().clone(),
+            }))
         })
     }
 }
