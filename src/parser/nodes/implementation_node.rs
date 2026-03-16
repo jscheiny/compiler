@@ -10,6 +10,12 @@ pub struct ImplementationNode {
     implemented_interfaces: OnceCell<HashSet<usize>>,
 }
 
+pub struct Method {
+    pub public: bool,
+    pub name: String,
+    pub function_type: Rc<FunctionType>,
+}
+
 impl ImplementationNode {
     pub fn new(entries: Vec<Node<ImplementationEntryNode>>) -> Self {
         Self {
@@ -50,17 +56,16 @@ impl ImplementationNode {
         scope
     }
 
-    // TODO get a better API for this
-    pub fn get_methods(&self, scope: &Scope) -> Vec<(String, bool, Rc<FunctionType>)> {
+    pub fn get_methods(&self, scope: &Scope) -> Vec<Method> {
         let mut methods = vec![];
         for entry in self.entries.iter() {
             match &entry.value {
                 ImplementationEntryNode::Method(method) => {
-                    methods.push((
-                        method.function.name().clone(),
-                        method.public,
-                        method.function.get_type(scope).clone(),
-                    ));
+                    methods.push(Method {
+                        public: method.public,
+                        name: method.function.name().clone(),
+                        function_type: method.function.get_type(scope).clone(),
+                    });
                 }
                 ImplementationEntryNode::Interface(implementation) => {
                     let interface_type = scope
@@ -69,7 +74,11 @@ impl ImplementationNode {
                         .map(|t| t.as_deref(scope));
                     if let Some(Type::Interface(interface_type)) = interface_type {
                         for (name, function_type) in interface_type.methods.iter() {
-                            methods.push((name.clone(), true, function_type.clone()));
+                            methods.push(Method {
+                                public: true,
+                                name: name.clone(),
+                                function_type: function_type.clone(),
+                            });
                         }
                     }
                 }

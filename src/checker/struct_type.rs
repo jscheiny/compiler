@@ -62,10 +62,10 @@ impl StructType {
         }
 
         if let Some(implementation) = self.node.implementation.as_ref() {
-            for (name, public, function_type) in implementation.get_methods(scope) {
-                members.entry(name).or_insert(StructMember {
-                    public,
-                    member_type: StructMemberType::Method(function_type),
+            for method in implementation.get_methods(scope) {
+                members.entry(method.name).or_insert(StructMember {
+                    public: method.public,
+                    member_type: StructMemberType::Method(method.function_type),
                 });
             }
         }

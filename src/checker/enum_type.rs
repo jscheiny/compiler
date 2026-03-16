@@ -53,10 +53,10 @@ impl EnumType {
         let scope = scope.global();
         let mut methods = HashMap::new();
         if let Some(implementation) = self.node.implementation.as_ref() {
-            for (name, public, function_type) in implementation.get_methods(scope) {
-                methods.entry(name).or_insert(EnumMethod {
-                    public,
-                    function_type,
+            for method in implementation.get_methods(scope) {
+                methods.entry(method.name).or_insert(EnumMethod {
+                    public: method.public,
+                    function_type: method.function_type,
                 });
             }
         }
