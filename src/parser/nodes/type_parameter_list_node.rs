@@ -5,13 +5,18 @@ use std::{
 };
 
 use crate::{
-    checker::{Scope, Type, TypeParameter},
+    checker::{Scope, Type, TypeParameter, TypeParameters},
     parser::{Node, TokenSpan, TypeParameterNode},
 };
 
 pub struct TypeParameterListNode {
     pub list: Vec<Node<TypeParameterNode>>,
-    types: OnceCell<HashMap<String, Rc<TypeParameter>>>,
+    types: OnceCell<TypeParameterListNodeData>,
+}
+
+struct TypeParameterListNodeData {
+    types_list: Vec<Rc<TypeParameter>>,
+    types_map: TypeParameters,
 }
 
 impl TypeParameterListNode {
@@ -50,22 +55,26 @@ impl TypeParameterListNode {
         scope
     }
 
-    pub fn get_types(&self) -> &HashMap<String, Rc<TypeParameter>> {
-        self.types.get_or_init(|| self.init_types())
+    pub fn get_types(&self) -> &TypeParameters {
+        &self.types.get_or_init(|| self.init_types()).types_map
     }
 
-    fn init_types(&self) -> HashMap<String, Rc<TypeParameter>> {
-        let mut types = HashMap::new();
-        for type_param in self.list.iter() {
-            types
-                .entry(type_param.name.value.clone())
-                .or_insert_with(|| {
-                    Rc::new(TypeParameter {
-                        name: type_param.name.clone(),
-                    })
-                });
+    fn init_types(&self) -> TypeParameterListNodeData {
+        let mut types_map = HashMap::new();
+        let mut types_list = vec![];
+        for node in self.list.iter() {
+            let type_param = Rc::new(TypeParameter {
+                name: node.name.clone(),
+            });
+            types_map
+                .entry(node.name.value.clone())
+                .or_insert(type_param.clone());
+            types_list.push(type_param);
         }
 
-        types
+        TypeParameterListNodeData {
+            types_list,
+            types_map,
+        }
     }
 }
