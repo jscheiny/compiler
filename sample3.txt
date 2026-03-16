@@ -1,17 +1,3 @@
-struct A(pub integer: int, boolean: bool) {
-    test(value: A): bool {
-        return value.boolean;
-    }
-}
-
-enum B() {
-    test(value: A): bool {
-        value.test(value);
-        return value.boolean;
-    }
-}
-
-fn test(a: A) {
-    a.integer;
-    a.boolean or false;
+fn test() {
+    let x: (int, int => int) = (3, a -> true);
 }

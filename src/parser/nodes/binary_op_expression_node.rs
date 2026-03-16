@@ -33,7 +33,7 @@ impl BinaryOpExpressionNode {
             O::GreaterThan => todo_unimplemented_operator(scope),
             O::GreaterThanOrEqual => todo_unimplemented_operator(scope),
             O::FunctionApplication => self.check_function_application(scope, expected_type),
-            O::Comma => self.check_comma(scope),
+            O::Comma => self.check_comma(scope, expected_type),
             O::LogicalAnd => self.check_logical_op(scope),
             O::LogicalOr => self.check_logical_op(scope),
             O::Access => panic!("ERROR: Expected ExpressionNode::Access"),
@@ -90,13 +90,21 @@ impl BinaryOpExpressionNode {
         }
     }
 
-    fn check_comma(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        // TODO implement expected types for tuples
-        let (mut scope, first_type) = self.left.check(scope);
+    fn check_comma(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
+        let expected_tuple_types = if let Some(Type::Tuple(types)) = expected_type {
+            types
+        } else {
+            &vec![]
+        };
+
+        let expected_first_type = expected_tuple_types.first();
+        let (mut scope, first_type) = self.left.check_expected(scope, expected_first_type);
         let mut tuple_types = vec![first_type];
         let mut current = &self.right;
 
+        let mut tuple_index = 0;
         loop {
+            tuple_index += 1;
             if let ExpressionNode::BinaryOp(BinaryOpExpressionNode {
                 left,
                 operator,
@@ -104,7 +112,8 @@ impl BinaryOpExpressionNode {
             }) = &current.value
             {
                 if operator.value == BinaryOperator::Comma {
-                    let (new_scope, left_type) = left.check(scope);
+                    let expected_type = expected_tuple_types.get(tuple_index);
+                    let (new_scope, left_type) = left.check_expected(scope, expected_type);
                     tuple_types.push(left_type);
                     scope = new_scope;
                     current = right;
@@ -114,7 +123,8 @@ impl BinaryOpExpressionNode {
             break;
         }
 
-        let (scope, current_type) = current.check(scope);
+        let expected_type = expected_tuple_types.get(tuple_index);
+        let (scope, current_type) = current.check_expected(scope, expected_type);
         tuple_types.push(current_type);
 
         (scope, Type::Tuple(Rc::new(tuple_types)))
