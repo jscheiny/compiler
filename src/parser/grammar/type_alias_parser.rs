@@ -9,11 +9,7 @@ use crate::{
 pub fn type_alias(tokens: &mut TokenStream) -> ParseResult<TypeAliasNode> {
     tokens.next();
     let name = tokens.name(NameType::Function)?;
-    let type_parameters = if tokens.accept(Symbol::OpenBracket) {
-        Some(tokens.located(type_parameter_list)?)
-    } else {
-        None
-    };
+    let type_parameters = type_parameter_list(tokens)?;
 
     tokens.expect(Symbol::Equal, SyntaxError::ExpectedType)?;
 

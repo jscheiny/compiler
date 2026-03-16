@@ -1,12 +1,23 @@
 use crate::{
-    lexer::Symbol,
+    lexer::{Symbol, TokenMatch},
     parser::{
-        NameType, ParseResult, TokenStream, TypeParameterListNode, TypeParameterNode,
+        NameType, Node, ParseResult, TokenStream, TypeParameterListNode, TypeParameterNode,
         grammar::comma_separated_list,
     },
 };
 
-pub fn type_parameter_list(tokens: &mut TokenStream) -> ParseResult<TypeParameterListNode> {
+pub fn type_parameter_list(
+    tokens: &mut TokenStream,
+) -> ParseResult<Option<Node<TypeParameterListNode>>> {
+    if Symbol::OpenBracket.matches(tokens.peek()) {
+        Ok(Some(tokens.located(type_parameter_list_impl)?))
+    } else {
+        Ok(None)
+    }
+}
+
+fn type_parameter_list_impl(tokens: &mut TokenStream) -> ParseResult<TypeParameterListNode> {
+    tokens.next();
     let list = comma_separated_list(tokens, Symbol::CloseBracket, type_parameter)?;
     Ok(TypeParameterListNode::new(list))
 }

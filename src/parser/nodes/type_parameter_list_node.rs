@@ -6,7 +6,7 @@ use std::{
 
 use crate::{
     checker::{Scope, Type, TypeParameter},
-    parser::{Node, TypeParameterNode},
+    parser::{Node, TokenSpan, TypeParameterNode},
 };
 
 pub struct TypeParameterListNode {
@@ -22,7 +22,15 @@ impl TypeParameterListNode {
         }
     }
 
-    pub fn check(&self, mut scope: Box<Scope>) -> Box<Scope> {
+    pub fn check(&self, mut scope: Box<Scope>, span: TokenSpan) -> Box<Scope> {
+        if self.list.is_empty() {
+            scope.source.print_error(
+                span,
+                "Type parameter list should not be empty",
+                "must provide at least one type parameter",
+            );
+        }
+
         let mut names = HashSet::new();
         for type_param in self.list.iter() {
             if !names.insert(&type_param.name.value) {
