@@ -91,6 +91,7 @@ impl BinaryOpExpressionNode {
     }
 
     fn check_comma(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        // TODO implement expected types for tuples
         let (mut scope, first_type) = self.left.check(scope);
         let mut tuple_types = vec![first_type];
         let mut current = &self.right;
