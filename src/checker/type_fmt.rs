@@ -79,7 +79,7 @@ impl Display for TypeFmt<'_> {
             ),
             Type::TypeParameter(type_parameter) => write!(f, "{}", type_parameter.name),
             Type::Void => write!(f, "{}", Keyword::Void),
-            Type::Error => write!(f, "<error-type>"),
+            Type::Error => write!(f, "{{Unknown}}"),
         }
     }
 }
