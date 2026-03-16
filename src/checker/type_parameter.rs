@@ -1,4 +1,4 @@
-use std::{collections::HashMap, rc::Rc};
+use std::{collections::HashMap, fmt::Display, rc::Rc};
 
 use crate::checker::Type;
 
@@ -20,5 +20,11 @@ impl TypeParameter {
         }
 
         Type::TypeParameter(self.clone())
+    }
+}
+
+impl Display for TypeParameter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.name)
     }
 }
