@@ -55,7 +55,6 @@ impl TypeAliasNode {
                 name: self.name.clone(),
                 base_type,
                 type_parameter_list: type_parameters.get_types_list().clone(),
-                type_parameter_map: type_parameters.get_types_map().clone(),
             }))
         })
     }
