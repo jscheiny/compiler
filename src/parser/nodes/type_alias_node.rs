@@ -54,7 +54,7 @@ impl TypeAliasNode {
             Type::Generic(Rc::new(GenericType {
                 name: self.name.clone(),
                 base_type,
-                type_parameter_list: type_parameters.get_types_list().clone(),
+                type_parameters: type_parameters.get_types_list().clone(),
             }))
         })
     }

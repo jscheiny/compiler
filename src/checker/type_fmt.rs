@@ -32,7 +32,7 @@ impl Display for TypeFmt<'_> {
             }
             Type::Generic(generic_type) => {
                 write!(f, "{}[", generic_type.name)?;
-                write_slice(f, &generic_type.type_parameter_list)?;
+                write_slice(f, &generic_type.type_parameters)?;
                 write!(f, "]")
             }
             Type::Interface(interface_type) => write!(f, "{}", interface_type.name),
