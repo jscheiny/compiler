@@ -7,8 +7,8 @@ use crate::{
 
 pub struct TypeAliasNode {
     pub name: NameNode,
-    pub type_parameters: Option<Node<TypeParameterListNode>>,
-    pub type_def: Node<TypeNode>,
+    type_parameters: Option<Node<TypeParameterListNode>>,
+    type_def: Node<TypeNode>,
     resolved_type: OnceCell<Type>,
 }
 
