@@ -37,16 +37,9 @@ impl Display for TypeFmt<'_> {
             }
             Type::Interface(interface_type) => write!(f, "{}", interface_type.name),
             Type::Primitive(primitive_type) => write!(f, "{}", primitive_type),
-            Type::Reference(index) => {
-                // TODO consider replacing with deref
-                write!(
-                    f,
-                    "{}",
-                    self.scope
-                        .get_type(*index)
-                        .unwrap_or(Type::Error)
-                        .format(self.scope)
-                )
+            Type::Reference(_) => {
+                let resolved_type = self.resolved_type.deref(self.scope);
+                write!(f, "{}", resolved_type.format(self.scope))
             }
             Type::Struct(struct_type) => write!(f, "{}", struct_type.name()),
             Type::Tuple(items) => {
