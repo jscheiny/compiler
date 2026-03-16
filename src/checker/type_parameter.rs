@@ -4,8 +4,7 @@ use crate::checker::Type;
 
 pub type TypeBindings = Vec<(Rc<TypeParameter>, Type)>;
 
-// TODO rename TypeParametersMap (maybe unbound?)
-pub type TypeParameters = HashMap<String, Rc<TypeParameter>>;
+pub type TypeParameterMap = HashMap<String, Rc<TypeParameter>>;
 
 pub struct TypeParameter {
     pub name: String,

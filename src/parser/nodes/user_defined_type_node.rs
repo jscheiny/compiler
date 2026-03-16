@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, rc::Rc};
 
 use crate::{
-    checker::{GenericType, Scope, Type, TypeBindings, TypeParameters},
+    checker::{GenericType, Scope, Type, TypeBindings, TypeParameterMap},
     parser::{NameNode, NodeVec, TypeNode},
 };
 
@@ -20,13 +20,13 @@ impl UserDefinedTypeNode {
         }
     }
 
-    pub fn get_type(&self, scope: &Scope, type_params: Option<&TypeParameters>) -> Type {
+    pub fn get_type(&self, scope: &Scope, type_params: Option<&TypeParameterMap>) -> Type {
         self.resolved_type
             .get_or_init(|| self.init_type(scope, type_params))
             .clone()
     }
 
-    fn init_type(&self, scope: &Scope, type_params: Option<&TypeParameters>) -> Type {
+    fn init_type(&self, scope: &Scope, type_params: Option<&TypeParameterMap>) -> Type {
         let base_type = self.get_base_type(scope, type_params);
         if let Some(bound_type_params) = self.bound_type_parameters.as_ref() {
             self.bind_type(scope, base_type, bound_type_params, type_params)
@@ -40,7 +40,7 @@ impl UserDefinedTypeNode {
         scope: &Scope,
         base_type: Type,
         bound_type_params: &NodeVec<TypeNode>,
-        type_params: Option<&TypeParameters>,
+        type_params: Option<&TypeParameterMap>,
     ) -> Type {
         let bound_types = bound_type_params
             .iter()
@@ -104,7 +104,7 @@ impl UserDefinedTypeNode {
         }
     }
 
-    fn get_base_type(&self, scope: &Scope, type_params: Option<&TypeParameters>) -> Type {
+    fn get_base_type(&self, scope: &Scope, type_params: Option<&TypeParameterMap>) -> Type {
         let type_parameter = type_params.and_then(|t| t.get(&self.name.value));
         if let Some(type_parameter) = type_parameter {
             return Type::TypeParameter(type_parameter.clone());

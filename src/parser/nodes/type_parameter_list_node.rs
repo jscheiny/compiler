@@ -5,7 +5,7 @@ use std::{
 };
 
 use crate::{
-    checker::{Scope, Type, TypeParameter, TypeParameters},
+    checker::{Scope, Type, TypeParameter, TypeParameterMap},
     parser::{Node, TokenSpan, TypeParameterNode},
 };
 
@@ -16,7 +16,7 @@ pub struct TypeParameterListNode {
 
 struct TypeParameterListNodeData {
     types_list: Vec<Rc<TypeParameter>>,
-    types_map: TypeParameters,
+    types_map: TypeParameterMap,
 }
 
 impl TypeParameterListNode {
@@ -59,7 +59,7 @@ impl TypeParameterListNode {
         &self.get_data().types_list
     }
 
-    pub fn get_types_map(&self) -> &TypeParameters {
+    pub fn get_types_map(&self) -> &TypeParameterMap {
         &self.get_data().types_map
     }
 

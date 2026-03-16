@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, rc::Rc};
 
 use crate::{
-    checker::{FunctionType, Scope, TypeParameters},
+    checker::{FunctionType, Scope, TypeParameterMap},
     parser::{Node, NodeVec, TypeNode},
 };
 
@@ -23,14 +23,14 @@ impl FunctionTypeNode {
     pub fn get_type(
         &self,
         scope: &Scope,
-        type_params: Option<&TypeParameters>,
+        type_params: Option<&TypeParameterMap>,
     ) -> Rc<FunctionType> {
         self.resolved_type
             .get_or_init(|| self.init_type(scope, type_params))
             .clone()
     }
 
-    fn init_type(&self, scope: &Scope, type_params: Option<&TypeParameters>) -> Rc<FunctionType> {
+    fn init_type(&self, scope: &Scope, type_params: Option<&TypeParameterMap>) -> Rc<FunctionType> {
         let parameters = self
             .parameters
             .value

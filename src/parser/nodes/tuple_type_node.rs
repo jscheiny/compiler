@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, rc::Rc};
 
 use crate::{
-    checker::{Scope, Type, TypeParameters},
+    checker::{Scope, Type, TypeParameterMap},
     parser::{Node, TypeNode},
 };
 
@@ -18,13 +18,13 @@ impl TupleTypeNode {
         }
     }
 
-    pub fn get_type(&self, scope: &Scope, type_params: Option<&TypeParameters>) -> Type {
+    pub fn get_type(&self, scope: &Scope, type_params: Option<&TypeParameterMap>) -> Type {
         self.resolved_type
             .get_or_init(|| self.init_type(scope, type_params))
             .clone()
     }
 
-    fn init_type(&self, scope: &Scope, type_params: Option<&TypeParameters>) -> Type {
+    fn init_type(&self, scope: &Scope, type_params: Option<&TypeParameterMap>) -> Type {
         let fields = self
             .fields
             .iter()
