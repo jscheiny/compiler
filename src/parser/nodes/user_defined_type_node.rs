@@ -1,7 +1,7 @@
-use std::{cell::OnceCell, rc::Rc};
+use std::cell::OnceCell;
 
 use crate::{
-    checker::{GenericType, Scope, Type, TypeBindings, TypeParameterMap},
+    checker::{Scope, Type, TypeParameterMap},
     parser::{NameNode, NodeVec, TypeNode},
 };
 
@@ -49,7 +49,7 @@ impl UserDefinedTypeNode {
 
         match base_type.deref(scope) {
             Type::Generic(generic_type) => {
-                self.bind_generic_type_alias(scope, generic_type, bound_type_params, &bound_types)
+                generic_type.bind(scope, bound_type_params, &bound_types)
             }
             Type::Enum(_) => todo!("Implement generic binding for enums"),
             Type::Interface(_) => todo!("Implement generic binding for interfaces"),
@@ -64,30 +64,6 @@ impl UserDefinedTypeNode {
         }
     }
 
-    fn bind_generic_type_alias(
-        &self,
-        scope: &Scope,
-        generic_type: Rc<GenericType>,
-        bound_type_params: &NodeVec<TypeNode>,
-        bound_types: &[Type],
-    ) -> Type {
-        // TODO better spans based on less than/greater than diff
-        if bound_types.len() != generic_type.type_parameters.len() {
-            scope.source.print_error(
-                bound_type_params.span,
-                "Mismatched type parameters",
-                &format!(
-                    "expected {} types, found {}",
-                    generic_type.type_parameters.len(),
-                    bound_type_params.len()
-                ),
-            );
-        }
-
-        let bindings = get_bindings(&generic_type, bound_types);
-        generic_type.base_type.bind(scope, &bindings)
-    }
-
     fn unbound_type(&self, scope: &Scope, base_type: Type) -> Type {
         match base_type.deref(scope) {
             Type::Generic(generic_type) => {
@@ -96,7 +72,7 @@ impl UserDefinedTypeNode {
                     "Type parameters required",
                     &format!("type `{}` is generic", base_type.format(scope)),
                 );
-                let error_bindings = get_bindings(&generic_type, &[]);
+                let error_bindings = generic_type.type_parameters.get_bindings(&[]);
                 generic_type.base_type.bind(scope, &error_bindings)
             }
             // TODO check for unbound generic interfaces/structs/enums
@@ -122,13 +98,4 @@ impl UserDefinedTypeNode {
         );
         Type::Error
     }
-}
-
-fn get_bindings(generic_type: &GenericType, bound_types: &[Type]) -> TypeBindings {
-    let mut bindings: TypeBindings = vec![];
-    for (index, type_parameter) in generic_type.type_parameters.iter().enumerate() {
-        let bound_type = bound_types.get(index).cloned().unwrap_or(Type::Error);
-        bindings.push((type_parameter.clone(), bound_type));
-    }
-    bindings
 }

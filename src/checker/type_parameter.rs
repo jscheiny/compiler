@@ -1,8 +1,6 @@
 use std::{collections::HashMap, fmt::Display, rc::Rc};
 
-use crate::checker::Type;
-
-pub type TypeBindings = Vec<(Rc<TypeParameter>, Type)>;
+use crate::checker::{Type, TypeBindings};
 
 pub type TypeParameterMap = HashMap<String, Rc<TypeParameter>>;
 

@@ -7,6 +7,7 @@ mod struct_type;
 mod type_fmt;
 mod type_map;
 mod type_parameter;
+mod type_parameter_list;
 mod types;
 
 pub use enum_type::*;
@@ -18,4 +19,5 @@ pub use struct_type::*;
 pub use type_fmt::*;
 pub use type_map::*;
 pub use type_parameter::*;
+pub use type_parameter_list::*;
 pub use types::*;
