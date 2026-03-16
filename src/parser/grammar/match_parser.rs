@@ -3,7 +3,7 @@ use crate::{
     parser::{
         ExpressionNode, MatchCaseNode, MatchNode, MatchPatternNode, NameType, ParseResult,
         StatementNode, SyntaxError, TokenStream, VariantMatchPattern,
-        grammar::{expression_parser::expression, statement_parser::end_statement},
+        grammar::{end_statement, expression},
     },
 };
 
