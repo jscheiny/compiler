@@ -72,13 +72,13 @@ impl UserDefinedTypeNode {
         bound_types: &[Type],
     ) -> Type {
         // TODO better spans based on less than/greater than diff
-        if bound_types.len() != generic_type.parameter_list.len() {
+        if bound_types.len() != generic_type.type_parameter_list.len() {
             scope.source.print_error(
                 bound_type_params.span,
                 "Mismatched type parameters",
                 &format!(
                     "expected {} types, found {}",
-                    generic_type.parameter_list.len(),
+                    generic_type.type_parameter_list.len(),
                     bound_type_params.len()
                 ),
             );
@@ -126,7 +126,7 @@ impl UserDefinedTypeNode {
 
 fn get_bindings(generic_type: &GenericType, bound_types: &[Type]) -> TypeBindings {
     let mut bindings: TypeBindings = vec![];
-    for (index, type_parameter) in generic_type.parameter_list.iter().enumerate() {
+    for (index, type_parameter) in generic_type.type_parameter_list.iter().enumerate() {
         let bound_type = bound_types.get(index).cloned().unwrap_or(Type::Error);
         bindings.push((type_parameter.clone(), bound_type));
     }
