@@ -23,7 +23,7 @@ fn type_parameter_list_impl(tokens: &mut TokenStream) -> ParseResult<TypeParamet
 }
 
 fn type_parameter(tokens: &mut TokenStream) -> ParseResult<TypeParameterNode> {
-    let name = tokens.name(NameType::Interface)?;
+    let name = tokens.name(NameType::TypeParameter)?;
     Ok(TypeParameterNode { name })
 }
 
