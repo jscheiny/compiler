@@ -69,7 +69,7 @@ impl UserDefinedTypeNode {
         scope: &Scope,
         generic_type: Rc<GenericType>,
         bound_type_params: &NodeVec<TypeNode>,
-        bound_types: &Vec<Type>,
+        bound_types: &[Type],
     ) -> Type {
         // TODO better spans based on less than/greater than diff
         if bound_types.len() != generic_type.parameter_list.len() {
@@ -96,7 +96,7 @@ impl UserDefinedTypeNode {
                     "Type parameters required",
                     &format!("type `{}` is generic", base_type.format(scope)),
                 );
-                let error_bindings = get_bindings(&generic_type, &vec![]);
+                let error_bindings = get_bindings(&generic_type, &[]);
                 generic_type.base_type.bind(scope, &error_bindings)
             }
             // TODO check for unbound generic interfaces/structs/enums
@@ -124,7 +124,7 @@ impl UserDefinedTypeNode {
     }
 }
 
-fn get_bindings(generic_type: &GenericType, bound_types: &Vec<Type>) -> TypeBindings {
+fn get_bindings(generic_type: &GenericType, bound_types: &[Type]) -> TypeBindings {
     let mut bindings: TypeBindings = vec![];
     for (index, type_parameter) in generic_type.parameter_list.iter().enumerate() {
         let bound_type = bound_types.get(index).cloned().unwrap_or(Type::Error);
