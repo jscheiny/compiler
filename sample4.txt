@@ -1,27 +1,42 @@
-interface ToString {
-    to_string(): [char];
+interface Super {
+    super(): int;
 }
 
-struct A() {
-    impl ToString {
-        to_string(): [char] -> "A";
+struct Sub1() {
+    impl Super {
+        super(): int -> 3;
     }
+
+    pub sub1(): bool -> true;
 }
 
-struct B() {
-    impl ToString {
-        to_string(): [char] -> "B";
+struct Sub2() {
+    impl Super {
+        super(): int -> 5;
     }
+
+    pub sub2(): bool -> true;
 }
 
-struct C() {
-    impl ToString {
-        to_string(): [int] -> [1,2,3];
-    }
+fn accept_super(value: Super) {
+    value.super();
 }
 
-enum Test(
-    A(A), B(B), C(C)
-) {
-    impl ToString;
+fn accept_sub1(value: Sub1) {
+    value.super();
+    value.sub1();
+}
+
+fn call_super(super: Super, f: Super => void) {
+    f(super);
+}
+
+fn call_sub1(sub1: Sub1, f: Sub1 => void) {
+    f(sub1);
+}
+
+fn main(super: Super, sub1: Sub1, sub2: Sub2) {
+    call_super(sub2, accept_sub1); // should be an error
+    call_sub1(sub1, accept_super); // shouldn't be an error
+    accept_super(sub1);
 }

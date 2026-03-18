@@ -52,6 +52,7 @@ impl Type {
         }
 
         match self {
+            // TODO should arrays be contravariant?
             Type::Array(left) => match other {
                 Type::Array(right) => left.is_assignable_from(right, scope),
                 _ => false,
@@ -67,7 +68,8 @@ impl Type {
                             .parameters
                             .iter()
                             .zip(right.parameters.iter())
-                            .all(|(left, right)| left.is_assignable_from(right, scope))
+                            // Parameters are contravariant
+                            .all(|(left, right)| left.is_assignable_to(right, scope))
                         && left
                             .return_type
                             .is_assignable_from(&right.return_type, scope)
