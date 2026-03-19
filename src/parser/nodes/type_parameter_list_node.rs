@@ -45,9 +45,7 @@ impl TypeParameterListNode {
                     "type alias already contains a type parameter with this name",
                 );
             } else {
-                let type_parameter = Rc::new(TypeParameter {
-                    name: type_param.name.clone(),
-                });
+                let type_parameter = Rc::new(TypeParameter::new(type_param.name.clone()));
                 scope.add_type(&type_param.name, Type::TypeParameter(type_parameter));
             }
         }
@@ -71,9 +69,7 @@ impl TypeParameterListNode {
         let mut types_map = HashMap::new();
         let mut types_list = vec![];
         for node in self.list.iter() {
-            let type_param = Rc::new(TypeParameter {
-                name: node.name.clone(),
-            });
+            let type_param = Rc::new(TypeParameter::new(node.name.clone()));
             types_map
                 .entry(node.name.value.clone())
                 .or_insert(type_param.clone());

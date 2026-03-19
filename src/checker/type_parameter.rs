@@ -1,22 +1,47 @@
-use std::{collections::HashMap, fmt::Display, rc::Rc};
+use std::{
+    collections::HashMap,
+    fmt::Display,
+    hash::Hash,
+    rc::Rc,
+    sync::atomic::{AtomicUsize, Ordering},
+};
 
 use crate::checker::{Type, TypeParameterBindings};
 
 pub type TypeParameterMap = HashMap<String, Rc<TypeParameter>>;
 
+#[derive(Eq)]
 pub struct TypeParameter {
     pub name: String,
+    id: usize,
 }
 
 impl TypeParameter {
-    pub fn bind(self: &Rc<Self>, bindings: &TypeParameterBindings) -> Type {
-        for (type_parameter, bound_type) in bindings {
-            if Rc::ptr_eq(self, type_parameter) {
-                return bound_type.clone();
-            }
+    pub fn new(name: String) -> Self {
+        static COUNTER: AtomicUsize = AtomicUsize::new(0);
+        Self {
+            name,
+            id: COUNTER.fetch_add(1, Ordering::Relaxed),
         }
+    }
 
-        Type::TypeParameter(self.clone())
+    pub fn bind(self: &Rc<Self>, bindings: &TypeParameterBindings) -> Type {
+        bindings
+            .get(self)
+            .cloned()
+            .unwrap_or_else(|| Type::TypeParameter(self.clone()))
+    }
+}
+
+impl PartialEq for TypeParameter {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Hash for TypeParameter {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
     }
 }
 

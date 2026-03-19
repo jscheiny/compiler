@@ -1,8 +1,8 @@
-use std::{ops::Deref, rc::Rc};
+use std::{collections::HashMap, ops::Deref, rc::Rc};
 
 use crate::checker::{Type, TypeParameter};
 
-pub type TypeParameterBindings = Vec<(Rc<TypeParameter>, Type)>;
+pub type TypeParameterBindings = HashMap<Rc<TypeParameter>, Type>;
 
 #[derive(Clone)]
 pub struct TypeParameterList {
@@ -15,10 +15,10 @@ impl TypeParameterList {
     }
 
     pub fn get_bindings(&self, bound_types: &[Type]) -> TypeParameterBindings {
-        let mut bindings: TypeParameterBindings = vec![];
+        let mut bindings = TypeParameterBindings::new();
         for (index, type_parameter) in self.list.iter().enumerate() {
             let bound_type = bound_types.get(index).cloned().unwrap_or(Type::Error);
-            bindings.push((type_parameter.clone(), bound_type));
+            bindings.insert(type_parameter.clone(), bound_type);
         }
 
         bindings

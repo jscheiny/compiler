@@ -104,7 +104,7 @@ impl Type {
             },
             Type::Type(_) => todo!("Implement assignability for runtime types"),
             Type::TypeParameter(left) => match other {
-                Type::TypeParameter(right) => Rc::ptr_eq(left, right),
+                Type::TypeParameter(right) => left == right,
                 _ => false,
             },
             Type::Void => matches!(other, Type::Void),
