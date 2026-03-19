@@ -18,40 +18,51 @@ impl FunctionCallExpressionNode {
 }
 
 pub fn check_function_call(
+    scope: Box<Scope>,
+    function_span: TokenSpan,
+    left_type: Type,
+    arguments: &NodeVec<ExpressionNode>,
+) -> (Box<Scope>, Type) {
+    let function_type = left_type.to_function(&scope);
+    match function_type {
+        Some(function_type) => check_valid_function_call(scope, function_type, arguments),
+        None => check_invalid_function_call(scope, function_span, left_type, arguments),
+    }
+}
+
+fn check_invalid_function_call(
     mut scope: Box<Scope>,
     function_span: TokenSpan,
     left_type: Type,
-    argument_expressions: &NodeVec<ExpressionNode>,
+    arguments: &NodeVec<ExpressionNode>,
 ) -> (Box<Scope>, Type) {
-    let function_type = left_type.to_function(&scope);
-    let mut arguments = vec![];
-    for (index, argument) in argument_expressions.iter().enumerate() {
-        let parameter_type = function_type
-            .as_ref()
-            .and_then(|ft| ft.parameters.get(index));
-        let (new_scope, resolved_type) = argument.check_expected(scope, parameter_type);
-        arguments.push(resolved_type);
-        scope = new_scope;
+    if !left_type.is_error() {
+        scope.source.print_error(
+            function_span,
+            "Cannot use value as a function",
+            &format!(
+                "type `{}` is not usable as a function",
+                left_type.format(&scope)
+            ),
+        );
     }
 
-    if function_type.is_none() {
-        if !left_type.is_error() {
-            scope.source.print_error(
-                function_span,
-                "Cannot use value as a function",
-                &format!(
-                    "type `{}` is not usable as a function",
-                    left_type.format(&scope)
-                ),
-            );
-        }
-        return (scope, Type::Error);
+    // Check parameter types without expected argument types
+    for argument in arguments.iter() {
+        scope = argument.check(scope).0;
     }
 
-    let function_type = function_type.unwrap();
+    (scope, Type::Error)
+}
+
+fn check_valid_function_call(
+    mut scope: Box<Scope>,
+    function_type: Rc<FunctionType>,
+    arguments: &NodeVec<ExpressionNode>,
+) -> (Box<Scope>, Type) {
     if arguments.len() > function_type.parameters.len() {
         scope.source.print_error(
-            argument_expressions.span,
+            arguments.span,
             "Too many arguments",
             &format!(
                 "expected at most {} argument{} but received {}",
@@ -66,16 +77,23 @@ pub fn check_function_call(
         );
     }
 
-    let parameters_and_arguments = function_type.parameters.iter().zip(&arguments);
-    for (index, (parameter, argument)) in parameters_and_arguments.enumerate() {
-        if !argument.is_assignable_to(parameter, &scope) {
+    for (index, argument) in arguments.iter().enumerate() {
+        let parameter_type = function_type.parameters.get(index);
+        let (new_scope, argument_type) = argument.check_expected(scope, parameter_type);
+        scope = new_scope;
+
+        let Some(parameter_type) = parameter_type else {
+            continue;
+        };
+
+        if !argument_type.is_assignable_to(parameter_type, &scope) {
             scope.source.print_error(
-                argument_expressions[index].span,
+                arguments[index].span,
                 "Argument not assignable to parameter type",
                 &format!(
                     "expected type `{}`, found type `{}`",
-                    parameter.format(&scope),
-                    argument.format(&scope),
+                    parameter_type.format(&scope),
+                    argument_type.format(&scope),
                 ),
             );
         }
