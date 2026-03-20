@@ -26,10 +26,7 @@ impl ClosureExpressionNode {
                 return (scope, Type::Error);
             }
 
-            let result_type = Type::Function(Rc::new(FunctionType {
-                parameters,
-                return_type: Box::new(return_type),
-            }));
+            let result_type = Type::Function(FunctionType::new(parameters, return_type));
             (scope, result_type)
         })
     }

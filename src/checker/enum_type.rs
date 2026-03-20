@@ -37,7 +37,7 @@ impl EnumType {
             .get(name)
             .map(|variant_type| match variant_type {
                 Some(inner_type) => {
-                    Type::Function(FunctionType::new(inner_type.clone(), self_type))
+                    Type::Function(FunctionType::simple(inner_type.clone(), self_type))
                 }
                 None => self_type,
             })

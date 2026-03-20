@@ -49,10 +49,10 @@ impl AccessExpressionNode {
             return (scope, result_type);
         }
 
-        let deferred_type = Type::Function(Rc::new(FunctionType {
-            parameters: function_type.parameters.clone(),
-            return_type: Box::new(result_type),
-        }));
+        let deferred_type = Type::Function(FunctionType::new(
+            function_type.parameters.clone(),
+            result_type,
+        ));
         (scope, deferred_type)
     }
 }

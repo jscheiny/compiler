@@ -38,11 +38,7 @@ impl FunctionTypeNode {
             .map(|parameter| parameter.get_type(scope, type_params))
             .collect();
 
-        let return_type = Box::new(self.return_type.get_type(scope, type_params));
-
-        Rc::new(FunctionType {
-            parameters,
-            return_type,
-        })
+        let return_type = self.return_type.get_type(scope, type_params);
+        FunctionType::new(parameters, return_type)
     }
 }

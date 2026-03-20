@@ -101,10 +101,10 @@ fn check_valid_function_call(
 
     if arguments.len() < function_type.parameters.len() {
         let remaining_parameters = &function_type.parameters[arguments.len()..];
-        let result_type = Type::Function(Rc::new(FunctionType {
-            parameters: remaining_parameters.to_vec(),
-            return_type: function_type.return_type.clone(),
-        }));
+        let result_type = Type::Function(FunctionType::new(
+            remaining_parameters.to_vec(),
+            *function_type.return_type.clone(),
+        ));
         (scope, result_type)
     } else {
         (scope, *function_type.return_type.clone())

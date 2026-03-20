@@ -46,9 +46,6 @@ impl FunctionSignatureNode {
             .as_ref()
             .map_or(Type::Void, |return_type| return_type.get_type(scope, None));
 
-        Rc::new(FunctionType {
-            parameters,
-            return_type: Box::new(return_type),
-        })
+        FunctionType::new(parameters, return_type)
     }
 }

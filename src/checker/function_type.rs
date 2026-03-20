@@ -8,30 +8,30 @@ pub struct FunctionType {
 }
 
 impl FunctionType {
-    pub fn new(input_type: Type, output_type: Type) -> Rc<FunctionType> {
-        Rc::new(FunctionType {
-            parameters: vec![input_type],
-            return_type: Box::new(output_type),
+    pub fn new(parameters: Vec<Type>, return_type: Type) -> Rc<Self> {
+        Rc::new(Self {
+            parameters,
+            return_type: Box::new(return_type),
         })
+    }
+
+    pub fn simple(input_type: Type, output_type: Type) -> Rc<Self> {
+        Self::new(vec![input_type], output_type)
     }
 
     pub fn as_static_method(self: Rc<Self>, self_type: Type) -> Type {
         let mut parameters = self.parameters.clone();
         parameters.insert(0, self_type.clone());
-        Type::Function(Rc::new(FunctionType {
-            parameters,
-            return_type: Box::new(self_type),
-        }))
+        Type::Function(Self::new(parameters, self_type))
     }
 
-    pub fn bind(&self, scope: &Scope, bindings: &TypeParameterBindings) -> Rc<FunctionType> {
-        Rc::new(FunctionType {
-            parameters: self
-                .parameters
+    pub fn bind(&self, scope: &Scope, bindings: &TypeParameterBindings) -> Rc<Self> {
+        Self::new(
+            self.parameters
                 .iter()
                 .map(|param| param.bind(scope, bindings))
                 .collect(),
-            return_type: Box::new(self.return_type.bind(scope, bindings)),
-        })
+            self.return_type.bind(scope, bindings),
+        )
     }
 }

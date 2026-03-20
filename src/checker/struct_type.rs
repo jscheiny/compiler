@@ -40,10 +40,7 @@ impl StructType {
             .collect();
         let return_type = Type::Struct(self.clone());
 
-        Rc::new(FunctionType {
-            parameters,
-            return_type: Box::new(return_type),
-        })
+        FunctionType::new(parameters, return_type)
     }
 
     pub fn get_member(&self, scope: &Scope, name: &String) -> Option<&StructMember> {
@@ -103,7 +100,7 @@ impl StructMemberType {
     pub fn as_static_type(&self, self_type: Type) -> Type {
         match self {
             Self::Field(field_type) => {
-                Type::Function(FunctionType::new(self_type, field_type.clone()))
+                Type::Function(FunctionType::simple(self_type, field_type.clone()))
             }
             Self::Method(function_type) => function_type.clone().as_static_method(self_type),
         }

@@ -37,7 +37,7 @@ impl DeferredAccessExpressionNode {
                 (scope, field_type)
             };
 
-            let function_type = FunctionType::new(parameter_type, result_type);
+            let function_type = FunctionType::simple(parameter_type, result_type);
             (scope, Type::Function(function_type))
         } else {
             scope.source.print_error(
