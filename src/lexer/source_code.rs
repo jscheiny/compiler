@@ -105,9 +105,16 @@ impl SourceCode {
             }
 
             let underline = underline.to_string();
-            let span_bytes = end_byte - start_byte;
-            for _ in 0..span_bytes {
-                print!("{}", apply_severity(underline.as_str(), severity));
+            let mut is_indent = true;
+            for line_char in line_text.chars() {
+                if !line_char.is_whitespace() {
+                    is_indent = false;
+                }
+                if !is_indent {
+                    print!("{}", apply_severity(underline.as_str(), severity));
+                } else {
+                    print!(" ");
+                }
             }
 
             if line_offset == lines.len() - 1 {
