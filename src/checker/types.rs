@@ -149,7 +149,7 @@ impl Type {
 
     pub fn to_function(&self, scope: &Scope) -> Option<Rc<FunctionType>> {
         match self.deref(scope) {
-            Type::Array(element_type) => Some(FunctionType::new(
+            Type::Array(element_type) => Some(FunctionType::simple(
                 Type::Primitive(PrimitiveType::Int),
                 element_type.as_ref().clone(),
             )),
