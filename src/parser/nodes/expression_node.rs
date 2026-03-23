@@ -5,6 +5,7 @@ use crate::{
         ClosureExpressionNode, ClosureParameterExpressionNode, DeferredAccessExpressionNode,
         FunctionCallExpressionNode, IfExpressionNode, MatchNode, NameNode, PostfixOpExpressionNode,
         PrefixOpExpressionNode, PrimitiveType, TokenSpan, TypeAccessExpressionNode,
+        TypeBindingExpressionNode,
     },
 };
 
@@ -29,6 +30,7 @@ pub enum ExpressionNode {
     SelfValue(TokenSpan),
     StringLiteral(String),
     TypeAccess(TypeAccessExpressionNode),
+    TypeBinding(TypeBindingExpressionNode),
     Error,
 }
 
@@ -69,6 +71,7 @@ impl ExpressionNode {
                 Type::Array(Box::new(Type::Primitive(PrimitiveType::Char))),
             ),
             Self::TypeAccess(node) => node.check(scope),
+            Self::TypeBinding(node) => node.check(scope),
             Self::Error => (scope, Type::Error),
         }
     }

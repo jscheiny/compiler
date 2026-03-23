@@ -10,6 +10,12 @@ pub struct TypeAccessExpressionNode {
 
 impl TypeAccessExpressionNode {
     pub fn check(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
+        if let ExpressionNode::TypeBinding(binding) = &self.left.value {
+            let (scope, receiver_type) = binding.check(scope);
+            let resolved_type = self.get_static_field(&scope, &receiver_type);
+            return (scope, resolved_type);
+        }
+
         let ExpressionNode::Name(name) = &self.left.value else {
             let (scope, _) = self.left.check(scope);
             scope.source.print_error(
@@ -35,7 +41,7 @@ impl TypeAccessExpressionNode {
     }
 
     fn get_static_field(&self, scope: &Scope, receiver_type: &Type) -> Type {
-        match receiver_type {
+        match receiver_type.deref(scope) {
             Type::Enum(enum_type) => {
                 if let Some(variant_type) = enum_type.get_variant(&self.field.value) {
                     variant_type
@@ -79,6 +85,8 @@ impl TypeAccessExpressionNode {
                     Type::Error
                 }
             }
+            Type::Generic(_) => todo!("Handle access on generic types"),
+            Type::Error => Type::Error,
             _ => {
                 scope.source.print_error(
                     self.left.span,

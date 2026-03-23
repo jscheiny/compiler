@@ -1,8 +1,25 @@
-type Identity[T] = T => T;
-type Mapper[A, B] = A => Identity[B];
+enum Test(A, B, C(int)) {}
 
-fn test() {
-    let x: Mapper = (3, 4);
-    let x: Mapper[int, bool] = a -> b -> b;
-    x(true)(5);
+struct Coordinate(pub row: int, pub col: int) {
+    pub add(other: Coordinate): Coordinate {}
+
+    pub magnitude(): int -> @row;
 }
+
+fn adder(adder: (Coordinate, Coordinate) => int) {}
+
+type Pair[T] = T;
+
+fn main() {
+    let c = Coordinate(3, 4);
+    let d = Coordinate(5, 6);
+    let c2: int = Pair[Coordinate, (int, int)]::add(c, d);
+    adder(Coordinate::add.magnitude());
+    main::add;
+    accept_test(A);
+    accept_test(Test::B);
+    accept_test(C(5));
+    Pair[Coordinate]::magnitude();
+}
+
+fn accept_test(test: Test) {}

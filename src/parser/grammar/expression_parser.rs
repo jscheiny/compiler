@@ -6,8 +6,8 @@ use crate::{
         DeferredAccessExpressionNode, ExpressionNode, FunctionCallExpressionNode, IfExpressionNode,
         LocatedSyntaxError, NameType, Node, Operator, ParseResult, PostfixOpExpressionNode,
         PostfixOperator, PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType,
-        SyntaxError, TokenSpan, TokenStream, TypeAccessExpressionNode,
-        grammar::{match_expression, statement, type_definition},
+        SyntaxError, TokenSpan, TokenStream, TypeAccessExpressionNode, TypeBindingExpressionNode,
+        grammar::{bound_type_parameters, match_expression, statement, type_definition},
     },
 };
 
@@ -99,6 +99,14 @@ fn sub_expression(
             }
 
             left = simple_closure(tokens, left)?;
+        } else if Symbol::OpenBracket.matches(token) {
+            // Type binding should be treated as the same precedence as a::b
+            let precedence = BinaryOperator::TypeAccess.precedence();
+            if precedence < context.min_precedence {
+                break;
+            }
+
+            left = type_binding(tokens, left)?;
         } else {
             break;
         }
@@ -231,6 +239,22 @@ fn simple_closure(
     let closure = closure(tokens, parameters)?;
     let full_span = left.span.expand_to(tokens);
     Ok(full_span.wrap(closure))
+}
+
+fn type_binding(
+    tokens: &mut TokenStream,
+    left: Node<ExpressionNode>,
+) -> ParseResult<Node<ExpressionNode>> {
+    tokens.next();
+    let bound_type_parameters = tokens.located(bound_type_parameters)?;
+    let span = left.span.expand_to(tokens);
+
+    Ok(
+        span.wrap(ExpressionNode::TypeBinding(TypeBindingExpressionNode {
+            left: Box::new(left),
+            bound_type_parameters,
+        })),
+    )
 }
 
 fn expression_atom(

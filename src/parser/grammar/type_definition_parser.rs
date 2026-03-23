@@ -52,7 +52,7 @@ pub fn user_defined_type(tokens: &mut TokenStream) -> ParseResult<UserDefinedTyp
     Ok(UserDefinedTypeNode::new(name, bound_type_parameters))
 }
 
-fn bound_type_parameters(tokens: &mut TokenStream) -> ParseResult<Vec<Node<TypeNode>>> {
+pub fn bound_type_parameters(tokens: &mut TokenStream) -> ParseResult<Vec<Node<TypeNode>>> {
     comma_separated_list(tokens, Symbol::CloseBracket, type_definition)
 }
 
