@@ -32,7 +32,6 @@ pub enum SyntaxError {
     ExpectedVariants,
     UnexpectedBindingPattern,
     UnexpectedBlockReturn(StatementType),
-    UnexpectedTypeExpression,
     UnexpectedMethodSignatureQualifier(Keyword),
 }
 
@@ -143,7 +142,6 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             E::UnexpectedBlockReturn(statement_type) => {
                 return write!(f, "unexpected block return in {}", statement_type);
             }
-            E::UnexpectedTypeExpression => return write!(f, "unexpected type declaration"),
             E::UnexpectedMethodSignatureQualifier(keyword) => {
                 return write!(f, "unexpected qualifier `{}` for interface method", keyword);
             }
@@ -206,10 +204,6 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
             E::UnexpectedBlockReturn(_) => {
                 write!(f, "block returns are only allowed in expressions")
             }
-            E::UnexpectedTypeExpression => write!(
-                f,
-                "type declarations should only appear in closure parameter lists"
-            ),
             E::UnexpectedMethodSignatureQualifier(_) => {
                 write!(f, "interface methods must not be qualified")
             }

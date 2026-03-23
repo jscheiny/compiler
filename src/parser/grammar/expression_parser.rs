@@ -15,7 +15,6 @@ use crate::{
 struct ExpressionContext {
     pub min_precedence: i32,
     pub allow_commas: bool,
-    pub allow_types: bool,
 }
 
 impl ExpressionContext {
@@ -23,7 +22,6 @@ impl ExpressionContext {
         Self {
             min_precedence: 0,
             allow_commas: true,
-            allow_types: false,
         }
     }
 
@@ -31,14 +29,12 @@ impl ExpressionContext {
         Self {
             min_precedence: 0,
             allow_commas: true,
-            allow_types: true,
         }
     }
 
-    pub fn with_precedence(self, min_precedence: i32, allow_types: bool) -> Self {
+    pub fn with_precedence(self, min_precedence: i32) -> Self {
         Self {
             min_precedence,
-            allow_types,
             ..self
         }
     }
@@ -83,7 +79,7 @@ fn sub_expression(
 
             // TODO should we remove type as a binary operator and treat it like function calls below...
             left = if operator.value == BinaryOperator::Type {
-                closure_parameter(tokens, left, context)
+                closure_parameter(tokens, left)
             } else {
                 binary_op_expression(tokens, left, operator, context)
             }?;
@@ -114,28 +110,21 @@ fn sub_expression(
 fn closure_parameter(
     tokens: &mut TokenStream,
     left: Node<ExpressionNode>,
-    context: ExpressionContext,
 ) -> ParseResult<Node<ExpressionNode>> {
-    if context.allow_types {
-        if let ExpressionNode::Name(name) = left.value {
-            let parameter_type = Some(tokens.located(type_definition)?);
-            let parameter_span = left.span.expand_to(tokens);
-            return Ok(parameter_span.wrap(ExpressionNode::ClosureParameter(
-                ClosureParameterExpressionNode {
-                    name,
-                    parameter_type,
-                },
-            )));
-        }
-    }
-
-    if context.allow_types {
+    if let ExpressionNode::Name(name) = left.value {
+        let parameter_type = Some(tokens.located(type_definition)?);
+        let parameter_span = left.span.expand_to(tokens);
+        return Ok(parameter_span.wrap(ExpressionNode::ClosureParameter(
+            ClosureParameterExpressionNode {
+                name,
+                parameter_type,
+            },
+        )));
+    } else {
         tokens.errors.push(LocatedSyntaxError {
             span: left.span,
             error: SyntaxError::ExpectedName(NameType::Parameter),
         });
-    } else {
-        tokens.push_error(SyntaxError::UnexpectedTypeExpression);
     }
 
     // Parse the type definition for errors and so we can continue parsing
@@ -171,8 +160,7 @@ fn binary_op_expression(
             Associativity::Right => 0,
         };
 
-    let allow_types = operator.value == BinaryOperator::Comma;
-    let context = context.with_precedence(next_min_precedence, allow_types);
+    let context = context.with_precedence(next_min_precedence);
     let right = tokens.located_with(sub_expression, context)?;
     let span = left.span.expand_to(tokens);
     Ok(span.wrap(ExpressionNode::BinaryOp(BinaryOpExpressionNode {
@@ -243,7 +231,7 @@ fn expression_atom(
         let precedence = operator.precedence();
         let operator = TokenSpan::singleton(tokens).wrap(operator);
         tokens.next();
-        let context = context.with_precedence(precedence, false);
+        let context = context.with_precedence(precedence);
         let expression = tokens.located_with(sub_expression, context)?;
         return Ok(ExpressionNode::PrefixOp(PrefixOpExpressionNode {
             operator,

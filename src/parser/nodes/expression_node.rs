@@ -52,9 +52,7 @@ impl ExpressionNode {
             Self::BooleanLiteral(_) => (scope, Type::Primitive(PrimitiveType::Bool)),
             Self::CharacterLiteral(_) => (scope, Type::Primitive(PrimitiveType::Char)),
             Self::Closure(node) => node.check(scope, expected_type),
-            Self::ClosureParameter(_) => {
-                panic!("ERROR: Unexpected closure parameter outside of parameter list")
-            }
+            Self::ClosureParameter(node) => node.check(scope),
             Self::DeferredAccess(node) => node.check(scope, expected_type),
             Self::FunctionCall(node) => node.check(scope, expected_type),
             Self::IfExpression(node) => node.check(scope, expected_type),
