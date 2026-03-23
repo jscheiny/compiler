@@ -8,13 +8,6 @@ use crate::{
     parser::PrimitiveType,
 };
 
-// TODO reconsider this name
-#[derive(Clone)]
-pub enum RuntimeType {
-    Enum(Rc<EnumType>),
-    Struct(Rc<StructType>),
-}
-
 #[derive(Clone)]
 pub enum Type {
     Array(Box<Type>),
@@ -26,7 +19,6 @@ pub enum Type {
     Reference(usize),
     Struct(Rc<StructType>),
     Tuple(Rc<Vec<Type>>),
-    Type(RuntimeType),
     TypeParameter(Rc<TypeParameter>),
     Void,
     Error,
@@ -102,7 +94,6 @@ impl Type {
                 }
                 _ => false,
             },
-            Type::Type(_) => todo!("Implement assignability for runtime types"),
             Type::TypeParameter(left) => match other {
                 Type::TypeParameter(right) => left == right,
                 _ => false,
@@ -128,7 +119,6 @@ impl Type {
             Type::Tuple(types) => Type::Tuple(Rc::new(
                 types.iter().map(|t| t.bind(scope, bindings)).collect(),
             )),
-            Type::Type(t) => Type::Type(t.clone()),
             Type::TypeParameter(t) => t.bind(bindings),
             Type::Void => Type::Void,
             Type::Error => Type::Error,
@@ -154,19 +144,6 @@ impl Type {
                 element_type.as_ref().clone(),
             )),
             Type::Function(function_type) => Some(function_type),
-            Type::Type(RuntimeType::Struct(struct_type)) => {
-                // TODO respect privacy!!!
-                Some(struct_type.get_constructor(scope))
-            }
-            _ => None,
-        }
-    }
-
-    pub fn as_runtime_type(self, scope: &Scope) -> Option<RuntimeType> {
-        match self.as_deref(scope) {
-            Type::Type(runtime_type) => Some(runtime_type),
-            Type::Enum(enum_type) => Some(RuntimeType::Enum(enum_type)),
-            Type::Struct(struct_type) => Some(RuntimeType::Struct(struct_type)),
             _ => None,
         }
     }

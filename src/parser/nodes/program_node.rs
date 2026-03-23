@@ -14,12 +14,16 @@ impl ProgramNode {
     pub fn check(&mut self, source: Rc<SourceCode>) {
         let mut types = TypeMap::new();
         for definition in self.definitions() {
-            types.declare(definition.name(), &source);
+            if definition.is_type() {
+                types.declare(definition.name(), &source);
+            }
         }
 
         let mut scope = self.create_scope(source, types);
         for definition in self.definitions_mut() {
-            definition.resolve_type(&mut scope);
+            if definition.is_type() {
+                definition.resolve_type(&mut scope);
+            }
         }
 
         for definition in self.definitions() {

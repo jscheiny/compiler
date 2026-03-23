@@ -14,24 +14,15 @@ impl NameNode {
             _ => None,
         });
 
-        // TODO disallow use of types as values
         if let Some(resolved_type) = scope.get_value(self) {
             (scope, resolved_type)
-        } else if let Some(index) = scope.get_type_index(self) {
-            let resolved_type = Type::Reference(index)
-                .as_runtime_type(&scope)
-                .map(Type::Type);
-            match resolved_type {
-                Some(resolved_type) => (scope, resolved_type),
-                None => {
-                    scope.source.print_error(
-                        self.span,
-                        "Invalid type as value",
-                        "cannot use type as a value",
-                    );
-                    (scope, Type::Error)
-                }
-            }
+        } else if scope.get_type_index(self).is_some() {
+            scope.source.print_error(
+                self.span,
+                "Types cannot be used as values",
+                "cannot use type as a value",
+            );
+            (scope, Type::Error)
         } else if let Some(enum_type) = expected_enum_type {
             if let Some(variant_type) = enum_type.get_variant(self) {
                 (scope, variant_type)

@@ -6,7 +6,7 @@ use crate::{
         DeferredAccessExpressionNode, ExpressionNode, FunctionCallExpressionNode, IfExpressionNode,
         LocatedSyntaxError, NameType, Node, Operator, ParseResult, PostfixOpExpressionNode,
         PostfixOperator, PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType,
-        SyntaxError, TokenSpan, TokenStream,
+        SyntaxError, TokenSpan, TokenStream, TypeAccessExpressionNode,
         grammar::{match_expression, statement, type_definition},
     },
 };
@@ -152,6 +152,17 @@ fn binary_op_expression(
             field,
             arguments,
         })));
+    }
+
+    if operator.value == BinaryOperator::TypeAccess {
+        let field = tokens.name(NameType::Type)?;
+        let span = left.span.expand_to(tokens);
+        return Ok(
+            span.wrap(ExpressionNode::TypeAccess(TypeAccessExpressionNode {
+                left: Box::new(left),
+                field,
+            })),
+        );
     }
 
     let next_min_precedence = operator.precedence()

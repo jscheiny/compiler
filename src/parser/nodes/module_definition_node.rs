@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    checker::{RuntimeType, Scope, Type},
+    checker::{Scope, Type},
     parser::{EnumNode, FunctionNode, InterfaceNode, NameNode, StructNode, TypeAliasNode},
 };
 
@@ -19,6 +19,10 @@ pub enum ModuleDefinitionNode {
 }
 
 impl ModuleDefinitionNode {
+    pub fn is_type(&self) -> bool {
+        !matches!(self, Self::Function(_))
+    }
+
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
         match self {
             Self::Enum(node) => node.check(scope),
@@ -31,11 +35,10 @@ impl ModuleDefinitionNode {
 
     pub fn add_to_scope(&self, scope: &mut Scope) {
         let resolved_type = match self {
-            Self::Enum(node) => Some(Type::Type(RuntimeType::Enum(node.get_type(scope)))),
             Self::Function(node) => Some(Type::Function(node.get_type(scope).clone())),
-            Self::Struct(node) => Some(Type::Type(RuntimeType::Struct(node.get_type()))),
-            // TODO Consider how these are added to scope
-            Self::Interface(_) | Self::TypeAlias(_) => None,
+            // TODO respect the privacy of the constructor
+            Self::Struct(node) => Some(Type::Function(node.get_type().get_constructor(scope))),
+            Self::Enum(_) | Self::Interface(_) | Self::TypeAlias(_) => None,
         };
 
         if let Some(resolved_type) = resolved_type {

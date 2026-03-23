@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    checker::{FunctionType, RuntimeType, Scope, Type},
+    checker::{FunctionType, Scope, Type},
     parser::{ExpressionNode, NameNode, Node, NodeVec, TokenSpan, check_function_call},
 };
 
@@ -139,61 +139,12 @@ pub fn get_field(
             }
         }
         Type::Tuple(_) => todo!("Implement access on tuples"),
-        Type::Type(inner_type) => get_static_field(inner_type, field, scope),
         Type::TypeParameter(_) => todo!("Implement access for type parameters"),
         Type::Error => Type::Error,
     }
 }
 
-fn get_static_field(runtime_type: &RuntimeType, field: &NameNode, scope: &Scope) -> Type {
-    match runtime_type {
-        RuntimeType::Enum(enum_type) => {
-            if let Some(variant_type) = enum_type.get_variant(field) {
-                variant_type
-            } else if let Some(method) = enum_type.get_method(scope, field) {
-                let receiver_type = Type::Enum(enum_type.clone());
-                if !method.public {
-                    check_private_access(scope, &receiver_type, field);
-                }
-                method.function_type.clone().as_static_method(receiver_type)
-            } else {
-                scope.source.print_error(
-                    field.span,
-                    &format!("Could not find field `{}`", field),
-                    &format!(
-                        "enum `{}` has no such method or variant `{}`",
-                        enum_type.name(),
-                        field
-                    ),
-                );
-                Type::Error
-            }
-        }
-        RuntimeType::Struct(struct_type) => {
-            let member = struct_type.get_member(scope, field);
-            if let Some(member) = member {
-                let receiver_type = Type::Struct(struct_type.clone());
-                if !member.public {
-                    check_private_access(scope, &receiver_type, field);
-                }
-                member.member_type.as_static_type(receiver_type)
-            } else {
-                scope.source.print_error(
-                    field.span,
-                    &format!("Could not find field `{}`", field),
-                    &format!(
-                        "struct `{}` has no such field or method `{}`",
-                        struct_type.name(),
-                        field
-                    ),
-                );
-                Type::Error
-            }
-        }
-    }
-}
-
-fn check_private_access(scope: &Scope, receiver_type: &Type, field: &NameNode) {
+pub fn check_private_access(scope: &Scope, receiver_type: &Type, field: &NameNode) {
     if is_external_private_access(scope, receiver_type) {
         scope.source.print_error(
             field.span,

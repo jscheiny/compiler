@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use crate::{
-    checker::{RuntimeType, Scope, Type},
+    checker::{Scope, Type},
     lexer::{Keyword, Symbol},
 };
 
@@ -47,14 +47,6 @@ impl Display for TypeFmt<'_> {
                 self.write_types_list(f, items)?;
                 write!(f, ")")
             }
-            Type::Type(runtime_type) => write!(
-                f,
-                "Runtime({})",
-                match runtime_type {
-                    RuntimeType::Enum(enum_type) => enum_type.name(),
-                    RuntimeType::Struct(struct_type) => struct_type.name(),
-                }
-            ),
             Type::TypeParameter(type_parameter) => write!(f, "{}", type_parameter.name),
             Type::Void => write!(f, "{}", Keyword::Void),
             Type::Error => write!(f, "{{Unknown}}"),
