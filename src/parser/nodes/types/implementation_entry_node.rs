@@ -1,6 +1,6 @@
 use crate::{
-    checker::{Scope, Type},
-    parser::{InterfaceImplementationNode, MethodNode},
+    checker::Scope,
+    parser::{ImplementationType, InterfaceImplementationNode, MethodNode},
 };
 
 pub enum ImplementationEntryNode {
@@ -9,7 +9,7 @@ pub enum ImplementationEntryNode {
 }
 
 impl ImplementationEntryNode {
-    pub fn check(&self, scope: Box<Scope>, self_type: &Type) -> Box<Scope> {
+    pub fn check(&self, scope: Box<Scope>, self_type: &ImplementationType) -> Box<Scope> {
         match self {
             Self::Method(node) => node.check(scope),
             Self::Interface(node) => node.check(scope, self_type),

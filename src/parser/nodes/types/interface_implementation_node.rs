@@ -3,7 +3,7 @@ use std::{collections::HashSet, rc::Rc};
 use crate::{
     checker::{EnumType, FunctionType, Scope, Type},
     lexer::Symbol,
-    parser::{FunctionNode, NameNode, Node},
+    parser::{FunctionNode, ImplementationType, NameNode, Node},
 };
 
 pub struct InterfaceImplementationNode {
@@ -12,7 +12,7 @@ pub struct InterfaceImplementationNode {
 }
 
 impl InterfaceImplementationNode {
-    pub fn check(&self, mut scope: Box<Scope>, self_type: &Type) -> Box<Scope> {
+    pub fn check(&self, mut scope: Box<Scope>, self_type: &ImplementationType) -> Box<Scope> {
         let implemented_type = scope
             .get_type_index(&self.name)
             .map(|t| Type::Reference(t).as_deref(&scope));
@@ -58,17 +58,16 @@ impl InterfaceImplementationNode {
 
         if self.methods.is_none() {
             match self_type {
-                Type::Struct(_) => scope.source.print_error(
+                ImplementationType::Struct(_) => scope.source.print_error(
                     self.name.span.after(),
                     "Cannot infer interface implementation for structs",
                     &format!("expected `{}`", Symbol::OpenBrace),
                 ),
-                Type::Enum(enum_type) => self.check_enum_default_implementation(
+                ImplementationType::Enum(enum_type) => self.check_enum_default_implementation(
                     &scope,
                     enum_type,
                     implemented_type.as_ref(),
                 ),
-                _ => panic!("Interface implementation node for non struct/enum"),
             }
         }
 

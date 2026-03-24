@@ -1,8 +1,8 @@
 use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{Scope, ScopeType, StructType, Type},
-    parser::{ImplementationNode, NameNode, Node, NodeVec, StructFieldNode},
+    checker::{Scope, ScopeType, StructType},
+    parser::{ImplementationNode, ImplementationType, NameNode, Node, NodeVec, StructFieldNode},
 };
 
 pub struct StructNode {
@@ -50,7 +50,7 @@ impl StructNode {
         }
 
         if let Some(implementation) = self.implementation.as_ref() {
-            let self_type = Type::Struct(self.get_type());
+            let self_type = ImplementationType::Struct(self.get_type());
             return implementation.check(scope, &self_type, scope_names);
         }
 

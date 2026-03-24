@@ -1,8 +1,8 @@
 use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{EnumType, Scope, ScopeType, Type},
-    parser::{EnumVariantNode, ImplementationNode, NameNode, Node, NodeVec},
+    checker::{EnumType, Scope, ScopeType},
+    parser::{EnumVariantNode, ImplementationNode, ImplementationType, NameNode, Node, NodeVec},
 };
 
 pub struct EnumNode {
@@ -47,7 +47,7 @@ impl EnumNode {
         }
 
         if let Some(implementation) = self.implementation.as_ref() {
-            let self_type = Type::Enum(self.get_type(&scope));
+            let self_type = ImplementationType::Enum(self.get_type(&scope));
             return implementation.check(scope, &self_type, scope_names);
         }
 
