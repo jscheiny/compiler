@@ -78,7 +78,6 @@ fn sub_expression(
 
             left = binary_op_expression(tokens, left, operator, context)?
         } else if let Some(operator) = SpecialOperator::from_token(token) {
-            dbg!(operator);
             if operator.precedence() < context.min_precedence {
                 break;
             }
