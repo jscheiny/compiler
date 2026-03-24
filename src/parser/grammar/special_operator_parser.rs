@@ -93,12 +93,11 @@ fn function_call(
     let arguments = tokens.located(function_arguments)?;
     let span = left.span.expand_to(tokens);
 
-    Ok(
-        span.wrap(ExpressionNode::FunctionCall(FunctionCallExpressionNode {
-            function: Box::new(left),
-            arguments,
-        })),
-    )
+    let result = ExpressionNode::FunctionCall(FunctionCallExpressionNode {
+        function: Box::new(left),
+        arguments,
+    });
+    Ok(span.wrap(result))
 }
 
 fn type_binding(
@@ -109,10 +108,9 @@ fn type_binding(
     let bound_type_parameters = tokens.located(bound_type_parameters)?;
     let span = left.span.expand_to(tokens);
 
-    Ok(
-        span.wrap(ExpressionNode::TypeBinding(TypeBindingExpressionNode {
-            left: Box::new(left),
-            bound_type_parameters,
-        })),
-    )
+    let result = ExpressionNode::TypeBinding(TypeBindingExpressionNode {
+        left: Box::new(left),
+        bound_type_parameters,
+    });
+    Ok(span.wrap(result))
 }
