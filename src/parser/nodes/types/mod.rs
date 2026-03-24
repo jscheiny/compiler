@@ -1,5 +1,10 @@
+mod enum_node;
+mod enum_variant_node;
 mod function_type_node;
+mod interface_node;
 mod primitive_type;
+mod struct_field_node;
+mod struct_node;
 mod tuple_type_node;
 mod type_alias_node;
 mod type_node;
@@ -7,8 +12,13 @@ mod type_parameter_list_node;
 mod type_parameter_node;
 mod user_defined_type_node;
 
+pub use enum_node::*;
+pub use enum_variant_node::*;
 pub use function_type_node::*;
+pub use interface_node::*;
 pub use primitive_type::*;
+pub use struct_field_node::*;
+pub use struct_node::*;
 pub use tuple_type_node::*;
 pub use type_alias_node::*;
 pub use type_node::*;
