@@ -36,8 +36,6 @@ impl BinaryOpExpressionNode {
             O::Comma => self.check_comma(scope, expected_type),
             O::LogicalAnd => self.check_logical_op(scope),
             O::LogicalOr => self.check_logical_op(scope),
-            O::Access => panic!("ERROR: Expected ExpressionNode::Access"),
-            O::TypeAccess => panic!("ERROR: Expected ExpressionNode::TypeAccess"),
         }
     }
 

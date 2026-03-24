@@ -1,11 +1,11 @@
 use crate::{
     lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
-        AccessExpressionNode, ArrayExpressionNode, Associativity, BinaryOpExpressionNode,
-        BinaryOperator, BlockNode, DeferredAccessExpressionNode, ExpressionNode, IfExpressionNode,
-        LocatedSyntaxError, NameType, Node, Operator, ParseResult, PostfixOpExpressionNode,
-        PostfixOperator, PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType,
-        SyntaxError, TokenSpan, TokenStream, TypeAccessExpressionNode,
+        ArrayExpressionNode, Associativity, BinaryOpExpressionNode, BinaryOperator, BlockNode,
+        DeferredAccessExpressionNode, ExpressionNode, IfExpressionNode, LocatedSyntaxError,
+        NameType, Node, Operator, ParseResult, PostfixOpExpressionNode, PostfixOperator,
+        PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType, SyntaxError,
+        TokenSpan, TokenStream,
         grammar::{SpecialOperator, closure, match_expression, statement},
     },
 };
@@ -97,32 +97,6 @@ fn binary_op_expression(
     operator: Node<BinaryOperator>,
     context: ExpressionContext,
 ) -> ParseResult<Node<ExpressionNode>> {
-    if operator.value == BinaryOperator::Access {
-        let field = tokens.name(NameType::Field)?;
-        let arguments = if Symbol::OpenParen.matches(tokens.peek()) {
-            Some(tokens.located(function_arguments)?)
-        } else {
-            None
-        };
-        let span = left.span.expand_to(tokens);
-        return Ok(span.wrap(ExpressionNode::Access(AccessExpressionNode {
-            left: Box::new(left),
-            field,
-            arguments,
-        })));
-    }
-
-    if operator.value == BinaryOperator::TypeAccess {
-        let field = tokens.name(NameType::Type)?;
-        let span = left.span.expand_to(tokens);
-        return Ok(
-            span.wrap(ExpressionNode::TypeAccess(TypeAccessExpressionNode {
-                left: Box::new(left),
-                field,
-            })),
-        );
-    }
-
     let next_min_precedence = operator.precedence()
         + match operator.associativity() {
             Associativity::Left => 1,

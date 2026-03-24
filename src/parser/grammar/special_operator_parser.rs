@@ -1,20 +1,22 @@
 use strum_macros::EnumIter;
 
 use crate::{
-    lexer::{Symbol, Token},
+    lexer::{Symbol, Token, TokenMatch},
     parser::{
-        BinaryOperator, ClosureParameterExpressionNode, ExpressionNode, FunctionCallExpressionNode,
-        LocatedSyntaxError, NameType, Node, Operator, ParseResult, SyntaxError, TokenStream,
-        TypeBindingExpressionNode,
+        AccessExpressionNode, ClosureParameterExpressionNode, ExpressionNode,
+        FunctionCallExpressionNode, LocatedSyntaxError, NameType, Node, Operator, ParseResult,
+        SyntaxError, TokenStream, TypeAccessExpressionNode, TypeBindingExpressionNode,
         grammar::{bound_type_parameters, function_arguments, simple_closure, type_definition},
     },
 };
 
 #[derive(Clone, Copy, Debug, EnumIter)]
 pub enum SpecialOperator {
-    Closure,          // params -> expr
+    Closure,          // param -> expr
     ClosureParameter, // value : type
     FunctionCall,     // fn ( params )
+    MemberType,       // Receiver :: field
+    MemberValue,      // receiver . field
     TypeBinding,      // T [ Args ]
 }
 
@@ -28,17 +30,9 @@ impl SpecialOperator {
             Self::Closure => simple_closure(tokens, left),
             Self::ClosureParameter => closure_parameter(tokens, left),
             Self::FunctionCall => function_call(tokens, left),
+            Self::MemberType => member_type(tokens, left),
+            Self::MemberValue => member_value(tokens, left),
             Self::TypeBinding => type_binding(tokens, left),
-        }
-    }
-
-    fn get_equivalent_precedence_operator(&self) -> BinaryOperator {
-        use BinaryOperator as B;
-        match self {
-            Self::Closure => B::Access,
-            Self::ClosureParameter => B::Comma,
-            Self::FunctionCall => B::Access,
-            Self::TypeBinding => B::TypeAccess,
         }
     }
 }
@@ -50,12 +44,18 @@ impl Operator for SpecialOperator {
             Self::Closure => Token::Symbol(S::SkinnyArrow),
             Self::ClosureParameter => Token::Symbol(S::Colon),
             Self::FunctionCall => Token::Symbol(S::OpenParen),
+            Self::MemberType => Token::Symbol(S::DoubleColon),
+            Self::MemberValue => Token::Symbol(S::Dot),
             Self::TypeBinding => Token::Symbol(S::OpenBracket),
         }
     }
 
     fn precedence(&self) -> i32 {
-        self.get_equivalent_precedence_operator().precedence()
+        match self {
+            Self::MemberType | Self::TypeBinding => 10,
+            Self::Closure | Self::FunctionCall | Self::MemberValue => 9,
+            Self::ClosureParameter => 0,
+        }
     }
 }
 
@@ -95,6 +95,40 @@ fn function_call(
 
     let result = ExpressionNode::FunctionCall(FunctionCallExpressionNode {
         function: Box::new(left),
+        arguments,
+    });
+    Ok(span.wrap(result))
+}
+
+fn member_type(
+    tokens: &mut TokenStream,
+    left: Node<ExpressionNode>,
+) -> ParseResult<Node<ExpressionNode>> {
+    tokens.next();
+    let field = tokens.name(NameType::Type)?;
+    let span = left.span.expand_to(tokens);
+    let result = ExpressionNode::TypeAccess(TypeAccessExpressionNode {
+        left: Box::new(left),
+        field,
+    });
+    Ok(span.wrap(result))
+}
+
+fn member_value(
+    tokens: &mut TokenStream,
+    left: Node<ExpressionNode>,
+) -> ParseResult<Node<ExpressionNode>> {
+    tokens.next();
+    let field = tokens.name(NameType::Field)?;
+    let arguments = if Symbol::OpenParen.matches(tokens.peek()) {
+        Some(tokens.located(function_arguments)?)
+    } else {
+        None
+    };
+    let span = left.span.expand_to(tokens);
+    let result = ExpressionNode::Access(AccessExpressionNode {
+        left: Box::new(left),
+        field,
         arguments,
     });
     Ok(span.wrap(result))

@@ -24,8 +24,6 @@ pub enum BinaryOperator {
     LessThanOrEqual,     // <=
     GreaterThan,         // >
     GreaterThanOrEqual,  // >=
-    Access,              // .
-    TypeAccess,          // ::
     FunctionApplication, // =>
     Comma,               // ,
     LogicalAnd,          // and
@@ -47,8 +45,6 @@ impl Operator for BinaryOperator {
             Self::LessThanOrEqual => Token::Symbol(S::LessThanEqual),
             Self::GreaterThan => Token::Symbol(S::GreaterThan),
             Self::GreaterThanOrEqual => Token::Symbol(S::GreaterThanEqual),
-            Self::Access => Token::Symbol(S::Dot),
-            Self::TypeAccess => Token::Symbol(S::DoubleColon),
             Self::FunctionApplication => Token::Symbol(S::ThickArrow),
             Self::Comma => Token::Symbol(S::Comma),
             Self::Assign => Token::Symbol(S::Equal),
@@ -64,11 +60,7 @@ impl Operator for BinaryOperator {
 
     fn precedence(&self) -> i32 {
         match self {
-            // Type access
-            Self::TypeAccess => 10,
-            // Access (and function calls not expressed here)
-            Self::Access => 9,
-            // Function application should bind slightly less tight than function calls
+            // Function application should bind slightly less tight than function calls (see SpecialOperator)
             Self::FunctionApplication => 8,
             // Multiplicative
             Self::Multiply | Self::Divide | Self::Mod => 7,
