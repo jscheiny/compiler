@@ -2,7 +2,7 @@ use crate::{
     lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
         ArrayExpressionNode, Associativity, BinaryOpExpressionNode, BinaryOperator, BlockNode,
-        DeferredAccessExpressionNode, ExpressionNode, IfExpressionNode, LocatedSyntaxError,
+        DeferredMemberExpressionNode, ExpressionNode, IfExpressionNode, LocatedSyntaxError,
         NameType, Node, Operator, ParseResult, PostfixOpExpressionNode, PostfixOperator,
         PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType, SyntaxError,
         TokenSpan, TokenStream,
@@ -179,7 +179,7 @@ fn expression_atom(
             let name = tokens.name(NameType::Field)?;
             Ok(ExpressionNode::SelfRef(name))
         }
-        Token::Symbol(Symbol::Dot) => deferred_access(tokens),
+        Token::Symbol(Symbol::Dot) => deferred_member(tokens),
         Token::Symbol(Symbol::OpenParen) => closure_or_tuple(tokens),
         Token::Symbol(Symbol::OpenBracket) => array(tokens),
         Token::Keyword(Keyword::If) => if_expression(tokens),
@@ -230,7 +230,7 @@ pub fn block(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult<Blo
     Ok(BlockNode { statements })
 }
 
-fn deferred_access(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
+fn deferred_member(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
     tokens.next();
     let field = tokens.name(NameType::Field)?;
     let arguments = if Symbol::OpenParen.matches(tokens.peek()) {
@@ -239,8 +239,8 @@ fn deferred_access(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
         None
     };
 
-    Ok(ExpressionNode::DeferredAccess(
-        DeferredAccessExpressionNode { field, arguments },
+    Ok(ExpressionNode::DeferredMember(
+        DeferredMemberExpressionNode { field, arguments },
     ))
 }
 

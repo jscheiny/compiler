@@ -3,12 +3,12 @@ use crate::{
     parser::{ExpressionNode, NameNode, NodeVec, check_function_call, get_field},
 };
 
-pub struct DeferredAccessExpressionNode {
+pub struct DeferredMemberExpressionNode {
     pub field: NameNode,
     pub arguments: Option<NodeVec<ExpressionNode>>,
 }
 
-impl DeferredAccessExpressionNode {
+impl DeferredMemberExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         let function_type = expected_type.and_then(|t| t.to_function(&scope));
         if let Some(function_type) = function_type {
@@ -16,7 +16,7 @@ impl DeferredAccessExpressionNode {
                 scope.source.print_error(
                     // TODO this span should cover the whole node...
                     self.field.span,
-                    "Deferred access expression must be a single parameter function",
+                    "Deferred member expression must be a single parameter function",
                     &format!(
                         "expected type takes {} parameters",
                         function_type.parameters.len(),
@@ -42,7 +42,7 @@ impl DeferredAccessExpressionNode {
         } else {
             scope.source.print_error(
                 self.field.span.before(),
-                "Deferred access type is ambiguous",
+                "Deferred member type is ambiguous",
                 "could not infer type of implicit parameter",
             );
             (scope, Type::Error)
