@@ -1,6 +1,6 @@
 use crate::{
     checker::{Scope, Type},
-    parser::{ExpressionNode, NameNode, Node, check_private_access},
+    parser::{ExpressionNode, NameNode, Node, check_private_member},
 };
 
 pub struct MemberTypeExpressionNode {
@@ -20,7 +20,7 @@ impl MemberTypeExpressionNode {
             let (scope, _) = self.left.check(scope);
             scope.source.print_error(
                 self.left.span,
-                "Cannot use type access operator on an expression",
+                "Cannot use type member operator on an expression",
                 "must be a type",
             );
             return (scope, Type::Error);
@@ -48,7 +48,7 @@ impl MemberTypeExpressionNode {
                 } else if let Some(method) = enum_type.get_method(scope, &self.field) {
                     let receiver_type = Type::Enum(enum_type.clone());
                     if !method.public {
-                        check_private_access(scope, &receiver_type, &self.field);
+                        check_private_member(scope, &receiver_type, &self.field);
                     }
                     method.function_type.clone().as_static_method(receiver_type)
                 } else {
@@ -69,7 +69,7 @@ impl MemberTypeExpressionNode {
                 if let Some(member) = member {
                     let receiver_type = Type::Struct(struct_type.clone());
                     if !member.public {
-                        check_private_access(scope, &receiver_type, &self.field);
+                        check_private_member(scope, &receiver_type, &self.field);
                     }
                     member.member_type.as_static_type(receiver_type)
                 } else {
@@ -85,7 +85,7 @@ impl MemberTypeExpressionNode {
                     Type::Error
                 }
             }
-            Type::Generic(_) => todo!("Handle access on generic types"),
+            Type::Generic(_) => todo!("Implement member type operator for generic types"),
             Type::Error => Type::Error,
             _ => {
                 scope.source.print_error(

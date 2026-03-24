@@ -67,8 +67,8 @@ pub fn get_field(
         Type::Array(_) | Type::Void => {
             scope.source.print_error(
                 field.span.before(),
-                "Access operator is not valid for this type",
-                &format!("Access on type: `{}`", input_type.format(scope)),
+                "Value member operator is not valid for this type",
+                &format!("type: `{}`", input_type.format(scope)),
             );
             Type::Error
         }
@@ -76,7 +76,7 @@ pub fn get_field(
             let method = enum_type.get_method(scope, field);
             if let Some(method) = method {
                 if !method.public {
-                    check_private_access(scope, input_type, field);
+                    check_private_member(scope, input_type, field);
                 }
                 Type::Function(method.function_type.clone())
             } else {
@@ -91,7 +91,7 @@ pub fn get_field(
         Type::Function(_) => {
             scope.source.print_error(
                 input_span,
-                "Cannot use access operator on a function which returns another function",
+                "Cannot use value member operator on a function which returns another function",
                 &format!("returns type: `{}`", input_type.format(scope)),
             );
             Type::Error
@@ -113,7 +113,7 @@ pub fn get_field(
                 Type::Error
             }
         }
-        Type::Primitive(_) => todo!("Implement access on primitive values"),
+        Type::Primitive(_) => todo!("Implement value member for primitive values"),
         Type::Reference(index) => {
             let resolved_type = scope.get_type(*index).unwrap();
             get_field(&resolved_type, input_span, field, scope)
@@ -122,7 +122,7 @@ pub fn get_field(
             let member = struct_type.get_member(scope, field);
             if let Some(member) = member {
                 if !member.public {
-                    check_private_access(scope, input_type, field);
+                    check_private_member(scope, input_type, field);
                 }
                 member.member_type.get_type()
             } else {
@@ -138,13 +138,13 @@ pub fn get_field(
                 Type::Error
             }
         }
-        Type::Tuple(_) => todo!("Implement access on tuples"),
-        Type::TypeParameter(_) => todo!("Implement access for type parameters"),
+        Type::Tuple(_) => todo!("Implement value member operator for tuples"),
+        Type::TypeParameter(_) => todo!("Implement value member operator for type parameters"),
         Type::Error => Type::Error,
     }
 }
 
-pub fn check_private_access(scope: &Scope, receiver_type: &Type, field: &NameNode) {
+pub fn check_private_member(scope: &Scope, receiver_type: &Type, field: &NameNode) {
     if is_external_private_access(scope, receiver_type) {
         scope.source.print_error(
             field.span,
