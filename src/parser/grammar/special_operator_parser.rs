@@ -3,9 +3,9 @@ use strum_macros::EnumIter;
 use crate::{
     lexer::{Symbol, Token, TokenMatch},
     parser::{
-        AccessExpressionNode, ClosureParameterExpressionNode, ExpressionNode,
-        FunctionCallExpressionNode, LocatedSyntaxError, NameType, Node, Operator, ParseResult,
-        SyntaxError, TokenStream, TypeAccessExpressionNode, TypeBindingExpressionNode,
+        ClosureParameterExpressionNode, ExpressionNode, FunctionCallExpressionNode,
+        LocatedSyntaxError, MemberTypeExpressionNode, MemberValueExpressionNode, NameType, Node,
+        Operator, ParseResult, SyntaxError, TokenStream, TypeBindingExpressionNode,
         grammar::{bound_type_parameters, function_arguments, simple_closure, type_definition},
     },
 };
@@ -107,7 +107,7 @@ fn member_type(
     tokens.next();
     let field = tokens.name(NameType::Type)?;
     let span = left.span.expand_to(tokens);
-    let result = ExpressionNode::TypeAccess(TypeAccessExpressionNode {
+    let result = ExpressionNode::MemberType(MemberTypeExpressionNode {
         left: Box::new(left),
         field,
     });
@@ -126,7 +126,7 @@ fn member_value(
         None
     };
     let span = left.span.expand_to(tokens);
-    let result = ExpressionNode::Access(AccessExpressionNode {
+    let result = ExpressionNode::MemberValue(MemberValueExpressionNode {
         left: Box::new(left),
         field,
         arguments,

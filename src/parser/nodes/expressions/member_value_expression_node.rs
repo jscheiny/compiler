@@ -5,13 +5,13 @@ use crate::{
     parser::{ExpressionNode, NameNode, Node, NodeVec, TokenSpan, check_function_call},
 };
 
-pub struct AccessExpressionNode {
+pub struct MemberValueExpressionNode {
     pub left: Box<Node<ExpressionNode>>,
     pub field: NameNode,
     pub arguments: Option<NodeVec<ExpressionNode>>,
 }
 
-impl AccessExpressionNode {
+impl MemberValueExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         // TODO should we mutate the expected type here?
         let (scope, left_type) = self.left.check_expected(scope, expected_type);

@@ -1,16 +1,15 @@
 use crate::{
     checker::{Scope, ScopeType, Type},
     parser::{
-        AccessExpressionNode, ArrayExpressionNode, BinaryOpExpressionNode, BlockNode,
-        ClosureExpressionNode, ClosureParameterExpressionNode, DeferredAccessExpressionNode,
-        FunctionCallExpressionNode, IfExpressionNode, MatchNode, NameNode, PostfixOpExpressionNode,
-        PrefixOpExpressionNode, PrimitiveType, TokenSpan, TypeAccessExpressionNode,
+        ArrayExpressionNode, BinaryOpExpressionNode, BlockNode, ClosureExpressionNode,
+        ClosureParameterExpressionNode, DeferredAccessExpressionNode, FunctionCallExpressionNode,
+        IfExpressionNode, MatchNode, MemberTypeExpressionNode, MemberValueExpressionNode, NameNode,
+        PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType, TokenSpan,
         TypeBindingExpressionNode,
     },
 };
 
 pub enum ExpressionNode {
-    Access(AccessExpressionNode),
     Array(ArrayExpressionNode),
     BinaryOp(BinaryOpExpressionNode),
     Block(BlockNode),
@@ -23,13 +22,14 @@ pub enum ExpressionNode {
     IfExpression(IfExpressionNode),
     IntegerLiteral(i64),
     Match(MatchNode),
+    MemberType(MemberTypeExpressionNode),
+    MemberValue(MemberValueExpressionNode),
     Name(NameNode),
     PostfixOp(PostfixOpExpressionNode),
     PrefixOp(PrefixOpExpressionNode),
     SelfRef(NameNode),
     SelfValue(TokenSpan),
     StringLiteral(String),
-    TypeAccess(TypeAccessExpressionNode),
     TypeBinding(TypeBindingExpressionNode),
     Error,
 }
@@ -45,7 +45,6 @@ impl ExpressionNode {
         expected_type: Option<&Type>,
     ) -> (Box<Scope>, Type) {
         match self {
-            Self::Access(node) => node.check(scope, expected_type),
             Self::Array(node) => node.check(scope, expected_type),
             Self::BinaryOp(node) => node.check(scope, expected_type),
             Self::Block(node) => {
@@ -61,6 +60,8 @@ impl ExpressionNode {
             Self::IfExpression(node) => node.check(scope, expected_type),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
             Self::Match(node) => node.check(scope, expected_type),
+            Self::MemberType(node) => node.check(scope),
+            Self::MemberValue(node) => node.check(scope, expected_type),
             Self::Name(node) => node.check(scope, expected_type),
             Self::PostfixOp(node) => node.check(scope),
             Self::PrefixOp(node) => node.check(scope),
@@ -70,7 +71,6 @@ impl ExpressionNode {
                 scope,
                 Type::Array(Box::new(Type::Primitive(PrimitiveType::Char))),
             ),
-            Self::TypeAccess(node) => node.check(scope),
             Self::TypeBinding(node) => node.check(scope),
             Self::Error => (scope, Type::Error),
         }
