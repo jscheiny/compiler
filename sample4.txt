@@ -39,4 +39,8 @@ fn main(super: Super, sub1: Sub1, sub2: Sub2) {
     call_super(sub2, accept_sub1); // should be an error
     call_sub1(sub1, accept_super); // shouldn't be an error
     accept_super(sub1);
+    let test = (4: int, y: bool) -> {};
+    accept_test(test);
 }
+
+fn accept_test(test: (int, bool) => void) {}

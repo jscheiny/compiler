@@ -38,7 +38,6 @@ impl BinaryOpExpressionNode {
             O::LogicalOr => self.check_logical_op(scope),
             O::Access => panic!("ERROR: Expected ExpressionNode::Access"),
             O::TypeAccess => panic!("ERROR: Expected ExpressionNode::TypeAccess"),
-            O::Type => panic!("ERROR: Unexpected closure parameter outside of context"),
         }
     }
 

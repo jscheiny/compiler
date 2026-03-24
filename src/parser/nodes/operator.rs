@@ -74,7 +74,6 @@ pub enum BinaryOperator {
     TypeAccess,          // ::
     FunctionApplication, // =>
     Comma,               // ,
-    Type,                // :
     LogicalAnd,          // and
     LogicalOr,           // or
 }
@@ -98,7 +97,6 @@ impl Operator for BinaryOperator {
             Self::TypeAccess => Token::Symbol(S::DoubleColon),
             Self::FunctionApplication => Token::Symbol(S::ThickArrow),
             Self::Comma => Token::Symbol(S::Comma),
-            Self::Type => Token::Symbol(S::Colon),
             Self::Assign => Token::Symbol(S::Equal),
             Self::Add => Token::Symbol(S::Plus),
             Self::Subtract => Token::Symbol(S::Minus),
@@ -141,7 +139,7 @@ impl Operator for BinaryOperator {
             | Self::ModAssign
             | Self::Assign => 1,
             // Comma / type
-            Self::Comma | Self::Type => 0,
+            Self::Comma => 0,
         }
     }
 }

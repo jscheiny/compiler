@@ -1,3 +1,4 @@
+mod closure_parser;
 mod enum_parser;
 mod expression_parser;
 mod function_parser;
@@ -6,18 +7,21 @@ mod interface_parser;
 mod match_parser;
 mod name_parser;
 mod program_parser;
+mod special_operator_parser;
 mod statement_parser;
 mod struct_parser;
 mod type_alias_parser;
 mod type_definition_parser;
 mod utils;
 
+use closure_parser::*;
 use enum_parser::*;
 use expression_parser::*;
 use function_parser::*;
 use generics_parser::*;
 use interface_parser::*;
 use match_parser::*;
+use special_operator_parser::*;
 use statement_parser::*;
 use struct_parser::*;
 use type_alias_parser::*;

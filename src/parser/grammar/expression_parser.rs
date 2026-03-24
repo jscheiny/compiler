@@ -2,12 +2,11 @@ use crate::{
     lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
         AccessExpressionNode, ArrayExpressionNode, Associativity, BinaryOpExpressionNode,
-        BinaryOperator, BlockNode, ClosureExpressionNode, ClosureParameterExpressionNode,
-        DeferredAccessExpressionNode, ExpressionNode, FunctionCallExpressionNode, IfExpressionNode,
+        BinaryOperator, BlockNode, DeferredAccessExpressionNode, ExpressionNode, IfExpressionNode,
         LocatedSyntaxError, NameType, Node, Operator, ParseResult, PostfixOpExpressionNode,
         PostfixOperator, PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType,
-        SyntaxError, TokenSpan, TokenStream, TypeAccessExpressionNode, TypeBindingExpressionNode,
-        grammar::{bound_type_parameters, match_expression, statement, type_definition},
+        SyntaxError, TokenSpan, TokenStream, TypeAccessExpressionNode,
+        grammar::{SpecialOperator, closure, match_expression, statement},
     },
 };
 
@@ -77,68 +76,20 @@ fn sub_expression(
             let operator = TokenSpan::singleton(tokens).wrap(operator);
             tokens.next();
 
-            // TODO should we remove type as a binary operator and treat it like function calls below...
-            left = if operator.value == BinaryOperator::Type {
-                closure_parameter(tokens, left)
-            } else {
-                binary_op_expression(tokens, left, operator, context)
-            }?;
-        } else if Symbol::OpenParen.matches(token) {
-            // Function calls should be treated as the same precedence as a.b
-            let precedence = BinaryOperator::Access.precedence();
-            if precedence < context.min_precedence {
+            left = binary_op_expression(tokens, left, operator, context)?
+        } else if let Some(operator) = SpecialOperator::from_token(token) {
+            dbg!(operator);
+            if operator.precedence() < context.min_precedence {
                 break;
             }
 
-            left = function_call(tokens, left)?;
-        } else if Symbol::SkinnyArrow.matches(token) {
-            // Function binding should be treated as the same precedence as a.b
-            let precedence = BinaryOperator::Access.precedence();
-            if precedence < context.min_precedence {
-                break;
-            }
-
-            left = simple_closure(tokens, left)?;
-        } else if Symbol::OpenBracket.matches(token) {
-            // Type binding should be treated as the same precedence as a::b
-            let precedence = BinaryOperator::TypeAccess.precedence();
-            if precedence < context.min_precedence {
-                break;
-            }
-
-            left = type_binding(tokens, left)?;
+            left = operator.parse(tokens, left)?;
         } else {
             break;
         }
     }
 
     Ok(left.value)
-}
-
-fn closure_parameter(
-    tokens: &mut TokenStream,
-    left: Node<ExpressionNode>,
-) -> ParseResult<Node<ExpressionNode>> {
-    if let ExpressionNode::Name(name) = left.value {
-        let parameter_type = Some(tokens.located(type_definition)?);
-        let parameter_span = left.span.expand_to(tokens);
-        return Ok(parameter_span.wrap(ExpressionNode::ClosureParameter(
-            ClosureParameterExpressionNode {
-                name,
-                parameter_type,
-            },
-        )));
-    } else {
-        tokens.errors.push(LocatedSyntaxError {
-            span: left.span,
-            error: SyntaxError::ExpectedName(NameType::Parameter),
-        });
-    }
-
-    // Parse the type definition for errors and so we can continue parsing
-    type_definition(tokens)?;
-    let parameter_span = left.span.expand_to(tokens);
-    Ok(parameter_span.wrap(ExpressionNode::Error))
 }
 
 fn binary_op_expression(
@@ -189,22 +140,7 @@ fn binary_op_expression(
     })))
 }
 
-fn function_call(
-    tokens: &mut TokenStream,
-    left: Node<ExpressionNode>,
-) -> ParseResult<Node<ExpressionNode>> {
-    let arguments = tokens.located(function_arguments)?;
-    let span = left.span.expand_to(tokens);
-
-    Ok(
-        span.wrap(ExpressionNode::FunctionCall(FunctionCallExpressionNode {
-            function: Box::new(left),
-            arguments,
-        })),
-    )
-}
-
-fn function_arguments(tokens: &mut TokenStream) -> ParseResult<Vec<Node<ExpressionNode>>> {
+pub fn function_arguments(tokens: &mut TokenStream) -> ParseResult<Vec<Node<ExpressionNode>>> {
     tokens.next();
 
     if tokens.accept(Symbol::CloseParen) {
@@ -215,46 +151,6 @@ fn function_arguments(tokens: &mut TokenStream) -> ParseResult<Vec<Node<Expressi
         tokens.expect(Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
         Ok(flatten_commas(right))
     }
-}
-
-fn simple_closure(
-    tokens: &mut TokenStream,
-    left: Node<ExpressionNode>,
-) -> ParseResult<Node<ExpressionNode>> {
-    tokens.next();
-    let parameter = match left.value {
-        ExpressionNode::Name(name) => Ok(ExpressionNode::ClosureParameter(
-            ClosureParameterExpressionNode {
-                name,
-                parameter_type: None,
-            },
-        )),
-        _ => Err(LocatedSyntaxError {
-            span: left.span,
-            error: SyntaxError::ExpectedName(NameType::Parameter),
-        }),
-    }?;
-
-    let parameters = vec![left.span.wrap(parameter)];
-    let closure = closure(tokens, parameters)?;
-    let full_span = left.span.expand_to(tokens);
-    Ok(full_span.wrap(closure))
-}
-
-fn type_binding(
-    tokens: &mut TokenStream,
-    left: Node<ExpressionNode>,
-) -> ParseResult<Node<ExpressionNode>> {
-    tokens.next();
-    let bound_type_parameters = tokens.located(bound_type_parameters)?;
-    let span = left.span.expand_to(tokens);
-
-    Ok(
-        span.wrap(ExpressionNode::TypeBinding(TypeBindingExpressionNode {
-            left: Box::new(left),
-            bound_type_parameters,
-        })),
-    )
 }
 
 fn expression_atom(
@@ -390,37 +286,6 @@ fn closure_or_tuple(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
     } else {
         Ok(expression.value)
     }
-}
-
-fn closure(
-    tokens: &mut TokenStream,
-    parameters: Vec<Node<ExpressionNode>>,
-) -> ParseResult<ExpressionNode> {
-    let parameters = parameters
-        .into_iter()
-        .map(|parameter| {
-            if let ExpressionNode::Name(name) = parameter.value {
-                Some(parameter.span.wrap(ClosureParameterExpressionNode {
-                    name,
-                    parameter_type: None,
-                }))
-            } else if let ExpressionNode::ClosureParameter(param) = parameter.value {
-                Some(parameter.span.wrap(param))
-            } else {
-                tokens.errors.push(LocatedSyntaxError {
-                    span: parameter.span,
-                    error: SyntaxError::ExpectedClosureParameter,
-                });
-                None
-            }
-        })
-        .collect();
-
-    let body = tokens.located(expression)?;
-    Ok(ExpressionNode::Closure(ClosureExpressionNode {
-        parameters,
-        body: Box::new(body),
-    }))
 }
 
 fn array(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
