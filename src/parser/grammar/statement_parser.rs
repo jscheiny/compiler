@@ -14,8 +14,8 @@ pub fn statement(tokens: &mut TokenStream, block_type: BlockType) -> ParseResult
         Token::Keyword(K::Let) => declaration(tokens, false),
         Token::Keyword(K::Mut) => declaration(tokens, true),
         Token::Keyword(K::Return) => function_return(tokens),
-        Token::Keyword(K::Break) => break_statement(tokens),
-        Token::Keyword(K::Continue) => continue_statement(tokens),
+        Token::Keyword(K::Break) => Ok(break_statement(tokens)),
+        Token::Keyword(K::Continue) => Ok(continue_statement(tokens)),
         Token::Keyword(K::While) => while_loop(tokens),
         Token::Keyword(K::If) => if_statement(tokens),
         Token::Keyword(K::Match) => match_statement(tokens),
@@ -71,16 +71,16 @@ fn function_return(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
     }
 }
 
-fn break_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
+fn break_statement(tokens: &mut TokenStream) -> StatementNode {
     tokens.next();
     end_statement(tokens);
-    Ok(StatementNode::Break)
+    StatementNode::Break
 }
 
-fn continue_statement(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
+fn continue_statement(tokens: &mut TokenStream) -> StatementNode {
     tokens.next();
     end_statement(tokens);
-    Ok(StatementNode::Continue)
+    StatementNode::Continue
 }
 
 fn while_loop(tokens: &mut TokenStream) -> ParseResult<StatementNode> {
