@@ -54,7 +54,7 @@ impl Display for TypeFmt<'_> {
     }
 }
 
-impl<'a> TypeFmt<'a> {
+impl TypeFmt<'_> {
     fn write_types_list(&self, f: &mut std::fmt::Formatter<'_>, list: &[Type]) -> std::fmt::Result {
         let mut iter = list.iter().map(|t| t.format(self.scope));
         write_iter(f, &mut iter, list.len())

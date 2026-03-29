@@ -109,7 +109,7 @@ pub struct SyntaxErrorMessage<'a> {
     tokens: Rc<Vec<LocatedToken>>,
 }
 
-impl<'a> Display for SyntaxErrorMessage<'a> {
+impl Display for SyntaxErrorMessage<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         use SyntaxError as E;
         use Token as T;
@@ -165,7 +165,7 @@ pub struct SyntaxErrorInlineMessage<'a> {
     error: &'a LocatedSyntaxError,
 }
 
-impl<'a> Display for SyntaxErrorInlineMessage<'a> {
+impl Display for SyntaxErrorInlineMessage<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         use Symbol as S;
         use SyntaxError as E;

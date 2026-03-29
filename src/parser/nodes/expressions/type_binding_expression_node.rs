@@ -32,7 +32,7 @@ impl TypeBindingExpressionNode {
         };
 
         let unbound_type = Type::Reference(type_index).deref(&scope);
-        let bound_type = bind_type(&scope, unbound_type, &self.bound_type_parameters, None);
+        let bound_type = bind_type(&scope, &unbound_type, &self.bound_type_parameters, None);
         (scope, bound_type)
     }
 }

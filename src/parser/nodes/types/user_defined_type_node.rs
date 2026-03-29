@@ -29,7 +29,7 @@ impl UserDefinedTypeNode {
     fn init_type(&self, scope: &Scope, type_params: Option<&TypeParameterMap>) -> Type {
         let base_type = self.get_base_type(scope, type_params);
         if let Some(bound_type_params) = self.bound_type_parameters.as_ref() {
-            bind_type(scope, base_type, bound_type_params, type_params)
+            bind_type(scope, &base_type, bound_type_params, type_params)
         } else {
             self.unbound_type(scope, base_type)
         }
@@ -73,7 +73,7 @@ impl UserDefinedTypeNode {
 
 pub fn bind_type(
     scope: &Scope,
-    base_type: Type,
+    base_type: &Type,
     bound_type_params: &NodeVec<TypeNode>,
     type_params: Option<&TypeParameterMap>,
 ) -> Type {

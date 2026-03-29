@@ -46,7 +46,7 @@ impl Scope {
         scope_type: ScopeType,
         handler: impl FnOnce(Box<Scope>) -> Box<Scope>,
     ) -> Box<Scope> {
-        let (scope, _) = self.nest_with(scope_type, |scope| (handler(scope), ()));
+        let (scope, ()) = self.nest_with(scope_type, |scope| (handler(scope), ()));
         scope
     }
 
@@ -129,7 +129,7 @@ impl Scope {
             v.insert(value);
         } else {
             if_present(self);
-        };
+        }
     }
 
     pub fn get_value(&self, name: &String) -> Option<Type> {

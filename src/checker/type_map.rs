@@ -11,7 +11,7 @@ pub struct TypeMap {
 
 impl TypeMap {
     pub fn new() -> Self {
-        Default::default()
+        TypeMap::default()
     }
 
     pub fn nest(&self) -> TypeMap {

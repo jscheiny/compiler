@@ -13,19 +13,19 @@ pub struct FunctionCallExpressionNode {
 impl FunctionCallExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         let (scope, function_type) = self.function.check_expected(scope, expected_type);
-        check_function_call(scope, self.function.span, function_type, &self.arguments)
+        check_function_call(scope, self.function.span, &function_type, &self.arguments)
     }
 }
 
 pub fn check_function_call(
     scope: Box<Scope>,
     function_span: TokenSpan,
-    left_type: Type,
+    left_type: &Type,
     arguments: &NodeVec<ExpressionNode>,
 ) -> (Box<Scope>, Type) {
     let function_type = left_type.to_function(&scope);
     match function_type {
-        Some(function_type) => check_valid_function_call(scope, function_type, arguments),
+        Some(function_type) => check_valid_function_call(scope, &function_type, arguments),
         None => check_invalid_function_call(scope, function_span, left_type, arguments),
     }
 }
@@ -33,7 +33,7 @@ pub fn check_function_call(
 fn check_invalid_function_call(
     mut scope: Box<Scope>,
     function_span: TokenSpan,
-    left_type: Type,
+    left_type: &Type,
     arguments: &NodeVec<ExpressionNode>,
 ) -> (Box<Scope>, Type) {
     if !left_type.is_error() {
@@ -57,7 +57,7 @@ fn check_invalid_function_call(
 
 fn check_valid_function_call(
     mut scope: Box<Scope>,
-    function_type: Rc<FunctionType>,
+    function_type: &Rc<FunctionType>,
     arguments: &NodeVec<ExpressionNode>,
 ) -> (Box<Scope>, Type) {
     if arguments.len() > function_type.parameters.len() {

@@ -33,7 +33,7 @@ pub fn tokenize(mut text: &str) -> TokenizerResult {
     while !text.is_empty() {
         while let Some(token) = next_token(text, tokenizers) {
             let NextToken { token, width, next } = token;
-            let end = start.add(width);
+            let end = start.add(&width);
             if let Some(token) = token {
                 let span = CharacterSpan { start, end };
                 tokens.push(LocatedToken { token, span });
@@ -57,7 +57,7 @@ pub fn tokenize(mut text: &str) -> TokenizerResult {
 
         let bad_token = &text[..bad_token_start];
         if !bad_token.is_empty() {
-            let end = start.add(TokenWidth::from(bad_token));
+            let end = start.add(&TokenWidth::from(bad_token));
             errors.push(CharacterSpan { start, end });
             start = end;
             text = &text[bad_token_start..];

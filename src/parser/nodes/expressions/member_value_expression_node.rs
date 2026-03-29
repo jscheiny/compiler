@@ -17,21 +17,21 @@ impl MemberValueExpressionNode {
         let (scope, left_type) = self.left.check_expected(scope, expected_type);
         let function_type = left_type.to_function(&scope);
         if let Some(function_type) = function_type {
-            return self.check_deferred(scope, function_type);
+            return self.check_deferred(scope, &function_type);
         }
 
         let field_type = get_field(&left_type, self.left.span, &self.field, &scope);
         if let Some(arguments) = self.arguments.as_ref() {
-            check_function_call(scope, self.field.span, field_type, arguments)
+            check_function_call(scope, self.field.span, &field_type, arguments)
         } else {
             (scope, field_type)
         }
     }
 
-    pub fn check_deferred(
+    fn check_deferred(
         &self,
         scope: Box<Scope>,
-        function_type: Rc<FunctionType>,
+        function_type: &Rc<FunctionType>,
     ) -> (Box<Scope>, Type) {
         let field_type = get_field(
             &function_type.return_type,
@@ -40,7 +40,7 @@ impl MemberValueExpressionNode {
             &scope,
         );
         let (scope, result_type) = if let Some(arguments) = self.arguments.as_ref() {
-            check_function_call(scope, self.field.span, field_type, arguments)
+            check_function_call(scope, self.field.span, &field_type, arguments)
         } else {
             (scope, field_type)
         };

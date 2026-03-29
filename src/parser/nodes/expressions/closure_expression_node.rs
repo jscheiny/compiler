@@ -14,7 +14,7 @@ impl ClosureExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         let function_type = get_expected_type(expected_type, &scope);
         scope.nest_with(ScopeType::Closure, |scope| {
-            let (scope, parameters) = self.check_parameters(function_type.clone(), scope);
+            let (scope, parameters) = self.check_parameters(function_type.as_ref(), scope);
             let expected_return_type = function_type.map(|t| t.return_type.clone());
             let (scope, return_type) = self
                 .body
@@ -33,7 +33,7 @@ impl ClosureExpressionNode {
 
     fn check_parameters(
         &self,
-        expected_type: Option<Rc<FunctionType>>,
+        expected_type: Option<&Rc<FunctionType>>,
         mut scope: Box<Scope>,
     ) -> (Box<Scope>, Vec<Type>) {
         let parameter_types = self
@@ -43,7 +43,7 @@ impl ClosureExpressionNode {
             .map(|(index, parameter)| {
                 if let Some(parameter) = parameter {
                     let parameter_type =
-                        get_parameter_type(parameter, index, expected_type.clone(), &scope);
+                        get_parameter_type(parameter, index, expected_type, &scope);
                     scope.add_value_or(&parameter.name, parameter_type.clone(), |scope| {
                         scope.source.print_error(
                             parameter.name.span,
@@ -65,7 +65,7 @@ impl ClosureExpressionNode {
 fn get_parameter_type(
     parameter: &Node<ClosureParameterExpressionNode>,
     index: usize,
-    expected_type: Option<Rc<FunctionType>>,
+    expected_type: Option<&Rc<FunctionType>>,
     scope: &Scope,
 ) -> Type {
     let expected_type = expected_type.and_then(|ft| ft.parameters.get(index).cloned());

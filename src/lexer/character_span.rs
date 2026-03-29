@@ -22,7 +22,7 @@ pub struct CharacterLocation {
 }
 
 impl CharacterLocation {
-    pub fn add(&self, width: TokenWidth) -> Self {
+    pub fn add(&self, width: &TokenWidth) -> Self {
         if width.new_lines == 0 {
             CharacterLocation {
                 line: self.line,
