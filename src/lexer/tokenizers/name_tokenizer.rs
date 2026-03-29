@@ -5,7 +5,7 @@ pub struct NameTokenizer;
 impl Tokenizer for NameTokenizer {
     fn try_tokenize(&self, text: &str) -> Option<TryTokenizeResult> {
         let mut width = TokenWidth::new();
-        let mut name = String::from("");
+        let mut name = String::new();
         for character in text.chars() {
             if !character.is_alphanumeric() && character != '_' {
                 break;

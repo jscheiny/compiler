@@ -13,7 +13,7 @@ impl MatchNode {
         let (mut scope, subject_type) = self.check_subject(scope);
         for case in &self.cases {
             let (new_scope, _) = case.check(scope, None, &subject_type);
-            scope = new_scope
+            scope = new_scope;
         }
 
         scope

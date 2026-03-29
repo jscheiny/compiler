@@ -112,6 +112,7 @@ pub struct SyntaxErrorMessage<'a> {
 impl<'a> Display for SyntaxErrorMessage<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         use SyntaxError as E;
+        use Token as T;
         match self.error.error {
             E::BlockReturnEarly => return write!(f, "early block return statement"),
             E::ExpectedBlock => write!(f, "expected statement block"),
@@ -148,7 +149,6 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
         write!(f, ", found ")?;
 
         let LocatedToken { token, .. } = &self.tokens[self.error.span.start_index];
-        use Token as T;
         match token {
             T::CharacterLiteral(_) => write!(f, "character literal"),
             T::Name(name) => write!(f, "name `{name}`"),

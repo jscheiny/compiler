@@ -76,7 +76,7 @@ fn sub_expression(
             let operator = TokenSpan::singleton(tokens).wrap(operator);
             tokens.next();
 
-            left = binary_op_expression(tokens, left, operator, context)?
+            left = binary_op_expression(tokens, left, operator, context)?;
         } else if let Some(operator) = SpecialOperator::from_token(token) {
             if operator.precedence() < context.min_precedence {
                 break;

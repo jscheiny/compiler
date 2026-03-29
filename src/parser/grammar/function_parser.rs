@@ -102,8 +102,8 @@ fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyNode> {
 }
 
 pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<Node<ParameterNode>>> {
-    let error = SyntaxError::ExpectedParameters;
     use Symbol as S;
+    let error = SyntaxError::ExpectedParameters;
     match tokens.peek() {
         Token::Symbol(S::OpenParen) => {
             tokens.next();

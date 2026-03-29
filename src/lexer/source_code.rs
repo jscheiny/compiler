@@ -100,7 +100,7 @@ impl SourceCode {
             print!("   {} ", "|".bold().cyan());
             if line_offset == 0 {
                 for _ in prefix.chars() {
-                    print!(" ")
+                    print!(" ");
                 }
             }
 
@@ -118,7 +118,7 @@ impl SourceCode {
             }
 
             if line_offset == lines.len() - 1 {
-                print!(" {}", apply_severity(message, severity))
+                print!(" {}", apply_severity(message, severity));
             }
             println!();
         }
