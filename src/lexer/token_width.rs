@@ -9,7 +9,7 @@ pub struct TokenWidth {
 
 impl TokenWidth {
     pub fn new() -> Self {
-        Default::default()
+        TokenWidth::default()
     }
 
     pub fn from(text: &str) -> Self {

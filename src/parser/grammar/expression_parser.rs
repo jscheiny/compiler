@@ -40,7 +40,7 @@ impl ExpressionContext {
 }
 
 pub fn expression(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
-    sub_expression(tokens, Default::default())
+    sub_expression(tokens, ExpressionContext::default())
 }
 
 fn sub_expression(

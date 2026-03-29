@@ -34,7 +34,10 @@ impl StructNode {
     fn check_nested(self: &Rc<Self>, mut scope: Box<Scope>) -> Box<Scope> {
         let mut scope_names = HashSet::new();
         for field in self.fields.iter() {
-            if !scope_names.insert(field.name.clone()) {
+            if scope_names.insert(field.name.clone()) {
+                let field_type = field.get_type(&scope).clone();
+                scope.add_value(&field.name, field_type);
+            } else {
                 scope.source.print_error(
                     field.name.span,
                     &format!("Duplicate struct member `{}`", field.name),
@@ -43,9 +46,6 @@ impl StructNode {
                         self.name
                     ),
                 );
-            } else {
-                let field_type = field.get_type(&scope).clone();
-                scope.add_value(&field.name, field_type);
             }
         }
 

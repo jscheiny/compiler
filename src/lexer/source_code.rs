@@ -110,10 +110,10 @@ impl SourceCode {
                 if !line_char.is_whitespace() {
                     is_indent = false;
                 }
-                if !is_indent {
-                    print!("{}", apply_severity(underline.as_str(), severity));
-                } else {
+                if is_indent {
                     print!(" ");
+                } else {
+                    print!("{}", apply_severity(underline.as_str(), severity));
                 }
             }
 

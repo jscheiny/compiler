@@ -146,10 +146,10 @@ fn check_method_equivalence(
             &format!(
                 "Expected {} parameter{} but found {}",
                 interface_type.parameters.len(),
-                if interface_type.parameters.len() != 1 {
-                    "s"
-                } else {
+                if interface_type.parameters.len() == 1 {
                     ""
+                } else {
+                    "s"
                 },
                 implemented_type.parameters.len()
             ),

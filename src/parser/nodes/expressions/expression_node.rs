@@ -66,7 +66,7 @@ impl ExpressionNode {
             Self::PostfixOp(node) => node.check(scope),
             Self::PrefixOp(node) => node.check(scope),
             Self::SelfRef(name) => self.check_self_ref(name, scope),
-            Self::SelfValue(span) => self.check_self_value(*span, scope),
+            Self::SelfValue(span) => check_self_value(*span, scope),
             Self::StringLiteral(_) => (
                 scope,
                 Type::Array(Box::new(Type::Primitive(PrimitiveType::Char))),
@@ -98,26 +98,26 @@ impl ExpressionNode {
 
         (scope, Type::Error)
     }
+}
 
-    fn check_self_value(&self, span: TokenSpan, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let mut self_index = None;
-        scope.find_scope(|scope_type| match scope_type {
-            ScopeType::Struct(index) => {
-                self_index = Some(index);
-                true
-            }
-            _ => false,
-        });
-
-        if let Some(index) = self_index {
-            (scope, Type::Reference(index))
-        } else {
-            scope.source.print_error(
-                span,
-                "Invalid `self` outside of struct or enum",
-                "`self` value only available inside of struct or enum",
-            );
-            (scope, Type::Error)
+fn check_self_value(span: TokenSpan, scope: Box<Scope>) -> (Box<Scope>, Type) {
+    let mut self_index = None;
+    scope.find_scope(|scope_type| match scope_type {
+        ScopeType::Struct(index) => {
+            self_index = Some(index);
+            true
         }
+        _ => false,
+    });
+
+    if let Some(index) = self_index {
+        (scope, Type::Reference(index))
+    } else {
+        scope.source.print_error(
+            span,
+            "Invalid `self` outside of struct or enum",
+            "`self` value only available inside of struct or enum",
+        );
+        (scope, Type::Error)
     }
 }

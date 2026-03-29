@@ -22,7 +22,7 @@ pub enum SpecialOperator {
 
 impl SpecialOperator {
     pub fn parse(
-        &self,
+        self,
         tokens: &mut TokenStream,
         left: Node<ExpressionNode>,
     ) -> ParseResult<Node<ExpressionNode>> {

@@ -38,15 +38,15 @@ impl TypeParameterListNode {
 
         let mut names = HashSet::new();
         for type_param in &self.list {
-            if !names.insert(&type_param.name.value) {
+            if names.insert(&type_param.name.value) {
+                let type_parameter = Rc::new(TypeParameter::new(type_param.name.clone()));
+                scope.add_type(&type_param.name, Type::TypeParameter(type_parameter));
+            } else {
                 scope.source.print_error(
                     type_param.name.span,
                     &format!("Duplicate type parameter name `{}`", type_param.name),
                     "type alias already contains a type parameter with this name",
                 );
-            } else {
-                let type_parameter = Rc::new(TypeParameter::new(type_param.name.clone()));
-                scope.add_type(&type_param.name, Type::TypeParameter(type_parameter));
             }
         }
 

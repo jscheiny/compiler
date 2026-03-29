@@ -44,7 +44,7 @@ impl TypeMap {
         if index < self.offset {
             return None;
         }
-        self.types.get(index - self.offset).and_then(|t| t.clone())
+        self.types.get(index - self.offset).and_then(Clone::clone)
     }
 
     pub fn resolve(&mut self, name: &str, value: Type) {
