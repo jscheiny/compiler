@@ -60,7 +60,7 @@ impl ImplementationNode {
                     self_type,
                     &mut scope_names,
                 ),
-            };
+            }
         }
 
         for entry in &self.entries {

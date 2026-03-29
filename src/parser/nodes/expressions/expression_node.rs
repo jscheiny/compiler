@@ -65,7 +65,7 @@ impl ExpressionNode {
             Self::Name(node) => node.check(scope, expected_type),
             Self::PostfixOp(node) => node.check(scope),
             Self::PrefixOp(node) => node.check(scope),
-            Self::SelfRef(name) => self.check_self_ref(name, scope),
+            Self::SelfRef(name) => check_self_ref(name, scope),
             Self::SelfValue(span) => check_self_value(*span, scope),
             Self::StringLiteral(_) => (
                 scope,
@@ -75,29 +75,29 @@ impl ExpressionNode {
             Self::Error => (scope, Type::Error),
         }
     }
+}
 
-    fn check_self_ref(&self, name: &NameNode, scope: Box<Scope>) -> (Box<Scope>, Type) {
-        let self_scope = scope.find_scope(|scope_type| matches!(scope_type, ScopeType::Struct(_)));
-        if let Some(self_scope) = self_scope {
-            let resolved_type = self_scope.get_local_value(name);
-            if let Some(resolved_type) = resolved_type {
-                return (scope, resolved_type);
-            }
-            scope.source.print_error(
-                name.span,
-                &format!("Could not find member `{name}`"),
-                "self type does not contain a member with this name",
-            );
-        } else {
-            scope.source.print_error(
-                name.span.before(),
-                "Self reference outside of struct or enum",
-                "operator invalid outside of struct or enum",
-            );
+fn check_self_ref(name: &NameNode, scope: Box<Scope>) -> (Box<Scope>, Type) {
+    let self_scope = scope.find_scope(|scope_type| matches!(scope_type, ScopeType::Struct(_)));
+    if let Some(self_scope) = self_scope {
+        let resolved_type = self_scope.get_local_value(name);
+        if let Some(resolved_type) = resolved_type {
+            return (scope, resolved_type);
         }
-
-        (scope, Type::Error)
+        scope.source.print_error(
+            name.span,
+            &format!("Could not find member `{name}`"),
+            "self type does not contain a member with this name",
+        );
+    } else {
+        scope.source.print_error(
+            name.span.before(),
+            "Self reference outside of struct or enum",
+            "operator invalid outside of struct or enum",
+        );
     }
+
+    (scope, Type::Error)
 }
 
 fn check_self_value(span: TokenSpan, scope: Box<Scope>) -> (Box<Scope>, Type) {
