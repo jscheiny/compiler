@@ -1,6 +1,6 @@
 use crate::{
     lexer::Symbol,
-    parser::{Node, ParseResult, TokenStream},
+    parser::{Node, ParseResult, SyntaxError, TokenStream},
 };
 
 pub fn comma_separated_list<T>(
@@ -8,12 +8,14 @@ pub fn comma_separated_list<T>(
     close_symbol: Symbol,
     parse_entry: impl Fn(&mut TokenStream) -> ParseResult<T>,
 ) -> ParseResult<Vec<Node<T>>> {
-    // TODO this could use better errors
     let mut entries = vec![];
     while !tokens.accept(close_symbol) {
         entries.push(tokens.located(&parse_entry)?);
-        if tokens.accept(Symbol::Comma) {
-            continue;
+        if tokens.accept(close_symbol) {
+            break;
+        }
+        if !tokens.accept(Symbol::Comma) {
+            tokens.push_error(SyntaxError::ExpectedComma);
         }
     }
     Ok(entries)

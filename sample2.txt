@@ -1,3 +1,5 @@
+enum X(A, B C,) {}
+
 struct S() {
     pub duplicate(): S {}
 }
@@ -10,6 +12,8 @@ fn test(s: S) {
     let f2: S => S = Identity[S]::duplicate;
     let x = (a: bool, b: bool) -> a or b;
     accept(a -> not a);
+
+    let x: X = C(5);
 }
 
 fn accept(f: bool => bool) {}
