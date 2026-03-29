@@ -38,7 +38,7 @@ fn field(tokens: &mut TokenStream) -> ParseResult<StructFieldNode> {
             let type_def = Some(tokens.located(type_definition)?);
             Ok(StructFieldNode::new(public, name, type_def))
         }
-        Token::Symbol(Symbol::Comma) | Token::Symbol(Symbol::CloseParen) => {
+        Token::Symbol(Symbol::Comma | Symbol::CloseParen) => {
             tokens.push_error(error);
             Ok(StructFieldNode::new(public, name, None))
         }

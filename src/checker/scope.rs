@@ -93,8 +93,7 @@ impl Scope {
             || self
                 .parent
                 .as_ref()
-                .map(|parent| parent.within(scope_type))
-                .unwrap_or(false)
+                .is_some_and(|parent| parent.within(scope_type))
     }
 
     pub fn find_scope(&self, mut predicate: impl FnMut(ScopeType) -> bool) -> Option<&Scope> {

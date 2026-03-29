@@ -73,12 +73,12 @@ fn closure_parameter(
                 parameter_type,
             },
         )));
-    } else {
-        tokens.errors.push(LocatedSyntaxError {
-            span: left.span,
-            error: SyntaxError::ExpectedName(NameType::Parameter),
-        });
     }
+
+    tokens.errors.push(LocatedSyntaxError {
+        span: left.span,
+        error: SyntaxError::ExpectedName(NameType::Parameter),
+    });
 
     // Parse the type definition for errors and so we can continue parsing
     type_definition(tokens)?;

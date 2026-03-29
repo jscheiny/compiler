@@ -68,8 +68,7 @@ impl EnumType {
         self.node
             .implementation
             .as_ref()
-            .map(|implementation| implementation.implements(scope, interface_type))
-            .unwrap_or(false)
+            .is_some_and(|implementation| implementation.implements(scope, interface_type))
     }
 }
 

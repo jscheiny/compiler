@@ -167,8 +167,7 @@ fn check_method_equivalence(
             let error_span = parameter_node
                 .type_def
                 .as_ref()
-                .map(|t| t.span)
-                .unwrap_or(parameter_node.span);
+                .map_or(parameter_node.span, |t| t.span);
             scope.source.print_error(
                 error_span,
                 &format!(
@@ -193,8 +192,7 @@ fn check_method_equivalence(
             .signature
             .return_type
             .as_ref()
-            .map(|node| node.span)
-            .unwrap_or_else(|| implemented_method.body.span.start());
+            .map_or_else(|| implemented_method.body.span.start(), |node| node.span);
         scope.source.print_error(
             error_span,
             &format!(

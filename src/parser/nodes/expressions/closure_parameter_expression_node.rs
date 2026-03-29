@@ -13,8 +13,7 @@ impl ClosureParameterExpressionNode {
         let span = self
             .parameter_type
             .as_ref()
-            .map(|node| node.span)
-            .unwrap_or(self.name.span);
+            .map_or(self.name.span, |node| node.span);
         scope.source.print_error(
             span,
             "unexpected type declaration",

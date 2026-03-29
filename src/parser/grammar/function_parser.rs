@@ -110,7 +110,7 @@ pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<Node<ParameterNod
             let list = comma_separated_list(tokens, S::CloseParen, parameter)?;
             Ok(list)
         }
-        Token::Symbol(S::SkinnyArrow) | Token::Symbol(S::OpenBrace) => {
+        Token::Symbol(S::SkinnyArrow | S::OpenBrace) => {
             tokens.push_error(error);
             Ok(vec![])
         }
@@ -127,7 +127,7 @@ fn parameter(tokens: &mut TokenStream) -> ParseResult<ParameterNode> {
             let type_def = Some(tokens.located(type_definition)?);
             Ok(ParameterNode::new(name, type_def))
         }
-        Token::Symbol(Symbol::Comma) | Token::Symbol(Symbol::CloseParen) => {
+        Token::Symbol(Symbol::Comma | Symbol::CloseParen) => {
             tokens.push_error(error);
             Ok(ParameterNode::new(name, None))
         }

@@ -126,7 +126,7 @@ impl SourceCode {
 
     fn span_prefix(&self, start_byte: usize) -> &str {
         let prefix = &self.source[..start_byte];
-        let start_line_byte = prefix.rfind('\n').map(|start| start + 1).unwrap_or(0);
+        let start_line_byte = prefix.rfind('\n').map_or(0, |start| start + 1);
         &prefix[start_line_byte..]
     }
 
