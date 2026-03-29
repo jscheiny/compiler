@@ -121,12 +121,11 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             E::ExpectedClosureParameter => write!(f, "expected parameter"),
             E::ExpectedElse => write!(f, "`{}` following true branch expression", Keyword::Else),
             E::ExpectedEndStatement => write!(f, "expected end of statement"),
-            E::ExpectedExpression => write!(f, "expected expression"),
+            E::ExpectedExpression | E::ExpectedMatchExpression => write!(f, "expected expression"),
             E::ExpectedFields => write!(f, "expected fields"),
             E::ExpectedFunctionBody => write!(f, "expected function body"),
             E::ExpectedInitializer => write!(f, "expected initializer"),
             E::ExpectedMatchBlock => write!(f, "expected match block"),
-            E::ExpectedMatchExpression => write!(f, "expected expression"),
             E::ExpectedMatchPattern => write!(f, "expected match pattern"),
             E::ExpectedMethods => write!(f, "expected methods block"),
             E::ExpectedMethodSignatures => write!(f, "expected method signatures block"),
@@ -172,28 +171,27 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
         use SyntaxError as E;
         match self.error.error {
             E::BlockReturnEarly => write!(f, "block return must be the last statement in a block"),
-            E::ExpectedBlock => fmt_symbol(f, S::OpenBrace),
+            E::ExpectedBlock | E::ExpectedMatchBlock | E::ExpectedMethodSignatures => {
+                fmt_symbol(f, S::OpenBrace)
+            }
             E::ExpectedCloseBracket => fmt_symbol(f, S::CloseBracket),
             E::ExpectedCloseParen => fmt_symbol(f, S::CloseParen),
-            E::ExpectedClosureBody => fmt_symbol(f, S::SkinnyArrow),
+            E::ExpectedClosureBody | E::ExpectedMatchExpression => fmt_symbol(f, S::SkinnyArrow),
             E::ExpectedClosureParameter => write!(f, "expected parameter for closure"),
             E::ExpectedElse => write!(f, "expected `{}`", Keyword::Else),
             E::ExpectedEndStatement => fmt_symbol(f, S::Semicolon),
             E::ExpectedExpression => write!(f, "expected expression"),
-            E::ExpectedFields => fmt_symbol(f, S::OpenParen),
+            E::ExpectedFields | E::ExpectedParameters | E::ExpectedVariants => {
+                fmt_symbol(f, S::OpenParen)
+            }
             E::ExpectedFunctionBody => fmt_symbols(f, S::SkinnyArrow, S::OpenBrace),
             E::ExpectedInitializer => fmt_symbol(f, S::Equal),
-            E::ExpectedMatchBlock => fmt_symbol(f, S::OpenBrace),
-            E::ExpectedMatchExpression => fmt_symbol(f, S::SkinnyArrow),
             E::ExpectedMatchPattern => write!(f, "expected pattern e.g. Variant(let binding)"),
             E::ExpectedMethods => fmt_symbols(f, S::OpenBrace, S::Semicolon),
-            E::ExpectedMethodSignatures => fmt_symbol(f, S::OpenBrace),
             E::ExpectedName(name_type) => write!(f, "expected {name_type}"),
-            E::ExpectedParameters => fmt_symbol(f, S::OpenParen),
             E::ExpectedThen => write!(f, "expected `{}`", Keyword::Then),
             E::ExpectedTopLevelDefinition => write!(f, "expected struct, tuple, enum, or function"),
             E::ExpectedType => write!(f, "expected type name"),
-            E::ExpectedVariants => fmt_symbol(f, S::OpenParen),
             E::UnexpectedBindingPattern => {
                 write!(
                     f,

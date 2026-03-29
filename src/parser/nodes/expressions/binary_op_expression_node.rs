@@ -15,27 +15,26 @@ impl BinaryOpExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         use BinaryOperator as O;
         match *self.operator {
-            O::Add => todo_unimplemented_operator(scope),
-            O::AddAssign => todo_unimplemented_operator(scope),
-            O::Subtract => todo_unimplemented_operator(scope),
-            O::SubtractAssign => todo_unimplemented_operator(scope),
-            O::Multiply => todo_unimplemented_operator(scope),
-            O::MultiplyAssign => todo_unimplemented_operator(scope),
-            O::Divide => todo_unimplemented_operator(scope),
-            O::DivideAssign => todo_unimplemented_operator(scope),
-            O::Mod => todo_unimplemented_operator(scope),
-            O::ModAssign => todo_unimplemented_operator(scope),
-            O::Assign => todo_unimplemented_operator(scope),
-            O::Equal => todo_unimplemented_operator(scope),
-            O::NotEqual => todo_unimplemented_operator(scope),
-            O::LessThan => todo_unimplemented_operator(scope),
-            O::LessThanOrEqual => todo_unimplemented_operator(scope),
-            O::GreaterThan => todo_unimplemented_operator(scope),
-            O::GreaterThanOrEqual => todo_unimplemented_operator(scope),
+            O::Add
+            | O::AddAssign
+            | O::Subtract
+            | O::SubtractAssign
+            | O::Multiply
+            | O::MultiplyAssign
+            | O::Divide
+            | O::DivideAssign
+            | O::Mod
+            | O::ModAssign
+            | O::Assign
+            | O::Equal
+            | O::NotEqual
+            | O::LessThan
+            | O::LessThanOrEqual
+            | O::GreaterThan
+            | O::GreaterThanOrEqual => todo_unimplemented_operator(scope),
             O::FunctionApplication => self.check_function_application(scope, expected_type),
             O::Comma => self.check_comma(scope, expected_type),
-            O::LogicalAnd => self.check_logical_op(scope),
-            O::LogicalOr => self.check_logical_op(scope),
+            O::LogicalAnd | O::LogicalOr => self.check_logical_op(scope),
         }
     }
 
