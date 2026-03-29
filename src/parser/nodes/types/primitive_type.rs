@@ -30,6 +30,6 @@ impl Display for PrimitiveType {
             Self::Float => Keyword::Float,
             Self::Int => Keyword::Int,
         };
-        write!(f, "{}", keyword)
+        write!(f, "{keyword}")
     }
 }

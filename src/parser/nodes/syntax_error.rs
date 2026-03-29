@@ -65,7 +65,7 @@ impl Display for NameType {
             Self::Variable => "variable",
             Self::Variant => "variant",
         };
-        write!(f, "{} name", message)
+        write!(f, "{message} name")
     }
 }
 
@@ -130,7 +130,7 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
             E::ExpectedMatchPattern => write!(f, "expected match pattern"),
             E::ExpectedMethods => write!(f, "expected methods block"),
             E::ExpectedMethodSignatures => write!(f, "expected method signatures block"),
-            E::ExpectedName(name_type) => write!(f, "expected {}", name_type),
+            E::ExpectedName(name_type) => write!(f, "expected {name_type}"),
             E::ExpectedParameters => write!(f, "expected parameters"),
             E::ExpectedThen => write!(f, "expected `{}` following predicate`", Keyword::Then),
             E::ExpectedTopLevelDefinition => write!(f, "expected struct, tuple, enum, or function"),
@@ -140,10 +140,10 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
                 return write!(f, "unexpected top level binding pattern");
             }
             E::UnexpectedBlockReturn(statement_type) => {
-                return write!(f, "unexpected block return in {}", statement_type);
+                return write!(f, "unexpected block return in {statement_type}");
             }
             E::UnexpectedMethodSignatureQualifier(keyword) => {
-                return write!(f, "unexpected qualifier `{}` for interface method", keyword);
+                return write!(f, "unexpected qualifier `{keyword}` for interface method");
             }
         }?;
         write!(f, ", found ")?;
@@ -152,11 +152,11 @@ impl<'a> Display for SyntaxErrorMessage<'a> {
         use Token as T;
         match token {
             T::CharacterLiteral(_) => write!(f, "character literal"),
-            T::Name(name) => write!(f, "name `{}`", name),
-            T::IntegerLiteral(literal) => write!(f, "integer literal `{}`", literal),
-            T::StringLiteral(literal) => write!(f, "string literal {}", literal),
-            T::Symbol(symbol) => write!(f, "`{}`", symbol),
-            T::Keyword(keyword) => write!(f, "keyword `{}`", keyword),
+            T::Name(name) => write!(f, "name `{name}`"),
+            T::IntegerLiteral(literal) => write!(f, "integer literal `{literal}`"),
+            T::StringLiteral(literal) => write!(f, "string literal {literal}"),
+            T::Symbol(symbol) => write!(f, "`{symbol}`"),
+            T::Keyword(keyword) => write!(f, "keyword `{keyword}`"),
             T::EndOfFile => write!(f, "end of file"),
         }
     }
@@ -188,7 +188,7 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
             E::ExpectedMatchPattern => write!(f, "expected pattern e.g. Variant(let binding)"),
             E::ExpectedMethods => fmt_symbols(f, S::OpenBrace, S::Semicolon),
             E::ExpectedMethodSignatures => fmt_symbol(f, S::OpenBrace),
-            E::ExpectedName(name_type) => write!(f, "expected {}", name_type),
+            E::ExpectedName(name_type) => write!(f, "expected {name_type}"),
             E::ExpectedParameters => fmt_symbol(f, S::OpenParen),
             E::ExpectedThen => write!(f, "expected `{}`", Keyword::Then),
             E::ExpectedTopLevelDefinition => write!(f, "expected struct, tuple, enum, or function"),
@@ -212,9 +212,9 @@ impl<'a> Display for SyntaxErrorInlineMessage<'a> {
 }
 
 fn fmt_symbol(f: &mut std::fmt::Formatter<'_>, symbol: Symbol) -> std::fmt::Result {
-    write!(f, "expected `{}`", symbol)
+    write!(f, "expected `{symbol}`")
 }
 
 fn fmt_symbols(f: &mut std::fmt::Formatter<'_>, s1: Symbol, s2: Symbol) -> std::fmt::Result {
-    write!(f, "expected `{}` or `{}`", s1, s2)
+    write!(f, "expected `{s1}` or `{s2}`")
 }

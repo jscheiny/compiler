@@ -49,7 +49,7 @@ impl InterfaceImplementationNode {
                         scope.source.print_error(
                             self.name.span,
                             &format!("Implementation of `{}` is incomplete", interface_type.name),
-                            &format!("does not implement method `{}`", method),
+                            &format!("does not implement method `{method}`"),
                         );
                     }
                 }
@@ -102,7 +102,7 @@ impl InterfaceImplementationNode {
                     scope.source.print_error(
                         self.name.span,
                         "Cannot infer interface implementation",
-                        &format!("variant `{}` is untyped", variant_name),
+                        &format!("variant `{variant_name}` is untyped"),
                     );
                 }
             }

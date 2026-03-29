@@ -82,8 +82,8 @@ pub fn get_field(
             } else {
                 scope.source.print_error(
                     field.span,
-                    &format!("Could not find field `{}`", field),
-                    &format!("enum `{}` has no such method `{}`", enum_type.name(), field),
+                    &format!("Could not find field `{field}`"),
+                    &format!("enum `{}` has no such method `{field}`", enum_type.name()),
                 );
                 Type::Error
             }
@@ -104,10 +104,10 @@ pub fn get_field(
             } else {
                 scope.source.print_error(
                     field.span,
-                    &format!("Could not find method `{}`", field),
+                    &format!("Could not find method `{field}`"),
                     &format!(
-                        "interface `{}` has no such method `{}`",
-                        interface_type.name, field
+                        "interface `{}` has no such method `{field}`",
+                        interface_type.name
                     ),
                 );
                 Type::Error
@@ -128,11 +128,10 @@ pub fn get_field(
             } else {
                 scope.source.print_error(
                     field.span,
-                    &format!("Could not find field `{}`", field),
+                    &format!("Could not find field `{field}`"),
                     &format!(
-                        "struct `{}` has no such field or method `{}`",
+                        "struct `{}` has no such field or method `{field}`",
                         struct_type.name(),
-                        field
                     ),
                 );
                 Type::Error
@@ -148,7 +147,7 @@ pub fn check_private_member(scope: &Scope, receiver_type: &Type, field: &NameNod
     if is_external_private_access(scope, receiver_type) {
         scope.source.print_error(
             field.span,
-            &format!("Cannot access private member `{}`", field),
+            &format!("Cannot access private member `{field}`"),
             &format!(
                 "this member is private to `{}`",
                 receiver_type.format(scope),

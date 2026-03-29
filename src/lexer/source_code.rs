@@ -87,12 +87,12 @@ impl SourceCode {
             let line = start_character.line + line_offset + 1;
             print_line_header(line);
             if line_offset == 0 {
-                print!("{}", prefix);
+                print!("{prefix}");
             }
 
-            print!("{}", line_text);
+            print!("{line_text}");
             if line_offset == lines.len() - 1 {
-                println!("{}", suffix);
+                println!("{suffix}");
             } else {
                 println!();
             }

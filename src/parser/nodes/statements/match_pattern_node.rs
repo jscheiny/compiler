@@ -25,7 +25,7 @@ impl MatchPatternNode {
                 if bindings.contains_key(&name.value) {
                     scope.source.print_error(
                         span,
-                        &format!("Duplicate pattern binding of `{}`", name),
+                        &format!("Duplicate pattern binding of `{name}`"),
                         "a binding of this name is declared elsewhere in this pattern",
                     );
                 } else {

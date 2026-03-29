@@ -29,7 +29,7 @@ impl NameNode {
             } else {
                 scope.source.print_error(
                     self.span,
-                    &format!("Could not find value `{}`", self),
+                    &format!("Could not find value `{self}`"),
                     "no such symbol found",
                 );
                 (scope, Type::Error)
@@ -37,7 +37,7 @@ impl NameNode {
         } else {
             scope.source.print_error(
                 self.span,
-                &format!("Could not find value `{}`", self),
+                &format!("Could not find value `{self}`"),
                 "no such symbol found",
             );
             (scope, Type::Error)

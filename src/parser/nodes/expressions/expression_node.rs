@@ -85,7 +85,7 @@ impl ExpressionNode {
             }
             scope.source.print_error(
                 name.span,
-                &format!("Could not find member `{}`", name),
+                &format!("Could not find member `{name}`"),
                 "self type does not contain a member with this name",
             );
         } else {

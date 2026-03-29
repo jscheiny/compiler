@@ -55,8 +55,8 @@ fn check_loop(keyword: Keyword, span: TokenSpan, scope: Box<Scope>) -> (Box<Scop
     if !scope.within(ScopeType::Loop) {
         scope.source.print_error(
             span,
-            &format!("Unexpected {}", keyword),
-            &format!("{} is not valid outside of a loop", keyword),
+            &format!("Unexpected {keyword}"),
+            &format!("{keyword} is not valid outside of a loop"),
         );
     }
     (scope, None)

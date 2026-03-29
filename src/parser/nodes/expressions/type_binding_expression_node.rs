@@ -25,7 +25,7 @@ impl TypeBindingExpressionNode {
         let Some(type_index) = scope.get_type_index(name) else {
             scope.source.print_error(
                 self.left.span,
-                &format!("Unknown type `{}`", name),
+                &format!("Unknown type `{name}`"),
                 "could not find a type with this name",
             );
             return (scope, Type::Error);

@@ -36,7 +36,7 @@ impl Display for TypeFmt<'_> {
                 write!(f, "]")
             }
             Type::Interface(interface_type) => write!(f, "{}", interface_type.name),
-            Type::Primitive(primitive_type) => write!(f, "{}", primitive_type),
+            Type::Primitive(primitive_type) => write!(f, "{primitive_type}"),
             Type::Reference(_) => {
                 let resolved_type = self.resolved_type.deref(self.scope);
                 write!(f, "{}", resolved_type.format(self.scope))
@@ -71,7 +71,7 @@ fn write_iter<T: Display>(
     len: usize,
 ) -> std::fmt::Result {
     for (index, element) in list.enumerate() {
-        write!(f, "{}", element)?;
+        write!(f, "{element}")?;
         if index != len - 1 {
             write!(f, ", ")?;
         }
