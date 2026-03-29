@@ -16,7 +16,7 @@ impl BlockNode {
         scope.nest_with(ScopeType::Block, |mut scope| {
             // TODO error if no block return statement when one might be expected
             let mut resolved_type = None;
-            for statement in self.statements.iter() {
+            for statement in &self.statements {
                 let (new_scope, statement_type) =
                     statement.check(scope, expected_type, statement.span);
                 scope = new_scope;

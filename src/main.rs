@@ -22,13 +22,13 @@ fn main() {
     let mut tokens = source.token_stream();
     let result = program(&mut tokens);
 
-    for error in source.tokenizer_errors.iter() {
+    for error in &source.tokenizer_errors {
         println!("{} unexpected token", "Lexer error:".red().bold());
         source.print_character_span(*error, '^', "unexpected token", Severity::Error);
         println!();
     }
 
-    for error in tokens.errors.iter() {
+    for error in &tokens.errors {
         print_err(&source, error);
     }
 

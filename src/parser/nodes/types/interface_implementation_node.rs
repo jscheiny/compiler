@@ -38,13 +38,13 @@ impl InterfaceImplementationNode {
 
         let mut method_names = HashSet::new();
         if let Some(methods) = self.methods.as_ref() {
-            for method in methods.iter() {
+            for method in methods {
                 scope = check_method(scope, method, implemented_type.as_ref());
                 method_names.insert(method.name());
             }
 
             if let Some(Type::Interface(interface_type)) = implemented_type.as_ref() {
-                for (method, _) in interface_type.methods.iter() {
+                for method in interface_type.methods.keys() {
                     if !method_names.contains(method) {
                         scope.source.print_error(
                             self.name.span,
@@ -81,7 +81,7 @@ impl InterfaceImplementationNode {
         implemented_type: Option<&Type>,
     ) {
         if let Some(Type::Interface(interface_type)) = implemented_type {
-            for (variant_name, variant_type) in enum_type.variants.iter() {
+            for (variant_name, variant_type) in &enum_type.variants {
                 if let Some(variant_type) = variant_type {
                     let implements_interface = match variant_type.clone().as_deref(scope) {
                         Type::Enum(e) => e.implements(scope, interface_type),

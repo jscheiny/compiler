@@ -10,7 +10,7 @@ pub struct IfStatementNode {
 
 impl IfStatementNode {
     pub fn check(&self, mut scope: Box<Scope>) -> Box<Scope> {
-        for condition in self.conditions.iter() {
+        for condition in &self.conditions {
             scope = condition.check(scope);
         }
 

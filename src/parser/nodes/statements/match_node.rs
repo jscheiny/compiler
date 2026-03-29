@@ -11,7 +11,7 @@ pub struct MatchNode {
 impl MatchNode {
     pub fn check_statement(&self, scope: Box<Scope>) -> Box<Scope> {
         let (mut scope, subject_type) = self.check_subject(scope);
-        for case in self.cases.iter() {
+        for case in &self.cases {
             let (new_scope, _) = case.check(scope, None, &subject_type);
             scope = new_scope
         }
@@ -26,7 +26,7 @@ impl MatchNode {
         // TODO don't check for match branches in statement version
         // TODO completeness check
 
-        for case in self.cases.iter() {
+        for case in &self.cases {
             let (new_scope, case_type) = case.check(scope, expected_type, &subject_type);
             scope = new_scope;
 

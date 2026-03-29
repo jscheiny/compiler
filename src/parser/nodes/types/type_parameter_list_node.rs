@@ -37,7 +37,7 @@ impl TypeParameterListNode {
         }
 
         let mut names = HashSet::new();
-        for type_param in self.list.iter() {
+        for type_param in &self.list {
             if !names.insert(&type_param.name.value) {
                 scope.source.print_error(
                     type_param.name.span,
@@ -68,7 +68,7 @@ impl TypeParameterListNode {
     fn init_types(&self) -> TypeParameterListNodeData {
         let mut types_map = HashMap::new();
         let mut types_list = vec![];
-        for node in self.list.iter() {
+        for node in &self.list {
             let type_param = Rc::new(TypeParameter::new(node.name.clone()));
             types_map
                 .entry(node.name.value.clone())

@@ -45,7 +45,7 @@ impl ImplementationNode {
         mut scope_names: HashSet<String>,
     ) -> Box<Scope> {
         let mut implemented_interfaces = HashSet::new();
-        for entry in self.entries.iter() {
+        for entry in &self.entries {
             match &entry.value {
                 ImplementationEntryNode::Interface(interface) => check_duplicate_interface(
                     interface,
@@ -63,7 +63,7 @@ impl ImplementationNode {
             };
         }
 
-        for entry in self.entries.iter() {
+        for entry in &self.entries {
             scope = entry.check(scope, self_type);
         }
 
@@ -72,7 +72,7 @@ impl ImplementationNode {
 
     pub fn get_methods(&self, scope: &Scope) -> Vec<Method> {
         let mut methods = vec![];
-        for entry in self.entries.iter() {
+        for entry in &self.entries {
             match &entry.value {
                 ImplementationEntryNode::Method(method) => {
                     methods.push(Method {
@@ -87,7 +87,7 @@ impl ImplementationNode {
                         .map(Type::Reference)
                         .map(|t| t.as_deref(scope));
                     if let Some(Type::Interface(interface_type)) = interface_type {
-                        for (name, function_type) in interface_type.methods.iter() {
+                        for (name, function_type) in &interface_type.methods {
                             methods.push(Method {
                                 public: true,
                                 name: name.clone(),
@@ -115,7 +115,7 @@ impl ImplementationNode {
 
     fn init_implemented_interfaces(&self, scope: &Scope) -> HashSet<usize> {
         let mut result = HashSet::new();
-        for entry in self.entries.iter() {
+        for entry in &self.entries {
             if let ImplementationEntryNode::Interface(node) = &entry.value {
                 let index = scope.get_type_index(&node.name);
                 if let Some(index) = index {
@@ -153,7 +153,7 @@ fn check_duplicate_interface(
     }
 
     if let Some(methods) = interface_implementation.methods.as_ref() {
-        for method in methods.iter() {
+        for method in methods {
             check_duplicate_method(method, scope, self_type, scope_names);
         }
     }
