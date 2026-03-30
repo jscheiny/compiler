@@ -28,6 +28,7 @@ pub enum ExpressionNode {
     PostfixOp(PostfixOpExpressionNode),
     PrefixOp(PrefixOpExpressionNode),
     SelfRef(NameNode),
+    SelfType(TokenSpan),
     SelfValue(TokenSpan),
     StringLiteral(String),
     TypeBinding(TypeBindingExpressionNode),
@@ -66,7 +67,8 @@ impl ExpressionNode {
             Self::PostfixOp(node) => node.check(scope),
             Self::PrefixOp(node) => node.check(scope),
             Self::SelfRef(name) => check_self_ref(name, scope),
-            Self::SelfValue(span) => check_self_value(*span, scope),
+            Self::SelfType(span) => check_self_type(scope, *span),
+            Self::SelfValue(span) => check_self_value(scope, *span),
             Self::StringLiteral(_) => (
                 scope,
                 Type::Array(Box::new(Type::Primitive(PrimitiveType::Char))),
@@ -100,18 +102,34 @@ fn check_self_ref(name: &NameNode, scope: Box<Scope>) -> (Box<Scope>, Type) {
     (scope, Type::Error)
 }
 
-fn check_self_value(span: TokenSpan, scope: Box<Scope>) -> (Box<Scope>, Type) {
-    let mut self_index = None;
-    scope.find_scope(|scope_type| match scope_type {
-        ScopeType::Struct(index) => {
-            self_index = Some(index);
-            true
-        }
-        _ => false,
-    });
+fn check_self_type(scope: Box<Scope>, span: TokenSpan) -> (Box<Scope>, Type) {
+    let self_type = scope.get_self_type();
+    let Some(self_type) = self_type else {
+        scope.source.print_error(
+            span,
+            "Invalid `Self` outside of struct or enum",
+            "`Self` value only available inside of struct or enum",
+        );
+        return (scope, Type::Error);
+    };
 
-    if let Some(index) = self_index {
-        (scope, Type::Reference(index))
+    let Type::Struct(struct_type) = self_type.deref(&scope) else {
+        scope.source.print_error(
+            span,
+            "Type `Self` with no constructor cannot be used as a value",
+            "cannot use type as a value",
+        );
+        return (scope, Type::Error);
+    };
+
+    let constructor = struct_type.get_constructor(&scope);
+    (scope, Type::Function(constructor))
+}
+
+fn check_self_value(scope: Box<Scope>, span: TokenSpan) -> (Box<Scope>, Type) {
+    let self_type = scope.get_self_type();
+    if let Some(self_type) = self_type {
+        (scope, self_type)
     } else {
         scope.source.print_error(
             span,

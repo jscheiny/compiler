@@ -145,11 +145,3 @@ fn create_map(): HashMap[Key, Vec[Value]] {
     return result;
 }
 ```
-
-### `Self` type
-
-```
-struct Integer(value: int) {
-    @squared(): Self -> Self(value^2);
-}
-```
