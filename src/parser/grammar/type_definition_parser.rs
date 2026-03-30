@@ -28,6 +28,11 @@ pub fn type_definition_impl(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
             tokens.next();
             Ok(TypeNode::Void)
         }
+        Token::Keyword(Keyword::SelfType) => {
+            let span = tokens.current_span();
+            tokens.next();
+            Ok(TypeNode::SelfType(span))
+        }
         Token::Keyword(keyword) => {
             let keyword = *keyword;
             tokens.next();

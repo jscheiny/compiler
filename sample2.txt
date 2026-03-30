@@ -1,7 +1,13 @@
-enum X(A, B C,) {}
+enum X(A, B, C,) {}
+
+interface I {
+    get_self(): Self;
+}
 
 struct S() {
-    pub duplicate(): S {}
+    pub duplicate(): S {
+        let g: Self = S();
+    }
 }
 
 
@@ -16,4 +22,6 @@ fn test(s: S) {
     let x: X = C(5);
 }
 
-fn accept(f: bool => bool) {}
+fn accept(f: bool => bool) {
+    let x: Self = 5;
+}
