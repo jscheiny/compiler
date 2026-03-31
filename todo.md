@@ -135,13 +135,3 @@ struct Coordinate(row: int, column: int) {
     @magnitude(): int -> @row + @column; // use @ to indicate non-static
 }
 ```
-
-### `Result` type
-
-```
-fn create_map(): HashMap[Key, Vec[Value]] {
-    let result = Result.new(); // Same as HashMap[Key, Vec[Value]].new()
-
-    return result;
-}
-```

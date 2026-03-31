@@ -16,26 +16,7 @@ impl MemberTypeExpressionNode {
             return (scope, resolved_type);
         }
 
-        let ExpressionNode::Name(name) = &self.left.value else {
-            let (scope, _) = self.left.check(scope);
-            scope.source.print_error(
-                self.left.span,
-                "Cannot use type member operator on an expression",
-                "must be a type",
-            );
-            return (scope, Type::Error);
-        };
-
-        let Some(type_index) = scope.get_type_index(name) else {
-            scope.source.print_error(
-                self.left.span,
-                &format!("Unknown type `{name}`"),
-                "could not find a type with this name",
-            );
-            return (scope, Type::Error);
-        };
-
-        let receiver_type = Type::Reference(type_index).deref(&scope);
+        let (scope, receiver_type) = self.left.check_type(scope, self.left.span);
         let resolved_type = self.get_static_field(&scope, &receiver_type);
         (scope, resolved_type)
     }

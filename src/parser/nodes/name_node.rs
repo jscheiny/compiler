@@ -14,13 +14,14 @@ impl NameNode {
             _ => None,
         });
 
+        let type_value = scope.get_type_index(self).map(Type::Reference);
         if let Some(resolved_type) = scope.get_value(self) {
             (scope, resolved_type)
-        } else if scope.get_type_index(self).is_some() {
+        } else if let Some(type_value) = type_value {
             scope.source.print_error(
                 self.span,
                 "Types cannot be used as values",
-                "cannot use type as a value",
+                &format!("cannot use type `{}` as a value", type_value.format(&scope)),
             );
             (scope, Type::Error)
         } else if let Some(enum_type) = expected_enum_type {

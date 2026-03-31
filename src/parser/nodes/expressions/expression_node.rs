@@ -1,5 +1,6 @@
 use crate::{
     checker::{Scope, ScopeType, Type},
+    lexer::{EnumToken, Keyword},
     parser::{
         ArrayExpressionNode, BinaryOpExpressionNode, BlockNode, ClosureExpressionNode,
         ClosureParameterExpressionNode, DeferredMemberExpressionNode, FunctionCallExpressionNode,
@@ -28,7 +29,6 @@ pub enum ExpressionNode {
     PostfixOp(PostfixOpExpressionNode),
     PrefixOp(PrefixOpExpressionNode),
     SelfRef(NameNode),
-    SelfType(TokenSpan),
     SelfValue(TokenSpan),
     StringLiteral(String),
     TypeBinding(TypeBindingExpressionNode),
@@ -66,8 +66,7 @@ impl ExpressionNode {
             Self::Name(node) => node.check(scope, expected_type),
             Self::PostfixOp(node) => node.check(scope),
             Self::PrefixOp(node) => node.check(scope),
-            Self::SelfRef(name) => check_self_ref(name, scope),
-            Self::SelfType(span) => check_self_type(scope, *span),
+            Self::SelfRef(name) => check_self_ref(scope, name),
             Self::SelfValue(span) => check_self_value(scope, *span),
             Self::StringLiteral(_) => (
                 scope,
@@ -77,9 +76,52 @@ impl ExpressionNode {
             Self::Error => (scope, Type::Error),
         }
     }
+
+    pub fn check_type(&self, scope: Box<Scope>, span: TokenSpan) -> (Box<Scope>, Type) {
+        let ExpressionNode::Name(name) = self else {
+            let (scope, _) = self.check(scope);
+            scope.source.print_error(
+                span,
+                "Cannot use type member operator on an expression",
+                "must be a type",
+            );
+            return (scope, Type::Error);
+        };
+
+        let Some(type_index) = scope.get_type_index(name) else {
+            print_unknown_type_error(&scope, span, name);
+            return (scope, Type::Error);
+        };
+
+        let result_type = Type::Reference(type_index).as_deref(&scope);
+        (scope, result_type)
+    }
 }
 
-fn check_self_ref(name: &NameNode, scope: Box<Scope>) -> (Box<Scope>, Type) {
+fn print_unknown_type_error(scope: &Scope, span: TokenSpan, name: &str) {
+    if name == Keyword::Result.as_str() {
+        scope.source.print_error(
+            span,
+            "`Result` type not available outside of function bodies",
+            "cannot use type `Result` here",
+        );
+    } else if name == Keyword::SelfType.as_str() {
+        scope.source.print_error(
+            span,
+            "`Self` type not available outside of struct or enum",
+            "cannot use type `Self` here",
+        );
+    } else {
+        scope.source.print_error(
+            span,
+            &format!("Unknown type `{name}`"),
+            "could not find a type with this name",
+        );
+    }
+}
+
+fn check_self_ref(scope: Box<Scope>, name: &NameNode) -> (Box<Scope>, Type) {
+    // TODO maybe replace with using get_self_type and get_field from member_value_expression_node.rs
     let self_scope = scope.find_scope(|scope_type| matches!(scope_type, ScopeType::Struct(_)));
     if let Some(self_scope) = self_scope {
         let resolved_type = self_scope.get_local_value(name);
@@ -100,30 +142,6 @@ fn check_self_ref(name: &NameNode, scope: Box<Scope>) -> (Box<Scope>, Type) {
     }
 
     (scope, Type::Error)
-}
-
-fn check_self_type(scope: Box<Scope>, span: TokenSpan) -> (Box<Scope>, Type) {
-    let self_type = scope.get_self_type();
-    let Some(self_type) = self_type else {
-        scope.source.print_error(
-            span,
-            "Invalid `Self` outside of struct or enum",
-            "`Self` value only available inside of struct or enum",
-        );
-        return (scope, Type::Error);
-    };
-
-    let Type::Struct(struct_type) = self_type.deref(&scope) else {
-        scope.source.print_error(
-            span,
-            "Type `Self` with no constructor cannot be used as a value",
-            "cannot use type as a value",
-        );
-        return (scope, Type::Error);
-    };
-
-    let constructor = struct_type.get_constructor(&scope);
-    (scope, Type::Function(constructor))
 }
 
 fn check_self_value(scope: Box<Scope>, span: TokenSpan) -> (Box<Scope>, Type) {

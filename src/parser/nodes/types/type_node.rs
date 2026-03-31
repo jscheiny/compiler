@@ -7,6 +7,7 @@ pub enum TypeNode {
     Array(Box<TypeNode>),
     Function(FunctionTypeNode),
     Primitive(PrimitiveType),
+    ResultType(TokenSpan),
     SelfType(TokenSpan),
     Tuple(TupleTypeNode),
     UserDefined(UserDefinedTypeNode),
@@ -19,11 +20,26 @@ impl TypeNode {
             Self::Array(node) => Type::Array(Box::new(node.get_type(scope, type_params))),
             Self::Primitive(primitive) => Type::Primitive(*primitive),
             Self::Function(node) => Type::Function(node.get_type(scope, type_params)),
+            Self::ResultType(span) => get_result_type(scope, *span),
             Self::SelfType(span) => get_self_type(scope, *span),
             Self::Tuple(node) => node.get_type(scope, type_params),
             Self::UserDefined(node) => node.get_type(scope, type_params),
             Self::Void => Type::Void,
         }
+    }
+}
+
+fn get_result_type(scope: &Scope, span: TokenSpan) -> Type {
+    let result_type = scope.return_type();
+    if let Some(result_type) = result_type {
+        result_type.clone()
+    } else {
+        scope.source.print_error(
+            span,
+            "`Result` type not available outside of function bodies",
+            "cannot use type `Result` here",
+        );
+        Type::Error
     }
 }
 
@@ -34,7 +50,7 @@ fn get_self_type(scope: &Scope, span: TokenSpan) -> Type {
     } else {
         scope.source.print_error(
             span,
-            "Self type not available outside of struct or enum",
+            "`Self` type not available outside of struct or enum",
             "cannot use type `Self` here",
         );
         Type::Error

@@ -143,10 +143,17 @@ fn expression_atom(
         }));
     }
     match tokens.peek() {
+        Token::Keyword(Keyword::Result) => {
+            let span = TokenSpan::singleton(tokens);
+            tokens.next();
+            Ok(ExpressionNode::Name(span.wrap(Keyword::Result.to_string())))
+        }
         Token::Keyword(Keyword::SelfType) => {
             let span = TokenSpan::singleton(tokens);
             tokens.next();
-            Ok(ExpressionNode::SelfType(span))
+            Ok(ExpressionNode::Name(
+                span.wrap(Keyword::SelfType.to_string()),
+            ))
         }
         Token::Keyword(Keyword::SelfValue) => {
             let span = TokenSpan::singleton(tokens);

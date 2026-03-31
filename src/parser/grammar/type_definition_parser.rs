@@ -24,14 +24,19 @@ pub fn type_definition_impl(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
     let token = tokens.peek();
     match token {
         Token::Name(_) => Ok(TypeNode::UserDefined(user_defined_type(tokens)?)),
-        Token::Keyword(Keyword::Void) => {
+        Token::Keyword(Keyword::Result) => {
+            let span = tokens.current_span();
             tokens.next();
-            Ok(TypeNode::Void)
+            Ok(TypeNode::ResultType(span))
         }
         Token::Keyword(Keyword::SelfType) => {
             let span = tokens.current_span();
             tokens.next();
             Ok(TypeNode::SelfType(span))
+        }
+        Token::Keyword(Keyword::Void) => {
+            tokens.next();
+            Ok(TypeNode::Void)
         }
         Token::Keyword(keyword) => {
             let keyword = *keyword;

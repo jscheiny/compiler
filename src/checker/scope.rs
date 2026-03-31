@@ -5,7 +5,7 @@ use std::{
 
 use crate::{
     checker::{Type, TypeMap},
-    lexer::SourceCode,
+    lexer::{EnumToken, Keyword, SourceCode},
 };
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -57,11 +57,15 @@ impl Scope {
     ) -> (Box<Scope>, T) {
         let source = self.source.clone();
         let types = self.types.nest();
-        let scope = Box::new(Self {
+        let mut scope = Box::new(Self {
             scope_type,
             parent: Some(self),
             ..Self::new(source, types)
         });
+        if let ScopeType::Struct(index) = scope_type {
+            let self_type = Type::Reference(index).as_deref(&scope);
+            scope.add_type_and_value(Keyword::SelfType.as_str(), &self_type);
+        }
         let (scope, result) = handler(scope);
         (scope.parent(), result)
     }
@@ -73,12 +77,13 @@ impl Scope {
     ) -> Box<Scope> {
         let source = self.source.clone();
         let types = self.types.nest();
-        let scope = Box::new(Self {
+        let mut scope = Box::new(Self {
             scope_type: ScopeType::Function,
             parent: Some(self),
             return_type: Some(return_type.clone()),
             ..Self::new(source, types)
         });
+        scope.add_type_and_value(Keyword::Result.as_str(), return_type);
         handler(scope).parent()
     }
 
@@ -179,5 +184,12 @@ impl Scope {
 
     pub fn resolve_type(&mut self, name: &str, value: Type) {
         self.types.resolve(name, value);
+    }
+
+    fn add_type_and_value(&mut self, name: &str, value: &Type) {
+        self.add_type(name, value.clone());
+        if let Type::Struct(struct_type) = value.deref(self) {
+            self.add_value(name, Type::Function(struct_type.get_constructor(self)));
+        }
     }
 }
