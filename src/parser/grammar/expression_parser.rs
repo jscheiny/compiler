@@ -5,7 +5,7 @@ use crate::{
         DeferredMemberExpressionNode, ExpressionNode, IfExpressionNode, LocatedSyntaxError,
         NameType, Node, Operator, ParseResult, PostfixOpExpressionNode, PostfixOperator,
         PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType, SyntaxError,
-        TokenSpan, TokenStream,
+        TokenSpan, TokenStream, TupleExpressionNode,
         grammar::{SpecialOperator, closure, match_expression, statement},
     },
 };
@@ -266,10 +266,11 @@ fn closure_or_tuple(tokens: &mut TokenStream) -> ParseResult<ExpressionNode> {
     let context = ExpressionContext::parentheses();
     let expression = tokens.located_with(sub_expression, context)?;
     tokens.expect(Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
+    let expressions = flatten_commas(expression);
     if tokens.accept(Symbol::SkinnyArrow) {
-        closure(tokens, flatten_commas(expression))
+        closure(tokens, expressions)
     } else {
-        Ok(expression.value)
+        Ok(ExpressionNode::Tuple(TupleExpressionNode { expressions }))
     }
 }
 

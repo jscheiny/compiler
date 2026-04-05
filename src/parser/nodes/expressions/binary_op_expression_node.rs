@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::{
     checker::{Scope, Type},
     parser::{BinaryOperator, ExpressionNode, Node, Operator, PrimitiveType, TokenSpan},
@@ -33,7 +31,8 @@ impl BinaryOpExpressionNode {
             | O::GreaterThan
             | O::GreaterThanOrEqual => todo_unimplemented_operator(scope),
             O::FunctionApplication => self.check_function_application(scope, expected_type),
-            O::Comma => self.check_comma(scope, expected_type),
+            // TODO can we remove this panic somehow?
+            O::Comma => panic!("ERROR: How did we get here?"),
             O::LogicalAnd | O::LogicalOr => self.check_logical_op(scope),
         }
     }
@@ -85,46 +84,6 @@ impl BinaryOpExpressionNode {
             }
             (scope, Type::Error)
         }
-    }
-
-    fn check_comma(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
-        let expected_tuple_types = if let Some(Type::Tuple(types)) = expected_type {
-            types
-        } else {
-            &vec![]
-        };
-
-        let expected_first_type = expected_tuple_types.first();
-        let (mut scope, first_type) = self.left.check_expected(scope, expected_first_type);
-        let mut tuple_types = vec![first_type];
-        let mut current = &self.right;
-
-        let mut tuple_index = 0;
-        loop {
-            tuple_index += 1;
-            if let ExpressionNode::BinaryOp(BinaryOpExpressionNode {
-                left,
-                operator,
-                right,
-            }) = &current.value
-            {
-                if operator.value == BinaryOperator::Comma {
-                    let expected_type = expected_tuple_types.get(tuple_index);
-                    let (new_scope, left_type) = left.check_expected(scope, expected_type);
-                    tuple_types.push(left_type);
-                    scope = new_scope;
-                    current = right;
-                    continue;
-                }
-            }
-            break;
-        }
-
-        let expected_type = expected_tuple_types.get(tuple_index);
-        let (scope, current_type) = current.check_expected(scope, expected_type);
-        tuple_types.push(current_type);
-
-        (scope, Type::Tuple(Rc::new(tuple_types)))
     }
 
     fn check_logical_op(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
