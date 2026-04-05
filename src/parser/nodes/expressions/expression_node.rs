@@ -5,7 +5,7 @@ use crate::{
         ArrayExpressionNode, BinaryOpExpressionNode, BlockNode, ClosureExpressionNode,
         ClosureParameterExpressionNode, DeferredMemberExpressionNode, FunctionCallExpressionNode,
         IfExpressionNode, MatchNode, MemberTypeExpressionNode, MemberValueExpressionNode, NameNode,
-        PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType, TokenSpan,
+        PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType, SpreadNode, TokenSpan,
         TupleExpressionNode, TypeBindingExpressionNode,
     },
 };
@@ -30,9 +30,10 @@ pub enum ExpressionNode {
     PrefixOp(PrefixOpExpressionNode),
     SelfRef(NameNode),
     SelfValue(TokenSpan),
+    Spread(SpreadNode),
     StringLiteral(String),
-    TypeBinding(TypeBindingExpressionNode),
     Tuple(TupleExpressionNode),
+    TypeBinding(TypeBindingExpressionNode),
     Error,
 }
 
@@ -69,6 +70,7 @@ impl ExpressionNode {
             Self::PrefixOp(node) => node.check(scope),
             Self::SelfRef(name) => check_self_ref(scope, name),
             Self::SelfValue(span) => check_self_value(scope, *span),
+            Self::Spread(node) => node.check_invalid(scope, expected_type),
             Self::StringLiteral(_) => (
                 scope,
                 Type::Array(Box::new(Type::Primitive(PrimitiveType::Char))),

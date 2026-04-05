@@ -4,8 +4,8 @@ use crate::{
         ArrayExpressionNode, Associativity, BinaryOpExpressionNode, BinaryOperator, BlockNode,
         DeferredMemberExpressionNode, ExpressionNode, IfExpressionNode, LocatedSyntaxError,
         NameType, Node, Operator, ParseResult, PostfixOpExpressionNode, PostfixOperator,
-        PrefixOpExpressionNode, PrefixOperator, StatementNode, StatementType, SyntaxError,
-        TokenSpan, TokenStream, TupleExpressionNode,
+        PrefixOpExpressionNode, PrefixOperator, SpreadNode, StatementNode, StatementType,
+        SyntaxError, TokenSpan, TokenStream, TupleExpressionNode,
         grammar::{SpecialOperator, closure, match_expression, statement},
     },
 };
@@ -190,6 +190,11 @@ fn expression_atom(
             tokens.next();
             let name = tokens.name(NameType::Field)?;
             Ok(ExpressionNode::SelfRef(name))
+        }
+        Token::Symbol(Symbol::Elipsis) => {
+            tokens.next();
+            let expression = Box::new(tokens.located(expression)?);
+            Ok(ExpressionNode::Spread(SpreadNode { expression }))
         }
         Token::Symbol(Symbol::Dot) => deferred_member(tokens),
         Token::Symbol(Symbol::OpenParen) => closure_or_tuple(tokens),

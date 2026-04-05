@@ -10,6 +10,7 @@ mod member_type_expression_node;
 mod member_value_expression_node;
 mod postfix_op_expression_node;
 mod prefix_op_expression_node;
+mod spread_node;
 mod tuple_expression_node;
 mod type_binding_expression_node;
 
@@ -25,5 +26,6 @@ pub use member_type_expression_node::*;
 pub use member_value_expression_node::*;
 pub use postfix_op_expression_node::*;
 pub use prefix_op_expression_node::*;
+pub use spread_node::*;
 pub use tuple_expression_node::*;
 pub use type_binding_expression_node::*;
