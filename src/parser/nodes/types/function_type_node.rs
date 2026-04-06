@@ -2,17 +2,17 @@ use std::{cell::OnceCell, rc::Rc};
 
 use crate::{
     checker::{FunctionType, Scope, TypeParameterMap},
-    parser::{Node, NodeVec, TypeNode},
+    parser::{Node, TypeListNode, TypeNode},
 };
 
 pub struct FunctionTypeNode {
-    parameters: NodeVec<TypeNode>,
+    parameters: TypeListNode,
     return_type: Box<Node<TypeNode>>,
     resolved_type: OnceCell<Rc<FunctionType>>,
 }
 
 impl FunctionTypeNode {
-    pub fn new(parameters: NodeVec<TypeNode>, return_type: Box<Node<TypeNode>>) -> Self {
+    pub fn new(parameters: TypeListNode, return_type: Box<Node<TypeNode>>) -> Self {
         Self {
             parameters,
             return_type,
@@ -31,13 +31,7 @@ impl FunctionTypeNode {
     }
 
     fn init_type(&self, scope: &Scope, type_params: Option<&TypeParameterMap>) -> Rc<FunctionType> {
-        let parameters = self
-            .parameters
-            .value
-            .iter()
-            .map(|parameter| parameter.get_type(scope, type_params))
-            .collect();
-
+        let parameters = self.parameters.get_type(scope, type_params);
         let return_type = self.return_type.get_type(scope, type_params);
         FunctionType::new(parameters, return_type)
     }

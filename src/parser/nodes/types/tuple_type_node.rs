@@ -2,16 +2,16 @@ use std::{cell::OnceCell, rc::Rc};
 
 use crate::{
     checker::{Scope, Type, TypeParameterMap},
-    parser::{Node, TypeNode},
+    parser::TypeListNode,
 };
 
 pub struct TupleTypeNode {
-    fields: Vec<Node<TypeNode>>,
+    fields: TypeListNode,
     resolved_type: OnceCell<Type>,
 }
 
 impl TupleTypeNode {
-    pub fn new(fields: Vec<Node<TypeNode>>) -> Self {
+    pub fn new(fields: TypeListNode) -> Self {
         Self {
             fields,
             resolved_type: OnceCell::new(),
@@ -25,12 +25,7 @@ impl TupleTypeNode {
     }
 
     fn init_type(&self, scope: &Scope, type_params: Option<&TypeParameterMap>) -> Type {
-        let fields = self
-            .fields
-            .iter()
-            .map(|field| field.get_type(scope, type_params))
-            .collect();
-
+        let fields = self.fields.get_type(scope, type_params);
         Type::Tuple(Rc::new(fields))
     }
 }

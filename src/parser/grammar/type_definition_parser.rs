@@ -2,7 +2,8 @@ use crate::{
     lexer::{Keyword, Symbol, Token},
     parser::{
         FunctionTypeNode, NameType, Node, ParseResult, PrimitiveType, SyntaxError, TokenStream,
-        TupleTypeNode, TypeNode, UserDefinedTypeNode, grammar::comma_separated_list,
+        TupleTypeNode, TypeListElementNode, TypeListNode, TypeNode, UserDefinedTypeNode,
+        grammar::comma_separated_list,
     },
 };
 
@@ -10,7 +11,13 @@ pub fn type_definition(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
     let inner_type = tokens.located(type_definition_impl)?;
     if tokens.accept(Symbol::ThickArrow) {
         let return_type = tokens.located(type_definition)?;
-        let parameters = inner_type.span.wrap(vec![inner_type]);
+        let parameter = inner_type.span.wrap(TypeListElementNode {
+            is_spread: false,
+            inner_type,
+        });
+        let parameters = TypeListNode {
+            elements: vec![parameter],
+        };
         Ok(TypeNode::Function(FunctionTypeNode::new(
             parameters,
             Box::new(return_type),
@@ -68,15 +75,15 @@ pub fn bound_type_parameters(tokens: &mut TokenStream) -> ParseResult<Vec<Node<T
 
 fn function_or_tuple_type(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
     tokens.next();
-    let parameters = tokens.located(type_list)?;
+    let type_list = type_list(tokens)?;
     if tokens.accept(Symbol::ThickArrow) {
         let return_type = tokens.located(type_definition)?;
         Ok(TypeNode::Function(FunctionTypeNode::new(
-            parameters,
+            type_list,
             Box::new(return_type),
         )))
     } else {
-        Ok(TypeNode::Tuple(TupleTypeNode::new(parameters.value)))
+        Ok(TypeNode::Tuple(TupleTypeNode::new(type_list)))
     }
 }
 
@@ -87,6 +94,16 @@ fn array_type(tokens: &mut TokenStream) -> ParseResult<TypeNode> {
     Ok(TypeNode::Array(Box::new(element_type)))
 }
 
-fn type_list(tokens: &mut TokenStream) -> ParseResult<Vec<Node<TypeNode>>> {
-    comma_separated_list(tokens, Symbol::CloseParen, type_definition)
+fn type_list(tokens: &mut TokenStream) -> ParseResult<TypeListNode> {
+    let elements = comma_separated_list(tokens, Symbol::CloseParen, type_list_element)?;
+    Ok(TypeListNode { elements })
+}
+
+fn type_list_element(tokens: &mut TokenStream) -> ParseResult<TypeListElementNode> {
+    let is_spread = tokens.accept(Symbol::Elipsis);
+    let inner_type = tokens.located(type_definition)?;
+    Ok(TypeListElementNode {
+        is_spread,
+        inner_type,
+    })
 }
