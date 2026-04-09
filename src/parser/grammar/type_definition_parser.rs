@@ -100,7 +100,7 @@ fn type_list(tokens: &mut TokenStream) -> ParseResult<TypeListNode> {
 }
 
 fn type_list_element(tokens: &mut TokenStream) -> ParseResult<TypeListElementNode> {
-    let is_spread = tokens.accept(Symbol::Elipsis);
+    let is_spread = tokens.accept(Symbol::Ellipsis);
     let inner_type = tokens.located(type_definition)?;
     Ok(TypeListElementNode {
         is_spread,

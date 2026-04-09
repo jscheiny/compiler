@@ -191,7 +191,7 @@ fn expression_atom(
             let name = tokens.name(NameType::Field)?;
             Ok(ExpressionNode::SelfRef(name))
         }
-        Token::Symbol(Symbol::Elipsis) => {
+        Token::Symbol(Symbol::Ellipsis) => {
             tokens.next();
             let expression = Box::new(tokens.located(expression)?);
             Ok(ExpressionNode::Spread(SpreadNode { expression }))
