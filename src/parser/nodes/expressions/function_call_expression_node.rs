@@ -78,6 +78,7 @@ fn check_valid_function_call(
             let parameter_type = function_type.parameters.get(argument_count);
             let (new_scope, argument_type) = argument.check_expected(scope, parameter_type);
             scope = new_scope;
+            argument_count += 1;
 
             let Some(parameter_type) = parameter_type else {
                 continue;
@@ -94,7 +95,6 @@ fn check_valid_function_call(
                     ),
                 );
             }
-            argument_count += 1;
         }
     }
 
