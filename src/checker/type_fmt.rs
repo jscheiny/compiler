@@ -16,11 +16,16 @@ impl Display for TypeFmt<'_> {
             Type::Array(element_type) => write!(f, "[{}]", element_type.format(self.scope)),
             Type::Enum(enum_type) => write!(f, "{}", enum_type.name()),
             Type::Function(function_type) => {
-                if function_type.parameters.len() != 1 {
+                let show_parentheses = function_type.parameters.len() != 1
+                    || matches!(
+                        function_type.parameters[0].deref(self.scope),
+                        Type::Tuple(_)
+                    );
+                if show_parentheses {
                     write!(f, "(")?;
                 }
                 self.write_types_list(f, &function_type.parameters)?;
-                if function_type.parameters.len() != 1 {
+                if show_parentheses {
                     write!(f, ")")?;
                 }
                 write!(
