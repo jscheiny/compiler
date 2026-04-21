@@ -2,7 +2,7 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{Scope, Type, TypeParameterMap},
-    parser::{NameNode, NodeVec, TypeNode},
+    parser::{NameNode, NodeVec, TypeNode, VisitedTypes},
 };
 
 pub struct UserDefinedTypeNode {
@@ -20,16 +20,26 @@ impl UserDefinedTypeNode {
         }
     }
 
-    pub fn get_type(&self, scope: &Scope, type_params: Option<&TypeParameterMap>) -> Type {
+    pub fn get_type(
+        &self,
+        scope: &Scope,
+        type_params: Option<&TypeParameterMap>,
+        visited: VisitedTypes,
+    ) -> Type {
         self.resolved_type
-            .get_or_init(|| self.init_type(scope, type_params))
+            .get_or_init(|| self.init_type(scope, type_params, visited))
             .clone()
     }
 
-    fn init_type(&self, scope: &Scope, type_params: Option<&TypeParameterMap>) -> Type {
-        let base_type = self.get_base_type(scope, type_params);
+    fn init_type(
+        &self,
+        scope: &Scope,
+        type_params: Option<&TypeParameterMap>,
+        visited: VisitedTypes,
+    ) -> Type {
+        let base_type = self.get_base_type(scope, type_params, visited.clone());
         if let Some(bound_type_params) = self.bound_type_parameters.as_ref() {
-            bind_type(scope, &base_type, bound_type_params, type_params)
+            bind_type(scope, &base_type, bound_type_params, type_params, visited)
         } else {
             self.unbound_type(scope, base_type)
         }
@@ -51,23 +61,40 @@ impl UserDefinedTypeNode {
         }
     }
 
-    fn get_base_type(&self, scope: &Scope, type_params: Option<&TypeParameterMap>) -> Type {
+    fn get_base_type(
+        &self,
+        scope: &Scope,
+        type_params: Option<&TypeParameterMap>,
+        visited: VisitedTypes,
+    ) -> Type {
         let type_parameter = type_params.and_then(|t| t.get(&self.name.value));
         if let Some(type_parameter) = type_parameter {
             return Type::TypeParameter(type_parameter.clone());
         }
 
         let index = scope.get_type_index(&self.name);
-        if let Some(index) = index {
-            return Type::Reference(index);
+        let Some(index) = index else {
+            scope.source.print_error(
+                self.name.span,
+                &format!("Unknown type `{}`", self.name),
+                "could not find a type with this name",
+            );
+            return Type::Error;
+        };
+
+        if let Some(visited) = visited {
+            let mut visited = visited.borrow_mut();
+            if !visited.insert(index) {
+                scope.source.print_error(
+                    self.name.span,
+                    &format!("Type alias `{}` used recursively", self.name),
+                    "use of this type creates a circular type alias",
+                );
+                return Type::Error;
+            }
         }
 
-        scope.source.print_error(
-            self.name.span,
-            &format!("Unknown type `{}`", self.name),
-            "could not find a type with this name",
-        );
-        Type::Error
+        Type::Reference(index)
     }
 }
 
@@ -76,10 +103,11 @@ pub fn bind_type(
     base_type: &Type,
     bound_type_params: &NodeVec<TypeNode>,
     type_params: Option<&TypeParameterMap>,
+    visited: VisitedTypes,
 ) -> Type {
     let bound_types = bound_type_params
         .iter()
-        .map(|p| p.get_type(scope, type_params))
+        .map(|p| p.get_type(scope, type_params, visited.clone()))
         .collect::<Vec<_>>();
 
     match base_type.deref(scope) {

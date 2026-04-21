@@ -1,3 +1,5 @@
+use std::{cell::RefCell, collections::HashSet, rc::Rc};
+
 use crate::{
     checker::{Scope, Type, TypeParameterMap},
     parser::{FunctionTypeNode, PrimitiveType, TokenSpan, TupleTypeNode, UserDefinedTypeNode},
@@ -14,16 +16,23 @@ pub enum TypeNode {
     Void,
 }
 
+pub type VisitedTypes = Option<Rc<RefCell<HashSet<usize>>>>;
+
 impl TypeNode {
-    pub fn get_type(&self, scope: &Scope, type_params: Option<&TypeParameterMap>) -> Type {
+    pub fn get_type(
+        &self,
+        scope: &Scope,
+        type_params: Option<&TypeParameterMap>,
+        visited: VisitedTypes,
+    ) -> Type {
         match self {
-            Self::Array(node) => Type::Array(Box::new(node.get_type(scope, type_params))),
+            Self::Array(node) => Type::Array(Box::new(node.get_type(scope, type_params, visited))),
             Self::Primitive(primitive) => Type::Primitive(*primitive),
-            Self::Function(node) => Type::Function(node.get_type(scope, type_params)),
+            Self::Function(node) => Type::Function(node.get_type(scope, type_params, visited)),
             Self::ResultType(span) => get_result_type(scope, *span),
             Self::SelfType(span) => get_self_type(scope, *span),
-            Self::Tuple(node) => node.get_type(scope, type_params),
-            Self::UserDefined(node) => node.get_type(scope, type_params),
+            Self::Tuple(node) => node.get_type(scope, type_params, visited),
+            Self::UserDefined(node) => node.get_type(scope, type_params, visited),
             Self::Void => Type::Void,
         }
     }

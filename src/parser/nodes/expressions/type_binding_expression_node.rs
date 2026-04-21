@@ -12,7 +12,13 @@ impl TypeBindingExpressionNode {
     pub fn check(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
         // TODO left expression shouldn't necessarily be a type, as in the case of a generic function with bound type args
         let (scope, unbound_type) = self.left.check_type(scope, self.left.span);
-        let bound_type = bind_type(&scope, &unbound_type, &self.bound_type_parameters, None);
+        let bound_type = bind_type(
+            &scope,
+            &unbound_type,
+            &self.bound_type_parameters,
+            None,
+            None,
+        );
         (scope, bound_type)
     }
 }

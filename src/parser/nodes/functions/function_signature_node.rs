@@ -41,10 +41,9 @@ impl FunctionSignatureNode {
             .cloned()
             .collect();
 
-        let return_type = self
-            .return_type
-            .as_ref()
-            .map_or(Type::Void, |return_type| return_type.get_type(scope, None));
+        let return_type = self.return_type.as_ref().map_or(Type::Void, |return_type| {
+            return_type.get_type(scope, None, None)
+        });
 
         FunctionType::new(parameters, return_type)
     }

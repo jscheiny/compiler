@@ -15,7 +15,7 @@ impl DeclarationNode {
         let expected_type = self
             .type_def
             .as_ref()
-            .map(|type_def| type_def.get_type(&scope, None));
+            .map(|type_def| type_def.get_type(&scope, None, None));
 
         let (mut scope, resolved_type) = match self.initializer.as_ref() {
             Some(initializer) => check_initializer(scope, expected_type, initializer),

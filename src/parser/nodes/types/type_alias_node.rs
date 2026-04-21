@@ -1,8 +1,12 @@
-use std::{cell::OnceCell, rc::Rc};
+use std::{
+    cell::{OnceCell, RefCell},
+    collections::HashSet,
+    rc::Rc,
+};
 
 use crate::{
     checker::{GenericType, Scope, ScopeType, Type},
-    parser::{NameNode, Node, TypeNode, TypeParameterListNode},
+    parser::{NameNode, Node, TypeNode, TypeParameterListNode, VisitedTypes},
 };
 
 pub struct TypeAliasNode {
@@ -45,8 +49,13 @@ impl TypeAliasNode {
 
     pub fn get_type(&self, scope: &Scope) -> &Type {
         self.resolved_type.get_or_init(|| {
+            let index = scope
+                .get_type_index(&self.name)
+                .expect("Type should be registered at this point");
             let type_params = self.type_parameters.as_ref().map(|t| t.get_types_map());
-            let base_type = self.type_def.get_type(scope, type_params);
+            let base_type = self
+                .type_def
+                .get_type(scope, type_params, initial_visited(index));
             let Some(type_parameters) = self.type_parameters.as_ref() else {
                 return base_type;
             };
@@ -58,4 +67,10 @@ impl TypeAliasNode {
             }))
         })
     }
+}
+
+fn initial_visited(index: usize) -> VisitedTypes {
+    let mut visited_set = HashSet::new();
+    visited_set.insert(index);
+    Some(Rc::new(RefCell::new(visited_set)))
 }

@@ -1,6 +1,6 @@
 use crate::{
     checker::{Scope, Type, TypeParameterMap},
-    parser::{Node, TypeNode},
+    parser::{Node, TypeNode, VisitedTypes},
 };
 
 pub struct TypeListElementNode {
@@ -9,8 +9,13 @@ pub struct TypeListElementNode {
 }
 
 impl TypeListElementNode {
-    pub fn get_types(&self, scope: &Scope, type_params: Option<&TypeParameterMap>) -> Vec<Type> {
-        let resolved_type = self.inner_type.get_type(scope, type_params);
+    pub fn get_types(
+        &self,
+        scope: &Scope,
+        type_params: Option<&TypeParameterMap>,
+        visited: VisitedTypes,
+    ) -> Vec<Type> {
+        let resolved_type = self.inner_type.get_type(scope, type_params, visited);
         if !self.is_spread {
             return vec![resolved_type];
         }
