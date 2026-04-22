@@ -16,7 +16,6 @@ pub enum Type {
     Generic(Rc<GenericType>),
     Interface(Rc<InterfaceType>),
     Primitive(PrimitiveType),
-    Reference(usize),
     Struct(Rc<StructType>),
     Tuple(Rc<Vec<Type>>),
     TypeParameter(Rc<TypeParameter>),
@@ -36,11 +35,6 @@ impl Type {
     fn is_assignable_from(&self, other: &Type, scope: &Scope) -> bool {
         if other.is_error() {
             return true;
-        }
-
-        if let Type::Reference(_) = other {
-            let resolved_other = other.deref(scope);
-            return self.is_assignable_from(&resolved_other, scope);
         }
 
         match self {
@@ -79,7 +73,6 @@ impl Type {
                 Type::Primitive(right) => left == right,
                 _ => false,
             },
-            Type::Reference(_) => self.deref(scope).is_assignable_from(other, scope),
             Type::Struct(left) => match other {
                 Type::Struct(right) => left.name() == right.name(),
                 _ => false,
@@ -113,7 +106,6 @@ impl Type {
             // TODO implement bind for interfaces
             Type::Interface(t) => Type::Interface(t.clone()),
             Type::Primitive(t) => Type::Primitive(*t),
-            Type::Reference(_) => self.deref(scope).bind(scope, bindings),
             // TODO implement bind for structs
             Type::Struct(t) => Type::Struct(t.clone()),
             Type::Tuple(types) => Type::Tuple(Rc::new(
@@ -129,36 +121,24 @@ impl Type {
         matches!(self, Type::Error)
     }
 
-    pub fn is_primitive(&self, expected: PrimitiveType, scope: &Scope) -> bool {
-        match self.deref(scope) {
-            Self::Primitive(primitive) => primitive == expected,
+    // TODO remove scope parameter
+    pub fn is_primitive(&self, expected: PrimitiveType, _scope: &Scope) -> bool {
+        match self {
+            Self::Primitive(primitive) => *primitive == expected,
             Self::Error => true,
             _ => false,
         }
     }
 
-    pub fn to_function(&self, scope: &Scope) -> Option<Rc<FunctionType>> {
-        match self.deref(scope) {
+    // TODO remove scope parameter
+    pub fn to_function(&self, _scope: &Scope) -> Option<Rc<FunctionType>> {
+        match self {
             Type::Array(element_type) => Some(FunctionType::simple(
                 Type::Primitive(PrimitiveType::Int),
                 element_type.as_ref().clone(),
             )),
-            Type::Function(function_type) => Some(function_type),
+            Type::Function(function_type) => Some(function_type.clone()),
             _ => None,
-        }
-    }
-
-    pub fn as_deref(self, scope: &Scope) -> Type {
-        match self {
-            Type::Reference(index) => scope.get_type(index).unwrap_or(Type::Error).as_deref(scope),
-            _ => self,
-        }
-    }
-
-    pub fn deref(&self, scope: &Scope) -> Type {
-        match self {
-            Type::Reference(index) => scope.get_type(*index).unwrap_or(Type::Error).deref(scope),
-            _ => self.clone(),
         }
     }
 

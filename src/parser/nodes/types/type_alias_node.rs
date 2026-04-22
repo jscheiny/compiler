@@ -49,13 +49,13 @@ impl TypeAliasNode {
 
     pub fn get_type(&self, scope: &Scope) -> &Type {
         self.resolved_type.get_or_init(|| {
-            let index = scope
-                .get_type_index(&self.name)
+            let type_id = scope
+                .get_type_id(&self.name)
                 .expect("Type should be registered at this point");
             let type_params = self.type_parameters.as_ref().map(|t| t.get_types_map());
             let base_type = self
                 .type_def
-                .get_type(scope, type_params, initial_visited(index));
+                .get_type(scope, type_params, initial_visited(type_id));
             let Some(type_parameters) = self.type_parameters.as_ref() else {
                 return base_type;
             };
@@ -69,8 +69,8 @@ impl TypeAliasNode {
     }
 }
 
-fn initial_visited(index: usize) -> VisitedTypes {
+fn initial_visited(type_id: usize) -> VisitedTypes {
     let mut visited_set = HashSet::new();
-    visited_set.insert(index);
+    visited_set.insert(type_id);
     Some(Rc::new(RefCell::new(visited_set)))
 }

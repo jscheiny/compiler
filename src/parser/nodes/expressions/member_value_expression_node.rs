@@ -114,10 +114,6 @@ pub fn get_field(
             }
         }
         Type::Primitive(_) => todo!("Implement value member for primitive values"),
-        Type::Reference(index) => {
-            let resolved_type = scope.get_type(*index).unwrap();
-            get_field(&resolved_type, input_span, field, scope)
-        }
         Type::Struct(struct_type) => {
             let member = struct_type.get_member(scope, field);
             if let Some(member) = member {
@@ -162,6 +158,5 @@ fn is_external_private_access(scope: &Scope, receiver_type: &Type) -> bool {
         return true;
     };
 
-    let self_type = self_type.as_deref(scope);
     !self_type.is_equivalent_to(receiver_type, scope)
 }

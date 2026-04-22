@@ -27,8 +27,8 @@ impl EnumNode {
     }
 
     pub fn check(self: &Rc<Self>, scope: Box<Scope>) -> Box<Scope> {
-        let index = scope.get_type_index(&self.name).unwrap();
-        scope.nest(ScopeType::Struct(index), |scope| self.check_nested(scope))
+        let self_type = self.get_type(&scope);
+        scope.nest(ScopeType::Enum(self_type), |scope| self.check_nested(scope))
     }
 
     fn check_nested(self: &Rc<Self>, scope: Box<Scope>) -> Box<Scope> {

@@ -9,12 +9,12 @@ pub type NameNode = Node<String>;
 
 impl NameNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
-        let expected_enum_type = expected_type.and_then(|e| match e.deref(&scope) {
+        let expected_enum_type = expected_type.and_then(|e| match e {
             Type::Enum(enum_type) => Some(enum_type),
             _ => None,
         });
 
-        let type_value = scope.get_type_index(self).map(Type::Reference);
+        let type_value = scope.get_type(self);
         if let Some(resolved_type) = scope.get_value(self) {
             (scope, resolved_type)
         } else if let Some(type_value) = type_value {

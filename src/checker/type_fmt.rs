@@ -17,10 +17,7 @@ impl Display for TypeFmt<'_> {
             Type::Enum(enum_type) => write!(f, "{}", enum_type.name()),
             Type::Function(function_type) => {
                 let show_parentheses = function_type.parameters.len() != 1
-                    || matches!(
-                        function_type.parameters[0].deref(self.scope),
-                        Type::Tuple(_)
-                    );
+                    || matches!(function_type.parameters[0], Type::Tuple(_));
                 if show_parentheses {
                     write!(f, "(")?;
                 }
@@ -42,10 +39,6 @@ impl Display for TypeFmt<'_> {
             }
             Type::Interface(interface_type) => write!(f, "{}", interface_type.name),
             Type::Primitive(primitive_type) => write!(f, "{primitive_type}"),
-            Type::Reference(_) => {
-                let resolved_type = self.resolved_type.deref(self.scope);
-                write!(f, "{}", resolved_type.format(self.scope))
-            }
             Type::Struct(struct_type) => write!(f, "{}", struct_type.name()),
             Type::Tuple(items) => {
                 write!(f, "(")?;

@@ -46,7 +46,7 @@ impl UserDefinedTypeNode {
     }
 
     fn unbound_type(&self, scope: &Scope, base_type: Type) -> Type {
-        match base_type.deref(scope) {
+        match &base_type {
             Type::Generic(generic_type) => {
                 scope.source.print_error(
                     self.name.span,
@@ -72,8 +72,10 @@ impl UserDefinedTypeNode {
             return Type::TypeParameter(type_parameter.clone());
         }
 
-        let index = scope.get_type_index(&self.name);
-        let Some(index) = index else {
+        let base_type_entry = scope.get_type_entry(&self.name);
+        let type_id = base_type_entry.as_ref().map(|entry| entry.id);
+        let base_type = base_type_entry.and_then(|entry| entry.value);
+        let Some(base_type) = base_type else {
             scope.source.print_error(
                 self.name.span,
                 &format!("Unknown type `{}`", self.name),
@@ -81,10 +83,11 @@ impl UserDefinedTypeNode {
             );
             return Type::Error;
         };
+        let type_id = type_id.expect("Base type entry is unwrapped safely above");
 
         if let Some(visited) = visited {
             let mut visited = visited.borrow_mut();
-            if !visited.insert(index) {
+            if !visited.insert(type_id) {
                 scope.source.print_error(
                     self.name.span,
                     &format!("Type alias `{}` used recursively", self.name),
@@ -94,7 +97,7 @@ impl UserDefinedTypeNode {
             }
         }
 
-        Type::Reference(index)
+        base_type
     }
 }
 
@@ -110,7 +113,7 @@ pub fn bind_type(
         .map(|p| p.get_type(scope, type_params, visited.clone()))
         .collect::<Vec<_>>();
 
-    match base_type.deref(scope) {
+    match base_type {
         Type::Generic(generic_type) => generic_type.bind(scope, bound_type_params, &bound_types),
         Type::Enum(_) => todo!("Implement generic binding for enums"),
         Type::Interface(_) => todo!("Implement generic binding for interfaces"),

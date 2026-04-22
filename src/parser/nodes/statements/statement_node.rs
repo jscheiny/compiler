@@ -52,7 +52,7 @@ impl StatementNode {
 }
 
 fn check_loop(keyword: Keyword, span: TokenSpan, scope: Box<Scope>) -> (Box<Scope>, Option<Type>) {
-    if !scope.within(ScopeType::Loop) {
+    if !scope.within(|scope_type| matches!(scope_type, ScopeType::Loop)) {
         scope.source.print_error(
             span,
             &format!("Unexpected {keyword}"),

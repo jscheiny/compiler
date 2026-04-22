@@ -82,10 +82,7 @@ impl ImplementationNode {
                     });
                 }
                 ImplementationEntryNode::Interface(implementation) => {
-                    let interface_type = scope
-                        .get_type_index(&implementation.name)
-                        .map(Type::Reference)
-                        .map(|t| t.as_deref(scope));
+                    let interface_type = scope.get_type(&implementation.name);
                     if let Some(Type::Interface(interface_type)) = interface_type {
                         for (name, function_type) in &interface_type.methods {
                             methods.push(Method {
@@ -103,12 +100,12 @@ impl ImplementationNode {
     }
 
     pub fn implements(&self, scope: &Scope, interface_type: &Rc<InterfaceType>) -> bool {
-        let index = scope.global().get_type_index(&interface_type.name);
-        match index {
-            Some(index) => self
+        let interface_type_id = scope.global().get_type_id(&interface_type.name);
+        match interface_type_id {
+            Some(type_id) => self
                 .implemented_interfaces
                 .get_or_init(|| self.init_implemented_interfaces(scope))
-                .contains(&index),
+                .contains(&type_id),
             None => false,
         }
     }
@@ -117,9 +114,9 @@ impl ImplementationNode {
         let mut result = HashSet::new();
         for entry in &self.entries {
             if let ImplementationEntryNode::Interface(node) = &entry.value {
-                let index = scope.get_type_index(&node.name);
-                if let Some(index) = index {
-                    result.insert(index);
+                let type_id = scope.get_type_id(&node.name);
+                if let Some(type_id) = type_id {
+                    result.insert(type_id);
                 }
             }
         }
@@ -135,9 +132,8 @@ fn check_duplicate_interface(
     scope_names: &mut HashSet<String>,
     implemented_interfaces: &mut HashSet<String>,
 ) {
-    let implemented_type = scope
-        .get_type_index(&interface_implementation.name)
-        .map(|t| Type::Reference(t).as_deref(scope));
+    // TODO Should this use type ids instead?
+    let implemented_type = scope.get_type(&interface_implementation.name);
     if let Some(Type::Interface(interface_type)) = implemented_type {
         if !implemented_interfaces.insert(interface_type.name.clone()) {
             scope.source.print_error(

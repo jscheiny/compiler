@@ -22,7 +22,7 @@ impl MemberTypeExpressionNode {
     }
 
     fn get_static_field(&self, scope: &Scope, receiver_type: &Type) -> Type {
-        match receiver_type.deref(scope) {
+        match receiver_type {
             Type::Enum(enum_type) => {
                 if let Some(variant_type) = enum_type.get_variant(&self.field.value) {
                     variant_type

@@ -92,12 +92,11 @@ impl ExpressionNode {
             return (scope, Type::Error);
         };
 
-        let Some(type_index) = scope.get_type_index(name) else {
+        let Some(result_type) = scope.get_type(name) else {
             print_unknown_type_error(&scope, span, name);
             return (scope, Type::Error);
         };
 
-        let result_type = Type::Reference(type_index).as_deref(&scope);
         (scope, result_type)
     }
 }

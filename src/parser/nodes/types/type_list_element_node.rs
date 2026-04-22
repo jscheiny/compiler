@@ -20,7 +20,7 @@ impl TypeListElementNode {
             return vec![resolved_type];
         }
 
-        if let Type::Tuple(types) = resolved_type.deref(scope) {
+        if let Type::Tuple(types) = resolved_type {
             return types.to_vec();
         }
 

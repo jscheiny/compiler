@@ -13,9 +13,7 @@ pub struct InterfaceImplementationNode {
 
 impl InterfaceImplementationNode {
     pub fn check(&self, mut scope: Box<Scope>, self_type: &ImplementationType) -> Box<Scope> {
-        let implemented_type = scope
-            .get_type_index(&self.name)
-            .map(|t| Type::Reference(t).as_deref(&scope));
+        let implemented_type = scope.get_type(&self.name);
 
         if let Some(implemented_type) = implemented_type.as_ref() {
             if !matches!(implemented_type, Type::Interface(_)) {
@@ -83,7 +81,7 @@ impl InterfaceImplementationNode {
         if let Some(Type::Interface(interface_type)) = implemented_type {
             for (variant_name, variant_type) in &enum_type.variants {
                 if let Some(variant_type) = variant_type {
-                    let implements_interface = match variant_type.clone().as_deref(scope) {
+                    let implements_interface = match variant_type.clone() {
                         Type::Enum(e) => e.implements(scope, interface_type),
                         Type::Struct(s) => s.implements(scope, interface_type),
                         _ => false,

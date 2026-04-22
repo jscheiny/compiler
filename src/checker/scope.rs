@@ -4,11 +4,11 @@ use std::{
 };
 
 use crate::{
-    checker::{Type, TypeMap},
+    checker::{EnumType, StructType, Type, TypeEntry, TypeMap},
     lexer::{EnumToken, Keyword, SourceCode},
 };
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone)]
 pub enum ScopeType {
     Global,
     Function,
@@ -17,7 +17,8 @@ pub enum ScopeType {
     MatchCase,
     Loop,
     Type,
-    Struct(usize),
+    Enum(Rc<EnumType>),
+    Struct(Rc<StructType>),
 }
 
 pub struct Scope {
@@ -56,15 +57,17 @@ impl Scope {
         handler: impl FnOnce(Box<Scope>) -> (Box<Scope>, T),
     ) -> (Box<Scope>, T) {
         let source = self.source.clone();
-        let types = self.types.nest();
+        let types = TypeMap::new();
         let mut scope = Box::new(Self {
-            scope_type,
+            scope_type: scope_type.clone(),
             parent: Some(self),
             ..Self::new(source, types)
         });
-        if let ScopeType::Struct(index) = scope_type {
-            let self_type = Type::Reference(index).as_deref(&scope);
-            scope.add_type_and_value(Keyword::SelfType.as_str(), &self_type);
+        if let ScopeType::Struct(self_type) = &scope_type {
+            scope.add_type_and_value(Keyword::SelfType.as_str(), &Type::Struct(self_type.clone()));
+        }
+        if let ScopeType::Enum(self_type) = scope_type {
+            scope.add_type_and_value(Keyword::SelfType.as_str(), &Type::Enum(self_type));
         }
         let (scope, result) = handler(scope);
         (scope.parent(), result)
@@ -76,7 +79,7 @@ impl Scope {
         handler: impl FnOnce(Box<Scope>) -> Box<Scope>,
     ) -> Box<Scope> {
         let source = self.source.clone();
-        let types = self.types.nest();
+        let types = TypeMap::new();
         let mut scope = Box::new(Self {
             scope_type: ScopeType::Function,
             parent: Some(self),
@@ -93,17 +96,17 @@ impl Scope {
         function_scope.and_then(|scope| scope.return_type.as_ref())
     }
 
-    pub fn within(&self, scope_type: ScopeType) -> bool {
-        self.scope_type == scope_type
+    pub fn within(&self, mut predicate: impl FnMut(&ScopeType) -> bool) -> bool {
+        predicate(&self.scope_type)
             || self
                 .parent
                 .as_ref()
-                .is_some_and(|parent| parent.within(scope_type))
+                .is_some_and(|parent| parent.within(predicate))
     }
 
-    pub fn find_scope(&self, mut predicate: impl FnMut(ScopeType) -> bool) -> Option<&Scope> {
+    pub fn find_scope(&self, mut predicate: impl FnMut(&ScopeType) -> bool) -> Option<&Scope> {
         if let Some(parent) = self.parent.as_ref() {
-            if predicate(parent.scope_type) {
+            if predicate(&parent.scope_type) {
                 Some(parent)
             } else {
                 parent.find_scope(predicate)
@@ -152,25 +155,27 @@ impl Scope {
             .and_then(|parent| parent.get_value(name))
     }
 
-    pub fn get_type_index(&self, name: &String) -> Option<usize> {
-        self.types.get_index(name).or_else(|| {
+    pub fn get_type_entry(&self, name: &String) -> Option<TypeEntry> {
+        self.types.get_type_entry(name).or_else(|| {
             self.parent
                 .as_ref()
-                .and_then(|parent| parent.get_type_index(name))
+                .and_then(|parent| parent.get_type_entry(name))
         })
     }
 
-    pub fn get_type(&self, index: usize) -> Option<Type> {
-        self.types.get_type(index).or_else(|| {
-            self.parent
-                .as_ref()
-                .and_then(|parent| parent.get_type(index))
-        })
+    pub fn get_type_id(&self, name: &String) -> Option<usize> {
+        self.get_type_entry(name).map(|entry| entry.id)
+    }
+
+    pub fn get_type(&self, name: &String) -> Option<Type> {
+        self.get_type_entry(name).and_then(|entry| entry.value)
     }
 
     pub fn get_self_type(&self) -> Option<Type> {
-        if let ScopeType::Struct(index) = self.scope_type {
-            self.get_type(index)
+        if let ScopeType::Struct(struct_type) = &self.scope_type {
+            Some(Type::Struct(struct_type.clone()))
+        } else if let ScopeType::Enum(enum_type) = &self.scope_type {
+            Some(Type::Enum(enum_type.clone()))
         } else {
             self.parent
                 .as_ref()
@@ -188,7 +193,7 @@ impl Scope {
 
     fn add_type_and_value(&mut self, name: &str, value: &Type) {
         self.add_type(name, value.clone());
-        if let Type::Struct(struct_type) = value.deref(self) {
+        if let Type::Struct(struct_type) = value {
             self.add_value(name, Type::Function(struct_type.get_constructor(self)));
         }
     }
