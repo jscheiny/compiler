@@ -22,7 +22,7 @@ impl FunctionType {
     pub fn as_static_method(self: Rc<Self>, self_type: Type) -> Type {
         let mut parameters = self.parameters.clone();
         parameters.insert(0, self_type.clone());
-        Type::Function(Self::new(parameters, self_type))
+        Type::Function(Self::new(parameters, *self.return_type.clone()))
     }
 
     pub fn bind(&self, scope: &Scope, bindings: &TypeParameterBindings) -> Rc<Self> {
