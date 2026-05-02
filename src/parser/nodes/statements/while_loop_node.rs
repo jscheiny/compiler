@@ -11,7 +11,7 @@ pub struct WhileLoopNode {
 impl WhileLoopNode {
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
         let (scope, predicate_type) = self.predicate.check(scope);
-        if !predicate_type.is_primitive(PrimitiveType::Bool, &scope) {
+        if !predicate_type.is_primitive(PrimitiveType::Bool) {
             scope.source.print_error(
                 self.predicate.span,
                 "While loop predicate expected to be bool",

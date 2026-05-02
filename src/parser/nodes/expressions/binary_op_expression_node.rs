@@ -45,7 +45,7 @@ impl BinaryOpExpressionNode {
         let (scope, left_type) = self.left.check(scope);
         // TODO the expected type here should be a function from left_type -> expected_type
         let (scope, right_type) = self.right.check_expected(scope, expected_type);
-        let function_type = right_type.to_function(&scope);
+        let function_type = right_type.to_function();
 
         if let Some(function_type) = function_type {
             if function_type.parameters.len() != 1 {
@@ -86,12 +86,12 @@ impl BinaryOpExpressionNode {
         let bool_type = Type::Primitive(PrimitiveType::Bool);
 
         let (scope, left_type) = self.left.check(scope);
-        if !left_type.is_primitive(PrimitiveType::Bool, &scope) {
+        if !left_type.is_primitive(PrimitiveType::Bool) {
             self.print_operand_error(&scope, self.left.span, &bool_type, &left_type);
         }
 
         let (scope, right_type) = self.right.check(scope);
-        if !right_type.is_primitive(PrimitiveType::Bool, &scope) {
+        if !right_type.is_primitive(PrimitiveType::Bool) {
             self.print_operand_error(&scope, self.right.span, &bool_type, &right_type);
         }
 

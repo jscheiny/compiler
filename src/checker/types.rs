@@ -47,7 +47,7 @@ impl Type {
                 Type::Enum(right) => left.name() == right.name(),
                 _ => false,
             },
-            Type::Function(left) => match other.to_function(scope) {
+            Type::Function(left) => match other.to_function() {
                 Some(right) => {
                     left.parameters.len() == right.parameters.len()
                         && left
@@ -121,8 +121,7 @@ impl Type {
         matches!(self, Type::Error)
     }
 
-    // TODO remove scope parameter
-    pub fn is_primitive(&self, expected: PrimitiveType, _scope: &Scope) -> bool {
+    pub fn is_primitive(&self, expected: PrimitiveType) -> bool {
         match self {
             Self::Primitive(primitive) => *primitive == expected,
             Self::Error => true,
@@ -130,8 +129,7 @@ impl Type {
         }
     }
 
-    // TODO remove scope parameter
-    pub fn to_function(&self, _scope: &Scope) -> Option<Rc<FunctionType>> {
+    pub fn to_function(&self) -> Option<Rc<FunctionType>> {
         match self {
             Type::Array(element_type) => Some(FunctionType::simple(
                 Type::Primitive(PrimitiveType::Int),

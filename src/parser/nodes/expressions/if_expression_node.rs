@@ -12,7 +12,7 @@ pub struct IfExpressionNode {
 impl IfExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
         let (scope, predicate_type) = self.predicate.check(scope);
-        if !predicate_type.is_primitive(PrimitiveType::Bool, &scope) {
+        if !predicate_type.is_primitive(PrimitiveType::Bool) {
             scope.source.print_error(
                 self.predicate.span,
                 "If expression predicate expected to be bool",

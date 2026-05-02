@@ -23,7 +23,7 @@ pub fn check_function_call(
     left_type: &Type,
     arguments: &NodeVec<ExpressionNode>,
 ) -> (Box<Scope>, Type) {
-    let function_type = left_type.to_function(&scope);
+    let function_type = left_type.to_function();
     match function_type {
         Some(function_type) => check_valid_function_call(scope, &function_type, arguments),
         None => check_invalid_function_call(scope, function_span, left_type, arguments),

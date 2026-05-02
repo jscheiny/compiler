@@ -10,7 +10,7 @@ pub struct DeferredMemberExpressionNode {
 
 impl DeferredMemberExpressionNode {
     pub fn check(&self, scope: Box<Scope>, expected_type: Option<&Type>) -> (Box<Scope>, Type) {
-        let function_type = expected_type.and_then(|t| t.to_function(&scope));
+        let function_type = expected_type.and_then(|t| t.to_function());
         if let Some(function_type) = function_type {
             if function_type.parameters.len() != 1 {
                 scope.source.print_error(
