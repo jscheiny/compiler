@@ -23,6 +23,7 @@ pub enum ScopeType {
 }
 
 pub struct Scope {
+    // TODO consider making this private and just using scope.print_error() directly
     pub source: Rc<SourceCode>,
     scope_type: ScopeType,
     parent: Option<Box<Scope>>,
