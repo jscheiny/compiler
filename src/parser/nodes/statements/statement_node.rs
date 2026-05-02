@@ -67,7 +67,7 @@ fn check_function_return(
     statement_span: TokenSpan,
     mut scope: Box<Scope>,
 ) -> (Box<Scope>, Option<Type>) {
-    let expected_type = scope.return_type().cloned();
+    let expected_type = scope.get_return_type();
     if let Some(expected_type) = expected_type {
         let (new_scope, resolved_type) = match expression {
             Some(expression) => expression.check_expected(scope, Some(&expected_type)),

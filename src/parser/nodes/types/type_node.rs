@@ -39,9 +39,9 @@ impl TypeNode {
 }
 
 fn get_result_type(types: &impl Types, span: TokenSpan) -> Type {
-    let result_type = types.return_type();
+    let result_type = types.get_return_type();
     if let Some(result_type) = result_type {
-        result_type.clone()
+        result_type
     } else {
         types.print_error(
             span,

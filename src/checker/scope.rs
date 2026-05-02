@@ -180,10 +180,10 @@ impl Types for Scope {
         self.get_type_entry(name).map(|entry| entry.value)
     }
 
-    fn return_type(&self) -> Option<&Type> {
+    fn get_return_type(&self) -> Option<Type> {
         let function_scope =
             self.find_scope(|scope_type| matches!(scope_type, ScopeType::Function));
-        function_scope.and_then(|scope| scope.return_type.as_ref())
+        function_scope.and_then(|scope| scope.return_type.clone())
     }
 
     fn get_self_type(&self) -> Option<Type> {

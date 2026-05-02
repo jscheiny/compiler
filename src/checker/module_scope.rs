@@ -95,7 +95,7 @@ impl Types for ModuleScope {
         self.lookup.get(name).map(|entry| entry.node.get_type(self))
     }
 
-    fn return_type(&self) -> Option<&Type> {
+    fn get_return_type(&self) -> Option<Type> {
         None
     }
 
