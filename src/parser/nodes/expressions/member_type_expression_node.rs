@@ -74,7 +74,7 @@ impl MemberTypeExpressionNode {
                     "Cannot access properties of this type",
                     &format!(
                         "type `{}` does not have accessible properties",
-                        receiver_type.format(scope)
+                        receiver_type
                     ),
                 );
                 Type::Error

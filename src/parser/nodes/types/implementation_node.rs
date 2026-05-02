@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{EnumType, FunctionType, InterfaceType, Scope, StructType, Type},
+    checker::{EnumType, FunctionType, InterfaceType, Scope, StructType, Type, Types},
     parser::{FunctionNode, ImplementationEntryNode, InterfaceImplementationNode, Node},
 };
 
@@ -142,7 +142,7 @@ fn check_duplicate_interface(
                 &format!(
                     "{} `{}` already implements this interface",
                     get_container_type(self_type),
-                    self_type.as_type().format(scope),
+                    self_type.as_type(),
                 ),
             );
         }
@@ -182,7 +182,7 @@ fn print_duplicate_member_error(
         &format!(
             "{} `{}` already contains a {} with this name",
             container_type,
-            self_type.as_type().format(scope),
+            self_type.as_type(),
             match self_type {
                 ImplementationType::Enum(_) => "variant or method",
                 ImplementationType::Struct(_) => "field or method",

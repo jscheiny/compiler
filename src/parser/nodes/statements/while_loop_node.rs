@@ -15,7 +15,7 @@ impl WhileLoopNode {
             scope.source.print_error(
                 self.predicate.span,
                 "While loop predicate expected to be bool",
-                &format!("found type: `{}`", predicate_type.format(&scope)),
+                &format!("found type: `{}`", predicate_type),
             );
         }
 

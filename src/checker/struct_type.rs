@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, collections::HashMap, rc::Rc};
 
 use crate::{
-    checker::{FunctionType, InterfaceType, Scope, Type},
+    checker::{FunctionType, InterfaceType, Scope, Type, Types},
     parser::StructNode,
 };
 
@@ -12,26 +12,28 @@ pub struct StructType {
 }
 
 impl StructType {
-    pub fn from(node: Rc<StructNode>) -> Rc<StructType> {
-        Rc::new(StructType {
+    pub fn from(node: Rc<StructNode>, scope: &impl Types) -> Rc<StructType> {
+        let struct_type = Rc::new(StructType {
             node,
             constructor: OnceCell::new(),
             members: OnceCell::new(),
-        })
+        });
+        // Immediately initialize constructor using the global scope
+        struct_type.get_constructor(scope);
+        struct_type
     }
 
     pub fn name(&self) -> &String {
         &self.node.name
     }
 
-    pub fn get_constructor(self: &Rc<Self>, scope: &Scope) -> Rc<FunctionType> {
+    pub fn get_constructor(self: &Rc<Self>, scope: &impl Types) -> Rc<FunctionType> {
         self.constructor
             .get_or_init(|| self.init_constructor(scope))
             .clone()
     }
 
-    fn init_constructor(self: &Rc<Self>, scope: &Scope) -> Rc<FunctionType> {
-        let scope = scope.global();
+    fn init_constructor(self: &Rc<Self>, scope: &impl Types) -> Rc<FunctionType> {
         let parameters = self
             .node
             .fields

@@ -5,7 +5,7 @@ use std::{
 };
 
 use crate::{
-    checker::{GenericType, Scope, ScopeType, Type},
+    checker::{GenericType, Scope, ScopeType, Type, Types},
     parser::{NameNode, Node, TypeNode, TypeParameterListNode, VisitedTypes},
 };
 
@@ -35,7 +35,7 @@ impl TypeAliasNode {
             if let Some(type_parameters) = self.type_parameters.as_ref() {
                 scope = type_parameters.check(scope, type_parameters.span);
             }
-            let resolved_type = self.get_type(&scope).clone();
+            let resolved_type = self.get_type(&*scope).clone();
             (scope, resolved_type)
         })
     }
@@ -47,15 +47,15 @@ impl TypeAliasNode {
         // TODO check for recursion
     }
 
-    pub fn get_type(&self, scope: &Scope) -> &Type {
+    pub fn get_type(&self, types: &impl Types) -> &Type {
         self.resolved_type.get_or_init(|| {
-            let type_id = scope
+            let type_id = types
                 .get_type_id(&self.name)
                 .expect("Type should be registered at this point");
             let type_params = self.type_parameters.as_ref().map(|t| t.get_types_map());
             let base_type = self
                 .type_def
-                .get_type(scope, type_params, initial_visited(type_id));
+                .get_type(types, type_params, initial_visited(type_id));
             let Some(type_parameters) = self.type_parameters.as_ref() else {
                 return base_type;
             };

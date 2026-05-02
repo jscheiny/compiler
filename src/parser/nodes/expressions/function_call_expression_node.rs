@@ -40,10 +40,7 @@ fn check_invalid_function_call(
         scope.source.print_error(
             function_span,
             "Cannot use value as a function",
-            &format!(
-                "type `{}` is not usable as a function",
-                left_type.format(&scope)
-            ),
+            &format!("type `{}` is not usable as a function", left_type),
         );
     }
 
@@ -90,8 +87,7 @@ fn check_valid_function_call(
                     "Argument not assignable to parameter type",
                     &format!(
                         "expected type `{}`, found type `{}`",
-                        parameter_type.format(&scope),
-                        argument_type.format(&scope),
+                        parameter_type, argument_type,
                     ),
                 );
             }
@@ -164,8 +160,8 @@ fn check_spread_arg(
                 "Spread argument not assignable to parameter types",
                 &format!(
                     "expected type `{}`, found type `{}`",
-                    expected_type.format(&scope),
-                    Type::Tuple(spread_type.clone()).format(&scope),
+                    expected_type,
+                    Type::Tuple(spread_type.clone()),
                 ),
             );
             break;

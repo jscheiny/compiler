@@ -1,19 +1,19 @@
 use std::fmt::Display;
 
 use crate::{
-    checker::{Scope, Type},
+    checker::Type,
     lexer::{Keyword, Symbol},
 };
 
+// TODO refactors here - maybe combine with types.rs
 pub struct TypeFmt<'a> {
     pub resolved_type: &'a Type,
-    pub scope: &'a Scope,
 }
 
-impl Display for TypeFmt<'_> {
+impl Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self.resolved_type {
-            Type::Array(element_type) => write!(f, "[{}]", element_type.format(self.scope)),
+        match self {
+            Type::Array(element_type) => write!(f, "[{}]", element_type),
             Type::Enum(enum_type) => write!(f, "{}", enum_type.name()),
             Type::Function(function_type) => {
                 let show_parentheses = function_type.parameters.len() != 1
@@ -21,20 +21,15 @@ impl Display for TypeFmt<'_> {
                 if show_parentheses {
                     write!(f, "(")?;
                 }
-                self.write_types_list(f, &function_type.parameters)?;
+                write_list(f, &function_type.parameters)?;
                 if show_parentheses {
                     write!(f, ")")?;
                 }
-                write!(
-                    f,
-                    " {} {}",
-                    Symbol::ThickArrow,
-                    function_type.return_type.format(self.scope)
-                )
+                write!(f, " {} {}", Symbol::ThickArrow, function_type.return_type)
             }
             Type::Generic(generic_type) => {
                 write!(f, "{}[", generic_type.name)?;
-                write_slice(f, &generic_type.type_parameters)?;
+                write_list(f, &generic_type.type_parameters)?;
                 write!(f, "]")
             }
             Type::Interface(interface_type) => write!(f, "{}", interface_type.name),
@@ -42,7 +37,7 @@ impl Display for TypeFmt<'_> {
             Type::Struct(struct_type) => write!(f, "{}", struct_type.name()),
             Type::Tuple(items) => {
                 write!(f, "(")?;
-                self.write_types_list(f, items)?;
+                write_list(f, items)?;
                 write!(f, ")")
             }
             Type::TypeParameter(type_parameter) => write!(f, "{}", type_parameter.name),
@@ -52,25 +47,10 @@ impl Display for TypeFmt<'_> {
     }
 }
 
-impl TypeFmt<'_> {
-    fn write_types_list(&self, f: &mut std::fmt::Formatter<'_>, list: &[Type]) -> std::fmt::Result {
-        let mut iter = list.iter().map(|t| t.format(self.scope));
-        write_iter(f, &mut iter, list.len())
-    }
-}
-
-fn write_slice<T: Display>(f: &mut std::fmt::Formatter<'_>, list: &[T]) -> std::fmt::Result {
-    write_iter(f, &mut list.iter(), list.len())
-}
-
-fn write_iter<T: Display>(
-    f: &mut std::fmt::Formatter<'_>,
-    list: &mut dyn Iterator<Item = T>,
-    len: usize,
-) -> std::fmt::Result {
-    for (index, element) in list.enumerate() {
+fn write_list<T: Display>(f: &mut std::fmt::Formatter<'_>, list: &[T]) -> std::fmt::Result {
+    for (index, element) in list.iter().enumerate() {
         write!(f, "{element}")?;
-        if index != len - 1 {
+        if index != list.len() - 1 {
             write!(f, ", ")?;
         }
     }

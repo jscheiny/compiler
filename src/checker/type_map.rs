@@ -3,7 +3,7 @@ use std::{
     sync::atomic::{AtomicUsize, Ordering},
 };
 
-use crate::{checker::Type, lexer::SourceCode, parser::NameNode};
+use crate::checker::Type;
 
 #[derive(Default)]
 pub struct TypeMap {
@@ -15,26 +15,17 @@ impl TypeMap {
         TypeMap::default()
     }
 
-    pub fn declare(&mut self, name: &NameNode, source: &SourceCode) {
-        if self.lookup.contains_key(&name.value) {
-            source.print_error(
-                name.span,
-                "Duplicate type name",
-                "a type already exists with this name",
-            );
-            return;
-        }
-
-        self.lookup.insert(name.value.clone(), TypeEntry::empty());
+    pub fn from(lookup: HashMap<String, TypeEntry>) -> Self {
+        TypeMap { lookup }
     }
 
-    pub fn get_type_entry(&self, name: &String) -> Option<TypeEntry> {
+    pub fn get_type_entry(&self, name: &str) -> Option<TypeEntry> {
         self.lookup.get(name).cloned()
     }
 
     pub fn resolve(&mut self, name: &str, value: Type) {
         match self.lookup.entry(name.to_owned()) {
-            Entry::Occupied(mut o) => o.get_mut().fill(value),
+            Entry::Occupied(mut o) => o.get_mut().value = value,
             Entry::Vacant(v) => {
                 v.insert(TypeEntry::new(value));
             }
@@ -48,29 +39,16 @@ impl TypeMap {
 
 #[derive(Clone)]
 pub struct TypeEntry {
-    pub value: Option<Type>,
+    pub value: Type,
     pub id: usize,
 }
 
 // TODO move this
 impl TypeEntry {
-    pub fn empty() -> TypeEntry {
-        Self {
-            value: None,
-            id: new_type_id(),
-        }
-    }
-
     pub fn new(value: Type) -> TypeEntry {
         Self {
-            value: Some(value),
+            value,
             id: new_type_id(),
-        }
-    }
-
-    pub fn fill(&mut self, value: Type) {
-        if self.value.is_none() {
-            self.value = Some(value)
         }
     }
 }

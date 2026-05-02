@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::checker::{Scope, Type, TypeParameterBindings};
+use crate::checker::{Type, TypeParameterBindings, Types};
 
 pub struct FunctionType {
     pub parameters: Vec<Type>,
@@ -25,13 +25,13 @@ impl FunctionType {
         Type::Function(Self::new(parameters, *self.return_type.clone()))
     }
 
-    pub fn bind(&self, scope: &Scope, bindings: &TypeParameterBindings) -> Rc<Self> {
+    pub fn bind(&self, types: &impl Types, bindings: &TypeParameterBindings) -> Rc<Self> {
         Self::new(
             self.parameters
                 .iter()
-                .map(|param| param.bind(scope, bindings))
+                .map(|param| param.bind(types, bindings))
                 .collect(),
-            self.return_type.bind(scope, bindings),
+            self.return_type.bind(types, bindings),
         )
     }
 }

@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    checker::{Scope, Type},
+    checker::{ModuleTypeNode, Scope, Type},
     parser::{EnumNode, FunctionNode, InterfaceNode, NameNode, StructNode, TypeAliasNode},
 };
 
@@ -15,14 +15,10 @@ pub enum ModuleDefinitionNode {
     Function(FunctionNode),
     Interface(Rc<InterfaceNode>),
     Struct(Rc<StructNode>),
-    TypeAlias(TypeAliasNode),
+    TypeAlias(Rc<TypeAliasNode>),
 }
 
 impl ModuleDefinitionNode {
-    pub fn is_type(&self) -> bool {
-        !matches!(self, Self::Function(_))
-    }
-
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
         match self {
             Self::Enum(node) => node.check(scope),
@@ -37,7 +33,7 @@ impl ModuleDefinitionNode {
         let resolved_type = match self {
             Self::Function(node) => Some(Type::Function(node.get_type(scope).clone())),
             // TODO respect the privacy of the constructor
-            Self::Struct(node) => Some(Type::Function(node.get_type().get_constructor(scope))),
+            Self::Struct(node) => Some(Type::Function(node.get_type(scope).get_constructor(scope))),
             Self::Enum(_) | Self::Interface(_) | Self::TypeAlias(_) => None,
         };
 
@@ -46,17 +42,13 @@ impl ModuleDefinitionNode {
         }
     }
 
-    pub fn resolve_type(&mut self, scope: &mut Scope) {
-        let resolved_type = match self {
-            Self::Enum(node) => Some(Type::Enum(node.get_type(scope))),
-            Self::Interface(node) => Some(Type::Interface(node.get_type(scope))),
-            Self::Struct(node) => Some(Type::Struct(node.get_type())),
-            Self::TypeAlias(node) => Some(node.get_type(scope).clone()),
+    pub fn to_module_type_node(&self) -> Option<ModuleTypeNode> {
+        match self {
+            Self::Enum(node) => Some(ModuleTypeNode::Enum(node.clone())),
+            Self::Interface(node) => Some(ModuleTypeNode::Interface(node.clone())),
+            Self::Struct(node) => Some(ModuleTypeNode::Struct(node.clone())),
+            Self::TypeAlias(node) => Some(ModuleTypeNode::TypeAlias(node.clone())),
             Self::Function(_) => None,
-        };
-
-        if let Some(resolved_type) = resolved_type {
-            scope.resolve_type(self.name(), resolved_type);
         }
     }
 

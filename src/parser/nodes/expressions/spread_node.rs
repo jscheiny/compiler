@@ -48,7 +48,7 @@ impl SpreadNode {
         scope.source.print_error(
             self.expression.span,
             "Spread expression should be a tuple",
-            &format!("found type `{}`", found_type.format(scope)),
+            &format!("found type `{}`", found_type),
         );
     }
 }

@@ -21,7 +21,7 @@ impl ClosureParameterExpressionNode {
         );
 
         if let Some(parameter_type) = self.parameter_type.as_ref() {
-            parameter_type.get_type(&scope, None, None);
+            parameter_type.get_type(&*scope, None, None);
         }
 
         (scope, Type::Error)

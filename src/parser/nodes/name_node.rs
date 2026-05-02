@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use crate::{
-    checker::{Scope, Type},
+    checker::{Scope, Type, Types},
     parser::Node,
 };
 
@@ -21,7 +21,7 @@ impl NameNode {
             scope.source.print_error(
                 self.span,
                 "Types cannot be used as values",
-                &format!("cannot use type `{}` as a value", type_value.format(&scope)),
+                &format!("cannot use type `{}` as a value", type_value),
             );
             (scope, Type::Error)
         } else if let Some(enum_type) = expected_enum_type {

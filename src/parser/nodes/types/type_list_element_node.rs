@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, Type, TypeParameterMap},
+    checker::{Type, TypeParameterMap, Types},
     parser::{Node, TypeNode, VisitedTypes},
 };
 
@@ -11,7 +11,7 @@ pub struct TypeListElementNode {
 impl TypeListElementNode {
     pub fn get_types(
         &self,
-        scope: &Scope,
+        scope: &impl Types,
         type_params: Option<&TypeParameterMap>,
         visited: VisitedTypes,
     ) -> Vec<Type> {
@@ -24,10 +24,10 @@ impl TypeListElementNode {
             return types.to_vec();
         }
 
-        scope.source.print_error(
+        scope.print_error(
             self.inner_type.span,
             "Spread type should be a tuple",
-            &format!("found type `{}`", resolved_type.format(scope)),
+            &format!("found type `{}`", resolved_type),
         );
 
         vec![resolved_type]

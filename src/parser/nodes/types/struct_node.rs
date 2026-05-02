@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{Scope, ScopeType, StructType},
+    checker::{Scope, ScopeType, StructType, Types},
     parser::{ImplementationNode, ImplementationType, NameNode, Node, NodeVec, StructFieldNode},
 };
 
@@ -27,7 +27,7 @@ impl StructNode {
     }
 
     pub fn check(self: &Rc<Self>, scope: Box<Scope>) -> Box<Scope> {
-        let self_type = self.get_type();
+        let self_type = self.get_type(&*scope);
         scope.nest(ScopeType::Struct(self_type), |scope| {
             self.check_nested(scope)
         })
@@ -37,7 +37,7 @@ impl StructNode {
         let mut scope_names = HashSet::new();
         for field in self.fields.iter() {
             if scope_names.insert(field.name.clone()) {
-                let field_type = field.get_type(&scope).clone();
+                let field_type = field.get_type(&*scope).clone();
                 scope.add_value(&field.name, field_type);
             } else {
                 scope.source.print_error(
@@ -52,16 +52,16 @@ impl StructNode {
         }
 
         if let Some(implementation) = self.implementation.as_ref() {
-            let self_type = ImplementationType::Struct(self.get_type());
+            let self_type = ImplementationType::Struct(self.get_type(&*scope));
             return implementation.check(scope, &self_type, scope_names);
         }
 
         scope
     }
 
-    pub fn get_type(self: &Rc<Self>) -> Rc<StructType> {
+    pub fn get_type(self: &Rc<Self>, types: &impl Types) -> Rc<StructType> {
         self.resolved_type
-            .get_or_init(|| StructType::from(self.clone()))
+            .get_or_init(|| StructType::from(self.clone(), types))
             .clone()
     }
 }

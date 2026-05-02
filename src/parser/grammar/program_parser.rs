@@ -29,12 +29,13 @@ fn exportable_module_definition(
 fn module_definition(tokens: &mut TokenStream) -> ParseResult<ModuleDefinitionNode> {
     if let Token::Keyword(keyword) = tokens.peek() {
         use Keyword as K;
+        use ModuleDefinitionNode as N;
         match keyword {
-            K::Enum => Ok(ModuleDefinitionNode::Enum(Rc::new(enumeration(tokens)?))),
-            K::Fn => Ok(ModuleDefinitionNode::Function(top_level_function(tokens)?)),
-            K::Interface => Ok(ModuleDefinitionNode::Interface(Rc::new(interface(tokens)?))),
-            K::Struct => Ok(ModuleDefinitionNode::Struct(Rc::new(structure(tokens)?))),
-            K::Type => Ok(ModuleDefinitionNode::TypeAlias(type_alias(tokens)?)),
+            K::Enum => Ok(N::Enum(Rc::new(enumeration(tokens)?))),
+            K::Fn => Ok(N::Function(top_level_function(tokens)?)),
+            K::Interface => Ok(N::Interface(Rc::new(interface(tokens)?))),
+            K::Struct => Ok(N::Struct(Rc::new(structure(tokens)?))),
+            K::Type => Ok(N::TypeAlias(Rc::new(type_alias(tokens)?))),
             _ => Err(tokens.make_error(SyntaxError::ExpectedTopLevelDefinition)),
         }
     } else {

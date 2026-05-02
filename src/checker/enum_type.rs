@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, collections::HashMap, rc::Rc};
 
 use crate::{
-    checker::{FunctionType, InterfaceType, Scope, Type},
+    checker::{FunctionType, InterfaceType, Scope, Type, Types},
     parser::EnumNode,
 };
 
@@ -12,11 +12,11 @@ pub struct EnumType {
 }
 
 impl EnumType {
-    pub fn from(node: Rc<EnumNode>, scope: &Scope) -> Rc<EnumType> {
+    pub fn from(node: Rc<EnumNode>, types: &impl Types) -> Rc<EnumType> {
         let mut variants = HashMap::new();
         for variant in node.variants.iter() {
             let name = variant.name.clone();
-            let variant = variant.get_type(scope).cloned();
+            let variant = variant.get_type(types).cloned();
             variants.entry(name).or_insert(variant);
         }
 

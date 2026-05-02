@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{EnumType, Scope, ScopeType},
+    checker::{EnumType, Scope, ScopeType, Types},
     parser::{EnumVariantNode, ImplementationNode, ImplementationType, NameNode, Node, NodeVec},
 };
 
@@ -27,7 +27,7 @@ impl EnumNode {
     }
 
     pub fn check(self: &Rc<Self>, scope: Box<Scope>) -> Box<Scope> {
-        let self_type = self.get_type(&scope);
+        let self_type = self.get_type(&*scope);
         scope.nest(ScopeType::Enum(self_type), |scope| self.check_nested(scope))
     }
 
@@ -47,14 +47,14 @@ impl EnumNode {
         }
 
         if let Some(implementation) = self.implementation.as_ref() {
-            let self_type = ImplementationType::Enum(self.get_type(&scope));
+            let self_type = ImplementationType::Enum(self.get_type(&*scope));
             return implementation.check(scope, &self_type, scope_names);
         }
 
         scope
     }
 
-    pub fn get_type(self: &Rc<Self>, scope: &Scope) -> Rc<EnumType> {
+    pub fn get_type(self: &Rc<Self>, scope: &impl Types) -> Rc<EnumType> {
         self.resolved_type
             .get_or_init(|| EnumType::from(self.clone(), scope))
             .clone()

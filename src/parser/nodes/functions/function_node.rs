@@ -1,7 +1,7 @@
 use std::{collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{FunctionType, Scope, Type},
+    checker::{FunctionType, Scope, Type, Types},
     parser::{ExpressionNode, FunctionBodyNode, FunctionSignatureNode, Node},
 };
 
@@ -16,7 +16,7 @@ impl FunctionNode {
     }
 
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
-        let return_type = &self.get_type(&scope).return_type;
+        let return_type = &self.get_type(&*scope).return_type;
         scope.nest_fn(return_type, |scope| {
             let scope = self.check_params(scope);
             match &self.body.value {
@@ -38,11 +38,8 @@ impl FunctionNode {
         if !resolved_type.is_assignable_to(return_type, &scope) {
             scope.source.print_error(
                 self.body.span,
-                &format!(
-                    "Function must return value of type `{}`",
-                    return_type.format(&scope)
-                ),
-                &format!("found type: `{}`", resolved_type.format(&scope)),
+                &format!("Function must return value of type `{}`", return_type),
+                &format!("found type: `{}`", resolved_type),
             );
         }
         scope
@@ -59,14 +56,14 @@ impl FunctionNode {
                 );
             } else {
                 param_names.insert(param.name.clone());
-                scope.add_value(&param.name, param.get_type(&scope).clone());
+                scope.add_value(&param.name, param.get_type(&*scope).clone());
             }
         }
         scope
     }
 
-    pub fn get_type(&self, scope: &Scope) -> Rc<FunctionType> {
-        self.signature.get_type(scope)
+    pub fn get_type(&self, types: &impl Types) -> Rc<FunctionType> {
+        self.signature.get_type(types)
     }
 
     pub fn name(&self) -> &String {

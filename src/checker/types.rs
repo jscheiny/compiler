@@ -2,8 +2,8 @@ use std::rc::Rc;
 
 use crate::{
     checker::{
-        EnumType, FunctionType, GenericType, InterfaceType, Scope, StructType, TypeFmt,
-        TypeParameter, TypeParameterBindings,
+        EnumType, FunctionType, GenericType, InterfaceType, Scope, StructType, TypeParameter,
+        TypeParameterBindings, Types,
     },
     parser::PrimitiveType,
 };
@@ -96,20 +96,20 @@ impl Type {
         }
     }
 
-    pub fn bind(&self, scope: &Scope, bindings: &TypeParameterBindings) -> Type {
+    pub fn bind(&self, types: &impl Types, bindings: &TypeParameterBindings) -> Type {
         match self {
-            Type::Array(t) => Type::Array(Box::new(t.bind(scope, bindings))),
+            Type::Array(t) => Type::Array(Box::new(t.bind(types, bindings))),
             // TODO implement bind for enums
             Type::Enum(t) => Type::Enum(t.clone()),
-            Type::Function(t) => Type::Function(t.bind(scope, bindings)),
+            Type::Function(t) => Type::Function(t.bind(types, bindings)),
             Type::Generic(_) => panic!("It should not be possible to bind a generic type"),
             // TODO implement bind for interfaces
             Type::Interface(t) => Type::Interface(t.clone()),
             Type::Primitive(t) => Type::Primitive(*t),
             // TODO implement bind for structs
             Type::Struct(t) => Type::Struct(t.clone()),
-            Type::Tuple(types) => Type::Tuple(Rc::new(
-                types.iter().map(|t| t.bind(scope, bindings)).collect(),
+            Type::Tuple(elements) => Type::Tuple(Rc::new(
+                elements.iter().map(|t| t.bind(types, bindings)).collect(),
             )),
             Type::TypeParameter(t) => t.bind(bindings),
             Type::Void => Type::Void,
@@ -139,13 +139,6 @@ impl Type {
             )),
             Type::Function(function_type) => Some(function_type.clone()),
             _ => None,
-        }
-    }
-
-    pub fn format<'a>(&'a self, scope: &'a Scope) -> TypeFmt<'a> {
-        TypeFmt {
-            resolved_type: self,
-            scope,
         }
     }
 }

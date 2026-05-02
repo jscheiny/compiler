@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, Type, TypeParameterList},
+    checker::{Type, TypeParameterList, Types},
     parser::{NodeVec, TypeNode},
 };
 
@@ -12,12 +12,12 @@ pub struct GenericType {
 impl GenericType {
     pub fn bind(
         &self,
-        scope: &Scope,
+        types: &impl Types,
         bound_type_params: &NodeVec<TypeNode>,
         bound_types: &[Type],
     ) -> Type {
         if bound_types.len() != self.type_parameters.len() {
-            scope.source.print_error(
+            types.print_error(
                 bound_type_params.span,
                 "Mismatched type parameters",
                 &format!(
@@ -29,6 +29,6 @@ impl GenericType {
         }
 
         let bindings = self.type_parameters.get_bindings(bound_types);
-        self.base_type.bind(scope, &bindings)
+        self.base_type.bind(types, &bindings)
     }
 }

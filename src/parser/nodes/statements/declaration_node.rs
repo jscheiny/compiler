@@ -15,7 +15,7 @@ impl DeclarationNode {
         let expected_type = self
             .type_def
             .as_ref()
-            .map(|type_def| type_def.get_type(&scope, None, None));
+            .map(|type_def| type_def.get_type(&*scope, None, None));
 
         let (mut scope, resolved_type) = match self.initializer.as_ref() {
             Some(initializer) => check_initializer(scope, expected_type, initializer),
@@ -40,11 +40,8 @@ fn check_initializer(
     if !resolved_type.is_assignable_to(&expected_type, &scope) {
         scope.source.print_error(
             initializer.span,
-            &format!(
-                "Initializer not assignable to type `{}`",
-                expected_type.format(&scope)
-            ),
-            &format!("found type: `{}`", resolved_type.format(&scope)),
+            &format!("Initializer not assignable to type `{}`", expected_type),
+            &format!("found type: `{}`", resolved_type),
         );
     }
 

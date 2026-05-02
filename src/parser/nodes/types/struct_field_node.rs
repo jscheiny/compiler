@@ -1,7 +1,7 @@
 use std::cell::OnceCell;
 
 use crate::{
-    checker::{Scope, StructMember, StructMemberType, Type},
+    checker::{Scope, StructMember, StructMemberType, Type, Types},
     parser::{NameNode, Node, TypeNode},
 };
 
@@ -29,13 +29,13 @@ impl StructFieldNode {
         }
     }
 
-    pub fn get_type(&self, scope: &Scope) -> &Type {
-        self.resolved_type.get_or_init(|| self.init_type(scope))
+    pub fn get_type(&self, types: &impl Types) -> &Type {
+        self.resolved_type.get_or_init(|| self.init_type(types))
     }
 
-    fn init_type(&self, scope: &Scope) -> Type {
+    fn init_type(&self, types: &impl Types) -> Type {
         match self.type_def.as_ref() {
-            Some(type_def) => type_def.get_type(scope, None, None),
+            Some(type_def) => type_def.get_type(types, None, None),
             None => Type::Error,
         }
     }

@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, Type, TypeParameterMap},
+    checker::{Type, TypeParameterMap, Types},
     parser::{Node, TypeListElementNode, VisitedTypes},
 };
 
@@ -10,7 +10,7 @@ pub struct TypeListNode {
 impl TypeListNode {
     pub fn get_type(
         &self,
-        scope: &Scope,
+        scope: &impl Types,
         type_params: Option<&TypeParameterMap>,
         visited: VisitedTypes,
     ) -> Vec<Type> {

@@ -80,7 +80,7 @@ impl VariantMatchPattern {
                 "Unexpected variant pattern",
                 &format!(
                     "cannot use variant pattern on non-enum type `{}`",
-                    subject_type.format(scope),
+                    subject_type,
                 ),
             );
         }

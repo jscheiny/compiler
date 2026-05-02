@@ -1,7 +1,7 @@
 use std::{collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{EnumType, FunctionType, Scope, Type},
+    checker::{EnumType, FunctionType, Scope, Type, Types},
     lexer::Symbol,
     parser::{FunctionNode, ImplementationType, NameNode, Node},
 };
@@ -20,10 +20,7 @@ impl InterfaceImplementationNode {
                 scope.source.print_error(
                     self.name.span,
                     "Can only implement interfaces",
-                    &format!(
-                        "found non interface type: `{}`",
-                        implemented_type.format(&scope)
-                    ),
+                    &format!("found non interface type: `{}`", implemented_type),
                 );
             }
         } else {
@@ -175,8 +172,7 @@ fn check_method_equivalence(
                 ),
                 &format!(
                     "expected type `{}`, found type: `{}`",
-                    interface_parameter.format(scope),
-                    implemented_parameter.format(scope)
+                    interface_parameter, implemented_parameter
                 ),
             );
         }
@@ -199,8 +195,7 @@ fn check_method_equivalence(
             ),
             &format!(
                 "expected type `{}`, found type: `{}`",
-                interface_type.return_type.format(scope),
-                implemented_type.return_type.format(scope)
+                interface_type.return_type, implemented_type.return_type
             ),
         );
     }

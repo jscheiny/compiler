@@ -4,8 +4,9 @@ use std::{
 };
 
 use crate::{
-    checker::{EnumType, StructType, Type, TypeEntry, TypeMap},
+    checker::{EnumType, StructType, Type, TypeEntry, TypeMap, Types},
     lexer::{EnumToken, Keyword, SourceCode},
+    parser::TokenSpan,
 };
 
 #[derive(Clone)]
@@ -90,12 +91,6 @@ impl Scope {
         handler(scope).parent()
     }
 
-    pub fn return_type(&self) -> Option<&Type> {
-        let function_scope =
-            self.find_scope(|scope_type| matches!(scope_type, ScopeType::Function));
-        function_scope.and_then(|scope| scope.return_type.as_ref())
-    }
-
     pub fn within(&self, mut predicate: impl FnMut(&ScopeType) -> bool) -> bool {
         predicate(&self.scope_type)
             || self
@@ -116,6 +111,7 @@ impl Scope {
         }
     }
 
+    // TODO can we get rid of this an just preinitialize the things that need it when we're setting up the global scope?
     pub fn global(&self) -> &Scope {
         match self.parent.as_ref() {
             Some(parent) => parent.global(),
@@ -155,7 +151,7 @@ impl Scope {
             .and_then(|parent| parent.get_value(name))
     }
 
-    pub fn get_type_entry(&self, name: &String) -> Option<TypeEntry> {
+    pub fn get_type_entry(&self, name: &str) -> Option<TypeEntry> {
         self.types.get_type_entry(name).or_else(|| {
             self.parent
                 .as_ref()
@@ -163,15 +159,34 @@ impl Scope {
         })
     }
 
-    pub fn get_type_id(&self, name: &String) -> Option<usize> {
+    pub fn add_type(&mut self, name: &str, alias: Type) {
+        self.types.add(name, alias);
+    }
+
+    fn add_type_and_value(&mut self, name: &str, value: &Type) {
+        self.add_type(name, value.clone());
+        if let Type::Struct(struct_type) = value {
+            self.add_value(name, Type::Function(struct_type.get_constructor(self)));
+        }
+    }
+}
+
+impl Types for Scope {
+    fn get_type_id(&self, name: &str) -> Option<usize> {
         self.get_type_entry(name).map(|entry| entry.id)
     }
 
-    pub fn get_type(&self, name: &String) -> Option<Type> {
-        self.get_type_entry(name).and_then(|entry| entry.value)
+    fn get_type(&self, name: &str) -> Option<Type> {
+        self.get_type_entry(name).map(|entry| entry.value)
     }
 
-    pub fn get_self_type(&self) -> Option<Type> {
+    fn return_type(&self) -> Option<&Type> {
+        let function_scope =
+            self.find_scope(|scope_type| matches!(scope_type, ScopeType::Function));
+        function_scope.and_then(|scope| scope.return_type.as_ref())
+    }
+
+    fn get_self_type(&self) -> Option<Type> {
         if let ScopeType::Struct(struct_type) = &self.scope_type {
             Some(Type::Struct(struct_type.clone()))
         } else if let ScopeType::Enum(enum_type) = &self.scope_type {
@@ -183,18 +198,7 @@ impl Scope {
         }
     }
 
-    pub fn add_type(&mut self, name: &str, alias: Type) {
-        self.types.add(name, alias);
-    }
-
-    pub fn resolve_type(&mut self, name: &str, value: Type) {
-        self.types.resolve(name, value);
-    }
-
-    fn add_type_and_value(&mut self, name: &str, value: &Type) {
-        self.add_type(name, value.clone());
-        if let Type::Struct(struct_type) = value {
-            self.add_value(name, Type::Function(struct_type.get_constructor(self)));
-        }
+    fn print_error(&self, span: TokenSpan, message: &str, inline_message: &str) {
+        self.source.print_error(span, message, inline_message);
     }
 }

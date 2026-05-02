@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, ScopeType, Type},
+    checker::{Scope, ScopeType, Type, Types},
     lexer::Keyword,
     parser::{
         DeclarationNode, ExpressionNode, IfStatementNode, MatchNode, Node, TokenSpan,
@@ -82,11 +82,8 @@ fn check_function_return(
             };
             scope.source.print_error(
                 error_span,
-                &format!(
-                    "Function must return value of type `{}`",
-                    expected_type.format(&scope)
-                ),
-                &format!("found type: `{}`", resolved_type.format(&scope)),
+                &format!("Function must return value of type `{}`", expected_type),
+                &format!("found type: `{}`", resolved_type),
             );
         }
     } else {

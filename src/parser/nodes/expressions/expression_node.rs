@@ -1,5 +1,5 @@
 use crate::{
-    checker::{Scope, ScopeType, Type},
+    checker::{Scope, ScopeType, Type, Types},
     lexer::{EnumToken, Keyword},
     parser::{
         ArrayExpressionNode, BinaryOpExpressionNode, BlockNode, ClosureExpressionNode,
