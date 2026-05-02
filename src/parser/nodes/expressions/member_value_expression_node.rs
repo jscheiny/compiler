@@ -68,7 +68,7 @@ pub fn get_field(
             scope.source.print_error(
                 field.span.before(),
                 "Value member operator is not valid for this type",
-                &format!("type: `{}`", input_type),
+                &format!("type: `{input_type}`"),
             );
             Type::Error
         }
@@ -92,7 +92,7 @@ pub fn get_field(
             scope.source.print_error(
                 input_span,
                 "Cannot use value member operator on a function which returns another function",
-                &format!("returns type: `{}`", input_type),
+                &format!("returns type: `{input_type}`"),
             );
             Type::Error
         }
@@ -144,7 +144,7 @@ pub fn check_private_member(scope: &Scope, receiver_type: &Type, field: &NameNod
         scope.source.print_error(
             field.span,
             &format!("Cannot access private member `{field}`"),
-            &format!("this member is private to `{}`", receiver_type,),
+            &format!("this member is private to `{receiver_type}`"),
         );
     }
 }

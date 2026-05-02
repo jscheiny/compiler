@@ -38,8 +38,8 @@ impl FunctionNode {
         if !resolved_type.is_assignable_to(return_type, &scope) {
             scope.source.print_error(
                 self.body.span,
-                &format!("Function must return value of type `{}`", return_type),
-                &format!("found type: `{}`", resolved_type),
+                &format!("Function must return value of type `{return_type}`"),
+                &format!("found type: `{resolved_type}`"),
             );
         }
         scope

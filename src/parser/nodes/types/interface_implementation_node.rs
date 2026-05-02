@@ -20,7 +20,7 @@ impl InterfaceImplementationNode {
                 scope.source.print_error(
                     self.name.span,
                     "Can only implement interfaces",
-                    &format!("found non interface type: `{}`", implemented_type),
+                    &format!("found non interface type: `{implemented_type}`"),
                 );
             }
         } else {
@@ -171,8 +171,7 @@ fn check_method_equivalence(
                     implemented_method.name(),
                 ),
                 &format!(
-                    "expected type `{}`, found type: `{}`",
-                    interface_parameter, implemented_parameter
+                    "expected type `{interface_parameter}`, found type: `{implemented_parameter}`",
                 ),
             );
         }

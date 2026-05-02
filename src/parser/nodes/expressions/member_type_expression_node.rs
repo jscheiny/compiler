@@ -72,10 +72,7 @@ impl MemberTypeExpressionNode {
                 scope.source.print_error(
                     self.left.span,
                     "Cannot access properties of this type",
-                    &format!(
-                        "type `{}` does not have accessible properties",
-                        receiver_type
-                    ),
+                    &format!("type `{receiver_type}` does not have accessible properties"),
                 );
                 Type::Error
             }

@@ -40,8 +40,8 @@ fn check_initializer(
     if !resolved_type.is_assignable_to(&expected_type, &scope) {
         scope.source.print_error(
             initializer.span,
-            &format!("Initializer not assignable to type `{}`", expected_type),
-            &format!("found type: `{}`", resolved_type),
+            &format!("Initializer not assignable to type `{expected_type}`"),
+            &format!("found type: `{resolved_type}`"),
         );
     }
 

@@ -51,7 +51,7 @@ impl UserDefinedTypeNode {
                 types.print_error(
                     self.name.span,
                     "Type parameters required",
-                    &format!("type `{}` is generic", base_type),
+                    &format!("type `{base_type}` is generic"),
                 );
                 let error_bindings = generic_type.type_parameters.get_bindings(&[]);
                 generic_type.base_type.bind(types, &error_bindings)
@@ -119,11 +119,6 @@ pub fn bind_type(
         Type::Interface(_) => todo!("Implement generic binding for interfaces"),
         Type::Struct(_) => todo!("Implement generic binding for structs"),
         Type::Error => Type::Error,
-        _ => {
-            panic!(
-                "Type encountered that should not be possible? {}",
-                base_type
-            )
-        }
+        _ => panic!("Type encountered that should not be possible? {base_type}"),
     }
 }

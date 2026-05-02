@@ -25,7 +25,7 @@ impl PrefixOpExpressionNode {
                     "Operand of `{}` should be of type `bool`",
                     self.operator.as_token(),
                 ),
-                &format!("found type: `{}`", resolved_type),
+                &format!("found type: `{resolved_type}`"),
             );
         }
 
@@ -43,7 +43,7 @@ impl PrefixOpExpressionNode {
                 scope.source.print_error(
                     self.expression.span,
                     "Negation can only be applied to numeric types",
-                    &format!("found type: `{}`", resolved_type),
+                    &format!("found type: `{resolved_type}`"),
                 );
             }
             (scope, Type::Error)

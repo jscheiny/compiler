@@ -40,10 +40,7 @@ impl MatchNode {
                     scope.source.print_error(
                         case.if_match.span,
                         "Match cases types don't match",
-                        &format!(
-                            "case results in type `{}` which does not match previous type `{}`",
-                            case_type, t
-                        ),
+                        &format!("case results in type `{case_type}` which does not match previous type `{t}`"),
                     );
                 }
             } else {
@@ -65,7 +62,7 @@ impl MatchNode {
             scope.source.print_error(
                 self.subject.span,
                 "Match expressions only support enums",
-                &format!("found type: `{}`", subject_type),
+                &format!("found type: `{subject_type}`"),
             );
         }
 

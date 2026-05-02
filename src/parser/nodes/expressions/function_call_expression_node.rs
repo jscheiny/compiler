@@ -40,7 +40,7 @@ fn check_invalid_function_call(
         scope.source.print_error(
             function_span,
             "Cannot use value as a function",
-            &format!("type `{}` is not usable as a function", left_type),
+            &format!("type `{left_type}` is not usable as a function"),
         );
     }
 
@@ -85,10 +85,7 @@ fn check_valid_function_call(
                 scope.source.print_error(
                     argument.span,
                     "Argument not assignable to parameter type",
-                    &format!(
-                        "expected type `{}`, found type `{}`",
-                        parameter_type, argument_type,
-                    ),
+                    &format!("expected type `{parameter_type}`, found type `{argument_type}`"),
                 );
             }
         }
@@ -99,14 +96,13 @@ fn check_valid_function_call(
             arguments.span,
             "Too many arguments",
             &format!(
-                "expected at most {} argument{} but received {}",
+                "expected at most {} argument{} but received {argument_count}",
                 function_type.parameters.len(),
                 if function_type.parameters.len() == 1 {
                     ""
                 } else {
                     "s"
                 },
-                argument_count
             ),
         );
     }

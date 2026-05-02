@@ -82,8 +82,8 @@ fn check_function_return(
             };
             scope.source.print_error(
                 error_span,
-                &format!("Function must return value of type `{}`", expected_type),
-                &format!("found type: `{}`", resolved_type),
+                &format!("Function must return value of type `{expected_type}`"),
+                &format!("found type: `{resolved_type}`"),
             );
         }
     } else {

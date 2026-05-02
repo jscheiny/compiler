@@ -27,7 +27,7 @@ impl TypeListElementNode {
         types.print_error(
             self.inner_type.span,
             "Spread type should be a tuple",
-            &format!("found type `{}`", resolved_type),
+            &format!("found type `{resolved_type}`"),
         );
 
         vec![resolved_type]

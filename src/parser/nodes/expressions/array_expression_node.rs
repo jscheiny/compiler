@@ -30,8 +30,7 @@ impl ArrayExpressionNode {
                         node.span,
                         "Mismatching array types",
                         &format!(
-                            "element of type `{}` does not match previous type `{}`",
-                            element_type, t
+                            "element of type `{element_type}` does not match previous type `{t}`"
                         ),
                     );
                 }

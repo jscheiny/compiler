@@ -63,8 +63,8 @@ impl BinaryOpExpressionNode {
                     self.left.span,
                     "Function application argument does not match parameter type",
                     &format!(
-                        "expected value of type `{}`, found `{}`",
-                        left_type, function_type.parameters[0]
+                        "expected value of type `{left_type}`, found `{}`",
+                        function_type.parameters[0]
                     ),
                 );
             }
@@ -75,7 +75,7 @@ impl BinaryOpExpressionNode {
                 scope.source.print_error(
                     self.right.span,
                     "Cannot apply function",
-                    &format!("type `{}` is not callable", right_type),
+                    &format!("type `{right_type}` is not callable"),
                 );
             }
             (scope, Type::Error)
@@ -108,11 +108,10 @@ impl BinaryOpExpressionNode {
         scope.source.print_error(
             span,
             &format!(
-                "Operands of `{}` should be of type `{}`",
+                "Operands of `{}` should be of type `{expected_type}`",
                 self.operator.as_token(),
-                expected_type
             ),
-            &format!("found type: `{}`", found_type),
+            &format!("found type: `{found_type}`"),
         );
     }
 }

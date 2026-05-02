@@ -13,7 +13,7 @@ pub struct TypeFmt<'a> {
 impl Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Type::Array(element_type) => write!(f, "[{}]", element_type),
+            Type::Array(element_type) => write!(f, "[{element_type}]"),
             Type::Enum(enum_type) => write!(f, "{}", enum_type.name()),
             Type::Function(function_type) => {
                 let show_parentheses = function_type.parameters.len() != 1

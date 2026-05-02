@@ -78,10 +78,7 @@ impl VariantMatchPattern {
             scope.source.print_error(
                 self.name.span,
                 "Unexpected variant pattern",
-                &format!(
-                    "cannot use variant pattern on non-enum type `{}`",
-                    subject_type,
-                ),
+                &format!("cannot use variant pattern on non-enum type `{subject_type}`"),
             );
         }
         self.check_inner_pattern(scope, bindings, &Type::Error);
