@@ -54,9 +54,9 @@ impl EnumNode {
         scope
     }
 
-    pub fn get_type(self: &Rc<Self>, scope: &impl Types) -> Rc<EnumType> {
+    pub fn get_type(self: &Rc<Self>, types: &impl Types) -> Rc<EnumType> {
         self.resolved_type
-            .get_or_init(|| EnumType::from(self.clone(), scope))
+            .get_or_init(|| EnumType::from(self.clone(), types))
             .clone()
     }
 }

@@ -11,11 +11,11 @@ pub struct TypeListElementNode {
 impl TypeListElementNode {
     pub fn get_types(
         &self,
-        scope: &impl Types,
+        types: &impl Types,
         type_params: Option<&TypeParameterMap>,
         visited: VisitedTypes,
     ) -> Vec<Type> {
-        let resolved_type = self.inner_type.get_type(scope, type_params, visited);
+        let resolved_type = self.inner_type.get_type(types, type_params, visited);
         if !self.is_spread {
             return vec![resolved_type];
         }
@@ -24,7 +24,7 @@ impl TypeListElementNode {
             return types.to_vec();
         }
 
-        scope.print_error(
+        types.print_error(
             self.inner_type.span,
             "Spread type should be a tuple",
             &format!("found type `{}`", resolved_type),

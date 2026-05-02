@@ -10,13 +10,13 @@ pub struct TypeListNode {
 impl TypeListNode {
     pub fn get_type(
         &self,
-        scope: &impl Types,
+        types: &impl Types,
         type_params: Option<&TypeParameterMap>,
         visited: VisitedTypes,
     ) -> Vec<Type> {
         self.elements
             .iter()
-            .flat_map(|element| element.get_types(scope, type_params, visited.clone()))
+            .flat_map(|element| element.get_types(types, type_params, visited.clone()))
             .collect()
     }
 }

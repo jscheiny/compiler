@@ -12,14 +12,14 @@ pub struct StructType {
 }
 
 impl StructType {
-    pub fn from(node: Rc<StructNode>, scope: &impl Types) -> Rc<StructType> {
+    pub fn from(node: Rc<StructNode>, types: &impl Types) -> Rc<StructType> {
         let struct_type = Rc::new(StructType {
             node,
             constructor: OnceCell::new(),
             members: OnceCell::new(),
         });
-        // Immediately initialize constructor using the global scope
-        struct_type.get_constructor(scope);
+        // Immediately initialize constructor using the module level types
+        struct_type.get_constructor(types);
         struct_type
     }
 
@@ -27,18 +27,18 @@ impl StructType {
         &self.node.name
     }
 
-    pub fn get_constructor(self: &Rc<Self>, scope: &impl Types) -> Rc<FunctionType> {
+    pub fn get_constructor(self: &Rc<Self>, types: &impl Types) -> Rc<FunctionType> {
         self.constructor
-            .get_or_init(|| self.init_constructor(scope))
+            .get_or_init(|| self.init_constructor(types))
             .clone()
     }
 
-    fn init_constructor(self: &Rc<Self>, scope: &impl Types) -> Rc<FunctionType> {
+    fn init_constructor(self: &Rc<Self>, types: &impl Types) -> Rc<FunctionType> {
         let parameters = self
             .node
             .fields
             .iter()
-            .map(|field| field.get_type(scope).clone())
+            .map(|field| field.get_type(types).clone())
             .collect();
         let return_type = Type::Struct(self.clone());
 
