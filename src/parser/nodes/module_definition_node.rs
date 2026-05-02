@@ -12,7 +12,7 @@ pub struct ExportableModuleDefinitionNode {
 
 pub enum ModuleDefinitionNode {
     Enum(Rc<EnumNode>),
-    Function(FunctionNode),
+    Function(Box<FunctionNode>),
     Interface(Rc<InterfaceNode>),
     Struct(Rc<StructNode>),
     TypeAlias(Rc<TypeAliasNode>),

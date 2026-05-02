@@ -32,7 +32,7 @@ fn module_definition(tokens: &mut TokenStream) -> ParseResult<ModuleDefinitionNo
         use ModuleDefinitionNode as N;
         match keyword {
             K::Enum => Ok(N::Enum(Rc::new(enumeration(tokens)?))),
-            K::Fn => Ok(N::Function(top_level_function(tokens)?)),
+            K::Fn => Ok(N::Function(Box::new(top_level_function(tokens)?))),
             K::Interface => Ok(N::Interface(Rc::new(interface(tokens)?))),
             K::Struct => Ok(N::Struct(Rc::new(structure(tokens)?))),
             K::Type => Ok(N::TypeAlias(Rc::new(type_alias(tokens)?))),
