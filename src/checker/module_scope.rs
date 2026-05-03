@@ -19,7 +19,7 @@ impl ModuleTypeNode {
             ModuleTypeNode::Enum(node) => Type::Enum(node.get_type(scope)),
             ModuleTypeNode::Interface(node) => Type::Interface(node.get_type(scope)),
             ModuleTypeNode::Struct(node) => Type::Struct(node.get_type(scope)),
-            ModuleTypeNode::TypeAlias(node) => node.get_type(scope).clone(),
+            ModuleTypeNode::TypeAlias(node) => node.get_type(scope),
         }
     }
 }

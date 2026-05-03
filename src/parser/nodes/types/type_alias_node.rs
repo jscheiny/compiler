@@ -35,7 +35,7 @@ impl TypeAliasNode {
             if let Some(type_parameters) = self.type_parameters.as_ref() {
                 scope = type_parameters.check(scope, type_parameters.span);
             }
-            let resolved_type = self.get_type(&*scope).clone();
+            let resolved_type = self.get_type(&*scope);
             (scope, resolved_type)
         })
     }
@@ -47,25 +47,29 @@ impl TypeAliasNode {
         // TODO check for recursion
     }
 
-    pub fn get_type(&self, types: &impl Types) -> &Type {
-        self.resolved_type.get_or_init(|| {
-            let type_id = types
-                .get_type_id(&self.name)
-                .expect("Type should be registered at this point");
-            let type_params = self.type_parameters.as_ref().map(|t| t.get_types_map());
-            let base_type = self
-                .type_def
-                .get_type(types, type_params, initial_visited(type_id));
-            let Some(type_parameters) = self.type_parameters.as_ref() else {
-                return base_type;
-            };
+    pub fn get_type(&self, types: &impl Types) -> Type {
+        self.resolved_type
+            .get_or_init(|| self.init_type(types))
+            .clone()
+    }
 
-            Type::Generic(Rc::new(GenericType {
-                name: self.name.clone(),
-                base_type,
-                type_parameters: type_parameters.get_types_list().clone(),
-            }))
-        })
+    fn init_type(&self, types: &impl Types) -> Type {
+        let type_id = types
+            .get_type_id(&self.name)
+            .expect("Type should be registered at this point");
+        let type_params = self.type_parameters.as_ref().map(|t| t.get_types_map());
+        let base_type = self
+            .type_def
+            .get_type(types, type_params, initial_visited(type_id));
+        let Some(type_parameters) = self.type_parameters.as_ref() else {
+            return base_type;
+        };
+
+        Type::Generic(Rc::new(GenericType {
+            name: self.name.clone(),
+            base_type,
+            type_parameters: type_parameters.get_types_list().clone(),
+        }))
     }
 }
 
