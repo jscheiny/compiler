@@ -24,7 +24,7 @@ impl MemberTypeExpressionNode {
     fn get_static_field(&self, scope: &Scope, receiver_type: &Type) -> Type {
         match receiver_type {
             Type::Enum(enum_type) => {
-                if let Some(variant_type) = enum_type.get_variant(&self.field.value) {
+                if let Some(variant_type) = enum_type.get_variant(scope, &self.field.value) {
                     variant_type
                 } else if let Some(method) = enum_type.get_method(scope, &self.field) {
                     let receiver_type = Type::Enum(enum_type.clone());

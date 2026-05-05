@@ -25,6 +25,11 @@ impl StructType {
         &self.node.name
     }
 
+    pub fn complete(self: &Rc<Self>, scope: &Scope) {
+        self.get_constructor(scope);
+        self.get_members(scope);
+    }
+
     pub fn get_constructor(self: &Rc<Self>, types: &impl Types) -> Rc<FunctionType> {
         self.constructor
             .get_or_init(|| self.init_constructor(types))
@@ -44,13 +49,14 @@ impl StructType {
     }
 
     pub fn get_member(&self, scope: &Scope, name: &String) -> Option<&StructMember> {
-        self.members
-            .get_or_init(|| self.init_members(scope))
-            .get(name)
+        self.get_members(scope).get(name)
+    }
+
+    pub fn get_members(&self, scope: &Scope) -> &HashMap<String, StructMember> {
+        self.members.get_or_init(|| self.init_members(scope))
     }
 
     fn init_members(&self, scope: &Scope) -> HashMap<String, StructMember> {
-        let scope = scope.global();
         let mut members = HashMap::new();
         for field in self.node.fields.iter() {
             let member = field.get_member(scope);

@@ -76,7 +76,7 @@ impl InterfaceImplementationNode {
         implemented_type: Option<&Type>,
     ) {
         if let Some(Type::Interface(interface_type)) = implemented_type {
-            for (variant_name, variant_type) in &enum_type.variants {
+            for (variant_name, variant_type) in enum_type.get_variants(scope) {
                 if let Some(variant_type) = variant_type {
                     let implements_interface = match variant_type.clone() {
                         Type::Enum(e) => e.implements(scope, interface_type),

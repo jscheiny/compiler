@@ -25,7 +25,7 @@ impl NameNode {
             );
             (scope, Type::Error)
         } else if let Some(enum_type) = expected_enum_type {
-            if let Some(variant_type) = enum_type.get_variant(self) {
+            if let Some(variant_type) = enum_type.get_variant(&scope, self) {
                 (scope, variant_type)
             } else {
                 scope.source.print_error(

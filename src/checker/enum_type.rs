@@ -7,33 +7,31 @@ use crate::{
 
 pub struct EnumType {
     node: Rc<EnumNode>,
-    pub variants: HashMap<String, Option<Type>>,
+    variants: OnceCell<HashMap<String, Option<Type>>>,
     methods: OnceCell<HashMap<String, EnumMethod>>,
 }
 
 impl EnumType {
-    pub fn from(node: Rc<EnumNode>, types: &impl Types) -> Rc<EnumType> {
-        let mut variants = HashMap::new();
-        for variant in node.variants.iter() {
-            let name = variant.name.clone();
-            let variant = variant.get_type(types).cloned();
-            variants.entry(name).or_insert(variant);
-        }
-
+    pub fn from(node: Rc<EnumNode>) -> Rc<EnumType> {
         Rc::new(EnumType {
             node,
-            variants,
+            variants: OnceCell::new(),
             methods: OnceCell::new(),
         })
+    }
+
+    pub fn complete(&self, scope: &Scope) {
+        self.get_variants(scope);
+        self.get_methods(scope);
     }
 
     pub fn name(&self) -> &String {
         &self.node.name
     }
 
-    pub fn get_variant(self: &Rc<Self>, name: &String) -> Option<Type> {
+    pub fn get_variant(self: &Rc<Self>, scope: &Scope, name: &String) -> Option<Type> {
         let self_type = Type::Enum(self.clone());
-        self.variants
+        self.get_variants(scope)
             .get(name)
             .map(|variant_type| match variant_type {
                 Some(inner_type) => {
@@ -43,14 +41,30 @@ impl EnumType {
             })
     }
 
+    pub fn get_variants(&self, types: &impl Types) -> &HashMap<String, Option<Type>> {
+        self.variants.get_or_init(|| self.init_variants(types))
+    }
+
+    fn init_variants(&self, types: &impl Types) -> HashMap<String, Option<Type>> {
+        let mut variants = HashMap::new();
+        for variant in self.node.variants.iter() {
+            let name = variant.name.clone();
+            let variant = variant.get_type(types).cloned();
+            variants.entry(name).or_insert(variant);
+        }
+
+        variants
+    }
+
     pub fn get_method(&self, scope: &Scope, name: &String) -> Option<&EnumMethod> {
-        self.methods
-            .get_or_init(|| self.init_methods(scope))
-            .get(name)
+        self.get_methods(scope).get(name)
+    }
+
+    fn get_methods(&self, scope: &Scope) -> &HashMap<String, EnumMethod> {
+        self.methods.get_or_init(|| self.init_methods(scope))
     }
 
     fn init_methods(&self, scope: &Scope) -> HashMap<String, EnumMethod> {
-        let scope = scope.global();
         let mut methods = HashMap::new();
         if let Some(implementation) = self.node.implementation.as_ref() {
             for method in implementation.get_methods(scope) {

@@ -102,7 +102,7 @@ pub enum ModuleTypeNode {
 impl ModuleTypeNode {
     pub fn get_type(&self, scope: &ModuleScope) -> Option<Type> {
         match self {
-            ModuleTypeNode::Enum(node) => Some(Type::Enum(node.get_type(scope))),
+            ModuleTypeNode::Enum(node) => Some(Type::Enum(node.get_type())),
             ModuleTypeNode::Interface(node) => Some(Type::Interface(node.get_type(scope))),
             ModuleTypeNode::Struct(node) => Some(Type::Struct(node.get_type())),
             ModuleTypeNode::TypeAlias(node) => node.get_type(scope),
