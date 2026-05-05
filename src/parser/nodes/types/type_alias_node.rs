@@ -52,7 +52,6 @@ impl TypeAliasNode {
         let (mut scope, resolved_type) = self.check(scope);
         scope.add_type(&self.name, resolved_type);
         scope
-        // TODO check for recursion
     }
 
     pub fn get_type(&self, types: &impl Types) -> Option<Type> {
