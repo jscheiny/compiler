@@ -130,16 +130,16 @@ fn check_duplicate_interface(
     scope: &mut Scope,
     self_type: &ImplementationType,
     scope_names: &mut HashSet<String>,
-    implemented_interfaces: &mut HashSet<String>,
+    implemented_interfaces: &mut HashSet<usize>,
 ) {
-    // TODO Should this use type ids instead?
-    let implemented_type = scope.get_type(&interface_implementation.name);
-    if let Some(Type::Interface(interface_type)) = implemented_type
-        && !implemented_interfaces.insert(interface_type.name.clone())
+    let name = &interface_implementation.name;
+    let type_id = scope.get_type_id(name);
+    if let Some(type_id) = type_id
+        && !implemented_interfaces.insert(type_id)
     {
         scope.source.print_error(
             interface_implementation.name.span,
-            &format!("Duplicate implementation of `{}`", interface_type.name),
+            &format!("Duplicate implementation of `{name}`",),
             &format!(
                 "{} `{}` already implements this interface",
                 get_container_type(self_type),
