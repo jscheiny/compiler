@@ -2,7 +2,7 @@ use std::cell::OnceCell;
 
 use crate::{
     checker::{Type, TypeParameterMap, Types},
-    parser::{NameNode, NodeVec, TypeNode, VisitedTypes},
+    parser::{NameNode, NodeVec, TypeNode},
 };
 
 pub struct UserDefinedTypeNode {
@@ -20,26 +20,16 @@ impl UserDefinedTypeNode {
         }
     }
 
-    pub fn get_type(
-        &self,
-        types: &impl Types,
-        type_params: Option<&TypeParameterMap>,
-        visited: VisitedTypes,
-    ) -> Type {
+    pub fn get_type(&self, types: &impl Types, type_params: Option<&TypeParameterMap>) -> Type {
         self.resolved_type
-            .get_or_init(|| self.init_type(types, type_params, visited))
+            .get_or_init(|| self.init_type(types, type_params))
             .clone()
     }
 
-    fn init_type(
-        &self,
-        types: &impl Types,
-        type_params: Option<&TypeParameterMap>,
-        visited: VisitedTypes,
-    ) -> Type {
-        let base_type = self.get_base_type(types, type_params, visited.clone());
+    fn init_type(&self, types: &impl Types, type_params: Option<&TypeParameterMap>) -> Type {
+        let base_type = self.get_base_type(types, type_params);
         if let Some(bound_type_params) = self.bound_type_parameters.as_ref() {
-            bind_type(types, &base_type, bound_type_params, type_params, visited)
+            bind_type(types, &base_type, bound_type_params, type_params)
         } else {
             self.unbound_type(types, base_type)
         }
@@ -61,43 +51,35 @@ impl UserDefinedTypeNode {
         }
     }
 
-    fn get_base_type(
-        &self,
-        types: &impl Types,
-        type_params: Option<&TypeParameterMap>,
-        visited: VisitedTypes,
-    ) -> Type {
+    fn get_base_type(&self, types: &impl Types, type_params: Option<&TypeParameterMap>) -> Type {
         let type_parameter = type_params.and_then(|t| t.get(&self.name.value));
         if let Some(type_parameter) = type_parameter {
             return Type::TypeParameter(type_parameter.clone());
         }
 
-        // TODO should this be a single entry call?
         let base_type = types.get_type(&self.name);
         let type_id = types.get_type_id(&self.name);
-        let Some(base_type) = base_type else {
+        if type_id.is_none() {
             types.print_error(
                 self.name.span,
                 &format!("Unknown type `{}`", self.name),
                 "could not find a type with this name",
             );
             return Type::Error;
-        };
-        let type_id = type_id.expect("Base type entry is unwrapped safely above");
-
-        if let Some(visited) = visited {
-            let mut visited = visited.borrow_mut();
-            if !visited.insert(type_id) {
-                types.print_error(
-                    self.name.span,
-                    &format!("Type alias `{}` used recursively", self.name),
-                    "use of this type creates a circular type alias",
-                );
-                return Type::Error;
-            }
         }
 
-        base_type
+        // If type_id is some (the type exists), but base_type is none, then the type is still being resolved which indicates
+        // a recursive type alias.
+        if base_type.is_none() {
+            types.print_error(
+                self.name.span,
+                &format!("Type alias `{}` used recursively", self.name),
+                "use of this type creates a circular type alias",
+            );
+            return Type::Error;
+        }
+
+        base_type.unwrap_or(Type::Error)
     }
 }
 
@@ -106,11 +88,10 @@ pub fn bind_type(
     base_type: &Type,
     bound_type_params: &NodeVec<TypeNode>,
     type_params: Option<&TypeParameterMap>,
-    visited: VisitedTypes,
 ) -> Type {
     let bound_types = bound_type_params
         .iter()
-        .map(|p| p.get_type(types, type_params, visited.clone()))
+        .map(|p| p.get_type(types, type_params))
         .collect::<Vec<_>>();
 
     match base_type {

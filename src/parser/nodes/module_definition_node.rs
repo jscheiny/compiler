@@ -33,7 +33,7 @@ impl ModuleDefinitionNode {
         let resolved_type = match self {
             Self::Function(node) => Some(Type::Function(node.get_type(scope).clone())),
             // TODO respect the privacy of the constructor
-            Self::Struct(node) => Some(Type::Function(node.get_type(scope).get_constructor(scope))),
+            Self::Struct(node) => Some(Type::Function(node.get_type().get_constructor(scope))),
             Self::Enum(_) | Self::Interface(_) | Self::TypeAlias(_) => None,
         };
 

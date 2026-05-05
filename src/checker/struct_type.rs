@@ -12,14 +12,12 @@ pub struct StructType {
 }
 
 impl StructType {
-    pub fn from(node: Rc<StructNode>, types: &impl Types) -> Rc<StructType> {
+    pub fn from(node: Rc<StructNode>) -> Rc<StructType> {
         let struct_type = Rc::new(StructType {
             node,
             constructor: OnceCell::new(),
             members: OnceCell::new(),
         });
-        // Immediately initialize constructor using the module level types
-        struct_type.get_constructor(types);
         struct_type
     }
 

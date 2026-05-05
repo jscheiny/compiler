@@ -14,11 +14,11 @@ pub enum ModuleTypeNode {
 }
 
 impl ModuleTypeNode {
-    pub fn get_type(&self, scope: &ModuleScope) -> Type {
+    pub fn get_type(&self, scope: &ModuleScope) -> Option<Type> {
         match self {
-            ModuleTypeNode::Enum(node) => Type::Enum(node.get_type(scope)),
-            ModuleTypeNode::Interface(node) => Type::Interface(node.get_type(scope)),
-            ModuleTypeNode::Struct(node) => Type::Struct(node.get_type(scope)),
+            ModuleTypeNode::Enum(node) => Some(Type::Enum(node.get_type(scope))),
+            ModuleTypeNode::Interface(node) => Some(Type::Interface(node.get_type(scope))),
+            ModuleTypeNode::Struct(node) => Some(Type::Struct(node.get_type())),
             ModuleTypeNode::TypeAlias(node) => node.get_type(scope),
         }
     }
@@ -32,7 +32,7 @@ struct ModuleTypeEntry {
 impl ModuleTypeEntry {
     pub fn to_type_entry(&self, scope: &ModuleScope) -> TypeEntry {
         TypeEntry {
-            value: self.node.get_type(scope),
+            value: self.node.get_type(scope).unwrap_or(Type::Error),
             id: self.id,
         }
     }
@@ -92,7 +92,9 @@ impl Types for ModuleScope {
     }
 
     fn get_type(&self, name: &str) -> Option<Type> {
-        self.lookup.get(name).map(|entry| entry.node.get_type(self))
+        self.lookup
+            .get(name)
+            .and_then(|entry| entry.node.get_type(self))
     }
 
     fn get_return_type(&self) -> Option<Type> {

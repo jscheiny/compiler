@@ -27,8 +27,6 @@ impl EnumVariantNode {
     }
 
     fn init_type(&self, types: &impl Types) -> Option<Type> {
-        self.type_def
-            .as_ref()
-            .map(|ty| ty.get_type(types, None, None))
+        self.type_def.as_ref().map(|ty| ty.get_type(types, None))
     }
 }

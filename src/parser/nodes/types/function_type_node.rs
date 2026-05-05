@@ -2,7 +2,7 @@ use std::{cell::OnceCell, rc::Rc};
 
 use crate::{
     checker::{FunctionType, TypeParameterMap, Types},
-    parser::{Node, TypeListNode, TypeNode, VisitedTypes},
+    parser::{Node, TypeListNode, TypeNode},
 };
 
 pub struct FunctionTypeNode {
@@ -24,10 +24,9 @@ impl FunctionTypeNode {
         &self,
         types: &impl Types,
         type_params: Option<&TypeParameterMap>,
-        visited: VisitedTypes,
     ) -> Rc<FunctionType> {
         self.resolved_type
-            .get_or_init(|| self.init_type(types, type_params, visited))
+            .get_or_init(|| self.init_type(types, type_params))
             .clone()
     }
 
@@ -35,12 +34,9 @@ impl FunctionTypeNode {
         &self,
         types: &impl Types,
         type_params: Option<&TypeParameterMap>,
-        visited: VisitedTypes,
     ) -> Rc<FunctionType> {
-        let parameters = self
-            .parameters
-            .get_type(types, type_params, visited.clone());
-        let return_type = self.return_type.get_type(types, type_params, visited);
+        let parameters = self.parameters.get_type(types, type_params);
+        let return_type = self.return_type.get_type(types, type_params);
         FunctionType::new(parameters, return_type)
     }
 }

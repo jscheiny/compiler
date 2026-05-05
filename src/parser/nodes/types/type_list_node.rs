@@ -1,6 +1,6 @@
 use crate::{
     checker::{Type, TypeParameterMap, Types},
-    parser::{Node, TypeListElementNode, VisitedTypes},
+    parser::{Node, TypeListElementNode},
 };
 
 pub struct TypeListNode {
@@ -12,11 +12,10 @@ impl TypeListNode {
         &self,
         types: &impl Types,
         type_params: Option<&TypeParameterMap>,
-        visited: VisitedTypes,
     ) -> Vec<Type> {
         self.elements
             .iter()
-            .flat_map(|element| element.get_types(types, type_params, visited.clone()))
+            .flat_map(|element| element.get_types(types, type_params))
             .collect()
     }
 }

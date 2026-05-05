@@ -1,12 +1,11 @@
 use std::{
     cell::{OnceCell, RefCell},
-    collections::HashSet,
     rc::Rc,
 };
 
 use crate::{
     checker::{GenericType, Scope, ScopeType, Type, Types},
-    parser::{NameNode, Node, TypeNode, TypeParameterListNode, VisitedTypes},
+    parser::{NameNode, Node, TypeNode, TypeParameterListNode},
 };
 
 pub struct TypeAliasNode {
@@ -14,6 +13,14 @@ pub struct TypeAliasNode {
     type_parameters: Option<Node<TypeParameterListNode>>,
     type_def: Node<TypeNode>,
     resolved_type: OnceCell<Type>,
+    resolution_status: RefCell<ResolutionStatus>,
+}
+
+#[derive(PartialEq, Eq, Debug)]
+enum ResolutionStatus {
+    NotStarted,
+    InProgress,
+    Done,
 }
 
 impl TypeAliasNode {
@@ -27,6 +34,7 @@ impl TypeAliasNode {
             type_parameters,
             type_def,
             resolved_type: OnceCell::new(),
+            resolution_status: RefCell::new(ResolutionStatus::NotStarted),
         }
     }
 
@@ -35,7 +43,7 @@ impl TypeAliasNode {
             if let Some(type_parameters) = self.type_parameters.as_ref() {
                 scope = type_parameters.check(scope, type_parameters.span);
             }
-            let resolved_type = self.get_type(&*scope);
+            let resolved_type = self.get_type(&*scope).unwrap_or(Type::Error);
             (scope, resolved_type)
         })
     }
@@ -47,20 +55,29 @@ impl TypeAliasNode {
         // TODO check for recursion
     }
 
-    pub fn get_type(&self, types: &impl Types) -> Type {
-        self.resolved_type
-            .get_or_init(|| self.init_type(types))
-            .clone()
+    pub fn get_type(&self, types: &impl Types) -> Option<Type> {
+        {
+            let resolution_status = self.resolution_status.borrow();
+            if *resolution_status == ResolutionStatus::InProgress {
+                return None;
+            }
+        }
+
+        let resolved_type = self
+            .resolved_type
+            .get_or_init(|| {
+                self.set_resolution_status(ResolutionStatus::InProgress);
+                let result = self.init_type(types);
+                self.set_resolution_status(ResolutionStatus::Done);
+                result
+            })
+            .clone();
+        Some(resolved_type)
     }
 
     fn init_type(&self, types: &impl Types) -> Type {
-        let type_id = types
-            .get_type_id(&self.name)
-            .expect("Type should be registered at this point");
         let type_params = self.type_parameters.as_ref().map(|t| t.get_types_map());
-        let base_type = self
-            .type_def
-            .get_type(types, type_params, initial_visited(type_id));
+        let base_type = self.type_def.get_type(types, type_params);
         let Some(type_parameters) = self.type_parameters.as_ref() else {
             return base_type;
         };
@@ -71,10 +88,8 @@ impl TypeAliasNode {
             type_parameters: type_parameters.get_types_list().clone(),
         }))
     }
-}
 
-fn initial_visited(type_id: usize) -> VisitedTypes {
-    let mut visited_set = HashSet::new();
-    visited_set.insert(type_id);
-    Some(Rc::new(RefCell::new(visited_set)))
+    fn set_resolution_status(&self, status: ResolutionStatus) {
+        *self.resolution_status.borrow_mut() = status;
+    }
 }

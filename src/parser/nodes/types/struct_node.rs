@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{Scope, ScopeType, StructType, Types},
+    checker::{Scope, ScopeType, StructType},
     parser::{ImplementationNode, ImplementationType, NameNode, Node, NodeVec, StructFieldNode},
 };
 
@@ -27,7 +27,7 @@ impl StructNode {
     }
 
     pub fn check(self: &Rc<Self>, scope: Box<Scope>) -> Box<Scope> {
-        let self_type = self.get_type(&*scope);
+        let self_type = self.get_type();
         scope.nest(ScopeType::Struct(self_type), |scope| {
             self.check_nested(scope)
         })
@@ -52,16 +52,16 @@ impl StructNode {
         }
 
         if let Some(implementation) = self.implementation.as_ref() {
-            let self_type = ImplementationType::Struct(self.get_type(&*scope));
+            let self_type = ImplementationType::Struct(self.get_type());
             return implementation.check(scope, &self_type, scope_names);
         }
 
         scope
     }
 
-    pub fn get_type(self: &Rc<Self>, types: &impl Types) -> Rc<StructType> {
+    pub fn get_type(self: &Rc<Self>) -> Rc<StructType> {
         self.resolved_type
-            .get_or_init(|| StructType::from(self.clone(), types))
+            .get_or_init(|| StructType::from(self.clone()))
             .clone()
     }
 }
