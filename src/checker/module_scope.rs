@@ -6,38 +6,6 @@ use crate::{
     parser::{EnumNode, InterfaceNode, NameNode, StructNode, TokenSpan, TypeAliasNode},
 };
 
-pub enum ModuleTypeNode {
-    Enum(Rc<EnumNode>),
-    Interface(Rc<InterfaceNode>),
-    Struct(Rc<StructNode>),
-    TypeAlias(Rc<TypeAliasNode>),
-}
-
-impl ModuleTypeNode {
-    pub fn get_type(&self, scope: &ModuleScope) -> Option<Type> {
-        match self {
-            ModuleTypeNode::Enum(node) => Some(Type::Enum(node.get_type(scope))),
-            ModuleTypeNode::Interface(node) => Some(Type::Interface(node.get_type(scope))),
-            ModuleTypeNode::Struct(node) => Some(Type::Struct(node.get_type())),
-            ModuleTypeNode::TypeAlias(node) => node.get_type(scope),
-        }
-    }
-}
-
-struct ModuleTypeEntry {
-    node: ModuleTypeNode,
-    id: usize,
-}
-
-impl ModuleTypeEntry {
-    pub fn to_type_entry(&self, scope: &ModuleScope) -> TypeEntry {
-        TypeEntry {
-            value: self.node.get_type(scope).unwrap_or(Type::Error),
-            id: self.id,
-        }
-    }
-}
-
 pub struct ModuleScope {
     source: Rc<SourceCode>,
     lookup: HashMap<String, ModuleTypeEntry>,
@@ -107,5 +75,37 @@ impl Types for ModuleScope {
 
     fn print_error(&self, span: TokenSpan, message: &str, inline_message: &str) {
         self.source.print_error(span, message, inline_message);
+    }
+}
+
+struct ModuleTypeEntry {
+    node: ModuleTypeNode,
+    id: usize,
+}
+
+impl ModuleTypeEntry {
+    pub fn to_type_entry(&self, scope: &ModuleScope) -> TypeEntry {
+        TypeEntry {
+            value: self.node.get_type(scope).unwrap_or(Type::Error),
+            id: self.id,
+        }
+    }
+}
+
+pub enum ModuleTypeNode {
+    Enum(Rc<EnumNode>),
+    Interface(Rc<InterfaceNode>),
+    Struct(Rc<StructNode>),
+    TypeAlias(Rc<TypeAliasNode>),
+}
+
+impl ModuleTypeNode {
+    pub fn get_type(&self, scope: &ModuleScope) -> Option<Type> {
+        match self {
+            ModuleTypeNode::Enum(node) => Some(Type::Enum(node.get_type(scope))),
+            ModuleTypeNode::Interface(node) => Some(Type::Interface(node.get_type(scope))),
+            ModuleTypeNode::Struct(node) => Some(Type::Struct(node.get_type())),
+            ModuleTypeNode::TypeAlias(node) => node.get_type(scope),
+        }
     }
 }
