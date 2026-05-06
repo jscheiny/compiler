@@ -135,7 +135,9 @@ impl Display for SyntaxErrorMessage<'_> {
             E::ExpectedName(name_type) => write!(f, "expected {name_type}"),
             E::ExpectedParameters => write!(f, "expected parameters"),
             E::ExpectedThen => write!(f, "expected `{}` following predicate`", Keyword::Then),
-            E::ExpectedTopLevelDefinition => write!(f, "expected struct, tuple, enum, or function"),
+            E::ExpectedTopLevelDefinition => {
+                write!(f, "expected struct, enum, function, or type alias")
+            }
             E::ExpectedType => write!(f, "expected type name"),
             E::ExpectedVariants => write!(f, "expected enum variants"),
             E::UnexpectedBindingPattern => {
@@ -193,7 +195,9 @@ impl Display for SyntaxErrorInlineMessage<'_> {
             E::ExpectedMethods => fmt_symbols(f, S::OpenBrace, S::Semicolon),
             E::ExpectedName(name_type) => write!(f, "expected {name_type}"),
             E::ExpectedThen => write!(f, "expected `{}`", Keyword::Then),
-            E::ExpectedTopLevelDefinition => write!(f, "expected struct, tuple, enum, or function"),
+            E::ExpectedTopLevelDefinition => {
+                write!(f, "expected struct, enum, function, or type alias")
+            }
             E::ExpectedType => write!(f, "expected type name"),
             E::UnexpectedBindingPattern => {
                 write!(
