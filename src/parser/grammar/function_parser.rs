@@ -119,18 +119,18 @@ pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<Node<ParameterNod
 }
 
 fn parameter(tokens: &mut TokenStream) -> ParseResult<ParameterNode> {
+    let is_spread = tokens.accept(Symbol::Ellipsis);
     let name = tokens.name(NameType::Parameter)?;
-    let error = SyntaxError::ExpectedType;
     match tokens.peek() {
         Token::Symbol(Symbol::Colon) => {
             tokens.next();
             let type_def = Some(tokens.located(type_definition)?);
-            Ok(ParameterNode::new(name, type_def))
+            Ok(ParameterNode::new(is_spread, name, type_def))
         }
         Token::Symbol(Symbol::Comma | Symbol::CloseParen) => {
-            tokens.push_error(error);
-            Ok(ParameterNode::new(name, None))
+            tokens.push_error(SyntaxError::ExpectedType);
+            Ok(ParameterNode::new(is_spread, name, None))
         }
-        _ => Err(tokens.make_error(error)),
+        _ => Err(tokens.make_error(SyntaxError::ExpectedType)),
     }
 }

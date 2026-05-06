@@ -47,7 +47,7 @@ impl FunctionNode {
 
     fn check_params(&self, mut scope: Box<Scope>) -> Box<Scope> {
         let mut param_names = HashSet::new();
-        for param in self.signature.parameters.iter() {
+        for param in self.signature.body_parameters.iter() {
             if param_names.contains(&param.name.value) {
                 scope.source.print_error(
                     param.name.span,
@@ -56,7 +56,7 @@ impl FunctionNode {
                 );
             } else {
                 param_names.insert(param.name.clone());
-                scope.add_value(&param.name, param.get_type(&*scope).clone());
+                scope.add_value(&param.name, param.get_body_type(&*scope).clone());
             }
         }
         scope

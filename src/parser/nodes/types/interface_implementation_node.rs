@@ -128,7 +128,7 @@ fn check_method_equivalence(
     let implemented_type = implemented_method.get_type(scope);
     if interface_type.parameters.len() != implemented_type.parameters.len() {
         scope.source.print_error(
-            implemented_method.signature.parameters.span,
+            implemented_method.signature.body_parameters.span,
             &format!(
                 "Implementation of `{}` contains {} parameters",
                 implemented_method.name(),
@@ -158,11 +158,16 @@ fn check_method_equivalence(
         .enumerate();
     for (index, (interface_parameter, implemented_parameter)) in parameters_iter {
         if !implemented_parameter.is_equivalent_to(interface_parameter, scope) {
-            let parameter_node = &implemented_method.signature.parameters[index];
+            let body_parameter_index = implemented_method
+                .signature
+                .get_body_parameter_index(scope, index);
+            let parameter_node =
+                &implemented_method.signature.body_parameters[body_parameter_index];
             let error_span = parameter_node
                 .type_def
                 .as_ref()
                 .map_or(parameter_node.span, |t| t.span);
+            // TODO this error span could be better for spread parameters
             scope.source.print_error(
                 error_span,
                 &format!(
@@ -171,7 +176,7 @@ fn check_method_equivalence(
                     implemented_method.name(),
                 ),
                 &format!(
-                    "expected type `{interface_parameter}`, found type: `{implemented_parameter}`",
+                    "expected type `{implemented_parameter}`, found type: `{interface_parameter}`",
                 ),
             );
         }
