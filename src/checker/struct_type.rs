@@ -13,12 +13,11 @@ pub struct StructType {
 
 impl StructType {
     pub fn from(node: Rc<StructNode>) -> Rc<StructType> {
-        let struct_type = Rc::new(StructType {
+        Rc::new(StructType {
             node,
             constructor: OnceCell::new(),
             members: OnceCell::new(),
-        });
-        struct_type
+        })
     }
 
     pub fn name(&self) -> &String {
