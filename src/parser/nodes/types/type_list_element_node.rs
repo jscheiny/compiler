@@ -44,7 +44,7 @@ pub fn get_maybe_spread_type(
         types.print_error(
             base_type_span,
             "Spread type should be a tuple",
-            &format!("found type `{}`", base_type),
+            &format!("found type `{base_type}`"),
         );
     }
 

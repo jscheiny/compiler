@@ -155,8 +155,7 @@ fn check_spread_arg(
                 span,
                 "Spread argument not assignable to parameter types",
                 &format!(
-                    "expected type `{}`, found type `{}`",
-                    expected_type,
+                    "expected type `{expected_type}`, found type `{}`",
                     Type::Tuple(spread_type.clone()),
                 ),
             );
