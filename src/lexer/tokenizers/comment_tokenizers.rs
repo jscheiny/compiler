@@ -46,3 +46,84 @@ impl Tokenizer for MultiLineCommentTokenizer {
         Some(TryTokenizeResult { token: None, width })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn tokenize_single_line_comment(text: &str) -> Option<TryTokenizeResult> {
+        let tokenizer = SingleLineCommentTokenizer {};
+        tokenizer.try_tokenize(text)
+    }
+
+    #[test]
+    fn test_no_single_line_comment() {
+        assert_eq!(tokenize_single_line_comment("/ no comment"), None);
+        assert_eq!(tokenize_single_line_comment("/* no comment */"), None);
+    }
+
+    #[test]
+    fn test_single_line_comment() {
+        let source = "// this is a comment";
+        assert_eq!(
+            tokenize_single_line_comment(source),
+            Some(TryTokenizeResult {
+                token: None,
+                width: TokenWidth {
+                    bytes: source.len(),
+                    characters: source.len(),
+                    new_lines: 0,
+                    columns_since_last_new_line: source.len(),
+                    bytes_since_last_new_line: source.len(),
+                }
+            })
+        );
+    }
+
+    #[test]
+    fn test_single_line_comment_newline() {
+        assert_eq!(
+            tokenize_single_line_comment("// this is a comment\nthis isn't"),
+            Some(TryTokenizeResult {
+                token: None,
+                width: TokenWidth {
+                    bytes: 21,
+                    characters: 21,
+                    new_lines: 1,
+                    columns_since_last_new_line: 0,
+                    bytes_since_last_new_line: 0,
+                }
+            })
+        );
+    }
+
+    fn tokenize_multi_line_comment(text: &str) -> Option<TryTokenizeResult> {
+        let tokenizer = MultiLineCommentTokenizer {};
+        tokenizer.try_tokenize(text)
+    }
+
+    #[test]
+    fn test_no_multiline_comment() {
+        assert_eq!(tokenize_multi_line_comment("* no comment"), None);
+        assert_eq!(tokenize_multi_line_comment("// no comment"), None);
+        assert_eq!(tokenize_multi_line_comment("/ no comment"), None);
+    }
+
+    #[test]
+    fn test_multiline_comment_simple() {
+        let source = "/* comment */";
+        assert_eq!(
+            tokenize_multi_line_comment(source),
+            Some(TryTokenizeResult {
+                token: None,
+                width: TokenWidth {
+                    bytes: source.len(),
+                    characters: source.len(),
+                    new_lines: 0,
+                    columns_since_last_new_line: source.len(),
+                    bytes_since_last_new_line: source.len(),
+                }
+            })
+        );
+    }
+}

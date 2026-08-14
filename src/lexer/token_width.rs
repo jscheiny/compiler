@@ -1,4 +1,4 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq, Eq)]
 pub struct TokenWidth {
     pub bytes: usize,
     pub characters: usize,

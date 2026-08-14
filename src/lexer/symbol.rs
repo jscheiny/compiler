@@ -4,7 +4,7 @@ use strum_macros::EnumIter;
 
 use crate::lexer::{EnumToken, Token, TokenMatch};
 
-#[derive(Clone, Copy, EnumIter, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, EnumIter, PartialEq, Eq)]
 pub enum Symbol {
     At,
     CloseBrace,

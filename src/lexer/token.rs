@@ -13,7 +13,7 @@ impl Display for LocatedToken {
     }
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Token {
     CharacterLiteral(String),
     Name(String),
