@@ -20,6 +20,7 @@ pub enum SyntaxError {
     ExpectedFields,
     ExpectedFunctionBody,
     ExpectedInitializer,
+    ExpectedMethodInstanceSymbol,
     ExpectedMatchBlock,
     ExpectedMatchExpression,
     ExpectedMatchPattern,
@@ -130,6 +131,9 @@ impl Display for SyntaxErrorMessage<'_> {
             E::ExpectedInitializer => write!(f, "expected initializer"),
             E::ExpectedMatchBlock => write!(f, "expected match block"),
             E::ExpectedMatchPattern => write!(f, "expected match pattern"),
+            E::ExpectedMethodInstanceSymbol => {
+                write!(f, "expected method instance specifier symbol")
+            }
             E::ExpectedMethods => write!(f, "expected methods block"),
             E::ExpectedMethodSignatures => write!(f, "expected method signatures block"),
             E::ExpectedName(name_type) => write!(f, "expected {name_type}"),
@@ -192,6 +196,7 @@ impl Display for SyntaxErrorInlineMessage<'_> {
             E::ExpectedFunctionBody => fmt_symbols(f, S::SkinnyArrow, S::OpenBrace),
             E::ExpectedInitializer => fmt_symbol(f, S::Equal),
             E::ExpectedMatchPattern => write!(f, "expected pattern e.g. Variant(let binding)"),
+            E::ExpectedMethodInstanceSymbol => fmt_symbols(f, S::Dot, S::DoubleColon),
             E::ExpectedMethods => fmt_symbols(f, S::OpenBrace, S::Semicolon),
             E::ExpectedName(name_type) => write!(f, "expected {name_type}"),
             E::ExpectedThen => write!(f, "expected `{}`", Keyword::Then),

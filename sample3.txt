@@ -1,3 +1,9 @@
+struct Pair(pub first: int, pub second: int) {
+    pub .sum(): int -> @first + @second;
+}
+
 fn test() {
-    let x: (int, int => int) = (3, a -> true);
+    let p = Pair(3, 4);
+    let t: int = p.sum();
+    let x: Pair => bool = Pair::first;
 }

@@ -38,11 +38,24 @@ fn implementation_impl(tokens: &mut TokenStream) -> ParseResult<ImplementationNo
 
 fn method(tokens: &mut TokenStream) -> ParseResult<ImplementationEntryNode> {
     let public = tokens.accept(Keyword::Pub);
+    let instance = method_instance(tokens);
     let function = tokens.located(nested_function)?;
     Ok(ImplementationEntryNode::Method(Box::new(MethodNode {
         public,
+        instance,
         function,
     })))
+}
+
+fn method_instance(tokens: &mut TokenStream) -> bool {
+    if tokens.accept(Symbol::Dot) {
+        true
+    } else if tokens.accept(Symbol::DoubleColon) {
+        false
+    } else {
+        tokens.push_error(SyntaxError::ExpectedMethodInstanceSymbol);
+        true
+    }
 }
 
 pub fn top_level_function(tokens: &mut TokenStream) -> ParseResult<FunctionNode> {

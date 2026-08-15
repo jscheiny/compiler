@@ -5,6 +5,7 @@ use crate::{
 
 pub struct MethodNode {
     pub public: bool,
+    pub instance: bool,
     pub function: Node<FunctionNode>,
 }
 
