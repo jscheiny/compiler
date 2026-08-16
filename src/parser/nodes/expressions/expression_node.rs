@@ -4,9 +4,9 @@ use crate::{
     parser::{
         ArrayExpressionNode, BinaryOpExpressionNode, BlockNode, ClosureExpressionNode,
         ClosureParameterExpressionNode, DeferredMemberExpressionNode, FunctionCallExpressionNode,
-        IfExpressionNode, MatchNode, MemberTypeExpressionNode, MemberValueExpressionNode, NameNode,
-        PostfixOpExpressionNode, PrefixOpExpressionNode, PrimitiveType, SpreadNode, TokenSpan,
-        TupleExpressionNode, TypeBindingExpressionNode,
+        IfExpressionNode, MatchNode, NameNode, PostfixOpExpressionNode, PrefixOpExpressionNode,
+        PrimitiveType, SpreadNode, TokenSpan, TupleExpressionNode, TypeBindingExpressionNode,
+        TypeMemberExpressionNode, ValueMemberExpressionNode,
     },
 };
 
@@ -23,8 +23,6 @@ pub enum ExpressionNode {
     IfExpression(IfExpressionNode),
     IntegerLiteral(i64),
     Match(MatchNode),
-    MemberType(MemberTypeExpressionNode),
-    MemberValue(MemberValueExpressionNode),
     Name(NameNode),
     PostfixOp(PostfixOpExpressionNode),
     PrefixOp(PrefixOpExpressionNode),
@@ -34,6 +32,8 @@ pub enum ExpressionNode {
     StringLiteral(String),
     Tuple(TupleExpressionNode),
     TypeBinding(TypeBindingExpressionNode),
+    TypeMember(TypeMemberExpressionNode),
+    ValueMember(ValueMemberExpressionNode),
     Error,
 }
 
@@ -63,8 +63,6 @@ impl ExpressionNode {
             Self::IfExpression(node) => node.check(scope, expected_type),
             Self::IntegerLiteral(_) => (scope, Type::Primitive(PrimitiveType::Int)),
             Self::Match(node) => node.check(scope, expected_type),
-            Self::MemberType(node) => node.check(scope),
-            Self::MemberValue(node) => node.check(scope, expected_type),
             Self::Name(node) => node.check(scope, expected_type),
             Self::PostfixOp(node) => node.check(scope),
             Self::PrefixOp(node) => node.check(scope),
@@ -77,6 +75,8 @@ impl ExpressionNode {
             ),
             Self::Tuple(node) => node.check(scope, expected_type),
             Self::TypeBinding(node) => node.check(scope),
+            Self::TypeMember(node) => node.check(scope),
+            Self::ValueMember(node) => node.check(scope, expected_type),
             Self::Error => (scope, Type::Error),
         }
     }

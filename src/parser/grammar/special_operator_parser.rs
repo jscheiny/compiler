@@ -4,8 +4,8 @@ use crate::{
     lexer::{Symbol, Token, TokenMatch},
     parser::{
         ClosureParameterExpressionNode, ExpressionNode, FunctionCallExpressionNode,
-        LocatedSyntaxError, MemberTypeExpressionNode, MemberValueExpressionNode, NameType, Node,
-        Operator, ParseResult, SyntaxError, TokenStream, TypeBindingExpressionNode,
+        LocatedSyntaxError, NameType, Node, Operator, ParseResult, SyntaxError, TokenStream,
+        TypeBindingExpressionNode, TypeMemberExpressionNode, ValueMemberExpressionNode,
         grammar::{bound_type_parameters, function_arguments, simple_closure, type_definition},
     },
 };
@@ -15,9 +15,9 @@ pub enum SpecialOperator {
     Closure,          // param -> expr
     ClosureParameter, // value : type
     FunctionCall,     // fn ( params )
-    MemberType,       // Receiver :: field
-    MemberValue,      // receiver . field
     TypeBinding,      // T [ Args ]
+    TypeMember,       // Receiver :: field
+    ValueMember,      // receiver . field
 }
 
 impl SpecialOperator {
@@ -30,9 +30,9 @@ impl SpecialOperator {
             Self::Closure => simple_closure(tokens, left),
             Self::ClosureParameter => closure_parameter(tokens, left),
             Self::FunctionCall => function_call(tokens, left),
-            Self::MemberType => member_type(tokens, left),
-            Self::MemberValue => member_value(tokens, left),
             Self::TypeBinding => type_binding(tokens, left),
+            Self::TypeMember => type_member(tokens, left),
+            Self::ValueMember => value_member(tokens, left),
         }
     }
 }
@@ -44,16 +44,16 @@ impl Operator for SpecialOperator {
             Self::Closure => Token::Symbol(S::SkinnyArrow),
             Self::ClosureParameter => Token::Symbol(S::Colon),
             Self::FunctionCall => Token::Symbol(S::OpenParen),
-            Self::MemberType => Token::Symbol(S::DoubleColon),
-            Self::MemberValue => Token::Symbol(S::Dot),
             Self::TypeBinding => Token::Symbol(S::OpenBracket),
+            Self::TypeMember => Token::Symbol(S::DoubleColon),
+            Self::ValueMember => Token::Symbol(S::Dot),
         }
     }
 
     fn precedence(&self) -> i32 {
         match self {
-            Self::MemberType | Self::TypeBinding => 10,
-            Self::Closure | Self::FunctionCall | Self::MemberValue => 9,
+            Self::TypeMember | Self::TypeBinding => 10,
+            Self::Closure | Self::FunctionCall | Self::ValueMember => 9,
             Self::ClosureParameter => 0,
         }
     }
@@ -100,21 +100,21 @@ fn function_call(
     Ok(span.wrap(result))
 }
 
-fn member_type(
+fn type_member(
     tokens: &mut TokenStream,
     left: Node<ExpressionNode>,
 ) -> ParseResult<Node<ExpressionNode>> {
     tokens.next();
     let field = tokens.name(NameType::Type)?;
     let span = left.span.expand_to(tokens);
-    let result = ExpressionNode::MemberType(MemberTypeExpressionNode {
+    let result = ExpressionNode::TypeMember(TypeMemberExpressionNode {
         left: Box::new(left),
         field,
     });
     Ok(span.wrap(result))
 }
 
-fn member_value(
+fn value_member(
     tokens: &mut TokenStream,
     left: Node<ExpressionNode>,
 ) -> ParseResult<Node<ExpressionNode>> {
@@ -126,7 +126,7 @@ fn member_value(
         None
     };
     let span = left.span.expand_to(tokens);
-    let result = ExpressionNode::MemberValue(MemberValueExpressionNode {
+    let result = ExpressionNode::ValueMember(ValueMemberExpressionNode {
         left: Box::new(left),
         field,
         arguments,

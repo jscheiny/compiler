@@ -3,12 +3,12 @@ use crate::{
     parser::{ExpressionNode, NameNode, Node, check_private_member},
 };
 
-pub struct MemberTypeExpressionNode {
+pub struct TypeMemberExpressionNode {
     pub left: Box<Node<ExpressionNode>>,
     pub field: NameNode,
 }
 
-impl MemberTypeExpressionNode {
+impl TypeMemberExpressionNode {
     pub fn check(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
         if let ExpressionNode::TypeBinding(binding) = &self.left.value {
             let (scope, receiver_type) = binding.check(scope);
