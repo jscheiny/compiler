@@ -3,9 +3,15 @@ use crate::{
     parser::{FunctionNode, Node},
 };
 
+#[derive(Clone, Copy)]
+pub enum MethodInstanceType {
+    Instance,
+    Static,
+}
+
 pub struct MethodNode {
     pub public: bool,
-    pub instance: bool,
+    pub instance_type: MethodInstanceType,
     pub function: Node<FunctionNode>,
 }
 

@@ -1,9 +1,12 @@
 use crate::{
     lexer::{Keyword, Symbol, TokenMatch},
     parser::{
-        FunctionSignatureNode, ImplementationEntryNode, InterfaceImplementationNode, InterfaceNode,
+        ImplementationEntryNode, InterfaceImplementationNode, InterfaceNode, MethodSignatureNode,
         NameType, Node, ParseResult, SyntaxError, TokenStream,
-        grammar::{end_statement, function_signature, nested_function},
+        grammar::{
+            end_statement, function_parser::method_instance_type, function_signature,
+            nested_function,
+        },
     },
 };
 
@@ -15,9 +18,7 @@ pub fn interface(tokens: &mut TokenStream) -> ParseResult<InterfaceNode> {
     Ok(InterfaceNode::new(name, method_signatures))
 }
 
-pub fn method_signatures(
-    tokens: &mut TokenStream,
-) -> ParseResult<Vec<Node<FunctionSignatureNode>>> {
+pub fn method_signatures(tokens: &mut TokenStream) -> ParseResult<Vec<Node<MethodSignatureNode>>> {
     if tokens.accept(Symbol::Semicolon) {
         tokens.push_error(SyntaxError::ExpectedMethodSignatures);
         return Ok(vec![]);
@@ -33,11 +34,15 @@ pub fn method_signatures(
     Ok(method_signatures)
 }
 
-pub fn method_signature(tokens: &mut TokenStream) -> ParseResult<FunctionSignatureNode> {
+pub fn method_signature(tokens: &mut TokenStream) -> ParseResult<MethodSignatureNode> {
     no_qualifiers(tokens);
+    let instance_type = method_instance_type(tokens);
     let signature = function_signature(tokens, NameType::Interface)?;
     end_statement(tokens);
-    Ok(signature)
+    Ok(MethodSignatureNode {
+        instance_type,
+        signature,
+    })
 }
 
 pub fn interface_implementation(tokens: &mut TokenStream) -> ParseResult<ImplementationEntryNode> {
