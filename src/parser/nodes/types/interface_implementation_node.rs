@@ -113,7 +113,7 @@ fn check_method(
     if let Some(Type::Interface(interface_type)) = implemented_type {
         let interface_method = interface_type.methods.get(method.name());
         if let Some(interface_method) = interface_method {
-            check_method_equivalence(&scope, interface_method, method);
+            check_method_equivalence(&scope, &interface_method.function_type, method);
         }
     }
 

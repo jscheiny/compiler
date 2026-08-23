@@ -78,7 +78,7 @@ pub fn get_field(
                 if !method.public {
                     check_private_member(scope, input_type, field);
                 }
-                Type::Function(method.function_type.clone())
+                Type::Function(method.method_type.function_type.clone())
             } else {
                 scope.source.print_error(
                     field.span,
@@ -100,7 +100,7 @@ pub fn get_field(
         Type::Interface(interface_type) => {
             let method = interface_type.methods.get(&field.value);
             if let Some(method) = method {
-                Type::Function(method.clone())
+                Type::Function(method.function_type.clone())
             } else {
                 scope.source.print_error(
                     field.span,

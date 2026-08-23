@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{EnumType, FunctionType, InterfaceType, Scope, StructType, Type, Types},
+    checker::{EnumType, InterfaceType, MethodType, Scope, StructType, Type, Types},
     parser::{FunctionNode, ImplementationEntryNode, InterfaceImplementationNode, Node},
 };
 
@@ -27,7 +27,7 @@ impl ImplementationType {
 pub struct Method {
     pub public: bool,
     pub name: String,
-    pub function_type: Rc<FunctionType>,
+    pub method_type: MethodType,
 }
 
 impl ImplementationNode {
@@ -78,17 +78,20 @@ impl ImplementationNode {
                     methods.push(Method {
                         public: method.public,
                         name: method.function.name().clone(),
-                        function_type: method.function.get_type(scope).clone(),
+                        method_type: MethodType {
+                            instance_kind: method.instance_kind,
+                            function_type: method.function.get_type(scope).clone(),
+                        },
                     });
                 }
                 ImplementationEntryNode::Interface(implementation) => {
                     let interface_type = scope.get_type(&implementation.name);
                     if let Some(Type::Interface(interface_type)) = interface_type {
-                        for (name, function_type) in &interface_type.methods {
+                        for (name, method_type) in &interface_type.methods {
                             methods.push(Method {
                                 public: true,
                                 name: name.clone(),
-                                function_type: function_type.clone(),
+                                method_type: method_type.clone(),
                             });
                         }
                     }

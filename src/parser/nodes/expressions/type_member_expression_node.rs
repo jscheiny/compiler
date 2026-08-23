@@ -31,7 +31,12 @@ impl TypeMemberExpressionNode {
                     if !method.public {
                         check_private_member(scope, &receiver_type, &self.field);
                     }
-                    method.function_type.clone().as_static_method(receiver_type)
+                    // TODO this will need to change based on instance_kind
+                    method
+                        .method_type
+                        .function_type
+                        .clone()
+                        .as_static_method(receiver_type)
                 } else {
                     scope.source.print_error(
                         self.field.span,

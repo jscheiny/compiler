@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, collections::HashMap, rc::Rc};
 
 use crate::{
-    checker::{FunctionType, InterfaceType, Scope, Type, Types},
+    checker::{FunctionType, InterfaceType, MethodType, Scope, Type, Types},
     parser::EnumNode,
 };
 
@@ -70,7 +70,7 @@ impl EnumType {
             for method in implementation.get_methods(scope) {
                 methods.entry(method.name).or_insert(EnumMethod {
                     public: method.public,
-                    function_type: method.function_type,
+                    method_type: method.method_type,
                 });
             }
         }
@@ -88,5 +88,5 @@ impl EnumType {
 
 pub struct EnumMethod {
     pub public: bool,
-    pub function_type: Rc<FunctionType>,
+    pub method_type: MethodType,
 }

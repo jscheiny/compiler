@@ -1,6 +1,6 @@
-use crate::parser::{FunctionSignatureNode, MethodInstanceType};
+use crate::parser::{FunctionSignatureNode, MethodInstanceKind};
 
 pub struct MethodSignatureNode {
-    pub instance_type: MethodInstanceType,
+    pub instance_kind: MethodInstanceKind,
     pub signature: FunctionSignatureNode,
 }

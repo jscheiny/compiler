@@ -1,7 +1,7 @@
 use std::{cell::OnceCell, collections::HashMap, rc::Rc};
 
 use crate::{
-    checker::{FunctionType, InterfaceType, Scope, Type, Types},
+    checker::{FunctionType, InterfaceType, MethodType, Scope, Type, Types},
     parser::StructNode,
 };
 
@@ -67,7 +67,7 @@ impl StructType {
             for method in implementation.get_methods(scope) {
                 members.entry(method.name).or_insert(StructMember {
                     public: method.public,
-                    member_type: StructMemberType::Method(method.function_type),
+                    member_type: StructMemberType::Method(method.method_type),
                 });
             }
         }
@@ -90,14 +90,14 @@ pub struct StructMember {
 
 pub enum StructMemberType {
     Field(Type),
-    Method(Rc<FunctionType>),
+    Method(MethodType),
 }
 
 impl StructMemberType {
     pub fn get_type(&self) -> Type {
         match self {
             Self::Field(field_type) => field_type.clone(),
-            Self::Method(function_type) => Type::Function(function_type.clone()),
+            Self::Method(method) => Type::Function(method.function_type.clone()),
         }
     }
 
@@ -106,7 +106,8 @@ impl StructMemberType {
             Self::Field(field_type) => {
                 Type::Function(FunctionType::simple(self_type, field_type.clone()))
             }
-            Self::Method(function_type) => function_type.clone().as_static_method(self_type),
+            // TODO This has the wrong implementation for already static methods
+            Self::Method(method) => method.function_type.clone().as_static_method(self_type),
         }
     }
 }

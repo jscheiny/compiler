@@ -3,10 +3,7 @@ use crate::{
     parser::{
         ImplementationEntryNode, InterfaceImplementationNode, InterfaceNode, MethodSignatureNode,
         NameType, Node, ParseResult, SyntaxError, TokenStream,
-        grammar::{
-            end_statement, function_parser::method_instance_type, function_signature,
-            nested_function,
-        },
+        grammar::{end_statement, function_signature, method_instance_kind, nested_function},
     },
 };
 
@@ -36,11 +33,11 @@ pub fn method_signatures(tokens: &mut TokenStream) -> ParseResult<Vec<Node<Metho
 
 pub fn method_signature(tokens: &mut TokenStream) -> ParseResult<MethodSignatureNode> {
     no_qualifiers(tokens);
-    let instance_type = method_instance_type(tokens);
+    let instance_kind = method_instance_kind(tokens);
     let signature = function_signature(tokens, NameType::Interface)?;
     end_statement(tokens);
     Ok(MethodSignatureNode {
-        instance_type,
+        instance_kind,
         signature,
     })
 }

@@ -4,14 +4,14 @@ use crate::{
 };
 
 #[derive(Clone, Copy)]
-pub enum MethodInstanceType {
+pub enum MethodInstanceKind {
     Instance,
     Static,
 }
 
 pub struct MethodNode {
     pub public: bool,
-    pub instance_type: MethodInstanceType,
+    pub instance_kind: MethodInstanceKind,
     pub function: Node<FunctionNode>,
 }
 

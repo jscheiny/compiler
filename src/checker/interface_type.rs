@@ -1,9 +1,9 @@
-use std::{collections::HashMap, rc::Rc};
+use std::collections::HashMap;
 
-use crate::checker::FunctionType;
+use crate::checker::MethodType;
 
 #[derive(Default)]
 pub struct InterfaceType {
     pub name: String,
-    pub methods: HashMap<String, Rc<FunctionType>>,
+    pub methods: HashMap<String, MethodType>,
 }

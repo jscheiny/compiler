@@ -1,12 +1,18 @@
-enum X(A, B, C,) {}
+enum X(A, B, C,) {
+    .matc() {}
+}
 
 interface I {
-    get_self(): Self;
+    ::get_self(): int;
 }
 
 struct S() {
-    pub duplicate(): S {
+    pub ::duplicate(): S {
         let g: Self = S();
+    }
+
+    impl I {
+        get_self(): int -> 5;
     }
 }
 
@@ -19,9 +25,9 @@ fn test(s: S) {
     let x = (a: bool, b: bool) -> a or b;
     accept(a -> not a);
 
-    let x: X = C(5);
+    let x: X = C;
 }
 
 fn accept(f: bool => bool) {
-    let x: Self = 5;
+    let x = 5;
 }

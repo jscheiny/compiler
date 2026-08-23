@@ -2,7 +2,7 @@ use crate::{
     lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
         ExpressionNode, FunctionBodyNode, FunctionNode, FunctionSignatureNode,
-        ImplementationEntryNode, ImplementationNode, MethodInstanceType, MethodNode, NameType,
+        ImplementationEntryNode, ImplementationNode, MethodInstanceKind, MethodNode, NameType,
         Node, ParameterNode, ParseResult, SyntaxError, TokenStream,
         grammar::{
             BlockType, block, comma_separated_list, end_statement, expression,
@@ -38,23 +38,23 @@ fn implementation_impl(tokens: &mut TokenStream) -> ParseResult<ImplementationNo
 
 fn method(tokens: &mut TokenStream) -> ParseResult<ImplementationEntryNode> {
     let public = tokens.accept(Keyword::Pub);
-    let instance_type = method_instance_type(tokens);
+    let instance_kind = method_instance_kind(tokens);
     let function = tokens.located(nested_function)?;
     Ok(ImplementationEntryNode::Method(Box::new(MethodNode {
         public,
-        instance_type,
+        instance_kind,
         function,
     })))
 }
 
-pub fn method_instance_type(tokens: &mut TokenStream) -> MethodInstanceType {
+pub fn method_instance_kind(tokens: &mut TokenStream) -> MethodInstanceKind {
     if tokens.accept(Symbol::Dot) {
-        MethodInstanceType::Instance
+        MethodInstanceKind::Instance
     } else if tokens.accept(Symbol::DoubleColon) {
-        MethodInstanceType::Static
+        MethodInstanceKind::Static
     } else {
         tokens.push_error(SyntaxError::ExpectedMethodInstanceSymbol);
-        MethodInstanceType::Instance
+        MethodInstanceKind::Instance
     }
 }
 

@@ -5,7 +5,7 @@ use std::{
 };
 
 use crate::{
-    checker::{InterfaceType, Scope, Types},
+    checker::{InterfaceType, MethodType, Scope, Types},
     parser::{MethodSignatureNode, NameNode, NodeVec},
 };
 
@@ -50,8 +50,10 @@ impl InterfaceNode {
         let mut methods = HashMap::new();
         for method in self.method_signatures.iter() {
             let name = method.signature.name.clone();
-            let method = method.signature.get_type(types).clone();
-            methods.entry(name).or_insert(method);
+            methods.entry(name).or_insert_with(|| MethodType {
+                instance_kind: method.instance_kind,
+                function_type: method.signature.get_type(types).clone(),
+            });
         }
 
         Rc::new(InterfaceType {
