@@ -19,4 +19,8 @@ impl MethodNode {
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
         self.function.check(scope)
     }
+
+    pub fn name(&self) -> &String {
+        self.function.name()
+    }
 }

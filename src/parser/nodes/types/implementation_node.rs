@@ -2,7 +2,7 @@ use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
     checker::{EnumType, InterfaceType, MethodType, Scope, StructType, Type, Types},
-    parser::{FunctionNode, ImplementationEntryNode, InterfaceImplementationNode, Node},
+    parser::{ImplementationEntryNode, InterfaceImplementationNode, MethodNode, Node},
 };
 
 pub struct ImplementationNode {
@@ -54,12 +54,9 @@ impl ImplementationNode {
                     &mut scope_names,
                     &mut implemented_interfaces,
                 ),
-                ImplementationEntryNode::Method(method) => check_duplicate_method(
-                    &method.function,
-                    &mut scope,
-                    self_type,
-                    &mut scope_names,
-                ),
+                ImplementationEntryNode::Method(method) => {
+                    check_duplicate_method(method, &mut scope, self_type, &mut scope_names)
+                }
             }
         }
 
@@ -159,7 +156,7 @@ fn check_duplicate_interface(
 }
 
 fn check_duplicate_method(
-    method: &FunctionNode,
+    method: &MethodNode,
     scope: &mut Scope,
     self_type: &ImplementationType,
     scope_names: &mut HashSet<String>,
@@ -167,7 +164,7 @@ fn check_duplicate_method(
     if scope_names.contains(method.name()) {
         print_duplicate_member_error(scope, self_type, method);
     } else {
-        let method_type = Type::Function(method.get_type(scope).clone());
+        let method_type = Type::Function(method.function.get_type(scope).clone());
         scope.add_value(method.name(), method_type);
         scope_names.insert(method.name().clone());
     }
@@ -176,11 +173,11 @@ fn check_duplicate_method(
 fn print_duplicate_member_error(
     scope: &Scope,
     self_type: &ImplementationType,
-    method: &FunctionNode,
+    method: &MethodNode,
 ) {
     let container_type = get_container_type(self_type);
     scope.source.print_error(
-        method.signature.name.span,
+        method.function.signature.name.span,
         &format!("Duplicate {} member `{}`", container_type, method.name()),
         &format!(
             "{} `{}` already contains a {} with this name",

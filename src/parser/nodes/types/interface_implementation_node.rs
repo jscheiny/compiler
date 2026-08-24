@@ -3,12 +3,12 @@ use std::{collections::HashSet, rc::Rc};
 use crate::{
     checker::{EnumType, FunctionType, Scope, Type, Types},
     lexer::Symbol,
-    parser::{FunctionNode, ImplementationType, NameNode, Node},
+    parser::{FunctionNode, ImplementationType, MethodNode, NameNode, Node},
 };
 
 pub struct InterfaceImplementationNode {
     pub name: NameNode,
-    pub methods: Option<Vec<Node<FunctionNode>>>,
+    pub methods: Option<Vec<Node<MethodNode>>>,
 }
 
 impl InterfaceImplementationNode {
@@ -34,7 +34,7 @@ impl InterfaceImplementationNode {
         let mut method_names = HashSet::new();
         if let Some(methods) = self.methods.as_ref() {
             for method in methods {
-                scope = check_method(scope, method, implemented_type.as_ref());
+                scope = check_method(scope, &method.function, implemented_type.as_ref());
                 method_names.insert(method.name());
             }
 

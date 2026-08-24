@@ -1,8 +1,8 @@
 use crate::{
     lexer::{Keyword, Symbol, TokenMatch},
     parser::{
-        ImplementationEntryNode, InterfaceImplementationNode, InterfaceNode, MethodSignatureNode,
-        NameType, Node, ParseResult, SyntaxError, TokenStream,
+        ImplementationEntryNode, InterfaceImplementationNode, InterfaceNode, MethodNode,
+        MethodSignatureNode, NameType, Node, ParseResult, SyntaxError, TokenStream,
         grammar::{end_statement, function_signature, method_instance_kind, nested_function},
     },
 };
@@ -55,7 +55,7 @@ pub fn interface_implementation(tokens: &mut TokenStream) -> ParseResult<Impleme
         let mut methods = vec![];
         while !tokens.accept(Symbol::CloseBrace) {
             no_qualifiers(tokens);
-            methods.push(tokens.located(nested_function)?);
+            methods.push(tokens.located(implemented_method)?);
         }
         Ok(ImplementationEntryNode::Interface(
             InterfaceImplementationNode {
@@ -66,6 +66,16 @@ pub fn interface_implementation(tokens: &mut TokenStream) -> ParseResult<Impleme
     } else {
         Err(tokens.make_error(SyntaxError::ExpectedMethods))
     }
+}
+
+fn implemented_method(tokens: &mut TokenStream) -> ParseResult<MethodNode> {
+    let instance_kind = method_instance_kind(tokens);
+    let function = tokens.located(nested_function)?;
+    Ok(MethodNode {
+        public: true, // Interface methods are always public
+        instance_kind,
+        function,
+    })
 }
 
 fn no_qualifiers(tokens: &mut TokenStream) {

@@ -1,21 +1,21 @@
 interface Super {
-    super(): int;
+    .super(): int;
 }
 
 struct Sub1() {
     impl Super {
-        super(): int -> 3;
+        .super(): int -> 3;
     }
 
-    pub sub1(): bool -> true;
+    pub .sub1(): bool -> true;
 }
 
 struct Sub2() {
     impl Super {
-        super(): int -> 5;
+        .super(): int -> 5;
     }
 
-    pub sub2(): bool -> true;
+    pub .sub2(): bool -> true;
 }
 
 fn accept_super(value: Super) {
@@ -39,7 +39,7 @@ fn main(super: Super, sub1: Sub1, sub2: Sub2) {
     call_super(sub2, accept_sub1); // should be an error
     call_sub1(sub1, accept_super); // shouldn't be an error
     accept_super(sub1);
-    let test = (4: int, y: bool) -> {};
+    let test = (x: int, y: bool) -> {};
     accept_test(test);
 }
 
