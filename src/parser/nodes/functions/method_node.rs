@@ -1,5 +1,5 @@
 use crate::{
-    checker::Scope,
+    checker::{Scope, ScopeType},
     parser::{FunctionNode, Node},
 };
 
@@ -17,7 +17,12 @@ pub struct MethodNode {
 
 impl MethodNode {
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
-        self.function.check(scope)
+        match self.instance_kind {
+            MethodInstanceKind::Instance => self.function.check(scope),
+            MethodInstanceKind::Static => {
+                scope.nest(ScopeType::StaticMethod, |scope| self.function.check(scope))
+            }
+        }
     }
 
     pub fn name(&self) -> &String {

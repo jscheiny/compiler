@@ -126,6 +126,13 @@ fn print_unknown_type_error(scope: &Scope, span: TokenSpan, name: &str) {
 fn check_self_ref(scope: Box<Scope>, name: &NameNode) -> (Box<Scope>, Type) {
     let self_type = scope.get_self_type();
     if let Some(self_type) = self_type {
+        if scope.is_static() {
+            scope.print_error(
+                name.span.before(),
+                "Invalid self reference inside of static method",
+                &format!("`{}` cannot be used inside of a static method", Symbol::At),
+            );
+        }
         let resolved_type = get_field(&self_type, name.span.before(), name, &scope);
         (scope, resolved_type)
     } else {
@@ -141,6 +148,16 @@ fn check_self_ref(scope: Box<Scope>, name: &NameNode) -> (Box<Scope>, Type) {
 fn check_self_value(scope: Box<Scope>, span: TokenSpan) -> (Box<Scope>, Type) {
     let self_type = scope.get_self_type();
     if let Some(self_type) = self_type {
+        if scope.is_static() {
+            scope.print_error(
+                span,
+                &format!("Invalid `{}` inside of static method", Keyword::SelfValue),
+                &format!(
+                    "`{}` cannot be used inside of a static method",
+                    Keyword::SelfValue
+                ),
+            );
+        }
         (scope, self_type)
     } else {
         scope.source.print_error(

@@ -17,6 +17,7 @@ pub enum ScopeType {
     Block,
     MatchCase,
     Loop,
+    StaticMethod,
     Type,
     Enum(Rc<EnumType>),
     Struct(Rc<StructType>),
@@ -110,6 +111,11 @@ impl Scope {
         } else {
             None
         }
+    }
+
+    pub fn is_static(&self) -> bool {
+        self.find_scope(|s| matches!(s, ScopeType::StaticMethod))
+            .is_some()
     }
 
     // TODO can we get rid of this an just preinitialize the things that need it when we're setting up the global scope?
