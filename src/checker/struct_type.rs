@@ -1,8 +1,8 @@
 use std::{cell::OnceCell, collections::HashMap, rc::Rc};
 
 use crate::{
-    checker::{FunctionType, InterfaceType, MethodType, Scope, Type, Types},
-    parser::StructNode,
+    checker::{FunctionType, InterfaceType, MemberType, MethodType, Scope, Type, Types},
+    parser::{MethodInstanceKind, StructNode},
 };
 
 pub struct StructType {
@@ -85,7 +85,7 @@ impl StructType {
 
 pub struct StructMember {
     pub public: bool,
-    pub member_type: StructMemberType,
+    pub member_type: StructMemberType, // TODO change to member_kind
 }
 
 pub enum StructMemberType {
@@ -109,5 +109,22 @@ impl StructMemberType {
             // TODO This has the wrong implementation for already static methods
             Self::Method(method) => method.function_type.clone().as_static_method(self_type),
         }
+    }
+}
+
+impl MemberType for StructMember {
+    fn is_public(&self) -> bool {
+        self.public
+    }
+
+    fn instance_kind(&self) -> MethodInstanceKind {
+        match &self.member_type {
+            StructMemberType::Field(_) => MethodInstanceKind::Instance,
+            StructMemberType::Method(method) => method.instance_kind,
+        }
+    }
+
+    fn get_type(&self) -> Type {
+        self.member_type.get_type()
     }
 }

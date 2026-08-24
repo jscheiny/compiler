@@ -1,8 +1,8 @@
 use std::{cell::OnceCell, collections::HashMap, rc::Rc};
 
 use crate::{
-    checker::{FunctionType, InterfaceType, MethodType, Scope, Type, Types},
-    parser::EnumNode,
+    checker::{FunctionType, InterfaceType, MemberType, MethodType, Scope, Type, Types},
+    parser::{EnumNode, MethodInstanceKind},
 };
 
 pub struct EnumType {
@@ -89,4 +89,18 @@ impl EnumType {
 pub struct EnumMethod {
     pub public: bool,
     pub method_type: MethodType,
+}
+
+impl MemberType for EnumMethod {
+    fn is_public(&self) -> bool {
+        self.public
+    }
+
+    fn instance_kind(&self) -> MethodInstanceKind {
+        self.method_type.instance_kind
+    }
+
+    fn get_type(&self) -> Type {
+        Type::Function(self.method_type.function_type.clone())
+    }
 }

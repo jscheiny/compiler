@@ -1,8 +1,10 @@
 use std::rc::Rc;
 
 use crate::{
-    checker::{FunctionType, Scope, Type, Types},
-    parser::{ExpressionNode, NameNode, Node, NodeVec, TokenSpan, check_function_call},
+    checker::{FunctionType, MemberType, Scope, Type, Types},
+    parser::{
+        ExpressionNode, MethodInstanceKind, NameNode, Node, NodeVec, TokenSpan, check_function_call,
+    },
 };
 
 pub struct ValueMemberExpressionNode {
@@ -58,27 +60,24 @@ impl ValueMemberExpressionNode {
 }
 
 pub fn get_field(
-    input_type: &Type,
-    input_span: TokenSpan,
+    receiver_type: &Type,
+    receiver_span: TokenSpan,
     field: &NameNode,
     scope: &Scope,
 ) -> Type {
-    match input_type {
+    match receiver_type {
         Type::Array(_) | Type::Void => {
             scope.source.print_error(
                 field.span.before(),
                 "Value member operator is not valid for this type",
-                &format!("type: `{input_type}`"),
+                &format!("type: `{receiver_type}`"),
             );
             Type::Error
         }
         Type::Enum(enum_type) => {
             let method = enum_type.get_method(scope, field);
             if let Some(method) = method {
-                if !method.public {
-                    check_private_member(scope, input_type, field);
-                }
-                Type::Function(method.method_type.function_type.clone())
+                check_member(scope, receiver_type, enum_type.name(), field, method)
             } else {
                 scope.source.print_error(
                     field.span,
@@ -90,9 +89,9 @@ pub fn get_field(
         }
         Type::Function(_) => {
             scope.source.print_error(
-                input_span,
+                receiver_span,
                 "Cannot use value member operator on a function which returns another function",
-                &format!("returns type: `{input_type}`"),
+                &format!("returns type: `{receiver_type}`"),
             );
             Type::Error
         }
@@ -117,10 +116,7 @@ pub fn get_field(
         Type::Struct(struct_type) => {
             let member = struct_type.get_member(scope, field);
             if let Some(member) = member {
-                if !member.public {
-                    check_private_member(scope, input_type, field);
-                }
-                member.member_type.get_type()
+                check_member(scope, receiver_type, struct_type.name(), field, member)
             } else {
                 scope.source.print_error(
                     field.span,
@@ -137,6 +133,28 @@ pub fn get_field(
         Type::TypeParameter(_) => todo!("Implement value member operator for type parameters"),
         Type::Error => Type::Error,
     }
+}
+
+pub fn check_member(
+    scope: &Scope,
+    receiver_type: &Type,
+    receiver_name: &str,
+    field: &NameNode,
+    member: &impl MemberType,
+) -> Type {
+    if !member.is_public() {
+        check_private_member(scope, receiver_type, field);
+    }
+
+    if member.instance_kind() == MethodInstanceKind::Static {
+        scope.source.print_error(
+            field.span,
+            "Cannot use static member on instance value",
+            &format!("`{field}` is static on type `{receiver_name}`"),
+        );
+    }
+
+    member.get_type()
 }
 
 pub fn check_private_member(scope: &Scope, receiver_type: &Type, field: &NameNode) {
