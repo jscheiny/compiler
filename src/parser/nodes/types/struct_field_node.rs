@@ -1,7 +1,7 @@
 use std::cell::OnceCell;
 
 use crate::{
-    checker::{Scope, StructMember, StructMemberType, Type, Types},
+    checker::{Scope, StructMember, StructMemberKind, Type, Types},
     parser::{NameNode, Node, TypeNode},
 };
 
@@ -25,7 +25,7 @@ impl StructFieldNode {
     pub fn get_member(&self, scope: &Scope) -> StructMember {
         StructMember {
             public: self.public,
-            member_type: StructMemberType::Field(self.get_type(scope).clone()),
+            member_kind: StructMemberKind::Field(self.get_type(scope).clone()),
         }
     }
 

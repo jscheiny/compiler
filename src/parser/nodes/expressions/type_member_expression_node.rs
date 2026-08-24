@@ -57,7 +57,7 @@ impl TypeMemberExpressionNode {
                     if !member.public {
                         check_private_member(scope, &receiver_type, &self.field);
                     }
-                    member.member_type.as_static_type(receiver_type)
+                    member.member_kind.as_static_type(receiver_type)
                 } else {
                     scope.source.print_error(
                         self.field.span,

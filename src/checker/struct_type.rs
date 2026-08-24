@@ -67,7 +67,7 @@ impl StructType {
             for method in implementation.get_methods(scope) {
                 members.entry(method.name).or_insert(StructMember {
                     public: method.public,
-                    member_type: StructMemberType::Method(method.method_type),
+                    member_kind: StructMemberKind::Method(method.method_type),
                 });
             }
         }
@@ -85,15 +85,15 @@ impl StructType {
 
 pub struct StructMember {
     pub public: bool,
-    pub member_type: StructMemberType, // TODO change to member_kind
+    pub member_kind: StructMemberKind,
 }
 
-pub enum StructMemberType {
+pub enum StructMemberKind {
     Field(Type),
     Method(MethodType),
 }
 
-impl StructMemberType {
+impl StructMemberKind {
     pub fn get_type(&self) -> Type {
         match self {
             Self::Field(field_type) => field_type.clone(),
@@ -118,13 +118,13 @@ impl MemberType for StructMember {
     }
 
     fn instance_kind(&self) -> MethodInstanceKind {
-        match &self.member_type {
-            StructMemberType::Field(_) => MethodInstanceKind::Instance,
-            StructMemberType::Method(method) => method.instance_kind,
+        match &self.member_kind {
+            StructMemberKind::Field(_) => MethodInstanceKind::Instance,
+            StructMemberKind::Method(method) => method.instance_kind,
         }
     }
 
     fn get_type(&self) -> Type {
-        self.member_type.get_type()
+        self.member_kind.get_type()
     }
 }
