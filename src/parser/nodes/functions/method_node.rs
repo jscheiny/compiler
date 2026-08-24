@@ -3,7 +3,7 @@ use crate::{
     parser::{FunctionNode, Node},
 };
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum MethodInstanceKind {
     Instance,
     Static,

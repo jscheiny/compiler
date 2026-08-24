@@ -2,7 +2,7 @@ use colored::{ColoredString, Colorize};
 use std::{cmp::min, error::Error, fs::read_to_string, rc::Rc};
 
 use crate::{
-    lexer::{CharacterSpan, LocatedToken, TokenizerResult, tokenize},
+    lexer::{CharacterSpan, LocatedToken, Token, TokenizerResult, tokenize},
     parser::{TokenSpan, TokenStream},
 };
 
@@ -35,6 +35,10 @@ impl SourceCode {
 
     pub fn token_stream(&self) -> TokenStream {
         TokenStream::from(self.tokens.clone())
+    }
+
+    pub fn get_token(&self, index: usize) -> &Token {
+        &self.tokens[index].token
     }
 
     pub fn print_error(&self, span: TokenSpan, message: &str, inline_message: &str) {

@@ -1,9 +1,9 @@
 use std::{collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{EnumType, FunctionType, Scope, Type, Types},
-    lexer::Symbol,
-    parser::{FunctionNode, ImplementationType, MethodNode, NameNode, Node},
+    checker::{EnumType, MethodType, Scope, Type, Types},
+    lexer::{Symbol, Token},
+    parser::{ImplementationType, MethodInstanceKind, MethodNode, NameNode, Node},
 };
 
 pub struct InterfaceImplementationNode {
@@ -34,7 +34,7 @@ impl InterfaceImplementationNode {
         let mut method_names = HashSet::new();
         if let Some(methods) = self.methods.as_ref() {
             for method in methods {
-                scope = check_method(scope, &method.function, implemented_type.as_ref());
+                scope = check_method(scope, &method, implemented_type.as_ref());
                 method_names.insert(method.name());
             }
 
@@ -107,13 +107,13 @@ impl InterfaceImplementationNode {
 
 fn check_method(
     scope: Box<Scope>,
-    method: &Node<FunctionNode>,
+    method: &Node<MethodNode>,
     implemented_type: Option<&Type>,
 ) -> Box<Scope> {
     if let Some(Type::Interface(interface_type)) = implemented_type {
         let interface_method = interface_type.methods.get(method.name());
         if let Some(interface_method) = interface_method {
-            check_method_equivalence(&scope, &interface_method.function_type, method);
+            check_method_equivalence(&scope, interface_method, method);
         }
     }
 
@@ -122,17 +122,21 @@ fn check_method(
 
 fn check_method_equivalence(
     scope: &Scope,
-    interface_type: &FunctionType,
-    implemented_method: &Node<FunctionNode>,
+    interface_method: &MethodType,
+    implemented_method: &Node<MethodNode>,
 ) {
-    let implemented_type = implemented_method.get_type(scope);
-    if interface_type.parameters.len() != implemented_type.parameters.len() {
+    check_method_instance_kind(scope, interface_method, implemented_method);
+
+    let implemented_type = implemented_method.function.get_type(scope);
+    let expected_parameters = interface_method.function_type.parameters.len();
+    let actual_parameters = implemented_type.parameters.len();
+    if expected_parameters != actual_parameters {
         scope.source.print_error(
-            implemented_method.signature.body_parameters.span,
+            implemented_method.function.signature.body_parameters.span,
             &format!(
                 "Implementation of `{}` contains {} parameters",
                 implemented_method.name(),
-                if implemented_type.parameters.len() > interface_type.parameters.len() {
+                if actual_parameters > expected_parameters {
                     "too many"
                 } else {
                     "too few"
@@ -140,13 +144,9 @@ fn check_method_equivalence(
             ),
             &format!(
                 "Expected {} parameter{} but found {}",
-                interface_type.parameters.len(),
-                if interface_type.parameters.len() == 1 {
-                    ""
-                } else {
-                    "s"
-                },
-                implemented_type.parameters.len()
+                expected_parameters,
+                if expected_parameters == 1 { "" } else { "s" },
+                actual_parameters
             ),
         );
     }
@@ -154,15 +154,16 @@ fn check_method_equivalence(
     let parameters_iter = implemented_type
         .parameters
         .iter()
-        .zip(interface_type.parameters.iter())
+        .zip(interface_method.function_type.parameters.iter())
         .enumerate();
     for (index, (interface_parameter, implemented_parameter)) in parameters_iter {
         if !implemented_parameter.is_equivalent_to(interface_parameter, scope) {
             let body_parameter_index = implemented_method
+                .function
                 .signature
                 .get_body_parameter_index(scope, index);
             let parameter_node =
-                &implemented_method.signature.body_parameters[body_parameter_index];
+                &implemented_method.function.signature.body_parameters[body_parameter_index];
             let error_span = parameter_node
                 .type_def
                 .as_ref()
@@ -182,15 +183,20 @@ fn check_method_equivalence(
         }
     }
 
-    if !interface_type
+    if !interface_method
+        .function_type
         .return_type
         .is_equivalent_to(&implemented_type.return_type, scope)
     {
         let error_span = implemented_method
+            .function
             .signature
             .return_type
             .as_ref()
-            .map_or_else(|| implemented_method.body.span.start(), |node| node.span);
+            .map_or_else(
+                || implemented_method.function.body.span.start(),
+                |node| node.span,
+            );
         scope.source.print_error(
             error_span,
             &format!(
@@ -199,8 +205,44 @@ fn check_method_equivalence(
             ),
             &format!(
                 "expected type `{}`, found type: `{}`",
-                interface_type.return_type, implemented_type.return_type
+                interface_method.function_type.return_type, implemented_type.return_type
             ),
         );
     }
+}
+
+fn check_method_instance_kind(
+    scope: &Scope,
+    interface_method: &MethodType,
+    implemented_method: &Node<MethodNode>,
+) {
+    if interface_method.instance_kind == implemented_method.instance_kind {
+        return;
+    }
+
+    let mut span = implemented_method.function.signature.name.span.before();
+    let span_token = scope.source.get_token(span.start_index);
+    // If the user forgot to use a instance kind specifier, mark the error at the method name
+    if !matches!(span_token, Token::Symbol(Symbol::Dot | Symbol::DoubleColon)) {
+        span = implemented_method.function.signature.name.span;
+    }
+
+    scope.source.print_error(
+        span,
+        &format!(
+            "Method `{}` is {}static here which does not match the interface definition",
+            implemented_method.name(),
+            match implemented_method.instance_kind {
+                MethodInstanceKind::Instance => "not ",
+                MethodInstanceKind::Static => "",
+            },
+        ),
+        &format!(
+            "expected `{}`",
+            match interface_method.instance_kind {
+                MethodInstanceKind::Instance => Symbol::Dot,
+                MethodInstanceKind::Static => Symbol::DoubleColon,
+            }
+        ),
+    );
 }
