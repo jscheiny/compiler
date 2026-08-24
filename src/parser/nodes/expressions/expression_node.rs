@@ -1,12 +1,12 @@
 use crate::{
-    checker::{Scope, ScopeType, Type, Types},
-    lexer::{EnumToken, Keyword},
+    checker::{Scope, Type, Types},
+    lexer::{EnumToken, Keyword, Symbol},
     parser::{
         ArrayExpressionNode, BinaryOpExpressionNode, BlockNode, ClosureExpressionNode,
         ClosureParameterExpressionNode, DeferredMemberExpressionNode, FunctionCallExpressionNode,
         IfExpressionNode, MatchNode, NameNode, PostfixOpExpressionNode, PrefixOpExpressionNode,
         PrimitiveType, SpreadNode, TokenSpan, TupleExpressionNode, TypeBindingExpressionNode,
-        TypeMemberExpressionNode, ValueMemberExpressionNode,
+        TypeMemberExpressionNode, ValueMemberExpressionNode, get_field,
     },
 };
 
@@ -124,27 +124,18 @@ fn print_unknown_type_error(scope: &Scope, span: TokenSpan, name: &str) {
 }
 
 fn check_self_ref(scope: Box<Scope>, name: &NameNode) -> (Box<Scope>, Type) {
-    // TODO maybe replace with using get_self_type and get_field from member_value_expression_node.rs
-    let self_scope = scope.find_scope(|scope_type| matches!(scope_type, ScopeType::Struct(_)));
-    if let Some(self_scope) = self_scope {
-        let resolved_type = self_scope.get_local_value(name);
-        if let Some(resolved_type) = resolved_type {
-            return (scope, resolved_type);
-        }
-        scope.source.print_error(
-            name.span,
-            &format!("Could not find member `{name}`"),
-            "self type does not contain a member with this name",
-        );
+    let self_type = scope.get_self_type();
+    if let Some(self_type) = self_type {
+        let resolved_type = get_field(&self_type, name.span.before(), name, &scope);
+        (scope, resolved_type)
     } else {
         scope.source.print_error(
             name.span.before(),
-            "Self reference outside of struct or enum",
-            "operator invalid outside of struct or enum",
+            "Invalid self reference outside of struct or enum",
+            &format!("`{}` only available inside of struct or enum", Symbol::At),
         );
+        (scope, Type::Error)
     }
-
-    (scope, Type::Error)
 }
 
 fn check_self_value(scope: Box<Scope>, span: TokenSpan) -> (Box<Scope>, Type) {
@@ -154,8 +145,11 @@ fn check_self_value(scope: Box<Scope>, span: TokenSpan) -> (Box<Scope>, Type) {
     } else {
         scope.source.print_error(
             span,
-            "Invalid `self` outside of struct or enum",
-            "`self` value only available inside of struct or enum",
+            &format!("Invalid `{}` outside of struct or enum", Keyword::SelfValue),
+            &format!(
+                "`{}` value only available inside of struct or enum",
+                Keyword::SelfValue
+            ),
         );
         (scope, Type::Error)
     }
