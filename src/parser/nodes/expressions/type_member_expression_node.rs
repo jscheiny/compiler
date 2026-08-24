@@ -28,9 +28,8 @@ impl TypeMemberExpressionNode {
                     variant_type
                 } else if let Some(method) = enum_type.get_method(scope, &self.field) {
                     let receiver_type = Type::Enum(enum_type.clone());
-                    if !method.public {
-                        check_private_member(scope, &receiver_type, &self.field);
-                    }
+                    check_private_member(scope, &receiver_type, &self.field, method);
+
                     // TODO this will need to change based on instance_kind
                     method
                         .method_type
@@ -54,9 +53,7 @@ impl TypeMemberExpressionNode {
                 let member = struct_type.get_member(scope, &self.field.value);
                 if let Some(member) = member {
                     let receiver_type = Type::Struct(struct_type.clone());
-                    if !member.public {
-                        check_private_member(scope, &receiver_type, &self.field);
-                    }
+                    check_private_member(scope, &receiver_type, &self.field, member);
                     member.member_kind.as_static_type(receiver_type)
                 } else {
                     scope.source.print_error(

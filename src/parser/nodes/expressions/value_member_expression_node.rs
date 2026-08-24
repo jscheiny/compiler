@@ -142,9 +142,7 @@ pub fn check_member(
     field: &NameNode,
     member: &impl MemberType,
 ) -> Type {
-    if !member.is_public() {
-        check_private_member(scope, receiver_type, field);
-    }
+    check_private_member(scope, receiver_type, field, member);
 
     if member.instance_kind() == MethodInstanceKind::Static {
         scope.source.print_error(
@@ -157,8 +155,13 @@ pub fn check_member(
     member.get_type()
 }
 
-pub fn check_private_member(scope: &Scope, receiver_type: &Type, field: &NameNode) {
-    if is_external_private_access(scope, receiver_type) {
+pub fn check_private_member(
+    scope: &Scope,
+    receiver_type: &Type,
+    field: &NameNode,
+    member: &impl MemberType,
+) {
+    if !member.is_public() && is_external_private_access(scope, receiver_type) {
         scope.source.print_error(
             field.span,
             &format!("Cannot access private member `{field}`"),
