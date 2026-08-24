@@ -23,10 +23,10 @@ impl StructFieldNode {
     }
 
     pub fn get_member(&self, scope: &Scope) -> StructMember {
-        StructMember {
-            public: self.public,
-            member_kind: StructMemberKind::Field(self.get_type(scope).clone()),
-        }
+        StructMember::new(
+            self.public,
+            StructMemberKind::Field(self.get_type(scope).clone()),
+        )
     }
 
     pub fn get_type(&self, types: &impl Types) -> &Type {

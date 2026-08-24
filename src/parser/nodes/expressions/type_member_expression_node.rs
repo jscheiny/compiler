@@ -54,7 +54,7 @@ impl TypeMemberExpressionNode {
                 if let Some(member) = member {
                     let receiver_type = Type::Struct(struct_type.clone());
                     check_private_member(scope, &receiver_type, &self.field, member);
-                    member.member_kind.as_static_type(receiver_type)
+                    member.as_static_type(receiver_type)
                 } else {
                     scope.source.print_error(
                         self.field.span,

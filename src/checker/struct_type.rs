@@ -85,29 +85,26 @@ impl StructType {
 
 pub struct StructMember {
     pub public: bool,
-    pub member_kind: StructMemberKind,
+    member_kind: StructMemberKind,
 }
 
-pub enum StructMemberKind {
-    Field(Type),
-    Method(MethodType),
-}
-
-impl StructMemberKind {
-    pub fn get_type(&self) -> Type {
-        match self {
-            Self::Field(field_type) => field_type.clone(),
-            Self::Method(method) => Type::Function(method.function_type.clone()),
+impl StructMember {
+    pub fn new(public: bool, member_kind: StructMemberKind) -> Self {
+        Self {
+            public,
+            member_kind,
         }
     }
 
     pub fn as_static_type(&self, self_type: Type) -> Type {
-        match self {
-            Self::Field(field_type) => {
+        match &self.member_kind {
+            StructMemberKind::Field(field_type) => {
                 Type::Function(FunctionType::simple(self_type, field_type.clone()))
             }
             // TODO This has the wrong implementation for already static methods
-            Self::Method(method) => method.function_type.clone().as_static_method(self_type),
+            StructMemberKind::Method(method) => {
+                method.function_type.clone().as_static_method(self_type)
+            }
         }
     }
 }
@@ -125,6 +122,14 @@ impl MemberType for StructMember {
     }
 
     fn get_type(&self) -> Type {
-        self.member_kind.get_type()
+        match &self.member_kind {
+            StructMemberKind::Field(field_type) => field_type.clone(),
+            StructMemberKind::Method(method) => Type::Function(method.function_type.clone()),
+        }
     }
+}
+
+pub enum StructMemberKind {
+    Field(Type),
+    Method(MethodType),
 }
