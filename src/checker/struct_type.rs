@@ -101,10 +101,7 @@ impl StructMember {
             StructMemberKind::Field(field_type) => {
                 Type::Function(FunctionType::simple(self_type, field_type.clone()))
             }
-            // TODO This has the wrong implementation for already static methods
-            StructMemberKind::Method(method) => {
-                method.function_type.clone().as_static_method(self_type)
-            }
+            StructMemberKind::Method(method) => method.as_static_method(self_type),
         }
     }
 }
