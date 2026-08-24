@@ -34,7 +34,7 @@ impl InterfaceImplementationNode {
         let mut method_names = HashSet::new();
         if let Some(methods) = self.methods.as_ref() {
             for method in methods {
-                scope = check_method(scope, &method, implemented_type.as_ref());
+                scope = check_method(scope, method, implemented_type.as_ref());
                 method_names.insert(method.name());
             }
 
