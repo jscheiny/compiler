@@ -1,9 +1,12 @@
-struct Pair(pub first: int, pub second: int) {
-    pub .sum(): int -> @first + @second;
+struct Pair(first: int, second: int, impl cool: bool) {
+    .sum(): int -> @first + @second;
+
+    impl .total(): int -> @first + @second;
 }
 
 fn test() {
     let p = Pair(3, 4);
     let t: int = p.sum();
+    let t2 = p.total();
     let x: Pair => bool = Pair::first;
 }

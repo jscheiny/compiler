@@ -7,7 +7,7 @@ struct Sub1() {
         ::super(): int -> 3;
     }
 
-    pub .sub1(): bool -> true;
+    .sub1(): bool -> true;
 }
 
 struct Sub2() {
@@ -15,7 +15,7 @@ struct Sub2() {
         ::super(): int -> 5;
     }
 
-    pub .sub2(): bool -> true;
+    .sub2(): bool -> true;
 }
 
 fn accept_super(value: Super) {

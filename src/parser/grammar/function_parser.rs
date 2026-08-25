@@ -37,11 +37,11 @@ fn implementation_impl(tokens: &mut TokenStream) -> ParseResult<ImplementationNo
 }
 
 fn method(tokens: &mut TokenStream) -> ParseResult<ImplementationEntryNode> {
-    let public = tokens.accept(Keyword::Pub);
+    let private = tokens.accept(Keyword::Impl);
     let instance_kind = method_instance_kind(tokens);
     let function = tokens.located(nested_function)?;
     Ok(ImplementationEntryNode::Method(Box::new(MethodNode {
-        public,
+        private,
         instance_kind,
         function,
     })))

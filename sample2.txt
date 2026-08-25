@@ -7,7 +7,7 @@ interface I {
 }
 
 struct S() {
-    pub .duplicate(): S {
+    .duplicate(): S {
         let g: Self = S();
     }
 

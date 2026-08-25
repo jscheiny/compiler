@@ -6,7 +6,7 @@ use crate::{
 };
 
 pub struct ExportableModuleDefinitionNode {
-    pub public: bool,
+    pub private: bool,
     pub definition: ModuleDefinitionNode,
 }
 

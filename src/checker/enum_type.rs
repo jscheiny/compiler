@@ -69,7 +69,7 @@ impl EnumType {
         if let Some(implementation) = self.node.implementation.as_ref() {
             for method in implementation.get_methods(scope) {
                 methods.entry(method.name).or_insert(EnumMethod {
-                    public: method.public,
+                    private: method.private,
                     method_type: method.method_type,
                 });
             }
@@ -87,13 +87,13 @@ impl EnumType {
 }
 
 pub struct EnumMethod {
-    pub public: bool,
+    pub private: bool,
     pub method_type: MethodType,
 }
 
 impl MemberType for EnumMethod {
-    fn is_public(&self) -> bool {
-        self.public
+    fn is_private(&self) -> bool {
+        self.private
     }
 
     fn instance_kind(&self) -> MethodInstanceKind {

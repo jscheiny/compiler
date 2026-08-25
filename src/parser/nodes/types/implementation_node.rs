@@ -25,7 +25,7 @@ impl ImplementationType {
 }
 
 pub struct Method {
-    pub public: bool,
+    pub private: bool,
     pub name: String,
     pub method_type: MethodType,
 }
@@ -73,7 +73,7 @@ impl ImplementationNode {
             match &entry.value {
                 ImplementationEntryNode::Method(method) => {
                     methods.push(Method {
-                        public: method.public,
+                        private: method.private,
                         name: method.function.name().clone(),
                         method_type: MethodType {
                             instance_kind: method.instance_kind,
@@ -86,7 +86,7 @@ impl ImplementationNode {
                     if let Some(Type::Interface(interface_type)) = interface_type {
                         for (name, method_type) in &interface_type.methods {
                             methods.push(Method {
-                                public: true,
+                                private: false,
                                 name: name.clone(),
                                 method_type: method_type.clone(),
                             });

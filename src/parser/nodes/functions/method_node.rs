@@ -10,7 +10,7 @@ pub enum MethodInstanceKind {
 }
 
 pub struct MethodNode {
-    pub public: bool,
+    pub private: bool,
     pub instance_kind: MethodInstanceKind,
     pub function: Node<FunctionNode>,
 }

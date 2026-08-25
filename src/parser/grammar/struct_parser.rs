@@ -29,18 +29,18 @@ fn fields(tokens: &mut TokenStream) -> ParseResult<Vec<Node<StructFieldNode>>> {
 }
 
 fn field(tokens: &mut TokenStream) -> ParseResult<StructFieldNode> {
-    let public = tokens.accept(Keyword::Pub);
+    let private = tokens.accept(Keyword::Impl);
     let name = tokens.name(NameType::Field)?;
     let error = SyntaxError::ExpectedType;
     match tokens.peek() {
         Token::Symbol(Symbol::Colon) => {
             tokens.next();
             let type_def = Some(tokens.located(type_definition)?);
-            Ok(StructFieldNode::new(public, name, type_def))
+            Ok(StructFieldNode::new(private, name, type_def))
         }
         Token::Symbol(Symbol::Comma | Symbol::CloseParen) => {
             tokens.push_error(error);
-            Ok(StructFieldNode::new(public, name, None))
+            Ok(StructFieldNode::new(private, name, None))
         }
         _ => Err(tokens.make_error(error)),
     }

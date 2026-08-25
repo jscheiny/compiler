@@ -21,9 +21,12 @@ pub fn program(tokens: &mut TokenStream) -> ParseResult<ProgramNode> {
 fn exportable_module_definition(
     tokens: &mut TokenStream,
 ) -> ParseResult<ExportableModuleDefinitionNode> {
-    let public = tokens.accept(Keyword::Pub);
+    let private = tokens.accept(Keyword::Impl);
     let definition = module_definition(tokens)?;
-    Ok(ExportableModuleDefinitionNode { public, definition })
+    Ok(ExportableModuleDefinitionNode {
+        private,
+        definition,
+    })
 }
 
 fn module_definition(tokens: &mut TokenStream) -> ParseResult<ModuleDefinitionNode> {

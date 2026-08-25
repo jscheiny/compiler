@@ -49,7 +49,7 @@ enum Option[T](
     None
 ) {
     // Inner generic methods
-    map[U](mapper: T => U): Option[U]
+    .map[U](mapper: T => U): Option[U]
         -> match self {
             Some(let value) -> Some(mapper(value))
             None -> None
@@ -88,7 +88,7 @@ interface Plus[T, U] {
 // Apply to your types:
 struct Position(pub row: int, pub column: int) {
     impl Plus[Position, Position] {
-        plus(other: Position): Position
+        .plus(other: Position): Position
             -> Position(@row + other.row, @column + other.column);
     }
 }
@@ -110,28 +110,6 @@ let x: Pair[int].Tuple = (3, 4);
 interface Plus[T] {
     type Result;
 
-    plus(other: T): Result;
-}
-```
-
-## Misc
-
-### Static methods
-
-Option 1:
-```
-struct Coordinate(row: int, column: int) {
-    static diagonal(value: T): Coordinate -> Coordinate(value, value);
-    magnitude(): int -> @row + @column;
-}
-
-Coordinate.diagonal // [T] (T) => Coordinate[T]
-```
-
-Option 2:
-```
-struct Coordinate(row: int, column: int) {
-    diagonal(value: T): Coordinate -> Coordinate(value, value);
-    @magnitude(): int -> @row + @column; // use @ to indicate non-static
+    .plus(other: T): Result;
 }
 ```

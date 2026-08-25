@@ -161,7 +161,7 @@ pub fn check_private_member(
     field: &NameNode,
     member: &impl MemberType,
 ) {
-    if !member.is_public() && is_external_private_access(scope, receiver_type) {
+    if member.is_private() && is_external_private_access(scope, receiver_type) {
         scope.source.print_error(
             field.span,
             &format!("Cannot access private member `{field}`"),

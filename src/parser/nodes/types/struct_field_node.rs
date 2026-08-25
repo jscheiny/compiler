@@ -6,16 +6,16 @@ use crate::{
 };
 
 pub struct StructFieldNode {
-    pub public: bool,
+    pub private: bool,
     pub name: NameNode,
     pub type_def: Option<Node<TypeNode>>,
     resolved_type: OnceCell<Type>,
 }
 
 impl StructFieldNode {
-    pub fn new(public: bool, name: NameNode, type_def: Option<Node<TypeNode>>) -> Self {
+    pub fn new(private: bool, name: NameNode, type_def: Option<Node<TypeNode>>) -> Self {
         Self {
-            public,
+            private,
             name,
             type_def,
             resolved_type: OnceCell::new(),
@@ -24,7 +24,7 @@ impl StructFieldNode {
 
     pub fn get_member(&self, scope: &Scope) -> StructMember {
         StructMember::new(
-            self.public,
+            self.private,
             StructMemberKind::Field(self.get_type(scope).clone()),
         )
     }

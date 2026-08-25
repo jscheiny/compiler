@@ -72,16 +72,16 @@ fn implemented_method(tokens: &mut TokenStream) -> ParseResult<MethodNode> {
     let instance_kind = method_instance_kind(tokens);
     let function = tokens.located(nested_function)?;
     Ok(MethodNode {
-        public: true, // Interface methods are always public
+        private: false, // Interface methods are always public
         instance_kind,
         function,
     })
 }
 
 fn no_qualifiers(tokens: &mut TokenStream) {
-    if Keyword::Pub.matches(tokens.peek()) {
+    if Keyword::Impl.matches(tokens.peek()) {
         tokens.push_error(SyntaxError::UnexpectedMethodSignatureQualifier(
-            Keyword::Pub,
+            Keyword::Impl,
         ));
         tokens.next();
     }

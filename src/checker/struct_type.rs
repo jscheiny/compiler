@@ -66,7 +66,7 @@ impl StructType {
         if let Some(implementation) = self.node.implementation.as_ref() {
             for method in implementation.get_methods(scope) {
                 members.entry(method.name).or_insert(StructMember {
-                    public: method.public,
+                    private: method.private,
                     member_kind: StructMemberKind::Method(method.method_type),
                 });
             }
@@ -84,14 +84,14 @@ impl StructType {
 }
 
 pub struct StructMember {
-    pub public: bool,
+    private: bool,
     member_kind: StructMemberKind,
 }
 
 impl StructMember {
-    pub fn new(public: bool, member_kind: StructMemberKind) -> Self {
+    pub fn new(private: bool, member_kind: StructMemberKind) -> Self {
         Self {
-            public,
+            private,
             member_kind,
         }
     }
@@ -107,8 +107,8 @@ impl StructMember {
 }
 
 impl MemberType for StructMember {
-    fn is_public(&self) -> bool {
-        self.public
+    fn is_private(&self) -> bool {
+        self.private
     }
 
     fn instance_kind(&self) -> MethodInstanceKind {
