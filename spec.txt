@@ -1,72 +1,62 @@
 // Structs
 
 struct Coordinate(x: int, y: int) {
-    pub magnitude(): int -> sqrt(@x.squared() + @y.squared())
+    .magnitude(): int -> sqrt(@x.squared() + @y.squared())
 }
 
 let x = Coordinate(x: 3, y: 5);
-x.magnitude // type () -> int
-Coordinate.magnitured // type (self: Coordinate) -> int
-
-// Tuples
-
-tuple Pair[T](pub first: T, pub second: T) {
-
-}
-
-let y = Pair(3, 4) // type Pair[int]
-Pair[int].first // type ()
+x.magnitude // type () => int
+Coordinate::magnitude // type Coordinate => int
 
 
-
-struct Coordinate(pub row: i8, pub column: i8) {
-    pub shift(row_delta: i8, column_delta: i8): Coordinate -> 
-        Coordinate(row: @row + row_relta, column: @column + column_delta);
+struct Coordinate(row: i8, column: i8) {
+    .shift(row_delta: i8, column_delta: i8): Coordinate -> 
+        Coordinate(@row + row_relta, @column + column_delta);
 }
 
 enum Orientation(Horizontal, Vertical);
 
-struct MoveCoordinate(...pub coordinate: Coordinate, pub orientation: Orientation) {
-    shift(row_delta: i8, column_delta: i8): MoveCoordinate ->
+struct MoveCoordinate(...coordinate: Coordinate, orientation: Orientation) {
+    impl .shift(row_delta: i8, column_delta: i8): MoveCoordinate ->
         MoveCoordinate(...self, coordinate: @coordinate.shift(row_delta, column_delta));
     
-    pub forward(amount: i8): MoveCoordinate ->
+    .forward(amount: i8): MoveCoordinate ->
         match @orientation {
-            Orientation.Horizontal -> @shift(0, amount),
-            Orientation.Vertical -> @shift(amount, 0),
+            Horizontal -> @shift(0, amount),
+            Vertical -> @shift(amount, 0),
         };
     
-    pub backward(amount: i8): MoveCoordinate -> @forward(-amount)
+    .backward(amount: i8): MoveCoordinate -> @forward(-amount)
 
-    pub next(): MoveCoordinate -> @forward(1)
+    .next(): MoveCoordinate -> @forward(1)
 
-    pub prev(): MoveCoordinate -> @forward(-1)
+    .prev(): MoveCoordinate -> @forward(-1)
 
-    pub ortho_forward(amount: i8): MoveCoordinate ->
+    .ortho_forward(amount: i8): MoveCoordinate ->
         match @orientation {
-            Orientation.Horizontal -> @shift(amount, 0),
-            Orientation.Vertical -> @shift(0, amount),
+            Horizontal -> @shift(amount, 0),
+            Vertical -> @shift(0, amount),
         }
 
-    pub ortho_next(): MoveCoordinate -> @ortho_forward(1)
+    .ortho_next(): MoveCoordinate -> @ortho_forward(1)
 
-    pub ortho_prev(): MoveCoordinate -> @ortho_forward(-1)
+    .ortho_prev(): MoveCoordinate -> @ortho_forward(-1)
 
-    pub oriented_index(): i8 ->
+    .oriented_index(): i8 ->
         @coordinate => match @orientation {
-            Orientation.Horizontal -> .row
-            Orientation.Vertical -> .column
+            Horizontal -> .row
+            Vertical -> .column
         };
     
-    pub ortho_index(): i8 ->
+    .ortho_index(): i8 ->
         @coordinate => match @orientation {
-            Orientation.Horizontal -> .column,
-            Orientation.Vertical -> .row,
+            Horizontal -> .column,
+            Vertical -> .row,
         };
 }
 
-struct SearchCoordinate(pub index: usize, orientation: Orientation, next_delta: usize) {
-    static new(coord: MoveCoordinate, board_columns: usize): SearchCoordinate {
+struct SearchCoordinate(index: usize, orientation: Orientation, impl next_delta: usize) {
+    ::new(coord: MoveCoordinate, board_columns: usize): SearchCoordinate {
         let MoveCoordinate(coordinate, orientation) = coord;
         let index = coord.row as usize * board_columns + coordinate.column as usize;
         let next_delta = match orientation {
@@ -77,7 +67,7 @@ struct SearchCoordinate(pub index: usize, orientation: Orientation, next_delta: 
         -> SearchCoordinate(index, orientation, next_delta)
     }
 
-    next(): SearchCoordinate ->
+    .next(): SearchCoordinate ->
         SearchCoordinate(
             ...self,
             index: @index + self.next_delta,
@@ -90,7 +80,7 @@ struct RawBoard[Square](
     pub bounds: Coordinate,
     pub contents: Vec[Square],
 ) {
-    static pub new(rows: usize, columns: usize, fill: Square): RawBoard[Square] ->
+    ::new(rows: usize, columns: usize, fill: Square): RawBoard[Square] ->
         RawBoard(
             rows,
             columns,
@@ -98,7 +88,7 @@ struct RawBoard[Square](
             contents: Vec.new(rows * columns, fill)
         );
 
-    static pub from_vec(board: Vec[Vec[Square]]): RawBoard[Square] {
+    .from_vec(board: Vec[Vec[Square]]): RawBoard[Square] {
         let rows = board.len();
         let columns = board[0].len();
         let bounds = Coordinate(rows, columns);
@@ -106,13 +96,13 @@ struct RawBoard[Square](
         -> RawBoard(rows, columns, bounds, contents);
     }
 
-    pub is_out_of_bounds(coordinate: Coordinate): bool ->
+    .is_out_of_bounds(coordinate: Coordinate): bool ->
         coordinate.row < 0
             or coordinate.column < 0
             or coordinate.row >= @rows
             or coordinate.column >= @columns;
 
-    static make_board(rows: usize, columns: usize, fill: Square): Vec[Square] ->
+    impl ::make_board(rows: usize, columns: usize, fill: Square): Vec[Square] ->
         Vec.new(rows * columns, fill);
 }
 
@@ -121,7 +111,7 @@ enum Premium(
     WordMultiplier(Score),
     None
 ) {
-    static pub from(symbol: char): Premium {
+    ::from(symbol: char): Premium {
         if symbol.is_alphabetic() {
             let letter_multiplier = LETTER_SYMBOLS.position(symbol);
             -> match letter_multiplier {
