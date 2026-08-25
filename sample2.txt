@@ -3,16 +3,16 @@ enum X(A, B, C,) {
 }
 
 interface I {
-    ::get_self(): int;
+    .get_self(): int;
 }
 
 struct S() {
-    pub ::duplicate(): S {
+    pub .duplicate(): S {
         let g: Self = S();
     }
 
-    impl I {
-        get_self(): int -> 5;
+    as I {
+        .get_self(): int -> 5;
     }
 }
 

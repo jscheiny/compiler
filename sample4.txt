@@ -3,7 +3,7 @@ interface Super {
 }
 
 struct Sub1() {
-    impl Super {
+    as Super {
         ::super(): int -> 3;
     }
 
@@ -11,7 +11,7 @@ struct Sub1() {
 }
 
 struct Sub2() {
-    impl Super {
+    as Super {
         ::super(): int -> 5;
     }
 

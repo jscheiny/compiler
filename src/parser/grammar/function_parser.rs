@@ -26,7 +26,7 @@ fn implementation_impl(tokens: &mut TokenStream) -> ParseResult<ImplementationNo
     tokens.next();
     let mut entries = vec![];
     while !tokens.accept(Symbol::CloseBrace) {
-        if tokens.accept(Keyword::Impl) {
+        if tokens.accept(Keyword::As) {
             entries.push(tokens.located(interface_implementation)?);
         } else {
             entries.push(tokens.located(method)?);

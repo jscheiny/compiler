@@ -7,6 +7,7 @@ use crate::lexer::{EnumToken, Token, TokenMatch};
 #[derive(Clone, Copy, Debug, EnumIter, PartialEq, Eq)]
 pub enum Keyword {
     And,
+    As,
     Bool,
     Break,
     Char,
@@ -43,6 +44,7 @@ impl EnumToken for Keyword {
     fn as_str(&self) -> &str {
         match self {
             Self::And => "and",
+            Self::As => "as",
             Self::Bool => "bool",
             Self::Break => "break",
             Self::Char => "char",

@@ -27,7 +27,7 @@ fn using_it() {
 
 // Operator overloading
 struct Coordinate(pub x: int, pub y: int) {
-    impl Add[Coordinate, Coordinate] {
+    as Add[Coordinate, Coordinate] {
         operator_add(addened: Coordinate): Coordinate
             -> Coordinate(@x + other.x, @y + other.y);
     }
@@ -60,7 +60,7 @@ interface Stringify {
 }
 
 struct Pair[T: Stringify](first: T, second: T) {
-    impl Stringify {
+    as Stringify {
         // Also string interpolation would be nice
         pub to_string(): [char] -> "(" + @left.to_string() + ", " + @right.to_string() ")";
     }
