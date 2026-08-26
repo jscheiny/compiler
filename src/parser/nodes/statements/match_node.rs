@@ -57,11 +57,11 @@ impl MatchNode {
 
     fn check_subject(&self, scope: Box<Scope>) -> (Box<Scope>, Type) {
         let (scope, subject_type) = self.subject.check(scope);
-        if !matches!(subject_type, Type::Enum(_)) && !subject_type.is_error() {
+        if !matches!(subject_type, Type::Enum(_) | Type::Tuple(_)) && !subject_type.is_error() {
             // TODO handle other types besides enums
             scope.source.print_error(
                 self.subject.span,
-                "Match expressions only support enums",
+                "Match expressions only support enums and tuples",
                 &format!("found type: `{subject_type}`"),
             );
         }

@@ -2,8 +2,8 @@ use crate::{
     lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
         ExpressionNode, MatchCaseNode, MatchNode, MatchPatternNode, NameType, ParseResult,
-        StatementNode, SyntaxError, TokenStream, VariantMatchPatternNode,
-        grammar::{end_statement, expression},
+        StatementNode, SyntaxError, TokenStream, TupleMatchPatternNode, VariantMatchPatternNode,
+        grammar::{comma_separated_list, end_statement, expression},
     },
 };
 
@@ -78,6 +78,15 @@ fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<Match
                     inner_pattern: None,
                 }))
             }
+        }
+        Token::Symbol(Symbol::OpenParen) => {
+            tokens.next();
+            let inner_patterns = comma_separated_list(tokens, Symbol::CloseParen, |tokens| {
+                match_pattern(tokens, false)
+            })?;
+            Ok(MatchPatternNode::Tuple(TupleMatchPatternNode {
+                inner_patterns,
+            }))
         }
         Token::Keyword(Keyword::Let) => {
             if top_level {
