@@ -8,6 +8,7 @@ use crate::{
 pub enum MatchPatternNode {
     Variant(VariantMatchPattern),
     Binding(NameNode),
+    Wildcard,
     Else,
 }
 
@@ -32,7 +33,7 @@ impl MatchPatternNode {
                     bindings.insert(name.value.clone(), subject_type.clone());
                 }
             }
-            MatchPatternNode::Else => {}
+            MatchPatternNode::Wildcard | MatchPatternNode::Else => {}
         }
     }
 }

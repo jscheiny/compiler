@@ -87,6 +87,13 @@ fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<Match
             let name = tokens.name(NameType::PatternBinding)?;
             Ok(MatchPatternNode::Binding(name))
         }
+        Token::Symbol(Symbol::Times) => {
+            if top_level {
+                tokens.push_error(SyntaxError::UnexpectedBindingPattern);
+            }
+            tokens.next();
+            Ok(MatchPatternNode::Wildcard)
+        }
         _ => Err(tokens.make_error(SyntaxError::ExpectedMatchPattern)),
     }
 }
