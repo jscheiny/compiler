@@ -11,7 +11,12 @@ pub struct VariantMatchPatternNode {
 }
 
 impl VariantMatchPatternNode {
-    pub fn check(&self, scope: &Scope, bindings: &mut HashMap<String, Type>, subject_type: &Type) {
+    pub fn check(
+        &self,
+        scope: &Scope,
+        pattern_bindings: &mut HashMap<String, Type>,
+        subject_type: &Type,
+    ) {
         if let Type::Enum(enum_type) = subject_type {
             if let Some(variant) = enum_type.get_variants(scope).get(&self.name.value) {
                 if let Some(inner_type) = variant {
@@ -23,7 +28,7 @@ impl VariantMatchPatternNode {
                             &format!("typed variant `{}` must have a binding pattern", self.name),
                         );
                     } else {
-                        return self.check_inner_pattern(scope, bindings, inner_type);
+                        return self.check_inner_pattern(scope, pattern_bindings, inner_type);
                     }
                 } else if let Some(inner_pattern) = self.inner_pattern.as_ref() {
                     scope.source.print_error(
@@ -49,7 +54,7 @@ impl VariantMatchPatternNode {
                 &format!("cannot use variant pattern on non-enum type `{subject_type}`"),
             );
         }
-        self.check_inner_pattern(scope, bindings, &Type::Error);
+        self.check_inner_pattern(scope, pattern_bindings, &Type::Error);
     }
 
     fn check_inner_pattern(

@@ -17,20 +17,20 @@ impl MatchPatternNode {
         &self,
         scope: &Scope,
         span: TokenSpan,
-        bindings: &mut HashMap<String, Type>,
+        pattern_bindings: &mut HashMap<String, Type>,
         subject_type: &Type,
     ) {
         match self {
-            Self::Variant(pattern) => pattern.check(scope, bindings, subject_type),
+            Self::Variant(pattern) => pattern.check(scope, pattern_bindings, subject_type),
             Self::Binding(name) => {
-                if bindings.contains_key(&name.value) {
+                if pattern_bindings.contains_key(&name.value) {
                     scope.source.print_error(
                         span,
                         &format!("Duplicate pattern binding of `{name}`"),
                         "a binding of this name is declared elsewhere in this pattern",
                     );
                 } else {
-                    bindings.insert(name.value.clone(), subject_type.clone());
+                    pattern_bindings.insert(name.value.clone(), subject_type.clone());
                 }
             }
             Self::Wildcard | Self::Else => {}

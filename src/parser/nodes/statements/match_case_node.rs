@@ -17,11 +17,15 @@ impl MatchCaseNode {
         expected_type: Option<&Type>,
         subject_type: &Type,
     ) -> (Box<Scope>, Type) {
-        let mut bindings = HashMap::new();
-        self.pattern
-            .check(&scope, self.pattern.span, &mut bindings, subject_type);
+        let mut pattern_bindings = HashMap::new();
+        self.pattern.check(
+            &scope,
+            self.pattern.span,
+            &mut pattern_bindings,
+            subject_type,
+        );
         scope.nest_with(ScopeType::MatchCase, |mut scope| {
-            for (name, bound_type) in bindings {
+            for (name, bound_type) in pattern_bindings {
                 scope.add_value(name.as_str(), bound_type);
             }
             let (scope, resolved_type) = self.if_match.check_expected(scope, expected_type);
