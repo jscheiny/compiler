@@ -62,6 +62,15 @@ fn match_case(tokens: &mut TokenStream) -> ParseResult<MatchCaseNode> {
 
 fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<MatchPatternNode> {
     match tokens.peek() {
+        Token::Symbol(Symbol::OpenParen) => {
+            tokens.next();
+            let inner_patterns = comma_separated_list(tokens, Symbol::CloseParen, |tokens| {
+                match_pattern(tokens, false)
+            })?;
+            Ok(MatchPatternNode::Tuple(TupleMatchPatternNode {
+                inner_patterns,
+            }))
+        }
         Token::Name(name) => {
             let name = tokens.current_span().wrap(name.clone());
             tokens.next();
@@ -78,15 +87,6 @@ fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<Match
                     inner_pattern: None,
                 }))
             }
-        }
-        Token::Symbol(Symbol::OpenParen) => {
-            tokens.next();
-            let inner_patterns = comma_separated_list(tokens, Symbol::CloseParen, |tokens| {
-                match_pattern(tokens, false)
-            })?;
-            Ok(MatchPatternNode::Tuple(TupleMatchPatternNode {
-                inner_patterns,
-            }))
         }
         Token::Keyword(Keyword::Let) => {
             if top_level {
