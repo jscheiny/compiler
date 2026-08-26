@@ -2,7 +2,7 @@ use crate::{
     lexer::{Keyword, Symbol, Token, TokenMatch},
     parser::{
         ExpressionNode, MatchCaseNode, MatchNode, MatchPatternNode, NameType, ParseResult,
-        StatementNode, SyntaxError, TokenStream, VariantMatchPattern,
+        StatementNode, SyntaxError, TokenStream, VariantMatchPatternNode,
         grammar::{end_statement, expression},
     },
 };
@@ -68,12 +68,12 @@ fn match_pattern(tokens: &mut TokenStream, top_level: bool) -> ParseResult<Match
             if tokens.accept(Symbol::OpenParen) {
                 let inner_pattern = tokens.located_with(match_pattern, false)?;
                 tokens.expect(Symbol::CloseParen, SyntaxError::ExpectedCloseParen)?;
-                Ok(MatchPatternNode::Variant(VariantMatchPattern {
+                Ok(MatchPatternNode::Variant(VariantMatchPatternNode {
                     name,
                     inner_pattern: Some(Box::new(inner_pattern)),
                 }))
             } else {
-                Ok(MatchPatternNode::Variant(VariantMatchPattern {
+                Ok(MatchPatternNode::Variant(VariantMatchPatternNode {
                     name,
                     inner_pattern: None,
                 }))
