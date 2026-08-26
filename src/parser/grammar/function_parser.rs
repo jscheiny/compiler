@@ -116,7 +116,6 @@ fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyNode> {
 
 pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<Node<ParameterNode>>> {
     use Symbol as S;
-    let error = SyntaxError::ExpectedParameters;
     match tokens.peek() {
         Token::Symbol(S::OpenParen) => {
             tokens.next();
@@ -124,10 +123,10 @@ pub fn parameters(tokens: &mut TokenStream) -> ParseResult<Vec<Node<ParameterNod
             Ok(list)
         }
         Token::Symbol(S::SkinnyArrow | S::OpenBrace) => {
-            tokens.push_error(error);
+            tokens.push_error(SyntaxError::ExpectedParameters);
             Ok(vec![])
         }
-        _ => Err(tokens.make_error(error)),
+        _ => Err(tokens.make_error(SyntaxError::ExpectedParameters)),
     }
 }
 

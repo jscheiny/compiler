@@ -46,17 +46,16 @@ fn declaration(tokens: &mut TokenStream, mutable: bool) -> ParseResult<Statement
 }
 
 fn initializer(tokens: &mut TokenStream) -> ParseResult<Option<Node<ExpressionNode>>> {
-    let error = SyntaxError::ExpectedInitializer;
     match tokens.peek() {
         Token::Symbol(Symbol::Equal) => {
             tokens.next();
             Ok(Some(tokens.located(expression)?))
         }
         Token::Symbol(Symbol::Semicolon) => {
-            tokens.push_error(error);
+            tokens.push_error(SyntaxError::ExpectedInitializer);
             Ok(None)
         }
-        _ => Err(tokens.make_error(error)),
+        _ => Err(tokens.make_error(SyntaxError::ExpectedInitializer)),
     }
 }
 
