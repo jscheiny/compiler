@@ -2,11 +2,10 @@ use std::collections::HashMap;
 
 use crate::{
     checker::{Scope, Type},
-    parser::{NameNode, TokenSpan, TupleMatchPatternNode, VariantMatchPatternNode},
+    parser::{NameNode, TokenSpan, VariantMatchPatternNode},
 };
 
 pub enum MatchPatternNode {
-    Tuple(TupleMatchPatternNode),
     Variant(VariantMatchPatternNode),
     Binding(NameNode),
     Wildcard,
@@ -22,7 +21,6 @@ impl MatchPatternNode {
         subject_type: &Type,
     ) {
         match self {
-            Self::Tuple(node) => node.check(scope, span, pattern_bindings, subject_type),
             Self::Variant(node) => node.check(scope, pattern_bindings, subject_type),
             Self::Binding(name) => {
                 if pattern_bindings.contains_key(&name.value) {
