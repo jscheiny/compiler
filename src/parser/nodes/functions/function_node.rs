@@ -17,7 +17,10 @@ impl FunctionNode {
 
     pub fn check(&self, scope: Box<Scope>) -> Box<Scope> {
         let return_type = &self.get_type(&*scope).return_type;
-        scope.nest_fn(return_type, |scope| {
+        scope.nest_fn(return_type, |mut scope| {
+            if let Some(type_parameters) = self.signature.type_parameters.as_ref() {
+                scope = type_parameters.check(scope, type_parameters.span);
+            }
             let scope = self.check_params(scope);
             match &self.body.value {
                 FunctionBodyNode::Expression(expression) => {
@@ -46,6 +49,12 @@ impl FunctionNode {
     }
 
     fn check_params(&self, mut scope: Box<Scope>) -> Box<Scope> {
+        let type_params = self
+            .signature
+            .type_parameters
+            .as_ref()
+            .map(|type_parameters| type_parameters.get_types_map());
+
         let mut param_names = HashSet::new();
         for param in self.signature.body_parameters.iter() {
             if param_names.contains(&param.name.value) {
@@ -56,7 +65,10 @@ impl FunctionNode {
                 );
             } else {
                 param_names.insert(param.name.clone());
-                scope.add_value(&param.name, param.get_body_type(&*scope).clone());
+                scope.add_value(
+                    &param.name,
+                    param.get_body_type(&*scope, type_params).clone(),
+                );
             }
         }
         scope

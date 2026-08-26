@@ -6,7 +6,7 @@ use crate::{
         Node, ParameterNode, ParseResult, SyntaxError, TokenStream,
         grammar::{
             BlockType, block, comma_separated_list, end_statement, expression,
-            interface_implementation, type_definition,
+            interface_implementation, type_definition, type_parameter_list,
         },
     },
 };
@@ -85,6 +85,7 @@ pub fn function_signature(
     name_type: NameType,
 ) -> ParseResult<FunctionSignatureNode> {
     let name = tokens.name(name_type)?;
+    let type_parameters = type_parameter_list(tokens)?;
     let parameters = tokens.located(parameters)?;
     let return_type = if tokens.accept(Symbol::Colon) {
         Some(tokens.located(type_definition)?)
@@ -92,7 +93,12 @@ pub fn function_signature(
         None
     };
 
-    Ok(FunctionSignatureNode::new(name, parameters, return_type))
+    Ok(FunctionSignatureNode::new(
+        name,
+        type_parameters,
+        parameters,
+        return_type,
+    ))
 }
 
 fn function_body(tokens: &mut TokenStream) -> ParseResult<FunctionBodyNode> {

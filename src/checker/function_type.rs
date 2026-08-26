@@ -1,15 +1,25 @@
 use std::rc::Rc;
 
-use crate::checker::{Type, TypeParameterBindings, Types};
+use crate::checker::{Type, TypeParameterBindings, TypeParameterList, Types};
 
 pub struct FunctionType {
+    pub type_parameters: Option<TypeParameterList>,
     pub parameters: Vec<Type>,
     pub return_type: Box<Type>,
 }
 
 impl FunctionType {
     pub fn new(parameters: Vec<Type>, return_type: Type) -> Rc<Self> {
+        Self::generic(None, parameters, return_type)
+    }
+
+    pub fn generic(
+        type_parameters: Option<TypeParameterList>,
+        parameters: Vec<Type>,
+        return_type: Type,
+    ) -> Rc<Self> {
         Rc::new(Self {
+            type_parameters,
             parameters,
             return_type: Box::new(return_type),
         })

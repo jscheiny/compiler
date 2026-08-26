@@ -1,7 +1,7 @@
 use std::cell::OnceCell;
 
 use crate::{
-    checker::{Type, Types},
+    checker::{Type, TypeParameterMap, Types},
     parser::{NameNode, Node, TypeNode, get_maybe_spread_type},
 };
 
@@ -22,19 +22,28 @@ impl ParameterNode {
         }
     }
 
-    pub fn get_call_type(&self, types: &impl Types) -> Vec<Type> {
-        let body_type = self.get_body_type(types);
+    pub fn get_call_type(
+        &self,
+        types: &impl Types,
+        type_params: Option<&TypeParameterMap>,
+    ) -> Vec<Type> {
+        let body_type = self.get_body_type(types, type_params);
         let type_span = self.type_def.as_ref().map(|t| t.span);
         get_maybe_spread_type(types, self.is_spread, body_type.clone(), type_span)
     }
 
-    pub fn get_body_type(&self, types: &impl Types) -> &Type {
-        self.resolved_type.get_or_init(|| self.init_type(types))
+    pub fn get_body_type(
+        &self,
+        types: &impl Types,
+        type_params: Option<&TypeParameterMap>,
+    ) -> &Type {
+        self.resolved_type
+            .get_or_init(|| self.init_type(types, type_params))
     }
 
-    fn init_type(&self, types: &impl Types) -> Type {
+    fn init_type(&self, types: &impl Types, type_params: Option<&TypeParameterMap>) -> Type {
         match self.type_def.as_ref() {
-            Some(type_def) => type_def.get_type(types, None),
+            Some(type_def) => type_def.get_type(types, type_params),
             None => Type::Error,
         }
     }
