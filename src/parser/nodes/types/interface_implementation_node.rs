@@ -39,11 +39,14 @@ impl InterfaceImplementationNode {
             }
 
             if let Some(Type::Interface(interface_type)) = implemented_type.as_ref() {
-                for method in interface_type.methods.keys() {
+                for method in interface_type.get_methods(&scope).keys() {
                     if !method_names.contains(method) {
                         scope.source.print_error(
                             self.name.span,
-                            &format!("Implementation of `{}` is incomplete", interface_type.name),
+                            &format!(
+                                "Implementation of `{}` is incomplete",
+                                interface_type.name()
+                            ),
                             &format!("does not implement method `{method}`"),
                         );
                     }
@@ -89,7 +92,8 @@ impl InterfaceImplementationNode {
                             "Cannot infer interface implementation",
                             &format!(
                                 "variant `{}` does not implement `{}`",
-                                variant_name, interface_type.name
+                                variant_name,
+                                interface_type.name()
                             ),
                         );
                     }
@@ -111,7 +115,7 @@ fn check_method(
     implemented_type: Option<&Type>,
 ) -> Box<Scope> {
     if let Some(Type::Interface(interface_type)) = implemented_type {
-        let interface_method = interface_type.methods.get(method.name());
+        let interface_method = interface_type.get_method(&scope, method.name());
         if let Some(interface_method) = interface_method {
             check_method_equivalence(&scope, interface_method, method);
         }

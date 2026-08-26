@@ -84,7 +84,7 @@ impl ImplementationNode {
                 ImplementationEntryNode::Interface(implementation) => {
                     let interface_type = scope.get_type(&implementation.name);
                     if let Some(Type::Interface(interface_type)) = interface_type {
-                        for (name, method_type) in &interface_type.methods {
+                        for (name, method_type) in interface_type.get_methods(scope) {
                             methods.push(Method {
                                 private: false,
                                 name: name.clone(),
@@ -100,7 +100,7 @@ impl ImplementationNode {
     }
 
     pub fn implements(&self, scope: &Scope, interface_type: &Rc<InterfaceType>) -> bool {
-        let interface_type_id = scope.global().get_type_id(&interface_type.name);
+        let interface_type_id = scope.global().get_type_id(interface_type.name());
         match interface_type_id {
             Some(type_id) => self
                 .implemented_interfaces

@@ -1,17 +1,13 @@
-use std::{
-    cell::OnceCell,
-    collections::{HashMap, HashSet},
-    rc::Rc,
-};
+use std::{cell::OnceCell, collections::HashSet, rc::Rc};
 
 use crate::{
-    checker::{InterfaceType, MethodType, Scope, Types},
+    checker::{InterfaceType, Scope},
     parser::{MethodSignatureNode, NameNode, NodeVec},
 };
 
 pub struct InterfaceNode {
     pub name: NameNode,
-    method_signatures: NodeVec<MethodSignatureNode>,
+    pub method_signatures: NodeVec<MethodSignatureNode>,
     resolved_type: OnceCell<Rc<InterfaceType>>,
 }
 
@@ -40,25 +36,9 @@ impl InterfaceNode {
         scope
     }
 
-    pub fn get_type(&self, types: &impl Types) -> Rc<InterfaceType> {
+    pub fn get_type(self: &Rc<Self>) -> Rc<InterfaceType> {
         self.resolved_type
-            .get_or_init(|| self.init_type(types))
+            .get_or_init(|| InterfaceType::from(self.clone()))
             .clone()
-    }
-
-    fn init_type(&self, types: &impl Types) -> Rc<InterfaceType> {
-        let mut methods = HashMap::new();
-        for method in self.method_signatures.iter() {
-            let name = method.signature.name.clone();
-            methods.entry(name).or_insert_with(|| MethodType {
-                instance_kind: method.instance_kind,
-                function_type: method.signature.get_type(types).clone(),
-            });
-        }
-
-        Rc::new(InterfaceType {
-            name: self.name.clone(),
-            methods,
-        })
     }
 }

@@ -42,7 +42,11 @@ impl ModuleDefinitionNode {
                 node.get_type().complete(scope);
                 None
             }
-            Self::Interface(_) | Self::TypeAlias(_) => None,
+            Self::Interface(node) => {
+                node.get_type().complete(scope);
+                None
+            }
+            Self::TypeAlias(_) => None,
         };
 
         if let Some(resolved_type) = resolved_type {

@@ -65,7 +65,7 @@ impl Type {
             },
             Type::Generic(_) => panic!("It should not be possible to produce a generic type"),
             Type::Interface(left) => match other {
-                Type::Interface(right) => left.name == right.name,
+                Type::Interface(right) => left.name() == right.name(),
                 Type::Enum(right) => right.implements(scope, left),
                 Type::Struct(right) => right.implements(scope, left),
                 _ => false,
@@ -164,7 +164,7 @@ impl Display for Type {
                 write_list(f, &generic_type.type_parameters)?;
                 write!(f, "]")
             }
-            Type::Interface(interface_type) => write!(f, "{}", interface_type.name),
+            Type::Interface(interface_type) => write!(f, "{}", interface_type.name()),
             Type::Primitive(primitive_type) => write!(f, "{primitive_type}"),
             Type::Struct(struct_type) => write!(f, "{}", struct_type.name()),
             Type::Tuple(items) => {

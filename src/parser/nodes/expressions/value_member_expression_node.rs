@@ -97,7 +97,7 @@ pub fn get_field(
         }
         Type::Generic(_) => panic!("It should not be possible to produce an unbound generic type"),
         Type::Interface(interface_type) => {
-            let method = interface_type.methods.get(&field.value);
+            let method = interface_type.get_method(scope, &field.value);
             if let Some(method) = method {
                 Type::Function(method.function_type.clone())
             } else {
@@ -106,7 +106,7 @@ pub fn get_field(
                     &format!("Could not find method `{field}`"),
                     &format!(
                         "interface `{}` has no such method `{field}`",
-                        interface_type.name
+                        interface_type.name()
                     ),
                 );
                 Type::Error
